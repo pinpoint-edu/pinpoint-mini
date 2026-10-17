@@ -1129,7 +1129,7 @@ var TabDisguiser = window.TabDisguiser || {
         try {
             // Avoid showing inside textbook game iframes
             if (window.location.pathname.includes('/textbooks/')) return;
-            const widgetDismissed = localStorage.getItem('pinpoint_info_widget_dismissed_v3') === 'true';
+            const widgetDismissed = localStorage.getItem('pinpoint_info_widget_dismissed_v4') === 'true';
             if (!widgetDismissed) {
                 this.showInfoWidget();
             }
@@ -1143,8 +1143,8 @@ var TabDisguiser = window.TabDisguiser || {
             if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
         }
         try {
-            localStorage.setItem('pinpoint_info_widget_dismissed_v3', 'true');
-            sessionStorage.setItem('pinpoint_info_widget_dismissed_v3', 'true');
+            localStorage.setItem('pinpoint_info_widget_dismissed_v4', 'true');
+            sessionStorage.setItem('pinpoint_info_widget_dismissed_v4', 'true');
         } catch (err) {}
         const widget = document.getElementById('pinpoint-info-widget');
         if (widget) {
@@ -1156,7 +1156,7 @@ var TabDisguiser = window.TabDisguiser || {
 
     showInfoWidget(force = false) {
         if (!force) {
-            const dismissed = localStorage.getItem('pinpoint_info_widget_dismissed_v3') === 'true';
+            const dismissed = localStorage.getItem('pinpoint_info_widget_dismissed_v4') === 'true';
             if (dismissed) return;
         }
 
@@ -1167,7 +1167,7 @@ var TabDisguiser = window.TabDisguiser || {
 
         let existing = document.getElementById('pinpoint-info-widget');
         if (existing) {
-            if (!force && localStorage.getItem('pinpoint_info_widget_dismissed_v3') === 'true') {
+            if (!force && localStorage.getItem('pinpoint_info_widget_dismissed_v4') === 'true') {
                 existing.remove();
                 return;
             }
@@ -1375,7 +1375,21 @@ var TabDisguiser = window.TabDisguiser || {
                     <div id="info-script-toast" style="display:none;font-size:10.5px;color:#137333;font-weight:500;">✓ Script link copied to clipboard!</div>
                 </div>
 
-                <!-- 1. Bit Planes Online -->
+                <!-- 1. Flash & Ruffle Save Manager -->
+                <div class="pinpoint-list-item">
+                    <div class="pinpoint-item-head">
+                        <div class="pinpoint-item-title">
+                            <span class="material-symbols-outlined notranslate" style="font-size:16px;color:#e37400;line-height:1;">flash_on</span>
+                            <span>Flash & Ruffle Save Manager</span>
+                        </div>
+                        <span class="pinpoint-badge pinpoint-badge-addition">Addition</span>
+                    </div>
+                    <div class="pinpoint-item-desc">
+                        Proper save file export and import now supported for all Flash & Ruffle games (Bloons TD, Happy Wheels, Sprinter) directly from the runner topbar.
+                    </div>
+                </div>
+
+                <!-- 2. Bit Planes Online -->
                 <div class="pinpoint-list-item">
                     <div class="pinpoint-item-head">
                         <div class="pinpoint-item-title">
@@ -1389,7 +1403,7 @@ var TabDisguiser = window.TabDisguiser || {
                     </div>
                 </div>
 
-                <!-- 2. Library -->
+                <!-- 3. Library -->
                 <div class="pinpoint-list-item">
                     <div class="pinpoint-item-head">
                         <div class="pinpoint-item-title">
@@ -1403,7 +1417,7 @@ var TabDisguiser = window.TabDisguiser || {
                     </div>
                 </div>
 
-                <!-- 3. Bug Fix -->
+                <!-- 4. Bug Fix -->
                 <div class="pinpoint-list-item">
                     <div class="pinpoint-item-head">
                         <div class="pinpoint-item-title">
@@ -1414,20 +1428,6 @@ var TabDisguiser = window.TabDisguiser || {
                     </div>
                     <div class="pinpoint-item-desc">
                         Fixed 503 byte timeouts on jsDelivr mirrors, multi-file games, and Ruffle Flash WASM loading.
-                    </div>
-                </div>
-
-                <!-- 4. Retro Bowl Saves -->
-                <div class="pinpoint-list-item">
-                    <div class="pinpoint-item-head">
-                        <div class="pinpoint-item-title">
-                            <span class="material-symbols-outlined notranslate" style="font-size:16px;color:#137333;line-height:1;">sports_football</span>
-                            <span>Retro Bowl Dynasty Saves</span>
-                        </div>
-                        <span class="pinpoint-badge pinpoint-badge-addition">Addition</span>
-                    </div>
-                    <div class="pinpoint-item-desc">
-                        Export and import season save files for Retro Bowl & Retro Bowl College right from the runner topbar.
                     </div>
                 </div>
             </div>

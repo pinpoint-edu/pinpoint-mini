@@ -8,6 +8,33 @@
 
   const SAVE_SALT = 'PinpointMini_SecureSave_v1';
 
+  // Detect if a string value is Ruffle / Flash SharedObject (SOL) binary base64 data
+  function isRuffleSolData(val) {
+    if (!val || typeof val !== 'string' || val.length < 20) return false;
+    try {
+      const raw = atob(val.slice(0, 64));
+      return raw.length >= 10 && raw.indexOf('TCSO') !== -1;
+    } catch(e) {
+      return false;
+    }
+  }
+
+  // Extract SharedObject name from Ruffle SOL base64 data
+  function getSolInfo(base64Str) {
+    if (!isRuffleSolData(base64Str)) return null;
+    try {
+      const raw = atob(base64Str.slice(0, 100));
+      const tcsoIdx = raw.indexOf('TCSO');
+      if (tcsoIdx === -1 || raw.length < tcsoIdx + 10) return null;
+      const lenIdx = tcsoIdx + 8;
+      const nameLen = (raw.charCodeAt(lenIdx) << 8) | raw.charCodeAt(lenIdx + 1);
+      const soName = raw.slice(lenIdx + 2, lenIdx + 2 + nameLen);
+      return { name: soName };
+    } catch(e) {
+      return null;
+    }
+  }
+
   // Game Save Configurations for Supported Games
   const GAME_CONFIGS = {
     'retro-bowl': {
@@ -64,6 +91,117 @@
         }
         return { valid: true };
       }
+    },
+    'bloons-td': {
+      id: 'bloons-td',
+      title: 'Bloons TD',
+      isRuffle: true,
+      matchers: [
+        /textbooks\/bloons-td\.html/i,
+        /textbooks\/bloons-td/i,
+        /bloons-td\.swf/i,
+        /^bloons-td$/i,
+        /^bloons td$/i,
+        /^bloons$/i
+      ],
+      isKeyMatch: (key, val) => {
+        if (!key || typeof key !== 'string') return false;
+        const kLower = key.toLowerCase();
+        if (kLower.includes('college') || kLower.includes('happy') || kLower.includes('sprinter') || kLower.includes('retrobowl')) {
+          return false;
+        }
+        if (kLower.includes('bloons') || kLower.includes('btd')) return true;
+        if (val && isRuffleSolData(val)) {
+          const info = getSolInfo(val);
+          if (info && info.name && (info.name.toLowerCase().includes('bloon') || info.name.toLowerCase().includes('btd'))) return true;
+          if (kLower.includes('bloons-td.swf')) return true;
+        }
+        return false;
+      },
+      validateData: (data) => {
+        const keys = Object.keys(data || {});
+        if (keys.length === 0) return { valid: false, error: 'No save data entries found.' };
+        for (const k of keys) {
+          const kLower = k.toLowerCase();
+          if (kLower.includes('college') || kLower.includes('happy') || kLower.includes('sprinter') || kLower.includes('retrobowl')) {
+            return { valid: false, error: `Incompatible save key '${k}' detected for Bloons TD.` };
+          }
+        }
+        return { valid: true };
+      }
+    },
+    'happy-wheels': {
+      id: 'happy-wheels',
+      title: 'Happy Wheels',
+      isRuffle: true,
+      matchers: [
+        /textbooks\/happy-wheels\.html/i,
+        /textbooks\/happy-wheels/i,
+        /happy-wheels\.swf/i,
+        /^happy-wheels$/i,
+        /^happy wheels$/i
+      ],
+      isKeyMatch: (key, val) => {
+        if (!key || typeof key !== 'string') return false;
+        const kLower = key.toLowerCase();
+        if (kLower.includes('college') || kLower.includes('bloon') || kLower.includes('sprinter') || kLower.includes('retrobowl')) {
+          return false;
+        }
+        if (kLower.includes('happy') || kLower.includes('wheels') || kLower.includes('totaljerkface')) return true;
+        if (val && isRuffleSolData(val)) {
+          const info = getSolInfo(val);
+          if (info && info.name && (info.name.toLowerCase().includes('happy') || info.name.toLowerCase().includes('wheel') || info.name.toLowerCase().includes('user') || info.name.toLowerCase().includes('prop'))) return true;
+          if (kLower.includes('happy-wheels.swf')) return true;
+        }
+        return false;
+      },
+      validateData: (data) => {
+        const keys = Object.keys(data || {});
+        if (keys.length === 0) return { valid: false, error: 'No save data entries found.' };
+        for (const k of keys) {
+          const kLower = k.toLowerCase();
+          if (kLower.includes('college') || kLower.includes('bloon') || kLower.includes('sprinter') || kLower.includes('retrobowl')) {
+            return { valid: false, error: `Incompatible save key '${k}' detected for Happy Wheels.` };
+          }
+        }
+        return { valid: true };
+      }
+    },
+    'sprinter': {
+      id: 'sprinter',
+      title: 'Sprinter',
+      isRuffle: true,
+      matchers: [
+        /textbooks\/sprinter(\/index\.html)?/i,
+        /textbooks\/sprinter/i,
+        /sprinter\.swf/i,
+        /^sprinter$/i
+      ],
+      isKeyMatch: (key, val) => {
+        if (!key || typeof key !== 'string') return false;
+        const kLower = key.toLowerCase();
+        if (kLower.includes('college') || kLower.includes('bloon') || kLower.includes('happy') || kLower.includes('retrobowl')) {
+          return false;
+        }
+        if (kLower.includes('sprinter')) return true;
+        if (val && isRuffleSolData(val)) {
+          const info = getSolInfo(val);
+          if (info && info.name && (info.name.toLowerCase().includes('sprinter') || info.name.toLowerCase().includes('score') || info.name.toLowerCase().includes('high'))) return true;
+          if (kLower.includes('sprinter.swf')) return true;
+        }
+        return false;
+      },
+      validateData: (data) => {
+        const keys = Object.keys(data || {});
+        if (keys.length === 0) return { valid: false, error: 'No save data entries found.' };
+        for (const k of keys) {
+          const kLower = k.toLowerCase();
+          if (kLower.includes('college') || kLower.includes('bloon') || kLower.includes('happy') || kLower.includes('retrobowl')) {
+            return { valid: false, error: `Incompatible save key '${k}' detected for Sprinter.` };
+          }
+        }
+        return { valid: true };
+      }
     }
   };
 
@@ -84,7 +222,27 @@
 
   // Find game config matching a file path, title, or id
   function getGameConfig(fileOrTitle) {
-    if (!fileOrTitle || typeof fileOrTitle !== 'string') return null;
+    if (!fileOrTitle || typeof fileOrTitle !== 'string') {
+      // Check if runner iframe is active with a supported textbook
+      if (typeof document !== 'undefined') {
+        try {
+          const iframe = document.getElementById('runner-iframe');
+          if (iframe && iframe.getAttribute('src')) {
+            const iframeSrc = iframe.getAttribute('src');
+            if (iframeSrc && iframeSrc !== 'about:blank') {
+              for (const id in GAME_CONFIGS) {
+                const cfg = GAME_CONFIGS[id];
+                for (const m of cfg.matchers) {
+                  if (m.test(iframeSrc)) return cfg;
+                }
+              }
+            }
+          }
+        } catch(e) {}
+      }
+      return null;
+    }
+
     const cleanStr = fileOrTitle.trim();
     for (const id in GAME_CONFIGS) {
       const cfg = GAME_CONFIGS[id];
@@ -94,6 +252,39 @@
         if (m.test(cleanStr)) return cfg;
       }
     }
+
+    // Fallback: Check if fileOrTitle is a generic SWF or Ruffle Flash game
+    const lower = cleanStr.toLowerCase();
+    if (lower.includes('.swf') || lower.includes('/ruffle') || lower.includes('ruffle-')) {
+      const fileName = cleanStr.split('/').pop().replace(/\.html|\.swf|\.htm/gi, '');
+      const gameId = 'ruffle-' + (fileName || 'game').toLowerCase().replace(/[^a-z0-9_-]/g, '-');
+      const gameTitle = fileName ? (fileName.charAt(0).toUpperCase() + fileName.slice(1).replace(/[-_]/g, ' ')) : 'Flash Game';
+      return {
+        id: gameId,
+        title: gameTitle,
+        isRuffle: true,
+        matchers: [new RegExp(fileName || 'ruffle', 'i')],
+        isKeyMatch: (k, val) => {
+          if (!k || typeof k !== 'string') return false;
+          const kLower = k.toLowerCase();
+          if (fileName && kLower.includes(fileName.toLowerCase())) return true;
+          if (val && isRuffleSolData(val)) {
+            const info = getSolInfo(val);
+            if (info && info.name && fileName && info.name.toLowerCase().includes(fileName.toLowerCase())) return true;
+            if (kLower.includes('.swf') && !kLower.includes('happy-wheels') && !kLower.includes('bloons') && !kLower.includes('sprinter')) {
+              return true;
+            }
+          }
+          return false;
+        },
+        validateData: (data) => {
+          const keys = Object.keys(data || {});
+          if (keys.length === 0) return { valid: false, error: 'No save data entries found.' };
+          return { valid: true };
+        }
+      };
+    }
+
     return null;
   }
 
@@ -123,6 +314,15 @@
 
   // Extract all save entries for the given game
   function extractSaveData(gameConfig) {
+    try {
+      if (typeof document !== 'undefined') {
+        const iframe = document.getElementById('runner-iframe');
+        if (iframe && iframe.contentWindow) {
+          iframe.contentWindow.dispatchEvent(new Event('beforeunload'));
+        }
+      }
+    } catch(e) {}
+
     const storages = getStorageList();
     const result = {};
 
@@ -130,9 +330,9 @@
       try {
         for (let i = 0; i < storage.length; i++) {
           const key = storage.key(i);
-          if (key && gameConfig.isKeyMatch(key)) {
+          if (key) {
             const val = storage.getItem(key);
-            if (val !== null && val !== undefined) {
+            if (val !== null && val !== undefined && gameConfig.isKeyMatch(key, val)) {
               result[key] = val;
             }
           }
@@ -157,7 +357,11 @@
     const keyCount = Object.keys(data).length;
 
     if (keyCount === 0) {
-      notify(`No save data found yet for ${cfg.title}. Play a match or start a season first to generate save progress!`, 'warning', 5000);
+      if (cfg.isRuffle) {
+        notify(`No save data found yet for ${cfg.title}. Play through a level or reach a checkpoint first to generate save progress!`, 'warning', 5000);
+      } else {
+        notify(`No save data found yet for ${cfg.title}. Play a match or start a season first to generate save progress!`, 'warning', 5000);
+      }
       return false;
     }
 
@@ -173,7 +377,8 @@
       metadata: {
         keyCount: keyCount,
         keys: Object.keys(data),
-        totalBytes: JSON.stringify(data).length
+        totalBytes: JSON.stringify(data).length,
+        isRuffle: !!cfg.isRuffle
       },
       checksum: computeChecksum(cfg.id, data),
       data: data
@@ -191,7 +396,7 @@
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    notify(`Exported save file for ${cfg.title} (${keyCount} entries).`, 'success');
+    notify(`Exported save file for ${cfg.title} (${keyCount} ${keyCount === 1 ? 'entry' : 'entries'}).`, 'success');
     return true;
   }
 
@@ -258,13 +463,15 @@
     if (typeof showPinpointConfirm === 'function') {
       confirmed = await showPinpointConfirm({
         title: `Import Save for ${currentCfg.title}?`,
-        message: `This will overwrite your existing save progress on this device with ${saveCount} save entries from ${parsed.exportedAt ? new Date(parsed.exportedAt).toLocaleDateString() : 'the uploaded file'}.`,
+        message: `This will overwrite your existing save progress on this device with ${saveCount} save ${saveCount === 1 ? 'entry' : 'entries'} from ${parsed.exportedAt ? new Date(parsed.exportedAt).toLocaleDateString() : 'the uploaded file'}.`,
         icon: 'upload_file',
         confirmText: 'Import & Overwrite',
         cancelText: 'Cancel',
         danger: false
       });
-    } else {
+    } else if (typeof window !== 'undefined' && typeof window.confirm === 'function') {
+      confirmed = window.confirm(`Import save for ${currentCfg.title}? This will overwrite your existing save progress.`);
+    } else if (typeof confirm === 'function') {
       confirmed = confirm(`Import save for ${currentCfg.title}? This will overwrite your existing save progress.`);
     }
 
@@ -280,7 +487,7 @@
         const keysToRemove = [];
         for (let i = 0; i < storage.length; i++) {
           const k = storage.key(i);
-          if (k && currentCfg.isKeyMatch(k)) {
+          if (k && currentCfg.isKeyMatch(k, storage.getItem(k))) {
             keysToRemove.push(k);
           }
         }
@@ -290,6 +497,18 @@
 
         for (const [k, v] of Object.entries(parsed.data)) {
           storage.setItem(k, v);
+          // For Ruffle Flash saves, also map key to the current host and localhost
+          if (currentCfg.isRuffle && typeof k === 'string' && k.includes('/')) {
+            const currentHost = (typeof window !== 'undefined' && (window.location.host || window.location.hostname)) || 'localhost';
+            const cleanHost = currentHost.split(':')[0];
+            const hostsToSet = [currentHost, cleanHost, 'localhost'];
+            for (const h of hostsToSet) {
+              const remappedKey = k.replace(/^[^/]+/, h);
+              if (remappedKey !== k) {
+                storage.setItem(remappedKey, v);
+              }
+            }
+          }
         }
       } catch(e) {
         console.error('[PinpointSaveManager] Error writing to storage:', e);
