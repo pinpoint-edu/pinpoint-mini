@@ -1375,15 +1375,27 @@ form#game .action {
     transition: all 0.2s ease !important;
 }
 
-/* Prominent, Big Circular Stats Chart */
+/* Side-by-side Stats Card Body: Circle on Left, Data on Right */
+.home-stats-body {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    gap: clamp(12px, 1.8vw, 20px) !important;
+    margin-top: 6px !important;
+    box-sizing: border-box !important;
+}
+
 .home-chart-svg-wrap {
     position: relative !important;
-    width: clamp(170px, 20vw, 210px) !important;
-    height: clamp(170px, 20vw, 210px) !important;
+    width: clamp(135px, 15vw, 170px) !important;
+    height: clamp(135px, 15vw, 170px) !important;
+    flex-shrink: 0 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    margin: 4px 0 12px 0 !important;
+    margin: 0 !important;
 }
 
 .home-chart-svg {
@@ -1395,25 +1407,50 @@ form#game .action {
 
 .home-chart-metrics {
     display: flex !important;
-    justify-content: space-around !important;
-    width: 100% !important;
-    border-top: 1px solid #e2e8f0 !important;
-    padding-top: 12px !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+    gap: 8px !important;
     box-sizing: border-box !important;
 }
 
-.home-chart-metrics .m-label {
-    font-size: 12.5px !important;
+.home-metric-item {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 9px !important;
+    padding: 8px 14px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+}
+
+.home-metric-item .m-label {
+    font-size: 12px !important;
     font-weight: bold !important;
     color: #64748b !important;
     letter-spacing: 0.5px !important;
     margin-bottom: 2px !important;
+    text-transform: uppercase !important;
 }
 
-.home-chart-metrics .m-val {
-    font-size: 26px !important;
+.home-metric-item .m-val {
+    font-size: 25px !important;
     font-weight: bold !important;
     color: #0f172a !important;
+    line-height: 1.1 !important;
+}
+
+@media (max-width: 540px) {
+    .home-stats-body {
+        flex-direction: column !important;
+        align-items: center !important;
+    }
+    .home-chart-metrics {
+        width: 100% !important;
+    }
 }
 
 /* LIVE DOGFIGHT ARENA: Strict 16:9 Aspect Ratio */
@@ -1544,7 +1581,7 @@ form#game .action {
                     <i class="logo"></i>
                 </h1>
                 <div class="home-subtitle" style="font-family: 'Cormorant Garamond', serif; font-size: clamp(18px, 1.8vw, 21px); font-weight: 500; color: #555; margin-bottom: 14px;">
-                    Online (Beta): Made by Pinpoint
+                    Online: Made by Pinpoint
                 </div>
 
                 <!-- Flight Controls Summary Box -->
@@ -1567,7 +1604,7 @@ form#game .action {
                     <div class="game-modes" style="margin-top: 10px; gap: clamp(16px, 2.5vw, 36px);">
                         <div class="game-modes-column">
                             <p style="margin: 0 0 6px 0; font-weight: bold; color: #1e293b; font-size: 18px;">Game modes:</p>
-                            <div style="padding: 2px 0;"><label title="Online multiplayer mode."><input type="radio" name="mode" value="online-beta" id="mode-online-beta"> Online (Beta)</label></div>
+                            <div style="padding: 2px 0;"><label title="Online multiplayer mode."><input type="radio" name="mode" value="online-beta" id="mode-online-beta"> Online</label></div>
                             <div style="padding: 2px 0;"><label title="Everyone against everyone."><input type="radio" name="mode" value="death-match" checked> Death match</label></div>
                             <div style="padding: 2px 0;"><label title="Fight between teams."><input type="radio" name="mode" value="teams"> Teams</label></div>
                             <div style="padding: 2px 0;"><label title="One on one duel vs AI."><input type="radio" name="mode" value="duel"> Single Duel</label></div>
@@ -1613,31 +1650,33 @@ form#game .action {
                         <button type="button" class="stats-tab-btn" data-mode="kd" style="flex: 1; font-family: 'Cormorant Garamond', serif; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; background: transparent; color: #64748b; transition: all 0.2s;">K/D Ratio</button>
                     </div>
 
-                    <!-- Circular Chart SVG with Dynamic Percent & Label in center (Enlarged) -->
-                    <div class="home-chart-svg-wrap">
-                        <svg class="home-chart-svg" viewBox="0 0 100 100">
-                            <!-- Background Circle Track (Dynamically colored in Cows & KD modes) -->
-                            <circle id="home-chart-bg-circle" cx="50" cy="50" r="40" stroke="#e2e8f0" stroke-width="8" fill="none" style="transition: stroke 0.3s ease;"/>
-                            <!-- Animated Percentage Stroke -->
-                            <circle id="home-chart-circle" cx="50" cy="50" r="40" stroke="#0ea5e9" stroke-width="8" stroke-linecap="round" fill="none"
-                                stroke-dasharray="251.327" stroke-dashoffset="251.327" transform="rotate(-90 50 50)" style="transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.3s ease;"/>
-                            <!-- Center Big Percent Text -->
-                            <text id="home-chart-pct" x="50" y="47" text-anchor="middle" font-family="'Cormorant Garamond', serif" font-weight="bold" font-size="22" fill="#0f172a">0%</text>
-                            <!-- Center Subtitle Text -->
-                            <text id="home-chart-label" x="50" y="64" text-anchor="middle" font-family="'Cormorant Garamond', serif" font-weight="700" font-size="9.5" fill="#64748b" letter-spacing="0.6">ACCURACY</text>
-                        </svg>
-                    </div>
-
-                    <!-- Detailed Breakdown Metrics -->
-                    <div class="home-chart-metrics" style="display: flex; justify-content: space-around; width: 100%; border-top: 1px solid #e2e8f0;">
-                        <div style="text-align: center; flex: 1;">
-                            <div id="home-chart-m1-label" class="m-label" style="font-weight: bold; color: #64748b; letter-spacing: 0.3px;">PLANES DOWNED</div>
-                            <div id="home-chart-m1-val" class="m-val" style="font-weight: bold; color: #0f172a;">0</div>
+                    <!-- Side-by-Side Body: Circle on Left, Data on Right -->
+                    <div class="home-stats-body">
+                        <!-- LEFT: Circular Chart SVG -->
+                        <div class="home-chart-svg-wrap">
+                            <svg class="home-chart-svg" viewBox="0 0 100 100">
+                                <!-- Background Circle Track (Dynamically colored in Cows & KD modes) -->
+                                <circle id="home-chart-bg-circle" cx="50" cy="50" r="40" stroke="#e2e8f0" stroke-width="8" fill="none" style="transition: stroke 0.3s ease;"/>
+                                <!-- Animated Percentage Stroke -->
+                                <circle id="home-chart-circle" cx="50" cy="50" r="40" stroke="#0ea5e9" stroke-width="8" stroke-linecap="round" fill="none"
+                                    stroke-dasharray="251.327" stroke-dashoffset="251.327" transform="rotate(-90 50 50)" style="transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.3s ease;"/>
+                                <!-- Center Big Percent Text -->
+                                <text id="home-chart-pct" x="50" y="47" text-anchor="middle" font-family="'Cormorant Garamond', serif" font-weight="bold" font-size="22" fill="#0f172a">0%</text>
+                                <!-- Center Subtitle Text -->
+                                <text id="home-chart-label" x="50" y="64" text-anchor="middle" font-family="'Cormorant Garamond', serif" font-weight="700" font-size="9.5" fill="#64748b" letter-spacing="0.6">ACCURACY</text>
+                            </svg>
                         </div>
-                        <div style="width: 1px; background: #e2e8f0; margin: 0 4px;"></div>
-                        <div style="text-align: center; flex: 1;">
-                            <div id="home-chart-m2-label" class="m-label" style="font-weight: bold; color: #64748b; letter-spacing: 0.3px;">BULLETS FIRED</div>
-                            <div id="home-chart-m2-val" class="m-val" style="font-weight: bold; color: #0f172a;">0</div>
+
+                        <!-- RIGHT: Detailed Breakdown Metrics -->
+                        <div class="home-chart-metrics">
+                            <div class="home-metric-item">
+                                <div id="home-chart-m1-label" class="m-label">PLANES DOWNED</div>
+                                <div id="home-chart-m1-val" class="m-val">0</div>
+                            </div>
+                            <div class="home-metric-item">
+                                <div id="home-chart-m2-label" class="m-label">BULLETS FIRED</div>
+                                <div id="home-chart-m2-val" class="m-val">0</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -3509,7 +3548,7 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
   <div class="bp-menu-wrap">
     <div class="bp-menu-header">
       <div class="bp-menu-title">
-        <span>Online (Beta)</span>
+        <span>Online</span>
         <div id="modal-photon-status" class="bp-status-badge">
           <span id="modal-status-dot" style="display: inline-block; width: 10px; height: 10px; background: #ff9800; border-radius: 50%;"></span>
           <span id="modal-status-text" style="color: #cbd5e1;">Connecting...</span>
