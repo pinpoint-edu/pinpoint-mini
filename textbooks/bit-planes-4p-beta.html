@@ -1181,12 +1181,12 @@ kbd {
     box-shadow: 0 1px 0 rgba(0,0,0,0.2);
     white-space: nowrap;
 }
-/* Redesigned Responsive 2-Column Home Menu Dashboard Styles */
+/* Redesigned Full-Sized Responsive Home Menu Dashboard Styles */
 .home-layout-grid {
     display: grid !important;
-    grid-template-columns: 1.12fr 0.88fr !important;
-    gap: clamp(12px, 1.8vw, 24px) !important;
-    align-items: stretch !important;
+    grid-template-columns: 1.15fr 0.95fr !important;
+    gap: clamp(20px, 2.5vw, 36px) !important;
+    align-items: start !important;
     width: 100% !important;
     box-sizing: border-box !important;
 }
@@ -1199,238 +1199,282 @@ kbd {
     box-sizing: border-box !important;
 }
 
-.home-controls-box {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
+.home-left-col h1 {
+    font-size: clamp(34px, 3.8vw, 46px) !important;
+    margin: 0 0 4px 0 !important;
+    text-align: left !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
 }
 
-.home-stats-card,
-.home-demo-card {
+.home-left-col .home-subtitle {
+    font-size: clamp(17px, 1.8vw, 21px) !important;
+    font-family: 'Cormorant Garamond', serif !important;
+    font-weight: 500 !important;
+    color: #555 !important;
+    margin-bottom: 14px !important;
+}
+
+.home-controls-box {
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    padding: 10px 14px !important;
+    margin-bottom: 14px !important;
+}
+
+.home-controls-box .controls-title {
+    font-weight: bold !important;
+    font-size: 16px !important;
+    margin-bottom: 4px !important;
+    color: #334155 !important;
+}
+
+.home-controls-box ul {
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 15px !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 3px 12px !important;
+    line-height: 1.5 !important;
+    color: #475569 !important;
+}
+
+.nickname-section {
+    margin-bottom: 12px !important;
+}
+
+.nickname-section label {
+    display: block !important;
+    font-size: 19px !important;
+    font-weight: bold !important;
+    margin-bottom: 3px !important;
+    color: #1e293b !important;
+}
+
+.nickname-section input[type="text"] {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    font-family: 'Cormorant Garamond', serif !important;
+    font-size: 19px !important;
+    padding: 7px 12px !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 6px !important;
+    background: #fff !important;
+    outline: none !important;
+    transition: all 0.2s ease !important;
+}
+.nickname-section input[type="text"]:focus {
+    border-color: #38bdf8 !important;
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15) !important;
+}
+
+.game-modes {
+    display: flex !important;
+    margin-top: 10px !important;
+    gap: clamp(18px, 2.5vw, 36px) !important;
+}
+
+.game-modes-column p {
+    margin: 0 0 6px 0 !important;
+    font-weight: bold !important;
+    color: #1e293b !important;
+    font-size: 18px !important;
+}
+
+.game-modes-column div {
+    padding: 2.5px 0 !important;
+    font-size: 17px !important;
+}
+
+.game-modes-column label {
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+}
+
+form#game .action {
+    margin-top: 18px !important;
+}
+
+#main-submit-btn {
+    width: 100% !important;
+    font-size: 21px !important;
+    padding: 11px 20px !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+}
+
+/* BIGGER PILOT STATS CARD */
+.home-stats-card {
     background: #f8fafc !important;
     border: 1.5px solid #e2e8f0 !important;
+    border-radius: 14px !important;
+    padding: 18px 22px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+}
+
+.home-stats-card .stats-card-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+    margin-bottom: 12px !important;
+}
+
+.home-stats-card .stats-card-header span:first-of-type {
+    font-size: 20px !important;
+    font-weight: bold !important;
+    color: #1e293b !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+
+#stats-summary-badge {
+    font-size: 12.5px !important;
+    font-weight: bold !important;
+    background: #e0f2fe !important;
+    color: #0284c7 !important;
+    padding: 3px 10px !important;
     border-radius: 12px !important;
+    letter-spacing: 0.5px !important;
+}
+
+.stats-mode-tabs {
+    display: flex !important;
+    gap: 6px !important;
+    width: 100% !important;
+    margin-bottom: 12px !important;
+    background: #e2e8f0 !important;
+    padding: 4px !important;
+    border-radius: 8px !important;
     box-sizing: border-box !important;
 }
 
-.home-demo-card {
-    overflow: hidden !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
-    display: flex !important;
-    flex-direction: column !important;
+.stats-tab-btn {
+    flex: 1 !important;
+    padding: 6px 12px !important;
+    font-family: 'Cormorant Garamond', serif !important;
+    font-size: 15.5px !important;
+    font-weight: bold !important;
+    border: none !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    background: transparent !important;
+    color: #64748b !important;
+    box-sizing: border-box !important;
+    transition: all 0.2s ease !important;
+}
+
+/* Prominent, Big Circular Stats Chart */
+.home-chart-svg-wrap {
     position: relative !important;
+    width: clamp(170px, 20vw, 210px) !important;
+    height: clamp(170px, 20vw, 210px) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 4px 0 12px 0 !important;
+}
+
+.home-chart-svg {
+    width: 100% !important;
+    height: 100% !important;
+    display: block !important;
+    overflow: visible !important;
+}
+
+.home-chart-metrics {
+    display: flex !important;
+    justify-content: space-around !important;
+    width: 100% !important;
+    border-top: 1px solid #e2e8f0 !important;
+    padding-top: 12px !important;
+    box-sizing: border-box !important;
+}
+
+.home-chart-metrics .m-label {
+    font-size: 12.5px !important;
+    font-weight: bold !important;
+    color: #64748b !important;
+    letter-spacing: 0.5px !important;
+    margin-bottom: 2px !important;
+}
+
+.home-chart-metrics .m-val {
+    font-size: 26px !important;
+    font-weight: bold !important;
+    color: #0f172a !important;
+}
+
+/* LIVE DOGFIGHT ARENA: Strict 16:9 Aspect Ratio */
+.home-demo-card {
+    background: #e0f2fe !important;
+    border: 1.5px solid #cbd5e1 !important;
+    border-radius: 12px !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    aspect-ratio: 16 / 9 !important;
+    overflow: hidden !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
+    position: relative !important;
+    display: block !important;
 }
 
 .home-demo-card canvas.demo {
     width: 100% !important;
     height: 100% !important;
-    min-height: clamp(75px, 12vh, 180px) !important;
+    aspect-ratio: 16 / 9 !important;
     display: block !important;
     margin: 0 !important;
-    position: static !important;
+    position: absolute !important;
+    inset: 0 !important;
     background: #e0f2fe !important;
-    border-radius: 10px !important;
+    border-radius: 11px !important;
 }
 
-/* 16:9 Landscape / Desktop Viewports: Zero Scrolling Guaranteed */
+/* Desktop & 16:9 Landscape Screen Optimization (No scrolling on 16:9) */
 @media (min-width: 861px) and (min-aspect-ratio: 1/1) {
     html, body {
         height: 100vh !important;
-        max-height: 100vh !important;
-        overflow: hidden !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
         margin: 0 !important;
         padding: 0 !important;
     }
     main {
-        height: 100vh !important;
-        max-height: 100vh !important;
-        overflow: hidden !important;
+        min-height: 100vh !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        padding: clamp(6px, 1.2vh, 16px) clamp(10px, 1.6vw, 24px) !important;
+        padding: clamp(12px, 2vh, 24px) clamp(16px, 2.5vw, 32px) !important;
         box-sizing: border-box !important;
     }
     main .welcome {
-        max-height: calc(100vh - clamp(12px, 2.4vh, 28px)) !important;
-        height: 100% !important;
-        margin: 0 auto !important;
-        padding: clamp(8px, 1.4vh, 18px) clamp(14px, 2vw, 30px) !important;
-        overflow: hidden !important;
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: center !important;
-        max-width: min(96vw, 1140px) !important;
-        border-radius: 14px !important;
-        box-shadow: 0 6px 28px rgba(0, 0, 0, 0.08) !important;
+        max-width: min(95vw, 1160px) !important;
+        width: 100% !important;
+        margin: auto !important;
+        padding: clamp(18px, 2.5vh, 28px) clamp(22px, 3vw, 38px) !important;
+        border-radius: 16px !important;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08) !important;
         box-sizing: border-box !important;
         background: #ffffff !important;
     }
-    .home-layout-grid {
-        height: 100% !important;
-        max-height: 100% !important;
-        grid-template-columns: 1.12fr 0.88fr !important;
-        gap: clamp(10px, 1.6vw, 22px) !important;
-        align-items: stretch !important;
-        overflow: hidden !important;
-    }
-    .home-left-col {
-        justify-content: space-between !important;
-        height: 100% !important;
-        max-height: 100% !important;
-        min-height: 0 !important;
-    }
-    .home-left-col h1 {
-        font-size: clamp(22px, 3.2vh, 36px) !important;
-        margin: 0 0 clamp(1px, 0.3vh, 3px) 0 !important;
-        gap: clamp(6px, 1vw, 10px) !important;
-    }
-    .home-left-col .home-subtitle {
-        font-size: clamp(12.5px, 1.4vh, 16.5px) !important;
-        margin-bottom: clamp(3px, 0.6vh, 8px) !important;
-    }
-    .home-controls-box {
-        margin-bottom: clamp(4px, 0.7vh, 8px) !important;
-        padding: clamp(3px, 0.6vh, 6px) clamp(8px, 1vw, 12px) !important;
-    }
-    .home-controls-box .controls-title {
-        font-size: clamp(12px, 1.3vh, 14.5px) !important;
-        margin-bottom: 2px !important;
-    }
-    .home-controls-box ul {
-        font-size: clamp(10px, 1.2vh, 13px) !important;
-        gap: clamp(1px, 0.25vh, 2.5px) clamp(6px, 1vw, 10px) !important;
-        line-height: 1.3 !important;
-    }
-    .home-left-col form#game {
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: space-between !important;
-        flex: 1 !important;
-        margin: 0 !important;
-        min-height: 0 !important;
-    }
-    .nickname-section {
-        margin-bottom: clamp(3px, 0.5vh, 6px) !important;
-    }
-    .nickname-section label {
-        font-size: clamp(12.5px, 1.4vh, 15.5px) !important;
-        margin-bottom: 2px !important;
-    }
-    .nickname-section input[type="text"] {
-        font-size: clamp(12.5px, 1.5vh, 16px) !important;
-        padding: clamp(2px, 0.4vh, 5px) clamp(8px, 1vw, 12px) !important;
-    }
-    .game-modes {
-        margin-top: clamp(2px, 0.5vh, 6px) !important;
-        gap: clamp(10px, 1.8vw, 24px) !important;
-    }
-    .game-modes-column p {
-        font-size: clamp(12.5px, 1.4vh, 15.5px) !important;
-        margin: 0 0 2px 0 !important;
-    }
-    .game-modes-column div {
-        padding: clamp(0.5px, 0.15vh, 1.5px) 0 !important;
-        font-size: clamp(11px, 1.25vh, 14px) !important;
-    }
-    form#game .action {
-        margin-top: clamp(4px, 0.8vh, 10px) !important;
-    }
-    #main-submit-btn {
-        font-size: clamp(14px, 1.8vh, 19px) !important;
-        padding: clamp(5px, 0.8vh, 8px) !important;
-    }
     .home-right-col {
-        justify-content: space-between !important;
-        height: 100% !important;
-        max-height: 100% !important;
-        min-height: 0 !important;
-        gap: clamp(6px, 1vh, 12px) !important;
-    }
-    .home-stats-card {
-        padding: clamp(6px, 1vh, 12px) clamp(8px, 1.2vw, 14px) !important;
-    }
-    .home-stats-card .stats-card-header {
-        margin-bottom: clamp(3px, 0.5vh, 6px) !important;
-    }
-    .stats-mode-tabs {
-        margin-bottom: clamp(3px, 0.5vh, 6px) !important;
-    }
-    .stats-tab-btn {
-        padding: clamp(2px, 0.4vh, 4px) clamp(4px, 0.5vw, 6px) !important;
-        font-size: clamp(11px, 1.25vh, 13.5px) !important;
-    }
-    .home-chart-svg-wrap {
-        width: clamp(75px, 11vh, 120px) !important;
-        height: clamp(75px, 11vh, 120px) !important;
-        margin: clamp(1px, 0.2vh, 3px) 0 !important;
-    }
-    .home-chart-metrics {
-        padding-top: clamp(3px, 0.5vh, 6px) !important;
-    }
-    .home-chart-metrics .m-label {
-        font-size: clamp(9.5px, 1.05vh, 11.5px) !important;
-    }
-    .home-chart-metrics .m-val {
-        font-size: clamp(14px, 1.7vh, 19px) !important;
-    }
-    .home-demo-card {
-        flex: 1 !important;
-        min-height: clamp(60px, 11vh, 160px) !important;
-        height: auto !important;
-    }
-    .home-demo-card canvas.demo {
-        min-height: clamp(60px, 11vh, 160px) !important;
-    }
-
-    /* Modals in Landscape 16:9 - No Scrolling */
-    .bp-fullscreen-modal {
-        overflow-y: hidden !important;
-        padding: clamp(6px, 1.5vh, 18px) clamp(12px, 2vw, 28px) !important;
-    }
-    .bp-menu-wrap {
-        min-height: 0 !important;
-        max-height: calc(100vh - clamp(14px, 3vh, 36px)) !important;
-        gap: clamp(6px, 1.2vh, 14px) !important;
-        justify-content: center !important;
-    }
-    .bp-menu-header {
-        padding-bottom: clamp(4px, 0.8vh, 8px) !important;
-    }
-    .bp-card-glass {
-        padding: clamp(6px, 1vh, 12px) clamp(10px, 1.4vw, 18px) !important;
-    }
-    .bp-square-btn {
-        min-height: clamp(90px, 14vh, 140px) !important;
-        padding: clamp(8px, 1.3vh, 16px) clamp(10px, 1.2vw, 16px) !important;
-        gap: clamp(3px, 0.6vh, 6px) !important;
-    }
-    .bp-square-btn svg,
-    .bp-square-btn .material-symbols-outlined,
-    .bp-square-btn .material-symbols-outlined svg {
-        width: clamp(26px, 3.8vh, 38px) !important;
-        height: clamp(26px, 3.8vh, 38px) !important;
-        font-size: clamp(26px, 3.8vh, 38px) !important;
-    }
-    .bp-square-btn span:first-of-type {
-        font-size: clamp(15px, 2vh, 22px) !important;
-    }
-    .bp-square-btn span:last-of-type {
-        font-size: clamp(10.5px, 1.2vh, 13.5px) !important;
-    }
-    .modal-stats-grid {
-        padding: clamp(6px, 1vh, 12px) clamp(10px, 1.4vw, 18px) !important;
-        gap: clamp(8px, 1.2vw, 16px) !important;
-    }
-    .stat-box .stat-label {
-        font-size: clamp(11.5px, 1.3vh, 15px) !important;
-    }
-    .stat-box .stat-value {
-        font-size: clamp(18px, 2.5vh, 28px) !important;
+        gap: 16px !important;
     }
 }
 
-/* Portrait / Narrow Viewports: Smooth Vertical Scrolling Fallback */
+/* Portrait / Narrow Viewports: Responsive Vertical Stack */
 @media (max-width: 860px), (max-aspect-ratio: 1/1) {
     html, body {
         height: auto !important;
@@ -1439,37 +1483,29 @@ kbd {
         overflow-y: auto !important;
     }
     main {
-        height: auto !important;
-        max-height: none !important;
-        overflow: visible !important;
-        padding: 12px 10px !important;
+        min-height: 100vh !important;
         display: block !important;
+        padding: 12px 10px !important;
+        box-sizing: border-box !important;
     }
     main .welcome {
-        max-height: none !important;
-        height: auto !important;
-        margin: 12px auto !important;
-        padding: 16px 14px !important;
-        overflow: visible !important;
         max-width: 100% !important;
+        margin: 12px auto !important;
+        padding: 18px 14px !important;
+        box-sizing: border-box !important;
     }
     .home-layout-grid {
         grid-template-columns: 1fr !important;
-        gap: 20px !important;
-        height: auto !important;
-        max-height: none !important;
-        overflow: visible !important;
+        gap: 22px !important;
     }
     .home-left-col,
     .home-right-col {
-        height: auto !important;
-        max-height: none !important;
-        min-height: auto !important;
+        width: 100% !important;
         gap: 16px !important;
     }
-    .home-demo-card canvas.demo {
-        height: 180px !important;
-        min-height: 180px !important;
+    .home-demo-card {
+        width: 100% !important;
+        aspect-ratio: 16 / 9 !important;
     }
     .bp-fullscreen-modal {
         overflow-y: auto !important;
@@ -1490,7 +1526,7 @@ kbd {
         grid-template-columns: 1fr !important;
     }
     .bp-square-btn {
-        min-height: 100px !important;
+        min-height: 110px !important;
         padding: 14px 12px !important;
     }
 }
@@ -1577,18 +1613,18 @@ kbd {
                         <button type="button" class="stats-tab-btn" data-mode="kd" style="flex: 1; font-family: 'Cormorant Garamond', serif; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; background: transparent; color: #64748b; transition: all 0.2s;">K/D Ratio</button>
                     </div>
 
-                    <!-- Circular Chart SVG with Dynamic Percent & Label in center -->
-                    <div class="home-chart-svg-wrap" style="position: relative; display: flex; align-items: center; justify-content: center;">
-                        <svg class="home-chart-svg" viewBox="0 0 100 100" style="width: 100%; height: 100%; display: block; overflow: visible;">
+                    <!-- Circular Chart SVG with Dynamic Percent & Label in center (Enlarged) -->
+                    <div class="home-chart-svg-wrap">
+                        <svg class="home-chart-svg" viewBox="0 0 100 100">
                             <!-- Background Circle Track (Dynamically colored in Cows & KD modes) -->
                             <circle id="home-chart-bg-circle" cx="50" cy="50" r="40" stroke="#e2e8f0" stroke-width="8" fill="none" style="transition: stroke 0.3s ease;"/>
                             <!-- Animated Percentage Stroke -->
                             <circle id="home-chart-circle" cx="50" cy="50" r="40" stroke="#0ea5e9" stroke-width="8" stroke-linecap="round" fill="none"
                                 stroke-dasharray="251.327" stroke-dashoffset="251.327" transform="rotate(-90 50 50)" style="transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.3s ease;"/>
                             <!-- Center Big Percent Text -->
-                            <text id="home-chart-pct" x="50" y="47" text-anchor="middle" font-family="'Cormorant Garamond', serif" font-weight="bold" font-size="19" fill="#0f172a">0%</text>
+                            <text id="home-chart-pct" x="50" y="47" text-anchor="middle" font-family="'Cormorant Garamond', serif" font-weight="bold" font-size="22" fill="#0f172a">0%</text>
                             <!-- Center Subtitle Text -->
-                            <text id="home-chart-label" x="50" y="63" text-anchor="middle" font-family="'Cormorant Garamond', serif" font-weight="700" font-size="8.5" fill="#64748b" letter-spacing="0.5">ACCURACY</text>
+                            <text id="home-chart-label" x="50" y="64" text-anchor="middle" font-family="'Cormorant Garamond', serif" font-weight="700" font-size="9.5" fill="#64748b" letter-spacing="0.6">ACCURACY</text>
                         </svg>
                     </div>
 
@@ -2681,9 +2717,9 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
                 const bullets = stats.bullets || 0;
                 pct = bullets > 0 ? Math.min(100, (killed / bullets) * 100) : 0;
                 pctText.textContent = (pct % 1 === 0 ? pct.toFixed(0) : pct.toFixed(1)) + "%";
-                pctText.setAttribute("font-size", "19");
+                pctText.setAttribute("font-size", "22");
                 labelText.textContent = "ACCURACY";
-                labelText.setAttribute("font-size", "8.5");
+                labelText.setAttribute("font-size", "9.5");
                 strokeColor = "#0ea5e9";
                 bgStrokeColor = "#e2e8f0";
                 if (m1Label) m1Label.textContent = "PLANES DOWNED";
@@ -2695,8 +2731,8 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
                 const killed = stats.killed || 0;
                 const cows = stats.cowKilled || 0;
                 const total = killed + cows;
-                pctText.setAttribute("font-size", "19");
-                labelText.setAttribute("font-size", "8.5");
+                pctText.setAttribute("font-size", "22");
+                labelText.setAttribute("font-size", "9.5");
                 if (total === 0) {
                     pct = 0;
                     pctText.textContent = "0%";
@@ -2733,9 +2769,9 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
                 const winRate = total > 0 ? ((killed / total) * 100) : (killed > 0 ? 100 : 0);
                 pct = winRate;
                 pctText.textContent = kdRatio + " K/D";
-                pctText.setAttribute("font-size", "17");
+                pctText.setAttribute("font-size", "19");
                 labelText.textContent = killed + " KILLS : " + deaths + " DIED";
-                labelText.setAttribute("font-size", "7.5");
+                labelText.setAttribute("font-size", "8.5");
                 strokeColor = (killed >= deaths) ? "#10b981" : "#ef4444";
                 bgStrokeColor = deaths > 0 ? "#fca5a5" : "#e2e8f0";
                 if (m1Label) m1Label.textContent = "ENEMIES KILLED";
@@ -2777,6 +2813,8 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
             });
             renderHomeChart();
             setInterval(renderHomeChart, 2500);
+            setTimeout(function() { window.dispatchEvent(new Event("resize")); }, 100);
+            window.addEventListener("resize", renderHomeChart);
         }
 
         if (document.readyState === "loading") {
