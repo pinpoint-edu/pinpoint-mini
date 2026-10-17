@@ -1519,7 +1519,6 @@ var TabDisguiser = window.TabDisguiser || {
   <title>${popoutTitle}</title>
   <link rel="icon" type="image/png" href="${faviconUrl}">
   <link rel="shortcut icon" type="image/png" href="${faviconUrl}">
-  <script defer src="https://cloud.umami.is/script.js" data-website-id="aa9f6a9e-fe62-4b22-a716-f161605dadfc"><\/script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
