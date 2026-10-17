@@ -549,17 +549,18 @@
     }
   }
 
-  // Update visibility of Save Download / Upload buttons in runner
+  // Update visibility of Save Download / Upload buttons in runner and popouts
   function updateUI(fileOrTitle) {
-    const isSupported = !!getGameConfig(fileOrTitle);
-    const exportBtn = document.getElementById('runner-save-export');
-    const importBtn = document.getElementById('runner-save-import');
-    if (exportBtn) {
-      exportBtn.style.display = isSupported ? 'inline-flex' : 'none';
-    }
-    if (importBtn) {
-      importBtn.style.display = isSupported ? 'inline-flex' : 'none';
-    }
+    const target = fileOrTitle || (typeof currentRunnerFile !== 'undefined' ? currentRunnerFile : '') || (typeof currentRunnerTitle !== 'undefined' ? currentRunnerTitle : '');
+    const isSupported = !!getGameConfig(target);
+    const exportBtns = document.querySelectorAll('#runner-save-export, #popout-save-export');
+    const importBtns = document.querySelectorAll('#runner-save-import, #popout-save-import');
+    exportBtns.forEach(btn => {
+      btn.style.setProperty('display', isSupported ? 'inline-flex' : 'none', 'important');
+    });
+    importBtns.forEach(btn => {
+      btn.style.setProperty('display', isSupported ? 'inline-flex' : 'none', 'important');
+    });
   }
 
   function exportCurrentSave() {

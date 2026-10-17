@@ -1129,7 +1129,7 @@ var TabDisguiser = window.TabDisguiser || {
         try {
             // Avoid showing inside textbook game iframes
             if (window.location.pathname.includes('/textbooks/')) return;
-            const widgetDismissed = localStorage.getItem('pinpoint_info_widget_dismissed_v4') === 'true';
+            const widgetDismissed = localStorage.getItem('pinpoint_info_widget_dismissed_v5') === 'true';
             if (!widgetDismissed) {
                 this.showInfoWidget();
             }
@@ -1143,8 +1143,8 @@ var TabDisguiser = window.TabDisguiser || {
             if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
         }
         try {
-            localStorage.setItem('pinpoint_info_widget_dismissed_v4', 'true');
-            sessionStorage.setItem('pinpoint_info_widget_dismissed_v4', 'true');
+            localStorage.setItem('pinpoint_info_widget_dismissed_v5', 'true');
+            sessionStorage.setItem('pinpoint_info_widget_dismissed_v5', 'true');
         } catch (err) {}
         const widget = document.getElementById('pinpoint-info-widget');
         if (widget) {
@@ -1156,7 +1156,7 @@ var TabDisguiser = window.TabDisguiser || {
 
     showInfoWidget(force = false) {
         if (!force) {
-            const dismissed = localStorage.getItem('pinpoint_info_widget_dismissed_v4') === 'true';
+            const dismissed = localStorage.getItem('pinpoint_info_widget_dismissed_v5') === 'true';
             if (dismissed) return;
         }
 
@@ -1167,7 +1167,7 @@ var TabDisguiser = window.TabDisguiser || {
 
         let existing = document.getElementById('pinpoint-info-widget');
         if (existing) {
-            if (!force && localStorage.getItem('pinpoint_info_widget_dismissed_v4') === 'true') {
+            if (!force && localStorage.getItem('pinpoint_info_widget_dismissed_v5') === 'true') {
                 existing.remove();
                 return;
             }
@@ -1559,6 +1559,15 @@ var TabDisguiser = window.TabDisguiser || {
       </div>
     </div>
     <div class="topbar-right">
+      <button id="popout-save-export" class="action-btn" onclick="exportPopoutSave()" style="color:#1a73e8;display:none;" title="Download Save (.json)">
+        <span class="material-symbols-outlined notranslate" style="font-size:18px;">download</span>
+        <span>Save</span>
+      </button>
+      <button id="popout-save-import" class="action-btn" onclick="importPopoutSave()" style="color:#188038;display:none;" title="Upload Save (.json)">
+        <span class="material-symbols-outlined notranslate" style="font-size:18px;">upload</span>
+        <span>Load</span>
+      </button>
+      <input type="file" id="popout-save-input" accept=".json,application/json" style="display:none;" onchange="handlePopoutSaveFile(event)">
       <button id="popout-fav-btn" class="action-btn ${isFavorited ? 'starred' : ''}" onclick="togglePopoutFav()">
         <span class="material-symbols-outlined" id="popout-fav-icon" style="${isFavorited ? "font-variation-settings:'FILL' 1;color:#1a73e8;" : ""}">
           ${isFavorited ? 'bookmark' : 'bookmark_border'}
@@ -1572,6 +1581,7 @@ var TabDisguiser = window.TabDisguiser || {
     </div>
   </div>
   <iframe id="game-frame" class="game-iframe" src="${gameSrc}" allow="clipboard-write; clipboard-read; fullscreen; gamepad; autoplay" allowfullscreen></iframe>
+  <script src="${currentOrigin}/scripts/save-manager.js"></script>
   <script>
     const LOCKED_POPOUT_TITLE = ${JSON.stringify(popoutTitle)};
     try {
@@ -1618,6 +1628,41 @@ var TabDisguiser = window.TabDisguiser || {
 
     const TARGET_FILE = ${JSON.stringify(file)};
     let returnUrl = ${JSON.stringify(currentUrl)};
+
+    function exportPopoutSave() {
+      if (typeof PinpointSaveManager !== 'undefined') {
+        PinpointSaveManager.exportSave(TARGET_FILE);
+      } else if (window.opener && window.opener.PinpointSaveManager) {
+        window.opener.PinpointSaveManager.exportSave(TARGET_FILE);
+      }
+    }
+    function importPopoutSave() {
+      const inp = document.getElementById('popout-save-input');
+      if (inp) { inp.value = ''; inp.click(); }
+    }
+    function handlePopoutSaveFile(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const content = e.target.result;
+        if (typeof PinpointSaveManager !== 'undefined') {
+          PinpointSaveManager.importSave(TARGET_FILE, content);
+        } else if (window.opener && window.opener.PinpointSaveManager) {
+          window.opener.PinpointSaveManager.importSave(TARGET_FILE, content);
+        }
+      };
+      reader.readAsText(file);
+    }
+    try {
+      const sm = (typeof PinpointSaveManager !== 'undefined' && PinpointSaveManager) || (window.opener && window.opener.PinpointSaveManager);
+      if (sm && sm.isSupported(TARGET_FILE)) {
+        const exp = document.getElementById('popout-save-export');
+        const imp = document.getElementById('popout-save-import');
+        if (exp) exp.style.display = 'inline-flex';
+        if (imp) imp.style.display = 'inline-flex';
+      }
+    } catch(e) {}
 
     function returnToWebsite() {
       try {
