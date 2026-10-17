@@ -1375,17 +1375,17 @@ var TabDisguiser = window.TabDisguiser || {
                     <div id="info-script-toast" style="display:none;font-size:10.5px;color:#137333;font-weight:500;">✓ Script link copied to clipboard!</div>
                 </div>
 
-                <!-- 1. Bit Planes -->
+                <!-- 1. Bit Planes Online -->
                 <div class="pinpoint-list-item">
                     <div class="pinpoint-item-head">
                         <div class="pinpoint-item-title">
                             <span class="material-symbols-outlined notranslate" style="font-size:16px;color:#1a73e8;line-height:1;">flight</span>
-                            <span>Bit Planes (2PM)</span>
+                            <span>Bit Planes Online</span>
                         </div>
-                        <span class="pinpoint-badge pinpoint-badge-updated">Updated</span>
+                        <span class="pinpoint-badge pinpoint-badge-updated">Major Update</span>
                     </div>
                     <div class="pinpoint-item-desc">
-                        Brand new 1v1 local split-screen mode featuring dual independent cameras, customizable WASD & Arrow controls, live scores, homing missiles, and classic dogfighting!
+                        Now featuring real-time Online multiplayer (public lobbies & private rooms), intense 20-bot Juggernaut mode with extra lives, a sleek redesigned widescreen UI, and 1v1 local split-screen!
                     </div>
                 </div>
 
