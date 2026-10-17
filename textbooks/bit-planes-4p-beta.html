@@ -2,6 +2,8 @@
 <html lang="en">
 
 <head>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
     <script src="lib/Photon-Javascript_SDK.min.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport"
@@ -1370,52 +1372,58 @@ kbd {
     <div class="pause-bar"></div>
 </button>
 
-<!-- Pause / Death Menu Modal -->
-<div id="game-menu-modal" class="game-modal-backdrop" style="display:none;">
-    <div class="game-modal-card">
-        <h2>
-            <i class="logo"></i>
-            <span id="modal-title-text">Game Paused</span>
-            <i class="logo"></i>
-        </h2>
+<!-- Pause / Death Menu Modal (Styled matching Online & Split-Screen Fullscreen Glass Menus) -->
+<div id="game-menu-modal" class="game-modal-backdrop bp-fullscreen-modal" style="display:none;">
+    <div class="game-modal-card bp-menu-wrap">
+        <!-- Top-Left Header with Colorful Airplane Icon -->
+        <div class="bp-menu-header">
+            <h2 class="bp-menu-title" style="margin: 0; padding: 0; font-size: clamp(32px, 3.8vw, 46px);">
+                <i class="logo"></i>
+                <span id="modal-title-text">Game Paused</span>
+            </h2>
+        </div>
+
+        <!-- Left-Aligned Subtitle -->
         <div id="modal-subtitle" class="modal-subtitle"></div>
+
+        <!-- Left-Aligned Stats Grid -->
         <div id="modal-stats" class="modal-stats-grid">
             <div class="stat-box">
-                <span class="stat-label" id="modal-stat1-label" style="color: #ff5252;">Red Score</span>
+                <span class="stat-label" id="modal-stat1-label" style="color: #f87171;">Red Score</span>
                 <span class="stat-value" id="stat-kills">0</span>
             </div>
             <div class="stat-box">
-                <span class="stat-label" id="modal-stat2-label" style="color: #448aff;">Blue Score</span>
+                <span class="stat-label" id="modal-stat2-label" style="color: #60a5fa;">Blue Score</span>
                 <span class="stat-value" id="stat-deaths">0</span>
             </div>
             <div class="stat-box" id="stat-extra-box">
                 <span class="stat-label" id="stat-extra-label">Match Mode</span>
-                <span class="stat-value" id="stat-extra-value" style="font-size: 15px;">-</span>
+                <span class="stat-value" id="stat-extra-value" style="font-size: clamp(18px, 1.8vw, 22px);">-</span>
             </div>
         </div>
 
         <!-- 2-Player Controls Guide (Shown in pause menu) -->
-        <div id="modal-controls-2p" style="display: none; margin: 12px 0 16px 0; padding: 12px 16px; background: rgba(0, 0, 0, 0.035); border: 1px solid #dcdcdc; border-radius: 6px; text-align: left; font-family: 'Cormorant Garamond', serif;">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 16px;">
+        <div id="modal-controls-2p" class="bp-card-glass" style="display: none; padding: clamp(14px, 2vh, 20px) clamp(16px, 2vw, 24px); text-align: left;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: clamp(16px, 2.5vw, 28px); font-size: clamp(16px, 1.6vw, 19px);">
                 <!-- Player 1 List -->
                 <div>
-                    <div style="font-size: 18px; font-weight: bold; color: #c62828; margin-bottom: 6px; border-bottom: 2px solid #ffcdd2; padding-bottom: 3px;">
+                    <div style="font-size: clamp(18px, 1.9vw, 22px); font-weight: bold; color: #f87171; margin-bottom: 8px; border-bottom: 2px solid rgba(248, 113, 113, 0.4); padding-bottom: 4px;">
                         Player 1 (Red / Left)
                     </div>
-                    <ul style="list-style: none; margin: 0; padding: 0; line-height: 1.6;">
-                        <li style="display: flex; justify-content: space-between; align-items: center; padding: 3px 0; border-bottom: 1px dashed rgba(0,0,0,0.08);">
+                    <ul style="list-style: none; margin: 0; padding: 0; line-height: 1.7;">
+                        <li style="display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px dashed rgba(255,255,255,0.12);">
                             <span>Steer & Thrust:</span>
                             <span><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd></span>
                         </li>
-                        <li style="display: flex; justify-content: space-between; align-items: center; padding: 3px 0; border-bottom: 1px dashed rgba(0,0,0,0.08);">
+                        <li style="display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px dashed rgba(255,255,255,0.12);">
                             <span>Shoot Gun:</span>
                             <kbd>Z</kbd>
                         </li>
-                        <li style="display: flex; justify-content: space-between; align-items: center; padding: 3px 0; border-bottom: 1px dashed rgba(0,0,0,0.08);">
+                        <li style="display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px dashed rgba(255,255,255,0.12);">
                             <span>Launch Missile:</span>
                             <kbd>X</kbd>
                         </li>
-                        <li style="display: flex; justify-content: space-between; align-items: center; padding: 3px 0;">
+                        <li style="display: flex; justify-content: space-between; align-items: center; padding: 4px 0;">
                             <span>Bail / Re-enter:</span>
                             <kbd>C</kbd>
                         </li>
@@ -1424,62 +1432,78 @@ kbd {
 
                 <!-- Player 2 List -->
                 <div>
-                    <div style="font-size: 18px; font-weight: bold; color: #1565c0; margin-bottom: 6px; border-bottom: 2px solid #bbdefb; padding-bottom: 3px;">
+                    <div style="font-size: clamp(18px, 1.9vw, 22px); font-weight: bold; color: #60a5fa; margin-bottom: 8px; border-bottom: 2px solid rgba(96, 165, 250, 0.4); padding-bottom: 4px;">
                         Player 2 (Blue / Right)
                     </div>
-                    <ul style="list-style: none; margin: 0; padding: 0; line-height: 1.6;">
-                        <li style="display: flex; justify-content: space-between; align-items: center; padding: 3px 0; border-bottom: 1px dashed rgba(0,0,0,0.08);">
+                    <ul style="list-style: none; margin: 0; padding: 0; line-height: 1.7;">
+                        <li style="display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px dashed rgba(255,255,255,0.12);">
                             <span>Steer & Thrust:</span>
                             <span><kbd>&uarr;</kbd> <kbd>&larr;</kbd> <kbd>&darr;</kbd> <kbd>&rarr;</kbd></span>
                         </li>
-                        <li style="display: flex; justify-content: space-between; align-items: center; padding: 3px 0; border-bottom: 1px dashed rgba(0,0,0,0.08);">
+                        <li style="display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px dashed rgba(255,255,255,0.12);">
                             <span>Shoot Gun:</span>
                             <kbd>Right Ctrl</kbd>
                         </li>
-                        <li style="display: flex; justify-content: space-between; align-items: center; padding: 3px 0; border-bottom: 1px dashed rgba(0,0,0,0.08);">
+                        <li style="display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px dashed rgba(255,255,255,0.12);">
                             <span>Launch Missile:</span>
                             <kbd>Right Shift</kbd>
                         </li>
-                        <li style="display: flex; justify-content: space-between; align-items: center; padding: 3px 0;">
+                        <li style="display: flex; justify-content: space-between; align-items: center; padding: 4px 0;">
                             <span>Bail / Re-enter:</span>
                             <kbd>/</kbd>
                         </li>
                     </ul>
                 </div>
             </div>
-            <div style="margin-top: 10px; font-size: 15px; text-align: center; color: #555; border-top: 1px solid rgba(0,0,0,0.08); padding-top: 8px;">
+            <div style="margin-top: 12px; font-size: clamp(15px, 1.5vw, 17px); text-align: center; color: #94a3b8; border-top: 1px solid rgba(255,255,255,0.12); padding-top: 8px;">
                 Pause / Resume: <kbd>Space</kbd> or <kbd>Esc</kbd>
             </div>
         </div>
 
         <!-- 2-Player Nicknames Section -->
-        <div id="modal-nicknames-2p" style="display: none; margin: 12px 0 16px 0; text-align: left;">
-            <div style="display: flex; gap: 10px;">
-                <div style="flex: 1;">
-                    <label for="modal-nick-p1" style="font-size: 15px; color: #ff5252; font-weight: bold; display: block; margin-bottom: 2px;">Player 1 (Red)</label>
-                    <input type="text" id="modal-nick-p1" placeholder="You" maxlength="16" autocomplete="off" style="width: 100%; box-sizing: border-box; font-family: 'Cormorant Garamond', serif; font-size: 19px; padding: 4px 8px;">
+        <div id="modal-nicknames-2p" class="bp-card-glass" style="display: none; text-align: left; padding: clamp(14px, 2vh, 20px) clamp(16px, 2vw, 24px);">
+            <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 220px;">
+                    <label for="modal-nick-p1" style="font-size: clamp(16px, 1.6vw, 18px); color: #f87171; font-weight: bold; display: block; margin-bottom: 6px;">Player 1 (Red)</label>
+                    <input type="text" id="modal-nick-p1" placeholder="You" maxlength="16" autocomplete="off" class="bp-input-field">
                 </div>
-                <div style="flex: 1;">
-                    <label for="modal-nick-p2" style="font-size: 15px; color: #448aff; font-weight: bold; display: block; margin-bottom: 2px;">Player 2 (Blue)</label>
-                    <input type="text" id="modal-nick-p2" placeholder="Type username..." maxlength="16" autocomplete="off" style="width: 100%; box-sizing: border-box; font-family: 'Cormorant Garamond', serif; font-size: 19px; padding: 4px 8px;">
+                <div style="flex: 1; min-width: 220px;">
+                    <label for="modal-nick-p2" style="font-size: clamp(16px, 1.6vw, 18px); color: #60a5fa; font-weight: bold; display: block; margin-bottom: 6px;">Player 2 (Blue)</label>
+                    <input type="text" id="modal-nick-p2" placeholder="Type username..." maxlength="16" autocomplete="off" class="bp-input-field">
                 </div>
             </div>
         </div>
 
         <!-- 1-Player Nickname Section -->
-        <div class="modal-username-section" id="modal-nickname-1p" style="display: none;">
-            <label for="modal-nickname-input">Pilot Nickname</label>
-            <input type="text" id="modal-nickname-input" placeholder="You" maxlength="16" autocomplete="off">
+        <div class="modal-username-section bp-card-glass" id="modal-nickname-1p" style="display: none; padding: clamp(14px, 2vh, 20px) clamp(16px, 2vw, 24px); text-align: left;">
+            <label for="modal-nickname-input" style="font-size: clamp(16px, 1.6vw, 18px); color: #cbd5e1; font-weight: bold; display: block; margin-bottom: 6px;">Pilot Nickname</label>
+            <input type="text" id="modal-nickname-input" placeholder="You" maxlength="16" autocomplete="off" class="bp-input-field" style="max-width: 400px;">
         </div>
 
-        <div class="modal-actions">
-            <div class="modal-actions-left">
-                <button type="button" class="btn" id="modal-btn-resume">‣ Resume</button>
-                <button type="button" class="btn" id="modal-btn-restart">↻ Play Again</button>
-            </div>
-            <div class="modal-actions-right">
-                <button type="button" class="btn btn-secondary" id="modal-btn-menu">⌂ Main Menu</button>
-            </div>
+        <!-- Big Action Cards (Matching Online Beta Public & Private Big Buttons) -->
+        <div class="modal-actions" id="modal-actions-grid">
+            <button type="button" class="bp-square-btn bp-square-resume" id="modal-btn-resume">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+                <span style="font-size: clamp(22px, 2.3vw, 28px); font-weight: bold; letter-spacing: 0.5px;">Resume Match</span>
+                <span style="font-size: clamp(14px, 1.3vw, 16px); opacity: 0.88;">Continue flying (Esc / Space)</span>
+            </button>
+
+            <button type="button" class="bp-square-btn bp-square-restart" id="modal-btn-restart">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="23 4 23 10 17 10"></polyline>
+                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                </svg>
+                <span style="font-size: clamp(22px, 2.3vw, 28px); font-weight: bold; letter-spacing: 0.5px;">Play Again</span>
+                <span style="font-size: clamp(14px, 1.3vw, 16px); opacity: 0.88;">Restart match immediately</span>
+            </button>
+
+            <button type="button" class="bp-square-btn bp-square-menu" id="modal-btn-menu">
+                <span class="material-symbols-outlined" style="font-size: 48px; line-height: 1;">home</span>
+                <span style="font-size: clamp(22px, 2.3vw, 28px); font-weight: bold; letter-spacing: 0.5px;">Main Menu</span>
+                <span style="font-size: clamp(14px, 1.3vw, 16px); opacity: 0.88;">Return to hangar & modes</span>
+            </button>
         </div>
     </div>
 </div>
@@ -2059,8 +2083,8 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
 
         if (modalTitle) modalTitle.textContent = "Game Paused";
         if (modalSub) modalSub.textContent = "";
-        if (btnResume) btnResume.style.display = "inline-block";
-        if (btnRestart) btnRestart.style.display = "inline-block";
+        if (btnResume) btnResume.style.display = "flex";
+        if (btnRestart) btnRestart.style.display = "flex";
 
         updateStatsDisplay();
 
@@ -2111,7 +2135,7 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
         if (modalTitle) modalTitle.textContent = data.title || "Game Over";
         if (modalSub) modalSub.textContent = data.subtitle || "";
         if (btnResume) btnResume.style.display = "none";
-        if (btnRestart) btnRestart.style.display = "inline-block";
+        if (btnRestart) btnRestart.style.display = "flex";
 
         updateStatsDisplay(data.extraLabel ? { label: data.extraLabel, value: data.extraValue } : null);
 
@@ -2303,74 +2327,152 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
     font-family: 'Cormorant Garamond', serif !important;
 }
 
-/* In-Game Pause / Victory / Defeat Menus Translucent Frosted Glass Styling (Matching Online & Split-Screen) */
-.game-modal-backdrop {
-    background: rgba(10, 15, 26, 0.65) !important;
-    backdrop-filter: blur(14px) !important;
-    -webkit-backdrop-filter: blur(14px) !important;
+/* In-Game Pause / Victory / Defeat Menus Fullscreen Frosted Glass Layout (Matching Online & Split-Screen) */
+.game-modal-backdrop,
+#game-menu-modal.game-modal-backdrop {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 100000 !important;
+    background: rgba(10, 15, 26, 0.85) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    overflow-y: auto !important;
+    padding: clamp(16px, 3vh, 36px) clamp(16px, 3vw, 40px) !important;
+    box-sizing: border-box !important;
     font-family: 'Cormorant Garamond', serif !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
-.game-modal-card {
-    background: rgba(22, 27, 34, 0.76) !important;
-    border: 1.5px solid rgba(255, 255, 255, 0.18) !important;
-    border-radius: 14px !important;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
-    backdrop-filter: blur(18px) !important;
-    -webkit-backdrop-filter: blur(18px) !important;
+.game-modal-card,
+.game-modal-card.wide-modal {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    width: 100% !important;
+    max-width: min(94vw, 1140px) !important;
+    margin: auto !important;
+    padding: 0 !important;
+    text-align: left !important;
     color: #ffffff !important;
     font-family: 'Cormorant Garamond', serif !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: clamp(14px, 2vh, 22px) !important;
+    min-height: calc(100vh - clamp(32px, 6vh, 72px)) !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
 }
 
-.game-modal-card h2 {
+.game-modal-card .bp-menu-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+    padding-bottom: clamp(10px, 1.8vh, 16px) !important;
+    display: flex !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    width: 100% !important;
+}
+
+.game-modal-card h2,
+.game-modal-card .bp-menu-title {
     color: #ffffff !important;
-    font-size: clamp(30px, 3.2vw, 40px) !important;
+    font-size: clamp(32px, 3.6vw, 46px) !important;
     font-family: 'Cormorant Garamond', serif !important;
+    font-weight: bold !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    text-align: left !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
 }
 
-/* Colorful airplane icons flanking the container title (restores original colors with subtle drop-shadow) */
-.game-modal-card h2 .logo {
+/* Colorful airplane icons flanking the container title */
+.game-modal-card .logo,
+.game-modal-card h2 .logo,
+.game-modal-card .bp-menu-title .logo {
+    display: inline-block !important;
+    width: 44px !important;
+    height: 28px !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6)) !important;
 }
 
-.game-modal-card .modal-subtitle {
-    color: #94a3b8 !important;
-    font-size: clamp(16px, 1.6vw, 19px) !important;
-    font-family: 'Cormorant Garamond', serif !important;
-}
-
-/* Stat Grid Container: override default #f7f7f7 light box to dark translucent */
-.game-modal-card .modal-stats-grid {
-    background: rgba(255, 255, 255, 0.04) !important;
-    border: 1px solid rgba(255, 255, 255, 0.12) !important;
-    border-radius: 10px !important;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3) !important;
-}
-
-.game-modal-card .stat-box {
-    background: rgba(255, 255, 255, 0.06) !important;
-    border: 1px solid rgba(255, 255, 255, 0.12) !important;
-    border-radius: 8px !important;
-    color: #f1f5f9 !important;
-    font-family: 'Cormorant Garamond', serif !important;
-}
-
-.game-modal-card .stat-label {
+.game-modal-card .modal-subtitle,
+.game-modal-card.wide-modal .modal-subtitle {
     color: #cbd5e1 !important;
+    font-size: clamp(18px, 1.8vw, 22px) !important;
     font-family: 'Cormorant Garamond', serif !important;
+    text-align: left !important;
+    margin: 0 !important;
+    min-height: 0 !important;
+    line-height: 1.4 !important;
+    padding: 0 !important;
+    white-space: normal !important;
+}
+
+/* Left-Aligned Stat Grid Container: modern frosted cards */
+.game-modal-card .modal-stats-grid,
+.game-modal-card.wide-modal .modal-stats-grid {
+    display: flex !important;
+    gap: clamp(12px, 1.8vw, 20px) !important;
+    justify-content: flex-start !important;
+    align-items: stretch !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 4px 0 !important;
+    flex-wrap: wrap !important;
+}
+
+.game-modal-card .stat-box,
+.game-modal-card.wide-modal .stat-box {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    border-radius: 12px !important;
+    padding: clamp(14px, 1.8vh, 18px) clamp(18px, 2vw, 26px) !important;
+    text-align: left !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    flex: 1 1 200px !important;
+    max-width: 320px !important;
+    min-width: 170px !important;
+    box-sizing: border-box !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+}
+
+.game-modal-card .stat-label,
+.game-modal-card.wide-modal .stat-label {
+    font-size: clamp(15px, 1.4vw, 17px) !important;
+    font-weight: bold !important;
+    color: #cbd5e1 !important;
+    margin-bottom: 4px !important;
+    letter-spacing: 0.5px !important;
+    text-align: left !important;
+    white-space: normal !important;
 }
 
 .game-modal-card .stat-value,
-.game-modal-card #stat-extra-value {
+.game-modal-card #stat-extra-value,
+.game-modal-card.wide-modal .stat-value {
+    font-size: clamp(26px, 2.8vw, 34px) !important;
+    font-weight: bold !important;
     color: #38bdf8 !important;
-    font-family: 'Cormorant Garamond', serif !important;
+    text-align: left !important;
 }
 
 /* 2-Player Controls Guide in Pause Menu */
 #modal-controls-2p {
-    background: rgba(255, 255, 255, 0.04) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
     border: 1px solid rgba(255, 255, 255, 0.14) !important;
-    border-radius: 10px !important;
+    border-radius: 12px !important;
     color: #e2e8f0 !important;
 }
 
@@ -2432,63 +2534,89 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
     box-shadow: none !important;
 }
 
-/* Translucent action buttons */
-#modal-btn-resume {
-    background: rgba(56, 189, 248, 0.20) !important;
-    border: 1.5px solid rgba(56, 189, 248, 0.6) !important;
+/* Big Action Cards Grid (Styled like Online Config Public & Private Buttons) */
+.game-modal-card .modal-actions,
+#modal-actions-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
+    gap: clamp(14px, 2vw, 20px) !important;
+    width: 100% !important;
+    margin-top: 6px !important;
+}
+
+/* Material Symbols Outlined Icon Styling */
+.material-symbols-outlined {
+    font-family: 'Material Symbols Outlined', 'Material Icons', sans-serif !important;
+    font-weight: normal;
+    font-style: normal;
+    font-size: 48px;
+    line-height: 1;
+    display: inline-block;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: 'liga';
+}
+
+/* Resume Match Big Button */
+#modal-btn-resume.bp-square-btn,
+.bp-square-resume {
+    background: rgba(56, 189, 248, 0.14) !important;
+    border: 1.5px solid rgba(56, 189, 248, 0.5) !important;
     color: #38bdf8 !important;
-    border-radius: 8px !important;
-    font-family: 'Cormorant Garamond', serif !important;
-    font-weight: bold !important;
-    box-shadow: none !important;
-    padding: 8px 22px !important;
-    font-size: 19px !important;
-    cursor: pointer !important;
-    transition: background 0.15s, transform 0.15s !important;
 }
-#modal-btn-resume:hover {
-    background: rgba(56, 189, 248, 0.35) !important;
-    transform: translateY(-1px) !important;
+#modal-btn-resume.bp-square-btn:hover,
+.bp-square-resume:hover {
+    background: rgba(56, 189, 248, 0.28) !important;
+    border-color: #38bdf8 !important;
+    box-shadow: 0 8px 24px rgba(56, 189, 248, 0.3) !important;
+    transform: translateY(-2px) !important;
 }
 
-#modal-btn-restart {
-    background: rgba(74, 222, 128, 0.22) !important;
-    border: 1.5px solid rgba(74, 222, 128, 0.6) !important;
+/* Play Again Big Button */
+#modal-btn-restart.bp-square-btn,
+.bp-square-restart {
+    background: rgba(74, 222, 128, 0.14) !important;
+    border: 1.5px solid rgba(74, 222, 128, 0.5) !important;
     color: #4ade80 !important;
-    border-radius: 8px !important;
-    font-family: 'Cormorant Garamond', serif !important;
-    font-weight: bold !important;
-    box-shadow: none !important;
-    padding: 8px 22px !important;
-    font-size: 19px !important;
-    cursor: pointer !important;
-    transition: background 0.15s, transform 0.15s !important;
 }
-#modal-btn-restart:hover {
-    background: rgba(74, 222, 128, 0.38) !important;
-    transform: translateY(-1px) !important;
+#modal-btn-restart.bp-square-btn:hover,
+.bp-square-restart:hover {
+    background: rgba(74, 222, 128, 0.28) !important;
+    border-color: #4ade80 !important;
+    box-shadow: 0 8px 24px rgba(74, 222, 128, 0.3) !important;
+    transform: translateY(-2px) !important;
 }
 
-#modal-btn-menu {
+/* Main Menu Big Button */
+#modal-btn-menu.bp-square-btn,
+.bp-square-menu {
     background: rgba(255, 255, 255, 0.08) !important;
-    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.28) !important;
     color: #ffffff !important;
-    border-radius: 8px !important;
-    font-family: 'Cormorant Garamond', serif !important;
-    font-weight: bold !important;
-    box-shadow: none !important;
-    text-shadow: none !important;
-    padding: 8px 20px !important;
-    font-size: 19px !important;
-    cursor: pointer !important;
-    transition: background 0.15s !important;
 }
-#modal-btn-menu:hover {
+#modal-btn-menu.bp-square-btn:hover,
+.bp-square-menu:hover {
     background: rgba(255, 255, 255, 0.18) !important;
-    transform: translateY(-1px) !important;
+    border-color: rgba(255, 255, 255, 0.5) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+    transform: translateY(-2px) !important;
 }
-.game-modal-card .btn:hover {
-    transform: translateY(-1px) !important;
+
+/* Maintain display: flex on big action buttons when visible */
+#modal-btn-resume:not([style*="display: none"]):not([style*="display:none"]),
+#modal-btn-restart:not([style*="display: none"]):not([style*="display:none"]),
+#modal-btn-menu:not([style*="display: none"]):not([style*="display:none"]) {
+    display: flex !important;
+}
+#modal-btn-resume[style*="display: none"],
+#modal-btn-resume[style*="display:none"] {
+    display: none !important;
 }
 
 /* Completely remove old right-side notifications */
