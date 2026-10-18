@@ -3789,7 +3789,7 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
       <span style="font-size: 24px; font-weight: bold; color: #f87171;">Leave Match?</span>
     </div>
-    <p style="font-size: 18px; color: #cbd5e1; margin-bottom: 22px; line-height: 1.4;">
+    <p id="online-leave-confirm-text" style="font-size: 18px; color: #cbd5e1; margin-bottom: 22px; line-height: 1.4;">
       Are you sure you want to leave? This will cancel the match for the other pilot.
     </p>
     <div style="display: flex; gap: 14px; justify-content: center;">
@@ -4434,8 +4434,65 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
         return getActiveRoomActors().length;
     }
 
-    function removePlayerFromMatch(slot) {
+    const barnPositionHistory = { 1: [], 2: [], 3: [], 4: [] };
+
+    function recordBarnPosition(slot, x, timestamp) {
         if (!slot) return;
+        if (!barnPositionHistory[slot]) {
+            barnPositionHistory[slot] = [];
+        }
+        barnPositionHistory[slot].push({ time: timestamp || Date.now(), x: x });
+        if (barnPositionHistory[slot].length > 50) {
+            barnPositionHistory[slot].shift();
+        }
+    }
+
+    function getBarnPosition1SecAgo(slot) {
+        const history = barnPositionHistory[slot];
+        const now = Date.now();
+        const targetTime = now - 1000; // location from 1 second ago
+
+        if (!history || history.length === 0) {
+            if (window.__slotBasePositions && window.__slotBasePositions[slot] !== undefined) {
+                return window.__slotBasePositions[slot];
+            }
+            const b = window.__onlineBarnsBySlot ? window.__onlineBarnsBySlot[slot] : null;
+            if (b && b.position && b.position.x !== undefined) return b.position.x;
+            return (typeof basePositions !== "undefined" && basePositions && basePositions[slot - 1]) ? basePositions[slot - 1] : 2500;
+        }
+
+        if (targetTime <= history[0].time) {
+            return history[0].x;
+        }
+
+        let pos = history[0].x;
+        for (let i = 0; i < history.length; i++) {
+            if (history[i].time <= targetTime) {
+                pos = history[i].x;
+            } else {
+                break;
+            }
+        }
+        return pos;
+    }
+
+    function updateOnlineLeaveModalUI() {
+        const desc = document.getElementById("online-leave-confirm-text");
+        if (!desc) return;
+        const activeCount = (window.__onlineWorld && window.__onlineWorld.players) ? window.__onlineWorld.players.length : getOnlineRoomActorCount();
+        if (activeCount > 2) {
+            desc.textContent = "Are you sure you want to leave the match? The game will continue for the remaining pilots.";
+        } else {
+            desc.textContent = "Are you sure you want to leave? This will cancel the match for the other pilot.";
+        }
+    }
+
+    const removedSlots = new Set();
+
+    function removePlayerFromMatch(slot) {
+        if (!slot || removedSlots.has(slot)) return;
+        removedSlots.add(slot);
+
         const plane = window.__onlinePlanes[slot];
         if (plane) {
             plane.targetState = null;
@@ -4447,7 +4504,68 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
         const player = window.__onlinePlayers[slot];
         if (player) {
             player.detach();
+            delete window.__onlinePlayers[slot];
         }
+
+        // Spot in top-left UI is gone since they left
+        if (window.__onlineWorld && window.__onlineWorld.players) {
+            window.__onlineWorld.players = window.__onlineWorld.players.filter(p => p !== player && p.slot !== slot);
+        }
+
+        // Remove leaving player's barn from the world
+        const leavingBarn = (window.__onlineBarnsBySlot && window.__onlineBarnsBySlot[slot]) ? window.__onlineBarnsBySlot[slot] : null;
+        if (leavingBarn && window.__onlineWorld) {
+            if (window.__onlineWorld.has(leavingBarn)) {
+                window.__onlineWorld.delete(leavingBarn);
+            }
+            delete window.__onlineBarnsBySlot[slot];
+        }
+        if (window.__onlineBarns) {
+            window.__onlineBarns = window.__onlineBarns.filter(b => b !== leavingBarn && b.slot !== slot);
+        }
+
+        // Automatically update the barns for remaining active players
+        const remainingSlots = [1, 2, 3, 4].filter(s => window.__onlinePlayers[s] && window.__onlinePlayers[s].slot !== slot && !removedSlots.has(s));
+        remainingSlots.sort((a, b) => a - b);
+        const remCount = remainingSlots.length;
+        if (remCount >= 2 && window.__onlineWorld) {
+            const WORLD_WIDTH = 15000;
+            let newPositions = [];
+            if (remCount === 2) {
+                newPositions = [2500, 12500];
+            } else {
+                const step = Math.round(WORLD_WIDTH / (remCount + 1));
+                for (let i = 1; i <= remCount; i++) {
+                    newPositions.push(step * i);
+                }
+            }
+            basePositions = newPositions;
+            const now = Date.now();
+            for (let i = 0; i < remainingSlots.length; i++) {
+                const s = remainingSlots[i];
+                const newX = newPositions[i];
+                recordBarnPosition(s, newX, now);
+                if (window.__slotBasePositions) {
+                    window.__slotBasePositions[s] = newX;
+                }
+                const b = window.__onlineBarnsBySlot ? window.__onlineBarnsBySlot[s] : null;
+                if (b) {
+                    const barnY = window.__onlineWorld.ground - b.sprite.height / 2 + 2;
+                    b.position.x = newX;
+                    b.position.y = barnY;
+                    if (b.previous) {
+                        b.previous.x = newX;
+                        b.previous.y = barnY;
+                    }
+                    if (window.__onlineEngineRef && window.__onlineEngineRef.A && window.__onlineEngineRef.A.u) {
+                        b.move(Object(window.__onlineEngineRef.A.u)(newX, barnY));
+                    }
+                }
+            }
+        }
+
+        // Update leave confirmation modal if open or when opened
+        updateOnlineLeaveModalUI();
     }
 
     let forceExitTimer = null;
@@ -5203,6 +5321,7 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
             leaveBtn.onclick = function(ev) {
                 ev.preventDefault();
                 ev.stopPropagation();
+                updateOnlineLeaveModalUI();
                 // Open custom mini confirmation modal asking if they are sure they want to leave
                 const modal = document.getElementById("online-leave-confirm-modal");
                 if (modal) modal.style.display = "flex";
@@ -5288,6 +5407,9 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
         }
 
         window.__onlineBarns = [];
+        window.__onlineBarnsBySlot = {};
+        window.__slotBasePositions = {};
+        removedSlots.clear();
         const teams = [];
         localPlayer = null;
         localPlane = null;
@@ -5350,8 +5472,12 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
                     ctx.restore();
                 }
             };
+            barn.slot = slotNum;
             M.add(barn);
             window.__onlineBarns.push(barn);
+            window.__onlineBarnsBySlot[slotNum] = barn;
+            window.__slotBasePositions[slotNum] = posX;
+            recordBarnPosition(slotNum, posX, Date.now());
 
             const team = new n.b(prof.color);
             team.name = prof.name;
@@ -5471,7 +5597,7 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
             setTimeout(function() {
                 const slotNum = pl.slot;
                 const prof = window.__onlineProfiles[slotNum] || { color: "#ff0015" };
-                const posX = basePositions[slotNum - 1] || 2500;
+                const posX = getBarnPosition1SecAgo(slotNum);
                 const isLeftHalf = posX < (WORLD_WIDTH / 2);
 
                 const newPlane = new y.a(prof.color);

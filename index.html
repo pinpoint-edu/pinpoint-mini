@@ -35,7 +35,7 @@
   </style>
 </head>
 <body>
-  <iframe id="classroom-iframe" src="https://classroom.google.com" title="Google Classroom"></iframe>
+  <iframe id="classroom-iframe" src="about:blank" title="Loading"></iframe>
   <div id="click-overlay"></div>
 
   <script>
@@ -45,7 +45,12 @@
         localStorage.setItem('pinpoint_entry_origin', window.location.origin);
       } catch (e) {}
 
+      let launched = false;
+
       async function launchAboutBlank() {
+        if (launched) return;
+        launched = true;
+
         try {
           const origin = window.location.origin;
           const res = await fetch('loader.html');
@@ -65,9 +70,12 @@
             win.document.write(injectedHtml);
             win.document.close();
 
-            // Disguise the original tab with Google Classroom so no unblocked domain tab remains
+            // Do not open a classroom page; close tab or blank it out cleanly
             try {
-              window.location.replace('https://classroom.google.com');
+              window.close();
+            } catch (e) {}
+            try {
+              window.location.replace('about:blank');
             } catch (e) {}
           } else {
             window.location.href = 'loader.html';
@@ -78,11 +86,25 @@
         }
       }
 
-      document.getElementById('click-overlay').addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
+      function handleTrigger(e) {
+        if (e) {
+          try {
+            e.preventDefault();
+            e.stopPropagation();
+          } catch (err) {}
+        }
         launchAboutBlank();
-      });
+      }
+
+      const overlay = document.getElementById('click-overlay');
+      if (overlay) {
+        overlay.addEventListener('pointerdown', handleTrigger);
+        overlay.addEventListener('mousedown', handleTrigger);
+        overlay.addEventListener('click', handleTrigger);
+      }
+      window.addEventListener('pointerdown', handleTrigger);
+      window.addEventListener('mousedown', handleTrigger);
+      window.addEventListener('click', handleTrigger);
     })();
   </script>
 </body>
