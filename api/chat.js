@@ -3,7 +3,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { messages } = req.body;
+  const { messages } = req.body || {};
   if (!messages || !Array.isArray(messages)) {
     return res.status(400).json({ error: 'Messages array is required' });
   }
@@ -13,20 +13,38 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'AI service configuration error. GROQ_API_KEY is not configured.' });
   }
 
-  // Avoid decommissioned models (llama3-8b-8192 / llama3-70b-8192 were retired by Groq)
+  // 1. Dynamically discover active models supported by this Groq API key
+  let availableModels = [];
+  try {
+    const modelsRes = await fetch('https://api.groq.com/openai/v1/models', {
+      headers: { 'Authorization': `Bearer ${apiKey}` }
+    });
+    if (modelsRes.ok) {
+      const modelsData = await modelsRes.json();
+      if (modelsData && Array.isArray(modelsData.data)) {
+        availableModels = modelsData.data
+          .filter(m => m.active !== false && !m.id.includes('whisper') && !m.id.includes('embed') && !m.id.includes('guard'))
+          .map(m => m.id);
+      }
+    }
+  } catch (e) {
+    console.warn('Could not list Groq models:', e.message);
+  }
+
   const envModel = process.env.GROQ_MODEL;
   const isDecommissioned = envModel && (envModel.includes('llama3-8b') || envModel.includes('llama3-70b'));
 
   const modelsToTry = [
     (!isDecommissioned ? envModel : null),
+    ...availableModels,
     'llama-3.1-8b-instant',
-    'mixtral-8x7b-32768',
-    'gemma2-9b-it'
+    'llama-3.3-70b-versatile'
   ].filter(Boolean);
 
+  const uniqueModels = [...new Set(modelsToTry)];
   let lastError = null;
 
-  for (const model of modelsToTry) {
+  for (const model of uniqueModels) {
     try {
       const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
@@ -48,7 +66,7 @@ export default async function handler(req, res) {
       }
 
       const errorText = await response.text();
-      lastError = { status: response.status, details: errorText };
+      lastError = { status: response.status, details: errorText, model: model };
 
       // If model not found, decommissioned, or access denied, try next model in the chain
       if (
@@ -64,7 +82,7 @@ export default async function handler(req, res) {
 
       return res.status(response.status).json({ error: 'Error from Groq API', details: errorText });
     } catch (err) {
-      lastError = { status: 500, details: err.message };
+      lastError = { status: 500, details: err.message, model: model };
     }
   }
 
