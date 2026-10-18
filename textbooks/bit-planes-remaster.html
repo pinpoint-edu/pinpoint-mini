@@ -3637,7 +3637,7 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
 </div>
 
 <!-- Fullscreen Online Beta Modal -->
-<div id="modal-online-beta" class="bp-fullscreen-modal">
+<div id="modal-online-beta" class="bp-fullscreen-modal" style="display: none;">
   <div class="bp-menu-wrap">
     <div class="bp-menu-header">
       <div class="bp-menu-title">
@@ -3965,16 +3965,25 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
         photonClient = null;
     }
 
+    function isOnlineModalOpen() {
+        const modal = document.getElementById("modal-online-beta");
+        return !!(modal && (modal.style.display === "flex" || modal.style.display === "block"));
+    }
+
     let reconnectDebounceTimer = null;
     let reconnectAttempts = 0;
     function scheduleReconnect() {
+        if (!isOnlineModalOpen()) return;
         if (reconnectDebounceTimer) clearTimeout(reconnectDebounceTimer);
         reconnectAttempts++;
-        const delay = Math.min(1000 + reconnectAttempts * 1000, 8000);
+        if (reconnectAttempts > 3) {
+            updateConnectionStatus("error", "Multiplayer server busy. Reopen to retry.");
+            return;
+        }
+        const delay = Math.min(1000 + reconnectAttempts * 1000, 6000);
         reconnectDebounceTimer = setTimeout(() => {
             reconnectDebounceTimer = null;
-            const modal = document.getElementById("modal-online-beta");
-            if (modal && modal.style.display !== "none") {
+            if (isOnlineModalOpen()) {
                 ensurePhotonConnected();
             }
         }, delay);
@@ -4009,6 +4018,7 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
     }
 
     function ensurePhotonConnected() {
+        if (!isOnlineModalOpen()) return;
         if (!photonClient) {
             instantReconnect();
             return;
@@ -4021,9 +4031,8 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
     function startRoomsAutoRefresh() {
         if (roomsAutoRefreshTimer) return;
         roomsAutoRefreshTimer = setInterval(() => {
-            const modal = document.getElementById("modal-online-beta");
             const matchView = document.getElementById("view-matchmaking");
-            if (modal && modal.style.display !== "none" && matchView && matchView.style.display !== "none") {
+            if (isOnlineModalOpen() && matchView && matchView.style.display !== "none") {
                 renderPublicRoomsList();
             }
         }, 2500);
@@ -4044,6 +4053,11 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
                 PHOTON_APP_VERSION
             );
             window.__photonClient = photonClient;
+            try {
+                if (typeof Exitgames !== "undefined" && Exitgames.Common && Exitgames.Common.Logger && Exitgames.Common.Logger.Level) {
+                    photonClient.setLogLevel(Exitgames.Common.Logger.Level.WARN);
+                }
+            } catch(e) {}
             photonClient.autoJoinLobby = true;
             photonClient.keepAliveTimeoutMs = 8000;
 
@@ -4100,8 +4114,10 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
             updateConnectionStatus("connecting", "Connecting...");
         } else if (state === LbcState.Disconnected || state === LbcState.Error) {
             isBusyJoiningOrCreate = false;
-            updateConnectionStatus("error", "Disconnected. Reconnecting...");
-            scheduleReconnect();
+            updateConnectionStatus("error", "Disconnected.");
+            if (isOnlineModalOpen()) {
+                scheduleReconnect();
+            }
         }
     }
 
@@ -4127,13 +4143,14 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
     }
 
     function onError(code, message) {
-        console.warn("[Photon Error]", code, message);
-        isBusyJoiningOrCreate = false;
-        resetActionButtons();
-        // Do not pop up error toasts for idle background timeouts
+        if (!isOnlineModalOpen()) return;
+        // Do not pop up error toasts or log warnings for idle background timeouts
         if (code === 1004 || code === 1003 || code === 2004 || code === 2003) {
             return;
         }
+        console.warn("[Photon Error]", code, message);
+        isBusyJoiningOrCreate = false;
+        resetActionButtons();
         if (code === 1101 || code === 2101) {
             showModalError("Authentication error. Reconnecting...");
         } else if (code === 3001 || code === 1002 || code === 2002) {
@@ -4357,9 +4374,27 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
     }
 
 
+    function closeOnlineModal() {
+        const onlineModal = document.getElementById("modal-online-beta");
+        if (onlineModal) {
+            onlineModal.style.display = "none";
+        }
+        if (reconnectDebounceTimer) {
+            clearTimeout(reconnectDebounceTimer);
+            reconnectDebounceTimer = null;
+        }
+        if (roomsAutoRefreshTimer) {
+            clearInterval(roomsAutoRefreshTimer);
+            roomsAutoRefreshTimer = null;
+        }
+        reconnectAttempts = 0;
+        cleanupPhotonClient();
+    }
+
     function openOnlineModal() {
         const onlineModal = document.getElementById("modal-online-beta");
         if (onlineModal) {
+            reconnectAttempts = 0;
             onlineModal.style.display = "flex";
             initCallsignAndColor();
             const modalNick = document.getElementById("modal-callsign-input");
@@ -5900,8 +5935,8 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
             });
         }
 
-        if (btnCloseOnline && onlineModal) {
-            btnCloseOnline.onclick = () => { onlineModal.style.display = "none"; };
+        if (btnCloseOnline) {
+            btnCloseOnline.onclick = closeOnlineModal;
         }
 
 // openSplitScreenModal defined in outer scope
@@ -6033,12 +6068,12 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
 
         // Auto-reconnect listeners on tab visibility and focus
         document.addEventListener("visibilitychange", function() {
-            if (!document.hidden && onlineModal && onlineModal.style.display !== "none") {
+            if (!document.hidden && isOnlineModalOpen()) {
                 ensurePhotonConnected();
             }
         });
         window.addEventListener("focus", function() {
-            if (onlineModal && onlineModal.style.display !== "none") {
+            if (isOnlineModalOpen()) {
                 ensurePhotonConnected();
             }
         });

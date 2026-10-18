@@ -4,5 +4,6 @@
   "description": "Pinpoint Mini - Core Educational & Classwork Platform",
   "scripts": {
     "dev": "vercel dev"
-  }
+  },
+  "type": "module"
 }
