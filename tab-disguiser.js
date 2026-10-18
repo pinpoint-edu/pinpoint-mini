@@ -1581,6 +1581,7 @@ var TabDisguiser = window.TabDisguiser || {
     </div>
   </div>
   <iframe id="game-frame" class="game-iframe" src="${gameSrc}" allow="clipboard-write; clipboard-read; fullscreen; gamepad; autoplay" allowfullscreen></iframe>
+  <script src="${currentOrigin}/scripts/cors-interceptor.js"></script>
   <script src="${currentOrigin}/scripts/save-manager.js"></script>
   <script src="${currentOrigin}/scripts/btd-save-sync.js"></script>
   <script>
