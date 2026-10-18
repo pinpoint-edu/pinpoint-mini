@@ -12,65 +12,14 @@
     window['ppConfig'].deleteIsEnforced = false;
     window['ppConfig'].sealIsEnforced = false;
 
-    const EMPTY_SWF_BYTES = new Uint8Array([70, 87, 83, 8, 23, 0, 0, 0, 120, 0, 5, 220, 0, 0, 12, 114, 0, 0, 12, 1, 0, 0, 0]);
-
     function isRestrictedUrl(url) {
         if (!url || typeof url !== 'string') return false;
-        const u = url.toLowerCase();
-        return u.includes('classroom.google.com/log') ||
-               u.includes('play.google.com/log') ||
-               u.includes('rotatecookiespage') ||
-               u.includes('google.com/log') ||
-               u.includes('csp/proto') ||
-               u.includes('google-analytics.com') ||
-               u.includes('mochiads.com') ||
-               u.includes('mochibot.com') ||
-               u.includes('utmac=') ||
-               u.includes('/js/all.js') ||
-               u.includes('html/settings/js') ||
-               u.includes('settings/js/index.js');
-    }
-
-    function createInterceptedResponse(url) {
-        const u = String(url || '').toLowerCase();
-        if (u.includes('.swf')) {
-            return new Response(EMPTY_SWF_BYTES, {
-                status: 200,
-                statusText: 'OK',
-                headers: {
-                    'Content-Type': 'application/x-shockwave-flash',
-                    'Access-Control-Allow-Origin': '*'
-                }
-            });
-        }
-        if (u.includes('.js') || u.includes('all.js') || u.includes('index.js')) {
-            return new Response('/* stub */', {
-                status: 200,
-                statusText: 'OK',
-                headers: {
-                    'Content-Type': 'application/javascript',
-                    'Access-Control-Allow-Origin': '*'
-                }
-            });
-        }
-        if (u.includes('.gif') || u.includes('.png') || u.includes('utmac=') || u.includes('mochibot') || u.includes('__utm.gif')) {
-            return new Response('', {
-                status: 200,
-                statusText: 'OK',
-                headers: {
-                    'Content-Type': 'image/gif',
-                    'Access-Control-Allow-Origin': '*'
-                }
-            });
-        }
-        return new Response('{}', {
-            status: 200,
-            statusText: 'OK',
-            headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            }
-        });
+        return url.includes('classroom.google.com/log') ||
+               url.includes('play.google.com/log') ||
+               url.includes('RotateCookiesPage') ||
+               url.includes('google.com/log') ||
+               url.includes('csp/proto') ||
+               url.includes('google-analytics.com');
     }
 
     // 2. Intercept XMLHttpRequest
@@ -82,10 +31,6 @@
             this._isIntercepted = isRestrictedUrl(url);
             this._originalTargetUrl = url;
             if (this._isIntercepted) {
-                const u = String(url || '').toLowerCase();
-                if (u.includes('.swf')) {
-                    return origOpen.call(this, 'GET', 'data:application/x-shockwave-flash;base64,RldTCAcAAAB4AAXcAAAMcgAAAQwAAAA=', true);
-                }
                 return origOpen.call(this, 'GET', 'data:application/json,{}', true);
             }
             return origOpen.apply(this, arguments);
@@ -111,7 +56,11 @@
             }
 
             if (isRestrictedUrl(url)) {
-                return Promise.resolve(createInterceptedResponse(url));
+                return Promise.resolve(new Response('{}', {
+                    status: 200,
+                    statusText: 'OK',
+                    headers: { 'Content-Type': 'application/json' }
+                }));
             }
             return origFetch.apply(this, arguments);
         };

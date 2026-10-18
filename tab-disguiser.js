@@ -1129,7 +1129,7 @@ var TabDisguiser = window.TabDisguiser || {
         try {
             // Avoid showing inside textbook game iframes
             if (window.location.pathname.includes('/textbooks/')) return;
-            const widgetDismissed = localStorage.getItem('pinpoint_info_widget_dismissed_v6') === 'true';
+            const widgetDismissed = localStorage.getItem('pinpoint_info_widget_dismissed_v3') === 'true';
             if (!widgetDismissed) {
                 this.showInfoWidget();
             }
@@ -1143,8 +1143,8 @@ var TabDisguiser = window.TabDisguiser || {
             if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
         }
         try {
-            localStorage.setItem('pinpoint_info_widget_dismissed_v6', 'true');
-            sessionStorage.setItem('pinpoint_info_widget_dismissed_v6', 'true');
+            localStorage.setItem('pinpoint_info_widget_dismissed_v3', 'true');
+            sessionStorage.setItem('pinpoint_info_widget_dismissed_v3', 'true');
         } catch (err) {}
         const widget = document.getElementById('pinpoint-info-widget');
         if (widget) {
@@ -1156,7 +1156,7 @@ var TabDisguiser = window.TabDisguiser || {
 
     showInfoWidget(force = false) {
         if (!force) {
-            const dismissed = localStorage.getItem('pinpoint_info_widget_dismissed_v6') === 'true';
+            const dismissed = localStorage.getItem('pinpoint_info_widget_dismissed_v3') === 'true';
             if (dismissed) return;
         }
 
@@ -1167,7 +1167,7 @@ var TabDisguiser = window.TabDisguiser || {
 
         let existing = document.getElementById('pinpoint-info-widget');
         if (existing) {
-            if (!force && localStorage.getItem('pinpoint_info_widget_dismissed_v6') === 'true') {
+            if (!force && localStorage.getItem('pinpoint_info_widget_dismissed_v3') === 'true') {
                 existing.remove();
                 return;
             }
@@ -1375,21 +1375,7 @@ var TabDisguiser = window.TabDisguiser || {
                     <div id="info-script-toast" style="display:none;font-size:10.5px;color:#137333;font-weight:500;">✓ Script link copied to clipboard!</div>
                 </div>
 
-                <!-- 1. Bloons TD 1-4 Save & Auto-Resume -->
-                <div class="pinpoint-list-item">
-                    <div class="pinpoint-item-head">
-                        <div class="pinpoint-item-title">
-                            <span class="material-symbols-outlined notranslate" style="font-size:16px;color:#e37400;line-height:1;">flash_on</span>
-                            <span>Bloons TD 1-4 Save & Auto-Resume</span>
-                        </div>
-                        <span class="pinpoint-badge pinpoint-badge-addition">Addition</span>
-                    </div>
-                    <div class="pinpoint-item-desc">
-                        Full save downloader, uploader, and automatic game resume now supported for all Bloons TD games (Bloons TD 1, 2, 3, 4) and all Flash & Ruffle games! When you load your save, the game automatically resumes right where you left off.
-                    </div>
-                </div>
-
-                <!-- 2. Bit Planes Online -->
+                <!-- 1. Bit Planes Online -->
                 <div class="pinpoint-list-item">
                     <div class="pinpoint-item-head">
                         <div class="pinpoint-item-title">
@@ -1403,7 +1389,7 @@ var TabDisguiser = window.TabDisguiser || {
                     </div>
                 </div>
 
-                <!-- 3. Library -->
+                <!-- 2. Library -->
                 <div class="pinpoint-list-item">
                     <div class="pinpoint-item-head">
                         <div class="pinpoint-item-title">
@@ -1417,7 +1403,7 @@ var TabDisguiser = window.TabDisguiser || {
                     </div>
                 </div>
 
-                <!-- 4. Bug Fix -->
+                <!-- 3. Bug Fix -->
                 <div class="pinpoint-list-item">
                     <div class="pinpoint-item-head">
                         <div class="pinpoint-item-title">
@@ -1428,6 +1414,20 @@ var TabDisguiser = window.TabDisguiser || {
                     </div>
                     <div class="pinpoint-item-desc">
                         Fixed 503 byte timeouts on jsDelivr mirrors, multi-file games, and Ruffle Flash WASM loading.
+                    </div>
+                </div>
+
+                <!-- 4. Retro Bowl Saves -->
+                <div class="pinpoint-list-item">
+                    <div class="pinpoint-item-head">
+                        <div class="pinpoint-item-title">
+                            <span class="material-symbols-outlined notranslate" style="font-size:16px;color:#137333;line-height:1;">sports_football</span>
+                            <span>Retro Bowl Dynasty Saves</span>
+                        </div>
+                        <span class="pinpoint-badge pinpoint-badge-addition">Addition</span>
+                    </div>
+                    <div class="pinpoint-item-desc">
+                        Export and import season save files for Retro Bowl & Retro Bowl College right from the runner topbar.
                     </div>
                 </div>
             </div>
@@ -1559,15 +1559,6 @@ var TabDisguiser = window.TabDisguiser || {
       </div>
     </div>
     <div class="topbar-right">
-      <button id="popout-save-export" class="action-btn" onclick="exportPopoutSave()" style="color:#1a73e8;display:none;" title="Download Save (.json)">
-        <span class="material-symbols-outlined notranslate" style="font-size:18px;">download</span>
-        <span>Save</span>
-      </button>
-      <button id="popout-save-import" class="action-btn" onclick="importPopoutSave()" style="color:#188038;display:none;" title="Upload Save (.json)">
-        <span class="material-symbols-outlined notranslate" style="font-size:18px;">upload</span>
-        <span>Load</span>
-      </button>
-      <input type="file" id="popout-save-input" accept=".json,application/json" style="display:none;" onchange="handlePopoutSaveFile(event)">
       <button id="popout-fav-btn" class="action-btn ${isFavorited ? 'starred' : ''}" onclick="togglePopoutFav()">
         <span class="material-symbols-outlined" id="popout-fav-icon" style="${isFavorited ? "font-variation-settings:'FILL' 1;color:#1a73e8;" : ""}">
           ${isFavorited ? 'bookmark' : 'bookmark_border'}
@@ -1581,9 +1572,6 @@ var TabDisguiser = window.TabDisguiser || {
     </div>
   </div>
   <iframe id="game-frame" class="game-iframe" src="${gameSrc}" allow="clipboard-write; clipboard-read; fullscreen; gamepad; autoplay" allowfullscreen></iframe>
-  <script src="${currentOrigin}/scripts/cors-interceptor.js"></script>
-  <script src="${currentOrigin}/scripts/save-manager.js"></script>
-  <script src="${currentOrigin}/scripts/btd-save-sync.js"></script>
   <script>
     const LOCKED_POPOUT_TITLE = ${JSON.stringify(popoutTitle)};
     try {
@@ -1630,47 +1618,6 @@ var TabDisguiser = window.TabDisguiser || {
 
     const TARGET_FILE = ${JSON.stringify(file)};
     let returnUrl = ${JSON.stringify(currentUrl)};
-
-    function exportPopoutSave() {
-      if (typeof PinpointSaveManager !== 'undefined') {
-        PinpointSaveManager.exportSave(TARGET_FILE);
-      } else if (window.opener && window.opener.PinpointSaveManager) {
-        window.opener.PinpointSaveManager.exportSave(TARGET_FILE);
-      }
-    }
-    function importPopoutSave() {
-      const inp = document.getElementById('popout-save-input');
-      if (inp) { inp.value = ''; inp.click(); }
-    }
-    function handlePopoutSaveFile(event) {
-      const file = event.target.files && event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const content = e.target.result;
-        if (typeof PinpointSaveManager !== 'undefined') {
-          PinpointSaveManager.importSave(TARGET_FILE, content);
-        } else if (window.opener && window.opener.PinpointSaveManager) {
-          window.opener.PinpointSaveManager.importSave(TARGET_FILE, content);
-        }
-      };
-      reader.readAsText(file);
-    }
-    function checkPopoutSaveSupport() {
-      try {
-        const sm = (typeof PinpointSaveManager !== 'undefined' && PinpointSaveManager) || (window.opener && window.opener.PinpointSaveManager);
-        if (sm && sm.isSupported(TARGET_FILE)) {
-          const exp = document.getElementById('popout-save-export');
-          const imp = document.getElementById('popout-save-import');
-          if (exp) exp.style.display = 'inline-flex';
-          if (imp) imp.style.display = 'inline-flex';
-        }
-      } catch(e) {}
-    }
-    checkPopoutSaveSupport();
-    window.addEventListener('load', checkPopoutSaveSupport);
-    setTimeout(checkPopoutSaveSupport, 200);
-    setTimeout(checkPopoutSaveSupport, 800);
 
     function returnToWebsite() {
       try {

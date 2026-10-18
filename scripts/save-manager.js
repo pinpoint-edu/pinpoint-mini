@@ -8,33 +8,6 @@
 
   const SAVE_SALT = 'PinpointMini_SecureSave_v1';
 
-  // Detect if a string value is Ruffle / Flash SharedObject (SOL) binary base64 data
-  function isRuffleSolData(val) {
-    if (!val || typeof val !== 'string' || val.length < 20) return false;
-    try {
-      const raw = atob(val.slice(0, 64));
-      return raw.length >= 10 && raw.indexOf('TCSO') !== -1;
-    } catch(e) {
-      return false;
-    }
-  }
-
-  // Extract SharedObject name from Ruffle SOL base64 data
-  function getSolInfo(base64Str) {
-    if (!isRuffleSolData(base64Str)) return null;
-    try {
-      const raw = atob(base64Str.slice(0, 100));
-      const tcsoIdx = raw.indexOf('TCSO');
-      if (tcsoIdx === -1 || raw.length < tcsoIdx + 12) return null;
-      const lenIdx = tcsoIdx + 10;
-      const nameLen = (raw.charCodeAt(lenIdx) << 8) | raw.charCodeAt(lenIdx + 1);
-      const soName = raw.slice(lenIdx + 2, lenIdx + 2 + nameLen);
-      return { name: soName };
-    } catch(e) {
-      return null;
-    }
-  }
-
   // Game Save Configurations for Supported Games
   const GAME_CONFIGS = {
     'retro-bowl': {
@@ -91,349 +64,6 @@
         }
         return { valid: true };
       }
-    },
-    'bloons-td': {
-      id: 'bloons-td',
-      title: 'Bloons TD',
-      isRuffle: true,
-      matchers: [
-        /textbooks\/bloons-td\.html/i,
-        /textbooks\/bloons-td(?!\d)/i,
-        /bloons-td\.swf/i,
-        /^bloons-td$/i,
-        /^bloons-td-1$/i,
-        /^bloons td$/i,
-        /^bloons td 1$/i,
-        /^bloons$/i,
-        /^bloons 1$/i
-      ],
-      isKeyMatch: (key, val) => {
-        if (!key || typeof key !== 'string') return false;
-        const kLower = key.toLowerCase();
-        if (kLower.includes('college') || kLower.includes('happy') || kLower.includes('sprinter') || kLower.includes('retrobowl') || kLower.includes('bloxorz')) {
-          return false;
-        }
-        if (kLower.includes('bloonstd2') || kLower.includes('btd2') || kLower.includes('bloonstd3') || kLower.includes('btd3') || kLower.includes('bloonstd4') || kLower.includes('btd4')) {
-          return false;
-        }
-        if (kLower.includes('pinpoint_btd_state_1') || kLower.includes('pinpoint_btd_state_bloons-td')) {
-          return true;
-        }
-        if (kLower.includes('bloons-td.swf') || kLower.includes('bloons-td') || (kLower.includes('bloon') && !kLower.includes('2') && !kLower.includes('3') && !kLower.includes('4'))) {
-          return true;
-        }
-        if (val && isRuffleSolData(val)) {
-          const info = getSolInfo(val);
-          if (info && info.name) {
-            const nameLower = info.name.toLowerCase();
-            if (nameLower.includes('bloonstd2') || nameLower.includes('btd2') || nameLower.includes('bloonstd3') || nameLower.includes('btd3') || nameLower.includes('bloonstd4') || nameLower.includes('btd4')) {
-              return false;
-            }
-            if (nameLower.includes('bloon') || nameLower.includes('btd')) return true;
-          }
-          if (kLower.includes('bloons-td.swf')) return true;
-        }
-        return false;
-      },
-      validateData: (data) => {
-        const keys = Object.keys(data || {});
-        if (keys.length === 0) return { valid: false, error: 'No save data entries found.' };
-        for (const k of keys) {
-          const kLower = k.toLowerCase();
-          if (kLower.includes('college') || kLower.includes('happy') || kLower.includes('sprinter') || kLower.includes('retrobowl') || kLower.includes('bloxorz')) {
-            return { valid: false, error: `Incompatible save key '${k}' detected for Bloons TD.` };
-          }
-          if (kLower.includes('bloonstd2') || kLower.includes('btd2') || kLower.includes('bloonstd3') || kLower.includes('btd3') || kLower.includes('bloonstd4') || kLower.includes('btd4')) {
-            return { valid: false, error: `Incompatible save key '${k}' detected for Bloons TD.` };
-          }
-        }
-        return { valid: true };
-      }
-    },
-    'bloons-td-2': {
-      id: 'bloons-td-2',
-      title: 'Bloons TD 2',
-      isRuffle: true,
-      matchers: [
-        /textbooks\/bloonsTD2\.html/i,
-        /textbooks\/bloons-?td-?2/i,
-        /bloonstd2/i,
-        /bloons-td-2/i,
-        /^bloons td 2$/i,
-        /^bloons-td-2$/i,
-        /^bloonstd2$/i,
-        /^bloons 2$/i
-      ],
-      isKeyMatch: (key, val) => {
-        if (!key || typeof key !== 'string') return false;
-        const kLower = key.toLowerCase();
-        if (kLower.includes('college') || kLower.includes('happy') || kLower.includes('sprinter') || kLower.includes('retrobowl') || kLower.includes('bloxorz')) {
-          return false;
-        }
-        if (kLower.includes('bloonstd3') || kLower.includes('btd3') || kLower.includes('bloonstd4') || kLower.includes('btd4')) {
-          return false;
-        }
-        if (kLower.includes('pinpoint_btd_state_2') || kLower.includes('pinpoint_btd_state_bloons-td-2')) {
-          return true;
-        }
-        if (kLower.includes('bloonstd2') || kLower.includes('btd2') || kLower.includes('bloons-td-2') || kLower.includes('bloonstd_2')) {
-          return true;
-        }
-        if (val && isRuffleSolData(val)) {
-          const info = getSolInfo(val);
-          if (info && info.name) {
-            const nameLower = info.name.toLowerCase();
-            if (nameLower.includes('bloonstd2') || nameLower.includes('btd2') || (nameLower.includes('bloon') && nameLower.includes('2'))) return true;
-          }
-          if ((kLower.includes('google.com') || kLower.includes('doingso.swf') || kLower.includes('jsdelivr.net') || kLower.includes('papas-bakeria')) && info && info.name) {
-            const nameLower = info.name.toLowerCase();
-            if (nameLower.includes('bloonstd2') || nameLower.includes('btd2')) return true;
-          }
-        }
-        return false;
-      },
-      validateData: (data) => {
-        const keys = Object.keys(data || {});
-        if (keys.length === 0) return { valid: false, error: 'No save data entries found.' };
-        for (const k of keys) {
-          const kLower = k.toLowerCase();
-          if (kLower.includes('college') || kLower.includes('happy') || kLower.includes('sprinter') || kLower.includes('retrobowl') || kLower.includes('bloxorz')) {
-            return { valid: false, error: `Incompatible save key '${k}' detected for Bloons TD 2.` };
-          }
-          if (kLower.includes('bloonstd3') || kLower.includes('btd3') || kLower.includes('bloonstd4') || kLower.includes('btd4')) {
-            return { valid: false, error: `Incompatible save key '${k}' detected for Bloons TD 2.` };
-          }
-        }
-        return { valid: true };
-      }
-    },
-    'bloons-td-3': {
-      id: 'bloons-td-3',
-      title: 'Bloons TD 3',
-      isRuffle: true,
-      matchers: [
-        /textbooks\/bloonsTD3\.html/i,
-        /textbooks\/bloons-?td-?3/i,
-        /bloonstd3/i,
-        /bloons-td-3/i,
-        /^bloons td 3$/i,
-        /^bloons-td-3$/i,
-        /^bloonstd3$/i,
-        /^bloons 3$/i
-      ],
-      isKeyMatch: (key, val) => {
-        if (!key || typeof key !== 'string') return false;
-        const kLower = key.toLowerCase();
-        if (kLower.includes('college') || kLower.includes('happy') || kLower.includes('sprinter') || kLower.includes('retrobowl') || kLower.includes('bloxorz')) {
-          return false;
-        }
-        if (kLower.includes('bloonstd2') || kLower.includes('btd2') || kLower.includes('bloonstd4') || kLower.includes('btd4')) {
-          return false;
-        }
-        if (kLower.includes('pinpoint_btd_state_3') || kLower.includes('pinpoint_btd_state_bloons-td-3')) {
-          return true;
-        }
-        if (kLower.includes('btd3') || kLower.includes('bloonstd3') || kLower.includes('bloons-td-3') || kLower.includes('bloonstd_3')) {
-          return true;
-        }
-        if (val && isRuffleSolData(val)) {
-          const info = getSolInfo(val);
-          if (info && info.name) {
-            const nameLower = info.name.toLowerCase();
-            if (nameLower.includes('btd3') || nameLower.includes('bloonstd3') || (nameLower.includes('btd') && nameLower.includes('3'))) return true;
-          }
-          if ((kLower.includes('google.com') || kLower.includes('doingso.swf') || kLower.includes('jsdelivr.net') || kLower.includes('papas-bakeria')) && info && info.name) {
-            const nameLower = info.name.toLowerCase();
-            if (nameLower.includes('btd3') || nameLower.includes('bloonstd3')) return true;
-          }
-        }
-        return false;
-      },
-      validateData: (data) => {
-        const keys = Object.keys(data || {});
-        if (keys.length === 0) return { valid: false, error: 'No save data entries found.' };
-        for (const k of keys) {
-          const kLower = k.toLowerCase();
-          if (kLower.includes('college') || kLower.includes('happy') || kLower.includes('sprinter') || kLower.includes('retrobowl') || kLower.includes('bloxorz')) {
-            return { valid: false, error: `Incompatible save key '${k}' detected for Bloons TD 3.` };
-          }
-          if (kLower.includes('bloonstd2') || kLower.includes('btd2') || kLower.includes('bloonstd4') || kLower.includes('btd4')) {
-            return { valid: false, error: `Incompatible save key '${k}' detected for Bloons TD 3.` };
-          }
-        }
-        return { valid: true };
-      }
-    },
-    'bloons-td-4': {
-      id: 'bloons-td-4',
-      title: 'Bloons TD 4',
-      isRuffle: true,
-      matchers: [
-        /textbooks\/bloonsTD4\.html/i,
-        /textbooks\/bloons-?td-?4/i,
-        /bloonstd4/i,
-        /bloons-td-4/i,
-        /^bloons td 4$/i,
-        /^bloons-td-4$/i,
-        /^bloonstd4$/i,
-        /^bloons 4$/i
-      ],
-      isKeyMatch: (key, val) => {
-        if (!key || typeof key !== 'string') return false;
-        const kLower = key.toLowerCase();
-        if (kLower.includes('college') || kLower.includes('happy') || kLower.includes('sprinter') || kLower.includes('retrobowl') || kLower.includes('bloxorz')) {
-          return false;
-        }
-        if (kLower.includes('bloonstd2') || kLower.includes('btd2') || kLower.includes('bloonstd3') || kLower.includes('btd3')) {
-          return false;
-        }
-        if (kLower.includes('pinpoint_btd_state_4') || kLower.includes('pinpoint_btd_state_bloons-td-4')) {
-          return true;
-        }
-        if (kLower.includes('btd4') || kLower.includes('bloonstd4') || kLower.includes('bloons-td-4') || kLower.includes('bloonstd_4')) {
-          return true;
-        }
-        if (kLower.includes('doingso.swf') || (kLower.includes('google.com') && kLower.includes('.sol')) || kLower.includes('saved_game')) {
-          return true;
-        }
-        if (val && isRuffleSolData(val)) {
-          const info = getSolInfo(val);
-          if (info && info.name) {
-            const nameLower = info.name.toLowerCase();
-            if (nameLower.includes('btd4') || nameLower.includes('bloonstd4') || nameLower.includes('btd_4') || (nameLower.includes('bloon') && nameLower.includes('4')) || nameLower.includes('doingso') || nameLower.includes('saved_game')) return true;
-          }
-          if ((kLower.includes('google.com') || kLower.includes('doingso.swf')) && info && info.name) {
-            const nameLower = info.name.toLowerCase();
-            if (nameLower.includes('btd4') || nameLower.includes('bloonstd4') || nameLower.includes('btd') || nameLower.includes('bloon') || nameLower.includes('coins') || nameLower.includes('prop')) {
-              return true;
-            }
-          }
-        }
-        return false;
-      },
-      validateData: (data) => {
-        const keys = Object.keys(data || {});
-        if (keys.length === 0) return { valid: false, error: 'No save data entries found.' };
-        for (const k of keys) {
-          const kLower = k.toLowerCase();
-          if (kLower.includes('college') || kLower.includes('happy') || kLower.includes('sprinter') || kLower.includes('retrobowl') || kLower.includes('bloxorz')) {
-            return { valid: false, error: `Incompatible save key '${k}' detected for Bloons TD 4.` };
-          }
-          if (kLower.includes('bloonstd2') || kLower.includes('btd2') || kLower.includes('bloonstd3') || kLower.includes('btd3')) {
-            return { valid: false, error: `Incompatible save key '${k}' detected for Bloons TD 4.` };
-          }
-        }
-        return { valid: true };
-      }
-    },
-    'bloxorz': {
-      id: 'bloxorz',
-      title: 'Bloxorz',
-      isRuffle: true,
-      matchers: [
-        /textbooks\/bloxorz\.html/i,
-        /textbooks\/bloxorz/i,
-        /bloxorz/i,
-        /^bloxorz$/i
-      ],
-      isKeyMatch: (key, val) => {
-        if (!key || typeof key !== 'string') return false;
-        const kLower = key.toLowerCase();
-        if (kLower.includes('college') || kLower.includes('happy') || kLower.includes('sprinter') || kLower.includes('retrobowl') || kLower.includes('bloon') || kLower.includes('btd')) {
-          return false;
-        }
-        if (kLower.includes('bloxorz')) return true;
-        if (val && isRuffleSolData(val)) {
-          const info = getSolInfo(val);
-          if (info && info.name && info.name.toLowerCase().includes('bloxorz')) return true;
-          if (kLower.includes('doingso.swf') || kLower.includes('bloxorz')) return true;
-        }
-        return false;
-      },
-      validateData: (data) => {
-        const keys = Object.keys(data || {});
-        if (keys.length === 0) return { valid: false, error: 'No save data entries found.' };
-        for (const k of keys) {
-          const kLower = k.toLowerCase();
-          if (kLower.includes('college') || kLower.includes('happy') || kLower.includes('sprinter') || kLower.includes('retrobowl') || kLower.includes('bloon') || kLower.includes('btd')) {
-            return { valid: false, error: `Incompatible save key '${k}' detected for Bloxorz.` };
-          }
-        }
-        return { valid: true };
-      }
-    },
-    'happy-wheels': {
-      id: 'happy-wheels',
-      title: 'Happy Wheels',
-      isRuffle: true,
-      matchers: [
-        /textbooks\/happy-wheels\.html/i,
-        /textbooks\/happy-wheels/i,
-        /happy-wheels\.swf/i,
-        /^happy-wheels$/i,
-        /^happy wheels$/i
-      ],
-      isKeyMatch: (key, val) => {
-        if (!key || typeof key !== 'string') return false;
-        const kLower = key.toLowerCase();
-        if (kLower.includes('college') || kLower.includes('bloon') || kLower.includes('sprinter') || kLower.includes('retrobowl')) {
-          return false;
-        }
-        if (kLower.includes('happy') || kLower.includes('wheels') || kLower.includes('totaljerkface')) return true;
-        if (val && isRuffleSolData(val)) {
-          const info = getSolInfo(val);
-          if (info && info.name && (info.name.toLowerCase().includes('happy') || info.name.toLowerCase().includes('wheel') || info.name.toLowerCase().includes('user') || info.name.toLowerCase().includes('prop'))) return true;
-          if (kLower.includes('happy-wheels.swf')) return true;
-        }
-        return false;
-      },
-      validateData: (data) => {
-        const keys = Object.keys(data || {});
-        if (keys.length === 0) return { valid: false, error: 'No save data entries found.' };
-        for (const k of keys) {
-          const kLower = k.toLowerCase();
-          if (kLower.includes('college') || kLower.includes('bloon') || kLower.includes('sprinter') || kLower.includes('retrobowl')) {
-            return { valid: false, error: `Incompatible save key '${k}' detected for Happy Wheels.` };
-          }
-        }
-        return { valid: true };
-      }
-    },
-    'sprinter': {
-      id: 'sprinter',
-      title: 'Sprinter',
-      isRuffle: true,
-      matchers: [
-        /textbooks\/sprinter(\/index\.html)?/i,
-        /textbooks\/sprinter/i,
-        /sprinter\.swf/i,
-        /^sprinter$/i
-      ],
-      isKeyMatch: (key, val) => {
-        if (!key || typeof key !== 'string') return false;
-        const kLower = key.toLowerCase();
-        if (kLower.includes('college') || kLower.includes('bloon') || kLower.includes('happy') || kLower.includes('retrobowl')) {
-          return false;
-        }
-        if (kLower.includes('sprinter')) return true;
-        if (val && isRuffleSolData(val)) {
-          const info = getSolInfo(val);
-          if (info && info.name && (info.name.toLowerCase().includes('sprinter') || info.name.toLowerCase().includes('score') || info.name.toLowerCase().includes('high'))) return true;
-          if (kLower.includes('sprinter.swf')) return true;
-        }
-        return false;
-      },
-      validateData: (data) => {
-        const keys = Object.keys(data || {});
-        if (keys.length === 0) return { valid: false, error: 'No save data entries found.' };
-        for (const k of keys) {
-          const kLower = k.toLowerCase();
-          if (kLower.includes('college') || kLower.includes('bloon') || kLower.includes('happy') || kLower.includes('retrobowl')) {
-            return { valid: false, error: `Incompatible save key '${k}' detected for Sprinter.` };
-          }
-        }
-        return { valid: true };
-      }
     }
   };
 
@@ -454,72 +84,16 @@
 
   // Find game config matching a file path, title, or id
   function getGameConfig(fileOrTitle) {
-    if (!fileOrTitle || typeof fileOrTitle !== 'string') {
-      // Check if runner iframe is active with a supported textbook
-      if (typeof document !== 'undefined') {
-        try {
-          const iframe = document.getElementById('runner-iframe');
-          if (iframe && iframe.getAttribute('src')) {
-            const iframeSrc = iframe.getAttribute('src');
-            if (iframeSrc && iframeSrc !== 'about:blank') {
-              const cleanIframeSrc = iframeSrc.replace(/^\.*\/+/, '');
-              for (const id in GAME_CONFIGS) {
-                const cfg = GAME_CONFIGS[id];
-                for (const m of cfg.matchers) {
-                  if (m.test(iframeSrc) || m.test(cleanIframeSrc)) return cfg;
-                }
-              }
-            }
-          }
-        } catch(e) {}
-      }
-      return null;
-    }
-
+    if (!fileOrTitle || typeof fileOrTitle !== 'string') return null;
     const cleanStr = fileOrTitle.trim();
-    const cleanPath = cleanStr.replace(/^\.*\/+/, '');
     for (const id in GAME_CONFIGS) {
       const cfg = GAME_CONFIGS[id];
-      if (cfg.id === cleanStr || cfg.id === cleanPath) return cfg;
-      if (cfg.title.toLowerCase() === cleanStr.toLowerCase() || cfg.title.toLowerCase() === cleanPath.toLowerCase()) return cfg;
+      if (cfg.id === cleanStr) return cfg;
+      if (cfg.title.toLowerCase() === cleanStr.toLowerCase()) return cfg;
       for (const m of cfg.matchers) {
-        if (m.test(cleanStr) || m.test(cleanPath)) return cfg;
+        if (m.test(cleanStr)) return cfg;
       }
     }
-
-    // Fallback: Check if fileOrTitle is a generic SWF or Ruffle Flash game
-    const lower = cleanStr.toLowerCase();
-    const isKnownRuffleGame = lower.includes('bloon') || lower.includes('btd') || lower.includes('bloxorz') || lower.includes('happy-wheels') || lower.includes('sprinter');
-    if (isKnownRuffleGame || lower.includes('.swf') || lower.includes('/ruffle') || lower.includes('ruffle-')) {
-      const fileName = cleanStr.split('/').pop().replace(/\.html|\.swf|\.htm/gi, '');
-      const gameId = 'ruffle-' + (fileName || 'game').toLowerCase().replace(/[^a-z0-9_-]/g, '-');
-      const gameTitle = fileName ? (fileName.charAt(0).toUpperCase() + fileName.slice(1).replace(/[-_]/g, ' ')) : 'Flash Game';
-      return {
-        id: gameId,
-        title: gameTitle,
-        isRuffle: true,
-        matchers: [new RegExp(fileName || 'ruffle', 'i')],
-        isKeyMatch: (k, val) => {
-          if (!k || typeof k !== 'string') return false;
-          const kLower = k.toLowerCase();
-          if (fileName && kLower.includes(fileName.toLowerCase())) return true;
-          if (val && isRuffleSolData(val)) {
-            const info = getSolInfo(val);
-            if (info && info.name && fileName && info.name.toLowerCase().includes(fileName.toLowerCase())) return true;
-            if (kLower.includes('.swf') && !kLower.includes('happy-wheels') && !kLower.includes('bloons') && !kLower.includes('sprinter')) {
-              return true;
-            }
-          }
-          return false;
-        },
-        validateData: (data) => {
-          const keys = Object.keys(data || {});
-          if (keys.length === 0) return { valid: false, error: 'No save data entries found.' };
-          return { valid: true };
-        }
-      };
-    }
-
     return null;
   }
 
@@ -535,26 +109,11 @@
 
     try {
       if (typeof document !== 'undefined') {
-        const iframes = document.querySelectorAll('#runner-iframe, #game-frame, .game-iframe, iframe');
-        for (const iframe of iframes) {
-          try {
-            if (iframe && iframe.contentWindow && iframe.contentWindow.localStorage) {
-              if (!storages.includes(iframe.contentWindow.localStorage)) {
-                storages.push(iframe.contentWindow.localStorage);
-              }
-            }
-          } catch(e) {}
-        }
-      }
-    } catch(e) {}
-
-    try {
-      if (typeof window !== 'undefined') {
-        if (window.opener && window.opener.localStorage && !storages.includes(window.opener.localStorage)) {
-          storages.push(window.opener.localStorage);
-        }
-        if (window.parent && window.parent.localStorage && !storages.includes(window.parent.localStorage)) {
-          storages.push(window.parent.localStorage);
+        const iframe = document.getElementById('runner-iframe');
+        if (iframe && iframe.contentWindow && iframe.contentWindow.localStorage) {
+          if (!storages.includes(iframe.contentWindow.localStorage)) {
+            storages.push(iframe.contentWindow.localStorage);
+          }
         }
       }
     } catch(e) {}
@@ -564,25 +123,6 @@
 
   // Extract all save entries for the given game
   function extractSaveData(gameConfig) {
-    try {
-      if (typeof document !== 'undefined') {
-        const iframes = document.querySelectorAll('#runner-iframe, #game-frame, .game-iframe, iframe');
-        for (const iframe of iframes) {
-          try {
-            if (iframe && iframe.contentWindow) {
-              iframe.contentWindow.dispatchEvent(new Event('beforeunload'));
-              if (iframe.contentWindow.PinpointBtdSync && typeof iframe.contentWindow.PinpointBtdSync.flush === 'function') {
-                iframe.contentWindow.PinpointBtdSync.flush();
-              }
-            }
-          } catch(e) {}
-        }
-      }
-      if (typeof window !== 'undefined' && window.PinpointBtdSync && typeof window.PinpointBtdSync.flush === 'function') {
-        window.PinpointBtdSync.flush();
-      }
-    } catch(e) {}
-
     const storages = getStorageList();
     const result = {};
 
@@ -590,9 +130,9 @@
       try {
         for (let i = 0; i < storage.length; i++) {
           const key = storage.key(i);
-          if (key) {
+          if (key && gameConfig.isKeyMatch(key)) {
             const val = storage.getItem(key);
-            if (val !== null && val !== undefined && gameConfig.isKeyMatch(key, val)) {
+            if (val !== null && val !== undefined) {
               result[key] = val;
             }
           }
@@ -600,28 +140,6 @@
       } catch(e) {
         console.warn('[PinpointSaveManager] Error accessing localStorage:', e);
       }
-    }
-
-    // Fallback: If Bloons TD 1 has no entries yet, ensure default session state is present
-    if (Object.keys(result).length === 0 && gameConfig.id === 'bloons-td') {
-      try {
-        const fallbackState = JSON.stringify({
-          gameId: 'bloons-td',
-          title: 'Bloons TD',
-          version: 1,
-          lastSaved: Date.now(),
-          track: 1,
-          difficulty: 'Easy',
-          round: 1,
-          lives: 40,
-          money: 650,
-          canResume: true
-        });
-        result['pinpoint_btd_state_1'] = fallbackState;
-        for (const storage of storages) {
-          try { storage.setItem('pinpoint_btd_state_1', fallbackState); } catch(e) {}
-        }
-      } catch(e) {}
     }
 
     return result;
@@ -639,11 +157,7 @@
     const keyCount = Object.keys(data).length;
 
     if (keyCount === 0) {
-      if (cfg.isRuffle) {
-        notify(`No save data found yet for ${cfg.title}. Play through a level or reach a checkpoint first to generate save progress!`, 'warning', 5000);
-      } else {
-        notify(`No save data found yet for ${cfg.title}. Play a match or start a season first to generate save progress!`, 'warning', 5000);
-      }
+      notify(`No save data found yet for ${cfg.title}. Play a match or start a season first to generate save progress!`, 'warning', 5000);
       return false;
     }
 
@@ -659,8 +173,7 @@
       metadata: {
         keyCount: keyCount,
         keys: Object.keys(data),
-        totalBytes: JSON.stringify(data).length,
-        isRuffle: !!cfg.isRuffle
+        totalBytes: JSON.stringify(data).length
       },
       checksum: computeChecksum(cfg.id, data),
       data: data
@@ -678,7 +191,7 @@
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    notify(`Exported save file for ${cfg.title} (${keyCount} ${keyCount === 1 ? 'entry' : 'entries'}).`, 'success');
+    notify(`Exported save file for ${cfg.title} (${keyCount} entries).`, 'success');
     return true;
   }
 
@@ -745,15 +258,13 @@
     if (typeof showPinpointConfirm === 'function') {
       confirmed = await showPinpointConfirm({
         title: `Import Save for ${currentCfg.title}?`,
-        message: `This will overwrite your existing save progress on this device with ${saveCount} save ${saveCount === 1 ? 'entry' : 'entries'} from ${parsed.exportedAt ? new Date(parsed.exportedAt).toLocaleDateString() : 'the uploaded file'}.`,
+        message: `This will overwrite your existing save progress on this device with ${saveCount} save entries from ${parsed.exportedAt ? new Date(parsed.exportedAt).toLocaleDateString() : 'the uploaded file'}.`,
         icon: 'upload_file',
         confirmText: 'Import & Overwrite',
         cancelText: 'Cancel',
         danger: false
       });
-    } else if (typeof window !== 'undefined' && typeof window.confirm === 'function') {
-      confirmed = window.confirm(`Import save for ${currentCfg.title}? This will overwrite your existing save progress.`);
-    } else if (typeof confirm === 'function') {
+    } else {
       confirmed = confirm(`Import save for ${currentCfg.title}? This will overwrite your existing save progress.`);
     }
 
@@ -769,7 +280,7 @@
         const keysToRemove = [];
         for (let i = 0; i < storage.length; i++) {
           const k = storage.key(i);
-          if (k && currentCfg.isKeyMatch(k, storage.getItem(k))) {
+          if (k && currentCfg.isKeyMatch(k)) {
             keysToRemove.push(k);
           }
         }
@@ -779,56 +290,22 @@
 
         for (const [k, v] of Object.entries(parsed.data)) {
           storage.setItem(k, v);
-          // For Ruffle Flash saves, also map key to the current host, localhost, and google.com (for doingso.swf games)
-          if (currentCfg.isRuffle && typeof k === 'string' && k.includes('/')) {
-            const currentHost = (typeof window !== 'undefined' && (window.location.host || window.location.hostname)) || 'localhost';
-            const cleanHost = currentHost.split(':')[0];
-            const hostsToSet = [currentHost, cleanHost, 'localhost', 'google.com', 'cdn.jsdelivr.net'];
-            for (const h of hostsToSet) {
-              const remappedKey = k.replace(/^[^/]+/, h);
-              if (remappedKey !== k) {
-                storage.setItem(remappedKey, v);
-              }
-            }
-          }
         }
       } catch(e) {
         console.error('[PinpointSaveManager] Error writing to storage:', e);
       }
     }
 
-    // Set auto-resume flag so the game continues immediately upon reload
-    const resumePayload = {
-      gameId: currentCfg.id,
-      title: currentCfg.title,
-      timestamp: Date.now(),
-      autoResume: true
-    };
-    for (const storage of storages) {
-      try {
-        storage.setItem('pinpoint_auto_resume_game', currentCfg.id);
-        storage.setItem('pinpoint_auto_resume_data', JSON.stringify(resumePayload));
-      } catch(e) {}
-    }
-    try {
-      if (typeof sessionStorage !== 'undefined') {
-        sessionStorage.setItem('pinpoint_auto_resume_game', currentCfg.id);
-        sessionStorage.setItem('pinpoint_auto_resume_data', JSON.stringify(resumePayload));
-      }
-    } catch(e) {}
-
     // 6. Reload runner iframe so game re-reads updated localStorage
     reloadRunnerIframe();
 
-    notify(`✅ Successfully imported save for ${currentCfg.title}! Resuming game...`, 'success', 4000);
+    notify(`✅ Successfully imported save for ${currentCfg.title}! Reloading game...`, 'success', 4000);
     return true;
   }
 
-  // Reload runner iframe or game window
+  // Reload runner iframe
   function reloadRunnerIframe() {
-    const iframe = document.getElementById('runner-iframe') ||
-                   document.getElementById('game-frame') ||
-                   (typeof document.querySelector === 'function' ? document.querySelector('.game-iframe') : null);
+    const iframe = document.getElementById('runner-iframe');
     if (iframe) {
       try {
         if (iframe.contentWindow && iframe.contentWindow.location) {
@@ -839,21 +316,6 @@
       const src = iframe.src;
       iframe.src = 'about:blank';
       setTimeout(() => { iframe.src = src; }, 50);
-      return;
-    }
-    // If not in an iframe, check if we are in an about:blank tab or standalone window
-    if (typeof window !== 'undefined') {
-      try {
-        if (typeof window.navigateToAboutBlankPage === 'function' && window.__CURRENT_PAGE__) {
-          window.navigateToAboutBlankPage(window.__CURRENT_PAGE__);
-          return;
-        }
-      } catch(e) {}
-      try {
-        if (window.location) {
-          window.location.reload();
-        }
-      } catch(e) {}
     }
   }
 
@@ -868,18 +330,17 @@
     }
   }
 
-  // Update visibility of Save Download / Upload buttons in runner and popouts
+  // Update visibility of Save Download / Upload buttons in runner
   function updateUI(fileOrTitle) {
-    const target = fileOrTitle || (typeof currentRunnerFile !== 'undefined' ? currentRunnerFile : '') || (typeof currentRunnerTitle !== 'undefined' ? currentRunnerTitle : '');
-    const isSupported = !!getGameConfig(target);
-    const exportBtns = document.querySelectorAll('#runner-save-export, #popout-save-export');
-    const importBtns = document.querySelectorAll('#runner-save-import, #popout-save-import');
-    exportBtns.forEach(btn => {
-      btn.style.setProperty('display', isSupported ? 'inline-flex' : 'none', 'important');
-    });
-    importBtns.forEach(btn => {
-      btn.style.setProperty('display', isSupported ? 'inline-flex' : 'none', 'important');
-    });
+    const isSupported = !!getGameConfig(fileOrTitle);
+    const exportBtn = document.getElementById('runner-save-export');
+    const importBtn = document.getElementById('runner-save-import');
+    if (exportBtn) {
+      exportBtn.style.display = isSupported ? 'inline-flex' : 'none';
+    }
+    if (importBtn) {
+      importBtn.style.display = isSupported ? 'inline-flex' : 'none';
+    }
   }
 
   function exportCurrentSave() {
@@ -914,9 +375,6 @@
   global.PinpointSaveManager = {
     isSupported: (fileOrTitle) => !!getGameConfig(fileOrTitle),
     getGameConfig: getGameConfig,
-    extractSaveData: extractSaveData,
-    getSolInfo: getSolInfo,
-    isRuffleSolData: isRuffleSolData,
     exportSave: exportSave,
     importSave: importSave,
     exportCurrentSave: exportCurrentSave,
