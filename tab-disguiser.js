@@ -1116,12 +1116,16 @@ var TabDisguiser = window.TabDisguiser || {
             }
         }, true);
 
-        // Escape key to dismiss highlights
+        // Escape and arrow key navigation for intro modal
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                const widget = document.getElementById('pinpoint-info-widget');
-                if (widget && widget.style.display !== 'none' && !widget.classList.contains('pinpoint-dismissed')) {
+            const widget = document.getElementById('pinpoint-info-widget');
+            if (widget && widget.style.display !== 'none' && !widget.classList.contains('pinpoint-dismissed')) {
+                if (e.key === 'Escape') {
                     this.closeInfoWidget(e);
+                } else if (e.key === 'ArrowRight' || e.key === 'Enter') {
+                    this.nextIntroSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    this.prevIntroSlide();
                 }
             }
         });
@@ -1129,12 +1133,14 @@ var TabDisguiser = window.TabDisguiser || {
         try {
             // Avoid showing inside textbook game iframes
             if (window.location.pathname.includes('/textbooks/')) return;
-            const widgetDismissed = localStorage.getItem('pinpoint_info_widget_dismissed_v3') === 'true';
+            const widgetDismissed = localStorage.getItem('pinpoint_intro_dismissed_v4') === 'true';
             if (!widgetDismissed) {
                 this.showInfoWidget();
             }
         } catch (e) {}
     },
+
+    introCurrentSlide: 0,
 
     closeInfoWidget(e) {
         if (e) {
@@ -1143,8 +1149,9 @@ var TabDisguiser = window.TabDisguiser || {
             if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
         }
         try {
+            localStorage.setItem('pinpoint_intro_dismissed_v4', 'true');
+            sessionStorage.setItem('pinpoint_intro_dismissed_v4', 'true');
             localStorage.setItem('pinpoint_info_widget_dismissed_v3', 'true');
-            sessionStorage.setItem('pinpoint_info_widget_dismissed_v3', 'true');
         } catch (err) {}
         const widget = document.getElementById('pinpoint-info-widget');
         if (widget) {
@@ -1154,9 +1161,141 @@ var TabDisguiser = window.TabDisguiser || {
         }
     },
 
+    setIntroSlide(index) {
+        if (index < 0) index = 0;
+        if (index > 2) index = 2;
+        this.introCurrentSlide = index;
+
+        for (let i = 0; i < 3; i++) {
+            const slide = document.getElementById(`pinpoint-intro-slide-${i}`);
+            const dot = document.getElementById(`pinpoint-intro-dot-${i}`);
+            if (slide) {
+                slide.style.setProperty('display', (i === index) ? 'flex' : 'none', 'important');
+            }
+            if (dot) {
+                if (i === index) {
+                    dot.style.setProperty('width', '32px', 'important');
+                    dot.style.setProperty('border-radius', '99px', 'important');
+                    dot.style.setProperty('background', (index === 2) ? '#16a34a' : '#1a73e8', 'important');
+                    dot.style.setProperty('opacity', '1', 'important');
+                } else {
+                    dot.style.setProperty('width', '10px', 'important');
+                    dot.style.setProperty('border-radius', '50%', 'important');
+                    dot.style.setProperty('background', '#cbd5e1', 'important');
+                    dot.style.setProperty('opacity', '0.7', 'important');
+                }
+            }
+        }
+
+        const prevBtn = document.getElementById('pinpoint-intro-prev-btn');
+        const nextBtn = document.getElementById('pinpoint-intro-next-btn');
+
+        if (prevBtn) {
+            if (index === 0) {
+                prevBtn.style.setProperty('display', 'none', 'important');
+            } else {
+                prevBtn.style.setProperty('display', 'inline-flex', 'important');
+            }
+        }
+
+        if (nextBtn) {
+            if (index === 2) {
+                // Checkmark button on last slide
+                nextBtn.setAttribute('title', 'Done');
+                nextBtn.setAttribute('aria-label', 'Done');
+                nextBtn.innerHTML = `
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                `;
+                nextBtn.style.setProperty('background', '#16a34a', 'important');
+                nextBtn.style.setProperty('box-shadow', '0 6px 20px rgba(22, 163, 74, 0.45)', 'important');
+            } else {
+                // Right arrow button
+                nextBtn.setAttribute('title', 'Next');
+                nextBtn.setAttribute('aria-label', 'Next');
+                nextBtn.innerHTML = `
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;">
+                        <path d="M5 12h14M12 5l7 7-7 7"></path>
+                    </svg>
+                `;
+                nextBtn.style.setProperty('background', '#1a73e8', 'important');
+                nextBtn.style.setProperty('box-shadow', '0 6px 20px rgba(26, 115, 232, 0.35)', 'important');
+            }
+        }
+    },
+
+    prevIntroSlide() {
+        if (this.introCurrentSlide > 0) {
+            this.setIntroSlide(this.introCurrentSlide - 1);
+        }
+    },
+
+    nextIntroSlide() {
+        if (this.introCurrentSlide < 2) {
+            this.setIntroSlide(this.introCurrentSlide + 1);
+        } else {
+            this.closeInfoWidget();
+        }
+    },
+
+    copyChromeSettingsLink(e) {
+        if (e) {
+            if (typeof e.preventDefault === 'function') e.preventDefault();
+            if (typeof e.stopPropagation === 'function') e.stopPropagation();
+        }
+        const textToCopy = 'chrome://settings/content/all';
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(textToCopy).catch(() => {});
+        } else {
+            try {
+                const ta = document.createElement('textarea');
+                ta.value = textToCopy;
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+            } catch (err) {}
+        }
+
+        const btn = document.getElementById('pinpoint-copy-settings-btn');
+        const toast = document.getElementById('pinpoint-settings-toast');
+        if (btn) {
+            btn.innerHTML = `
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                <span>Copied!</span>
+            `;
+            btn.style.setProperty('background', '#16a34a', 'important');
+            setTimeout(() => {
+                const b = document.getElementById('pinpoint-copy-settings-btn');
+                if (b) {
+                    b.innerHTML = `
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        <span>Copy Link</span>
+                    `;
+                    b.style.setProperty('background', '#1a73e8', 'important');
+                }
+            }, 2500);
+        }
+        if (toast) {
+            toast.style.setProperty('display', 'block', 'important');
+            setTimeout(() => {
+                const t = document.getElementById('pinpoint-settings-toast');
+                if (t) t.style.setProperty('display', 'none', 'important');
+            }, 3500);
+        }
+    },
+
     showInfoWidget(force = false) {
         if (!force) {
-            const dismissed = localStorage.getItem('pinpoint_info_widget_dismissed_v3') === 'true';
+            const dismissed = localStorage.getItem('pinpoint_intro_dismissed_v4') === 'true';
             if (dismissed) return;
         }
 
@@ -1167,33 +1306,17 @@ var TabDisguiser = window.TabDisguiser || {
 
         let existing = document.getElementById('pinpoint-info-widget');
         if (existing) {
-            if (!force && localStorage.getItem('pinpoint_info_widget_dismissed_v3') === 'true') {
+            if (!force && localStorage.getItem('pinpoint_intro_dismissed_v4') === 'true') {
                 existing.remove();
                 return;
             }
             existing.classList.remove('pinpoint-dismissed');
             existing.style.setProperty('display', 'flex', 'important');
+            this.setIntroSlide(0);
             return;
         }
 
-        let currentHost = window.location.hostname || window.location.host || '';
-        if (!currentHost || currentHost === 'localhost' || currentHost === '127.0.0.1' || currentHost === 'about:blank' || currentHost.startsWith('about:')) {
-            const entry = localStorage.getItem('pinpoint_entry_origin');
-            if (entry) {
-                try {
-                    currentHost = new URL(entry).hostname || entry;
-                } catch (e) {
-                    currentHost = entry;
-                }
-            }
-        }
-        if (!currentHost || currentHost === 'about:blank') {
-            currentHost = 'Current Site';
-        }
-
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbxOoEViQ2ohkOZK6Lrm3bpCB4EXT0CvAHGALItv9SWW0M13YQOPdX7qcsXivsSDXyAkoQ/exec';
-
-        // Add or update style for simple closable list card
+        // Add or update style for big UI introduction modal
         let style = document.getElementById('pinpoint-info-widget-style');
         if (!style) {
             style = document.createElement('style');
@@ -1201,266 +1324,516 @@ var TabDisguiser = window.TabDisguiser || {
             document.head.appendChild(style);
         }
         style.textContent = `
-            .pinpoint-info-card, .pinpoint-info-hub {
+            @keyframes pinpointIntroFade {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            @keyframes pinpointIntroPop {
+                from { opacity: 0; transform: scale(0.96) translateY(8px); }
+                to { opacity: 1; transform: scale(1) translateY(0); }
+            }
+            .pinpoint-intro-overlay {
                 position: fixed !important;
-                bottom: 20px !important;
-                right: 20px !important;
-                left: auto !important;
-                width: 380px !important;
-                max-width: calc(100vw - 32px) !important;
-                max-height: 85vh !important;
+                inset: 0 !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                background: rgba(15, 23, 42, 0.55) !important;
+                backdrop-filter: blur(8px) !important;
+                -webkit-backdrop-filter: blur(8px) !important;
                 z-index: 2147483647 !important;
-                font-family: 'Google Sans', Roboto, Arial, sans-serif !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                padding: 16px !important;
                 box-sizing: border-box !important;
+                animation: pinpointIntroFade 0.2s ease-out !important;
+            }
+            .pinpoint-intro-card {
+                position: relative !important;
+                width: 580px !important;
+                max-width: calc(100vw - 32px) !important;
+                max-height: calc(100vh - 40px) !important;
                 background: #ffffff !important;
-                border: 1px solid #dadce0 !important;
-                border-radius: 16px !important;
-                box-shadow: 0 10px 32px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.06) !important;
-                overflow: hidden !important;
+                border-radius: 28px !important;
+                box-shadow: 0 24px 65px -10px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.08) !important;
                 display: flex !important;
                 flex-direction: column !important;
+                font-family: 'Google Sans', Roboto, -apple-system, BlinkMacSystemFont, Arial, sans-serif !important;
+                overflow: hidden !important;
+                animation: pinpointIntroPop 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+                box-sizing: border-box !important;
             }
-            .pinpoint-card-header, .pinpoint-info-header {
+            .pinpoint-intro-topbar {
                 display: flex !important;
-                flex-direction: row !important;
                 align-items: center !important;
                 justify-content: space-between !important;
-                width: 100% !important;
+                padding: 16px 24px 8px 24px !important;
                 box-sizing: border-box !important;
-                padding: 10px 14px !important;
-                background: #f8fafd !important;
-                border-bottom: 1px solid #e8eaed !important;
-                color: #202124 !important;
-                font-size: 13px !important;
-                font-weight: 600 !important;
-                user-select: none !important;
             }
-            .pinpoint-card-list {
+            .pinpoint-intro-badge {
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 6px !important;
+                background: #eff6ff !important;
+                color: #1a73e8 !important;
+                border: 1px solid #dbeafe !important;
+                border-radius: 99px !important;
+                padding: 4px 12px !important;
+                font-size: 11.5px !important;
+                font-weight: 700 !important;
+                text-transform: uppercase !important;
+                letter-spacing: 0.5px !important;
+            }
+            .pinpoint-intro-close-btn {
+                background: #f1f5f9 !important;
+                border: 1px solid #e2e8f0 !important;
+                color: #64748b !important;
+                border-radius: 50% !important;
+                width: 34px !important;
+                height: 34px !important;
+                min-width: 34px !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                cursor: pointer !important;
+                transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease !important;
+                padding: 0 !important;
+            }
+            .pinpoint-intro-close-btn:hover {
+                background: #e2e8f0 !important;
+                color: #1e293b !important;
+            }
+            .pinpoint-intro-close-btn:active {
+                transform: scale(0.94) !important;
+            }
+            .pinpoint-intro-content {
                 display: flex !important;
                 flex-direction: column !important;
-                gap: 6px !important;
-                padding: 10px !important;
+                padding: 8px 28px 20px 28px !important;
                 overflow-y: auto !important;
-                max-height: calc(85vh - 50px) !important;
+                max-height: calc(85vh - 120px) !important;
                 box-sizing: border-box !important;
             }
-            .pinpoint-list-item {
-                background: #f8fafd !important;
-                border: 1px solid #e8eaed !important;
-                border-radius: 8px !important;
-                padding: 7px 10px !important;
+            .pinpoint-intro-slide {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 14px !important;
+            }
+            .pinpoint-intro-slide-header {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 8px !important;
+            }
+            .pinpoint-intro-icon-circle {
+                width: 58px !important;
+                height: 58px !important;
+                border-radius: 18px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                margin-bottom: 2px !important;
+            }
+            .pinpoint-intro-title {
+                font-size: 26px !important;
+                font-weight: 800 !important;
+                color: #0f172a !important;
+                letter-spacing: -0.5px !important;
+                line-height: 1.2 !important;
+                margin: 0 !important;
+            }
+            .pinpoint-intro-desc {
+                font-size: 15px !important;
+                line-height: 1.55 !important;
+                color: #475569 !important;
+                margin: 0 !important;
+            }
+            .pinpoint-intro-cards-list {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 10px !important;
+                margin-top: 4px !important;
+            }
+            .pinpoint-intro-feat-card {
+                background: #f8fafc !important;
+                border: 1.5px solid #e2e8f0 !important;
+                border-radius: 16px !important;
+                padding: 13px 16px !important;
+                display: flex !important;
+                align-items: center !important;
+                gap: 14px !important;
                 box-sizing: border-box !important;
+                transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease !important;
+            }
+            .pinpoint-intro-feat-card:hover {
+                border-color: #cbd5e1 !important;
+                background: #f1f5f9 !important;
+                transform: translateY(-1px) !important;
+            }
+            .pinpoint-intro-feat-icon {
+                width: 42px !important;
+                height: 42px !important;
+                border-radius: 12px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                font-size: 20px !important;
+                flex-shrink: 0 !important;
+            }
+            .pinpoint-intro-feat-info {
                 display: flex !important;
                 flex-direction: column !important;
                 gap: 2px !important;
-                transition: background-color 0.15s ease, border-color 0.15s ease !important;
             }
-            .pinpoint-list-item:hover {
-                background: #f1f5f9 !important;
-                border-color: #d2e3fc !important;
+            .pinpoint-intro-feat-title {
+                font-size: 14.5px !important;
+                font-weight: 700 !important;
+                color: #1e293b !important;
             }
-            .pinpoint-item-head {
+            .pinpoint-intro-feat-desc {
+                font-size: 13px !important;
+                color: #64748b !important;
+                line-height: 1.4 !important;
+            }
+            /* Step rows for slide 3 */
+            .pinpoint-step-row {
+                background: #f8fafc !important;
+                border: 1.5px solid #e2e8f0 !important;
+                border-radius: 16px !important;
+                padding: 14px 16px !important;
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 8px !important;
+                box-sizing: border-box !important;
+            }
+            .pinpoint-step-header {
+                display: flex !important;
+                align-items: center !important;
+                gap: 10px !important;
+            }
+            .pinpoint-step-num {
+                width: 32px !important;
+                height: 32px !important;
+                min-width: 32px !important;
+                border-radius: 50% !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                font-size: 15px !important;
+                font-weight: 800 !important;
+            }
+            .pinpoint-step-title {
+                font-size: 15px !important;
+                font-weight: 700 !important;
+                color: #1e293b !important;
+            }
+            .pinpoint-step-desc {
+                font-size: 13px !important;
+                color: #64748b !important;
+                line-height: 1.4 !important;
+                margin-left: 42px !important;
+            }
+            .pinpoint-step-url-box {
+                margin-left: 42px !important;
+                background: #ffffff !important;
+                border: 1.5px solid #cbd5e1 !important;
+                border-radius: 12px !important;
+                padding: 6px 8px 6px 12px !important;
                 display: flex !important;
                 align-items: center !important;
                 justify-content: space-between !important;
-                gap: 6px !important;
+                gap: 8px !important;
+                box-sizing: border-box !important;
             }
-            .pinpoint-item-title {
-                display: flex !important;
+            .pinpoint-step-url-text {
+                font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+                font-size: 13px !important;
+                font-weight: 600 !important;
+                color: #0f172a !important;
+                user-select: all !important;
+                word-break: break-all !important;
+            }
+            .pinpoint-copy-btn {
+                background: #1a73e8 !important;
+                color: #ffffff !important;
+                border: none !important;
+                border-radius: 8px !important;
+                padding: 8px 14px !important;
+                font-size: 12.5px !important;
+                font-weight: 700 !important;
+                cursor: pointer !important;
+                display: inline-flex !important;
                 align-items: center !important;
                 gap: 6px !important;
-                font-size: 12px !important;
-                font-weight: 600 !important;
-                color: #202124 !important;
-            }
-            .pinpoint-item-desc {
-                font-size: 11px !important;
-                line-height: 1.35 !important;
-                color: #5f6368 !important;
-            }
-            .pinpoint-badge {
-                font-size: 9.5px !important;
-                font-weight: 700 !important;
-                padding: 1px 6px !important;
-                border-radius: 99px !important;
-                text-transform: uppercase !important;
-                letter-spacing: 0.3px !important;
+                font-family: inherit !important;
                 flex-shrink: 0 !important;
+                transition: background 0.15s ease, transform 0.1s ease !important;
             }
-            .pinpoint-badge-addition {
-                background: #e6f4ea !important;
-                color: #137333 !important;
-                border: 1px solid #ceead6 !important;
+            .pinpoint-copy-btn:hover {
+                background: #1557b0 !important;
             }
-            .pinpoint-badge-fix {
-                background: #fce8e6 !important;
-                color: #c5221f !important;
-                border: 1px solid #fad2cf !important;
+            .pinpoint-copy-btn:active {
+                transform: scale(0.96) !important;
             }
-            .pinpoint-badge-removal {
-                background: #f1f3f4 !important;
-                color: #5f6368 !important;
-                border: 1px solid #dadce0 !important;
+            .pinpoint-intro-footer {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                padding: 16px 28px !important;
+                background: #f8fafc !important;
+                border-top: 1px solid #e2e8f0 !important;
+                box-sizing: border-box !important;
             }
-            .pinpoint-badge-updated {
-                background: #e8f0fe !important;
-                color: #1a73e8 !important;
-                border: 1px solid #d2e3fc !important;
+            .pinpoint-intro-dots {
+                display: flex !important;
+                align-items: center !important;
+                gap: 8px !important;
             }
-            .pinpoint-info-card.pinpoint-dismissed {
+            .pinpoint-intro-dot {
+                height: 10px !important;
+                transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+                cursor: pointer !important;
+            }
+            .pinpoint-intro-nav-btns {
+                display: flex !important;
+                align-items: center !important;
+                gap: 12px !important;
+            }
+            .pinpoint-nav-arrow-btn {
+                width: 52px !important;
+                height: 52px !important;
+                min-width: 52px !important;
+                border-radius: 16px !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                cursor: pointer !important;
+                transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease !important;
+                user-select: none !important;
+                padding: 0 !important;
+            }
+            .pinpoint-nav-arrow-btn:active {
+                transform: scale(0.94) !important;
+            }
+            #pinpoint-intro-prev-btn {
+                background: #f1f5f9 !important;
+                border: 1.5px solid #e2e8f0 !important;
+                color: #334155 !important;
+            }
+            #pinpoint-intro-prev-btn:hover {
+                background: #e2e8f0 !important;
+                color: #0f172a !important;
+            }
+            #pinpoint-intro-next-btn {
+                border: none !important;
+                color: #ffffff !important;
+            }
+            #pinpoint-intro-next-btn:hover {
+                filter: brightness(1.08) !important;
+                transform: translateY(-1px) !important;
+            }
+            .pinpoint-intro-overlay.pinpoint-dismissed {
                 display: none !important;
                 visibility: hidden !important;
                 pointer-events: none !important;
                 opacity: 0 !important;
             }
-            #pinpoint-info-dismiss-btn {
-                background: none !important;
-                border: none !important;
-                color: #5f6368 !important;
-                cursor: pointer !important;
-                padding: 4px !important;
-                margin: 0 0 0 auto !important;
-                border-radius: 50% !important;
-                display: inline-flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-                width: 26px !important;
-                height: 26px !important;
-                min-width: 26px !important;
-                flex-shrink: 0 !important;
-                pointer-events: auto !important;
-                transition: background-color 0.15s ease, transform 0.1s ease !important;
-            }
-            #pinpoint-info-dismiss-btn:hover {
-                background-color: #e8eaed !important;
-                color: #202124 !important;
-            }
-            #pinpoint-info-dismiss-btn:active {
-                background-color: #dadce0 !important;
-                transform: scale(0.94) !important;
-            }
         `;
 
         const container = document.createElement('div');
         container.id = 'pinpoint-info-widget';
-        container.className = 'pinpoint-info-card';
-        container.style.cssText = 'position:fixed !important; bottom:20px !important; right:20px !important; left:auto !important; width:380px !important; max-width:calc(100vw - 32px) !important; max-height:85vh !important; z-index:2147483647 !important; font-family:\'Google Sans\',Roboto,Arial,sans-serif !important; box-sizing:border-box !important; background:#ffffff !important; border:1px solid #dadce0 !important; border-radius:16px !important; box-shadow:0 10px 32px rgba(0,0,0,0.14),0 2px 8px rgba(0,0,0,0.06) !important; overflow:hidden !important; display:flex !important; flex-direction:column !important;';
+        container.className = 'pinpoint-intro-overlay';
 
         container.innerHTML = `
-            <div class="pinpoint-card-header">
-                <div style="display:flex !important; align-items:center !important; gap:6px !important; flex:1 !important; min-width:0 !important;">
-                    <span class="material-symbols-outlined notranslate" style="font-size:18px !important; color:#1a73e8 !important; line-height:1 !important; flex-shrink:0 !important;">campaign</span>
-                    <span style="font-size:13px !important; font-weight:600 !important; color:#202124 !important; white-space:nowrap !important;">Classroom Highlights</span>
+            <div class="pinpoint-intro-card" onclick="event.stopPropagation()">
+                <!-- Topbar -->
+                <div class="pinpoint-intro-topbar">
+                    <div class="pinpoint-intro-badge">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        </svg>
+                        <span>What's New</span>
+                    </div>
+                    <button id="pinpoint-info-dismiss-btn" class="pinpoint-intro-close-btn" type="button" onclick="TabDisguiser.closeInfoWidget(event)" title="Close">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
                 </div>
-                <button id="pinpoint-info-dismiss-btn" type="button" onclick="TabDisguiser.closeInfoWidget(event)" title="Dismiss">
-                    <span class="material-symbols-outlined notranslate" style="font-size:18px !important; line-height:1 !important; color:#5f6368 !important; pointer-events:none !important;">close</span>
-                </button>
-            </div>
 
-            <div class="pinpoint-card-list">
-                <!-- Top Share Link (Not in regular container, no full URL displayed) -->
-                <div style="background:#f1f3f4;border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:3px;margin-bottom:2px;">
-                    <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
-                        <span style="font-size:12px;font-weight:600;color:#202124;display:flex;align-items:center;gap:5px;">
-                            <span class="material-symbols-outlined notranslate" style="font-size:15px;color:#1a73e8;">share</span>
-                            <span>Share Active Mirror</span>
-                        </span>
-                        <button id="info-copy-script-btn" type="button" style="background:#1a73e8;border:none;border-radius:6px;padding:4px 9px;font-size:11px;font-weight:600;color:#fff;cursor:pointer;display:inline-flex;align-items:center;gap:4px;font-family:inherit;">
-                            <span class="material-symbols-outlined notranslate" style="font-size:13px;line-height:1;">content_copy</span> Copy Script Link
+                <!-- Content Area -->
+                <div class="pinpoint-intro-content">
+                    <!-- Slide 0: Fast Offline Library -->
+                    <div id="pinpoint-intro-slide-0" class="pinpoint-intro-slide" style="display:flex;">
+                        <div class="pinpoint-intro-slide-header">
+                            <div class="pinpoint-intro-icon-circle" style="background:#eff6ff;">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1a73e8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7 10 12 15 17 10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                            </div>
+                            <h2 class="pinpoint-intro-title">Instant Offline Library</h2>
+                            <p class="pinpoint-intro-desc">
+                                The Library downloads games directly to your device storage. Everything runs locally for maximum speed and zero lag.
+                            </p>
+                        </div>
+                        <div class="pinpoint-intro-cards-list">
+                            <div class="pinpoint-intro-feat-card">
+                                <div class="pinpoint-intro-feat-icon" style="background:#fef3c7; color:#d97706;">⚡</div>
+                                <div class="pinpoint-intro-feat-info">
+                                    <div class="pinpoint-intro-feat-title">Zero Latency</div>
+                                    <div class="pinpoint-intro-feat-desc">Removes all stream delay and proxy lag—games respond instantly to your inputs.</div>
+                                </div>
+                            </div>
+                            <div class="pinpoint-intro-feat-card">
+                                <div class="pinpoint-intro-feat-icon" style="background:#e0f2fe; color:#0284c7;">📶</div>
+                                <div class="pinpoint-intro-feat-info">
+                                    <div class="pinpoint-intro-feat-title">Works 100% Offline</div>
+                                    <div class="pinpoint-intro-feat-desc">Play all saved games seamlessly without an active internet connection.</div>
+                                </div>
+                            </div>
+                            <div class="pinpoint-intro-feat-card">
+                                <div class="pinpoint-intro-feat-icon" style="background:#e6f4ea; color:#137333;">🚀</div>
+                                <div class="pinpoint-intro-feat-info">
+                                    <div class="pinpoint-intro-feat-title">Instant Loading Times</div>
+                                    <div class="pinpoint-intro-feat-desc">Games launch on demand immediately from local browser storage.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 1: Bit Planes Major Updates -->
+                    <div id="pinpoint-intro-slide-1" class="pinpoint-intro-slide" style="display:none;">
+                        <div class="pinpoint-intro-slide-header">
+                            <div class="pinpoint-intro-icon-circle" style="background:#e0f2fe;">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.3c.4-.2.6-.6.5-1.1z"></path>
+                                </svg>
+                            </div>
+                            <h2 class="pinpoint-intro-title">Bit Planes: Major Updates</h2>
+                            <p class="pinpoint-intro-desc">
+                                The high-flying aerial combat dogfight game has been overhauled with 3 massive new features:
+                            </p>
+                        </div>
+                        <div class="pinpoint-intro-cards-list">
+                            <div class="pinpoint-intro-feat-card">
+                                <div class="pinpoint-intro-feat-icon" style="background:#ede9fe; color:#7c3aed;">🖥️</div>
+                                <div class="pinpoint-intro-feat-info">
+                                    <div class="pinpoint-intro-feat-title">Redesigned Widescreen UI</div>
+                                    <div class="pinpoint-intro-feat-desc">Modernized layout with crisp HD visuals, smooth HUD animations, and responsive controls.</div>
+                                </div>
+                            </div>
+                            <div class="pinpoint-intro-feat-card">
+                                <div class="pinpoint-intro-feat-icon" style="background:#fef3c7; color:#d97706;">👥</div>
+                                <div class="pinpoint-intro-feat-info">
+                                    <div class="pinpoint-intro-feat-title">1v1 Local Split-Screen</div>
+                                    <div class="pinpoint-intro-feat-desc">Battle your friends in head-to-head dogfights right on the same keyboard!</div>
+                                </div>
+                            </div>
+                            <div class="pinpoint-intro-feat-card">
+                                <div class="pinpoint-intro-feat-icon" style="background:#e0f2fe; color:#0284c7;">🌐</div>
+                                <div class="pinpoint-intro-feat-info">
+                                    <div class="pinpoint-intro-feat-title">Online Multiplayer Mode</div>
+                                    <div class="pinpoint-intro-feat-desc">Join real-time public lobbies or create private match codes to duel anyone anywhere.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 2: Free Up Game Storage -->
+                    <div id="pinpoint-intro-slide-2" class="pinpoint-intro-slide" style="display:none;">
+                        <div class="pinpoint-intro-slide-header">
+                            <div class="pinpoint-intro-icon-circle" style="background:#fee2e2;">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-12M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"></path>
+                                </svg>
+                            </div>
+                            <h2 class="pinpoint-intro-title">Clear Unused Game Data</h2>
+                            <p class="pinpoint-intro-desc">
+                                Free up storage and keep your browser fast by deleting data from old game sites in 3 easy-to-remember steps:
+                            </p>
+                        </div>
+                        <div class="pinpoint-intro-cards-list">
+                            <!-- Step 1 -->
+                            <div class="pinpoint-step-row">
+                                <div class="pinpoint-step-header">
+                                    <div class="pinpoint-step-num" style="background:#eff6ff; color:#1a73e8;">1</div>
+                                    <div class="pinpoint-step-title">Copy & open this link in a new tab:</div>
+                                </div>
+                                <div class="pinpoint-step-url-box">
+                                    <span class="pinpoint-step-url-text">chrome://settings/content/all</span>
+                                    <button id="pinpoint-copy-settings-btn" class="pinpoint-copy-btn" type="button" onclick="TabDisguiser.copyChromeSettingsLink(event)">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                        </svg>
+                                        <span>Copy Link</span>
+                                    </button>
+                                </div>
+                                <div id="pinpoint-settings-toast" style="display:none; font-size:12px; color:#16a34a; font-weight:600; margin-left:42px;">
+                                    ✓ Link copied! Paste it into your Chrome address bar in a new tab.
+                                </div>
+                            </div>
+
+                            <!-- Step 2 -->
+                            <div class="pinpoint-step-row">
+                                <div class="pinpoint-step-header">
+                                    <div class="pinpoint-step-num" style="background:#f3e8ff; color:#7e22ce;">2</div>
+                                    <div class="pinpoint-step-title">Change "Sort by" to "Data stored"</div>
+                                </div>
+                                <div class="pinpoint-step-desc">
+                                    This immediately sorts all the largest websites right to the very top of your list.
+                                </div>
+                            </div>
+
+                            <!-- Step 3 -->
+                            <div class="pinpoint-step-row">
+                                <div class="pinpoint-step-header">
+                                    <div class="pinpoint-step-num" style="background:#fee2e2; color:#dc2626;">3</div>
+                                    <div class="pinpoint-step-title">Delete data for blocked or unused game sites</div>
+                                </div>
+                                <div class="pinpoint-step-desc">
+                                    Keep your school sites untouched, and clear out old bloated game websites you don't play anymore!
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="pinpoint-intro-footer">
+                    <div class="pinpoint-intro-dots">
+                        <div id="pinpoint-intro-dot-0" class="pinpoint-intro-dot" onclick="TabDisguiser.setIntroSlide(0)" title="Slide 1" style="width:32px; border-radius:99px; background:#1a73e8; opacity:1;"></div>
+                        <div id="pinpoint-intro-dot-1" class="pinpoint-intro-dot" onclick="TabDisguiser.setIntroSlide(1)" title="Slide 2" style="width:10px; border-radius:50%; background:#cbd5e1; opacity:0.7;"></div>
+                        <div id="pinpoint-intro-dot-2" class="pinpoint-intro-dot" onclick="TabDisguiser.setIntroSlide(2)" title="Slide 3" style="width:10px; border-radius:50%; background:#cbd5e1; opacity:0.7;"></div>
+                    </div>
+                    <div class="pinpoint-intro-nav-btns">
+                        <button id="pinpoint-intro-prev-btn" class="pinpoint-nav-arrow-btn" type="button" onclick="TabDisguiser.prevIntroSlide()" title="Previous slide" aria-label="Previous slide" style="display:none;">
+                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;">
+                                <path d="M19 12H5M12 19l-7-7 7-7"></path>
+                            </svg>
                         </button>
-                    </div>
-                    <div style="font-size:10.5px;color:#5f6368;line-height:1.3;">
-                        Share this link to always get an unblocked mirror.
-                    </div>
-                    <div id="info-script-toast" style="display:none;font-size:10.5px;color:#137333;font-weight:500;">✓ Script link copied to clipboard!</div>
-                </div>
-
-                <!-- 1. Bit Planes Online -->
-                <div class="pinpoint-list-item">
-                    <div class="pinpoint-item-head">
-                        <div class="pinpoint-item-title">
-                            <span class="material-symbols-outlined notranslate" style="font-size:16px;color:#1a73e8;line-height:1;">flight</span>
-                            <span>Bit Planes Online</span>
-                        </div>
-                        <span class="pinpoint-badge pinpoint-badge-updated">Major Update</span>
-                    </div>
-                    <div class="pinpoint-item-desc">
-                        Now featuring real-time Online multiplayer (public lobbies & private rooms), intense 20-bot Juggernaut mode with extra lives, a sleek redesigned widescreen UI, and 1v1 local split-screen!
-                    </div>
-                </div>
-
-                <!-- 2. Library -->
-                <div class="pinpoint-list-item">
-                    <div class="pinpoint-item-head">
-                        <div class="pinpoint-item-title">
-                            <span class="material-symbols-outlined notranslate" style="font-size:16px;color:#188038;line-height:1;">bookmark</span>
-                            <span>Unified Library</span>
-                        </div>
-                        <span class="pinpoint-badge pinpoint-badge-addition">Addition</span>
-                    </div>
-                    <div class="pinpoint-item-desc">
-                        A seamless upgrade replacing downloads and favorites—bookmark any game to instantly play offline with zero lag.
-                    </div>
-                </div>
-
-                <!-- 3. Bug Fix -->
-                <div class="pinpoint-list-item">
-                    <div class="pinpoint-item-head">
-                        <div class="pinpoint-item-title">
-                            <span class="material-symbols-outlined notranslate" style="font-size:16px;color:#c5221f;line-height:1;">build</span>
-                            <span>JSDelivr CDN & Engines</span>
-                        </div>
-                        <span class="pinpoint-badge pinpoint-badge-fix">Bug Fix</span>
-                    </div>
-                    <div class="pinpoint-item-desc">
-                        Fixed 503 byte timeouts on jsDelivr mirrors, multi-file games, and Ruffle Flash WASM loading.
-                    </div>
-                </div>
-
-                <!-- 4. Retro Bowl Saves -->
-                <div class="pinpoint-list-item">
-                    <div class="pinpoint-item-head">
-                        <div class="pinpoint-item-title">
-                            <span class="material-symbols-outlined notranslate" style="font-size:16px;color:#137333;line-height:1;">sports_football</span>
-                            <span>Retro Bowl Dynasty Saves</span>
-                        </div>
-                        <span class="pinpoint-badge pinpoint-badge-addition">Addition</span>
-                    </div>
-                    <div class="pinpoint-item-desc">
-                        Export and import season save files for Retro Bowl & Retro Bowl College right from the runner topbar.
+                        <button id="pinpoint-intro-next-btn" class="pinpoint-nav-arrow-btn" type="button" onclick="TabDisguiser.nextIntroSlide()" title="Next" aria-label="Next" style="background:#1a73e8; box-shadow:0 6px 20px rgba(26,115,232,0.35);">
+                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;">
+                                <path d="M5 12h14M12 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
                     </div>
                 </div>
             </div>
         `;
 
+        // Backdrop click dismisses
+        container.onclick = (e) => {
+            if (e.target === container) {
+                this.closeInfoWidget(e);
+            }
+        };
+
         document.body.appendChild(container);
-
-        // Copy actions
-        const copyScriptBtn = document.getElementById('info-copy-script-btn');
-        if (copyScriptBtn) {
-            copyScriptBtn.onclick = (e) => {
-                e.stopPropagation();
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(scriptUrl).catch(() => {});
-                }
-                const toast = document.getElementById('info-script-toast');
-                if (toast) {
-                    toast.style.display = 'block';
-                    setTimeout(() => { toast.style.display = 'none'; }, 3000);
-                }
-            };
-        }
-
-        // Dismiss action
-        const dismissBtn = container.querySelector('#pinpoint-info-dismiss-btn') || document.getElementById('pinpoint-info-dismiss-btn');
-        if (dismissBtn) {
-            dismissBtn.addEventListener('click', (e) => {
-                this.closeInfoWidget(e);
-            });
-            dismissBtn.onclick = (e) => {
-                this.closeInfoWidget(e);
-            };
-        }
+        this.setIntroSlide(0);
     },
 
     openPopout(file, title) {
@@ -1847,6 +2220,9 @@ if (typeof window !== 'undefined') {
     window.showCleanupReminder = (force) => TabDisguiser.showCleanupReminder(force);
     window.showWednesdayCleanupReminder = (force) => TabDisguiser.showCleanupReminder(force);
     window.showDomainScriptReminder = (force) => TabDisguiser.showDomainScriptReminder(force);
+    window.prevIntroSlide = () => TabDisguiser.prevIntroSlide();
+    window.nextIntroSlide = () => TabDisguiser.nextIntroSlide();
+    window.setIntroSlide = (i) => TabDisguiser.setIntroSlide(i);
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
             TabDisguiser.init();
