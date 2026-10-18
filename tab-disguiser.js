@@ -798,7 +798,11 @@ var TabDisguiser = window.TabDisguiser || {
         try { if (window.top) window.top.__IS_PANIC_TRIGGERED__ = true; } catch(e) {}
         try { if (window.parent) window.parent.__IS_PANIC_TRIGGERED__ = true; } catch(e) {}
 
-        targetUrl = targetUrl || localStorage.getItem('pinpoint_panic_url') || 'https://classroom.google.com/';
+        let resolvedUrl = (targetUrl || localStorage.getItem('pinpoint_panic_url') || 'https://classroom.google.com/').trim();
+        if (resolvedUrl && resolvedUrl !== 'about:blank' && !/^https?:\/\//i.test(resolvedUrl)) {
+            resolvedUrl = 'https://' + resolvedUrl;
+        }
+        targetUrl = resolvedUrl;
 
         // 1. Post message to all ancestors & opener so top about:blank window exits
         const msg = { type: 'panic', url: targetUrl };
@@ -2004,7 +2008,10 @@ var TabDisguiser = window.TabDisguiser || {
     }
 
     function triggerPopoutPanic(url) {
-      const targetUrl = url || localStorage.getItem('pinpoint_panic_url') || 'https://classroom.google.com/';
+      let targetUrl = (url || localStorage.getItem('pinpoint_panic_url') || 'https://classroom.google.com/').trim();
+      if (targetUrl && targetUrl !== 'about:blank' && !/^https?:\/\//i.test(targetUrl)) {
+        targetUrl = 'https://' + targetUrl;
+      }
       try { window.location.href = targetUrl; return; } catch(err) {}
       try { window.location.replace(targetUrl); return; } catch(err) {}
     }

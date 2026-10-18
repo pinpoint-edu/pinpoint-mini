@@ -146,11 +146,20 @@ var Vi=document.querySelector(`.${_.Ui.Bf} .gb_C`),Wi=document.querySelector("#g
           <option value="]">] (Right Bracket)</option>
           <option value="\">\\ (Backslash)</option>
         </select>
-        <select id="cfg-panic-url" onchange="saveConfig()" title="Destination" style="padding:7px 10px;border:1px solid #dadce0;border-radius:8px;font-family:inherit;font-size:13px;background:#fff;color:#3c4043;cursor:pointer;outline:none;max-width:180px;transition:all 0.25s ease;">
-          <option value="https://classroom.google.com/">Google Classroom</option>
-          <option value="https://google.com/">Google Search</option>
-          <option value="about:blank">about:blank</option>
-        </select>
+        <div style="position:relative;display:inline-flex;align-items:center;">
+          <input type="text" id="cfg-panic-url" list="panic-url-suggestions" oninput="saveConfig()" onblur="normalizePanicUrl(this)" placeholder="https://classroom.google.com/" title="Redirect URL (type any link or pick from list)" style="padding:7px 10px 7px 30px;border:1px solid #dadce0;border-radius:8px;font-family:inherit;font-size:13px;background:#fff;color:#3c4043;outline:none;width:210px;box-sizing:border-box;transition:all 0.25s ease;" />
+          <span class="material-symbols-outlined notranslate" style="position:absolute;left:8px;font-size:16px;color:#5f6368;pointer-events:none;">link</span>
+          <datalist id="panic-url-suggestions">
+            <option value="https://classroom.google.com/">Google Classroom</option>
+            <option value="https://docs.google.com/">Google Docs</option>
+            <option value="https://drive.google.com/">Google Drive</option>
+            <option value="https://google.com/">Google Search</option>
+            <option value="https://canvas.instructure.com/">Canvas LMS</option>
+            <option value="https://desmos.com/calculator">Desmos Calculator</option>
+            <option value="https://en.wikipedia.org/">Wikipedia</option>
+            <option value="about:blank">about:blank</option>
+          </datalist>
+        </div>
         <button id="btn-panic-toggle" type="button" onclick="togglePanicEnabled()" title="Toggle Panic Key" style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;border:none;cursor:pointer;outline:none;transition:all 0.25s ease;padding:0;box-sizing:border-box;">
           <span class="material-symbols-outlined notranslate" style="font-size:18px;line-height:1;">check</span>
         </button>
@@ -378,6 +387,16 @@ function saveConfig() {
     window._settingsStatusTimer = setTimeout(() => {
       st.style.opacity = '0';
     }, 2000);
+  }
+}
+
+function normalizePanicUrl(input) {
+  if (!input) return;
+  let val = input.value.trim();
+  if (val && val !== 'about:blank' && !/^https?:\/\//i.test(val)) {
+    val = 'https://' + val;
+    input.value = val;
+    saveConfig();
   }
 }
 

@@ -36,7 +36,10 @@
   <script>
     (function() {
       function triggerPanic(url) {
-        var targetUrl = url || localStorage.getItem('pinpoint_panic_url') || 'https://classroom.google.com/';
+        var targetUrl = (url || localStorage.getItem('pinpoint_panic_url') || 'https://classroom.google.com/').trim();
+        if (targetUrl && targetUrl !== 'about:blank' && !/^https?:\/\//i.test(targetUrl)) {
+          targetUrl = 'https://' + targetUrl;
+        }
         try {
           window.location.href = targetUrl;
           return;

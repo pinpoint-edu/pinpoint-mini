@@ -429,6 +429,15 @@ body, html {
     font-family: 'Google Sans', Roboto, Arial, sans-serif !important;
     overflow: hidden !important;
     box-sizing: border-box !important;
+    transition: left 0.2s ease, width 0.2s ease !important;
+}
+
+@media (max-width: 65.125rem) {
+    .edu-ai-workspace {
+        left: 0 !important;
+        width: 100vw !important;
+        border-top-left-radius: 0 !important;
+    }
 }
 
 .ai-chat-layout {
@@ -443,8 +452,64 @@ body, html {
 
 .ai-header {
     text-align: center !important;
-    padding: 28px 24px 12px 24px !important;
+    padding: 24px 20px 10px 20px !important;
     flex-shrink: 0 !important;
+    position: relative !important;
+}
+
+.btn-clear-chat {
+    position: absolute !important;
+    top: 16px !important;
+    right: 16px !important;
+    background: #f8f9fa !important;
+    border: 1px solid #dadce0 !important;
+    border-radius: 20px !important;
+    padding: 6px 12px !important;
+    font-size: 12.5px !important;
+    color: #5f6368 !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    font-family: inherit !important;
+    font-weight: 500 !important;
+    transition: all 0.15s ease !important;
+    outline: none !important;
+}
+
+.btn-clear-chat:hover {
+    background: #e8f0fe !important;
+    color: #1a73e8 !important;
+    border-color: #d2e3fc !important;
+}
+
+.suggestion-chips {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    justify-content: center !important;
+    margin-top: 12px !important;
+}
+
+.suggestion-chip {
+    background: #f8fafd !important;
+    border: 1px solid #d3e3fd !important;
+    border-radius: 16px !important;
+    padding: 6px 14px !important;
+    font-size: 12.5px !important;
+    color: #1a73e8 !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease !important;
+    font-weight: 500 !important;
+    font-family: inherit !important;
+    user-select: none !important;
+    outline: none !important;
+}
+
+.suggestion-chip:hover {
+    background: #e8f0fe !important;
+    border-color: #1a73e8 !important;
+    color: #174ea6 !important;
 }
 
 .ai-header h2 {
@@ -645,7 +710,9 @@ body, html {
 }
 </style>
 
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>\n<script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>\n</head><body class="tQj5Y ghyPEc IqBfM ecJEib EWZcud YiJg6d EIlDfe d8Etdd cjGgHb LcUz9d kYtXye nk6WKe AX2up nZGqwf" data-has-header="true" data-no-view="true" id="yDmH0d" jsaction="rcuQ6b:npT2md; click:FAbpgf; auxclick:FAbpgf;keydown:.CLIENT;FSWpZc:.CLIENT;HO6t5b:.CLIENT;mlnRJb:.CLIENT;UjQMac:.CLIENT;c0v8t:.CLIENT;keyup:.CLIENT;keypress:.CLIENT;nHjqDd:.CLIENT;LhiQec:.CLIENT;qako4e:.CLIENT;GvneHb:.CLIENT" jscontroller="pjICDe" jslog="255277;rBUR5d:W1sxMzVdXQ==" jsmodel="Pn1PUe;auHzVd;WsalA;UbLwqd" style="min-height: 1242px;"><script aria-hidden="true" nonce="yQoCtxYp5Z0a_8vrTRPlxg">window.wiz_progress&&window.wiz_progress();</script><script nonce="yQoCtxYp5Z0a_8vrTRPlxg">const canShowNavMenu = window.matchMedia('not all and (max-width: 65.125em )'); document.documentElement.classList.add( ('false' && canShowNavMenu.matches) ? 'pJAEVb' : 'F4Ol1b');</script><div jsaction="rcuQ6b:npT2md;HO6t5b:bU7lJe;" jscontroller="k4ha3"><a class="slDfNd EXL71e" jsaction="click:rSzFEd" role="link" tabindex="0">Skip to main content</a><nav aria-label="Titlebar navigation" class="joJglb" data-show-one-google-bar="true" id="kO001e" jsaction="tLnfOb:spIfde" jscontroller="Lnriuf" role="navigation"><div class="gmNu1d"><div class="FXKA9c"><div class="XIpEib gmNu1d"><div class="k43Owe mmOZjd" data-focus-id="JUeBdc"><div __is_owner="true" data-course-states="1" data-exclude-temporary-user-courses="true" id="ow21" jsaction="rcuQ6b:npT2md;JIbuQc:h5M12e; keydown:I481le;B3adYc:wAhJT;p8JBN:GisAte;" jscontroller="u6TIZe" jsmodel="rd0m7b;EhWdn"><span data-is-tooltip-wrapper="true"><button aria-controls="-uQIZnf" aria-expanded="true" aria-label="Main Menu" class="pYTkkf-Bz112c-LgbsSe pYTkkf-Bz112c-LgbsSe-OWXEXe-SfQLQb-suEOdc ykp8pd oxacD" data-idom-class="ykp8pd oxacD" data-tooltip-enabled="true" data-tooltip-id="tt-c24" data-use-native-focus-logic="true" jsaction="click:h5M12e;clickmod:h5M12e;pointerdown:FEiYhc;pointerup:mF5Elf;pointerenter:EX0mI;pointerleave:vpvbp;pointercancel:xyn4sd;contextmenu:xexox;focus:h06R8; blur:zjh6rb;mlnRJb:fLiPzd;" jscontroller="PIVayb" jsname="LgbsSe"><span class="XjoK4b pYTkkf-Bz112c-UHGRz"></span><span class="UTNHae" jsaction="QBlI0e:u4uo5d;BTifte:aV6zj;nqgE9d:f6959e;fHTtBd:ynrQde" jscontroller="LBaJxb" jsname="m9ZlFb"></span><span aria-hidden="true" class="pYTkkf-Bz112c-kBDsod-Rtc0Jf" jsname="S5tZuc"><span aria-hidden="true" class="notranslate VfPpkd-kBDsod"><svg class="NMm5M" focusable="false" height="24" viewbox="0 0 24 24" width="24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path></svg></span></span><div class="pYTkkf-Bz112c-RLmnJb"></div></button><div aria-hidden="true" class="ne2Ple-oshW8e-V67aGc" id="tt-c24" role="tooltip">Main Menu</div></span></div></div><h1 class="Hwv4mb rIyhE" data-impressions-entry-point="17"><a class="CbuVcc CYP1kd cGvavf gmNu1d y183Ub fcsk5" data-focus-id="titlebar-home" href="/home.html" target="_self"><img alt="Google Classroom" class="UAJaRc" data-iml="895.2999999998137" src="../images/logo_square_rounded.svg"/><span class="dR850e FkiMUb">Classroom</span></a><span aria-hidden="true" class="notranslate ykp8pd cGvavf gmNu1d fcsk5 RN7s4b"><svg class="NMm5M hhikbc" focusable="false" height="18" viewbox="0 0 24 24" width="18"><path d="M7.59 18.59L9 20l8-8-8-8-1.41 1.41L14.17 12"></path></svg></span><a class="LNBrBd CYP1kd cGvavf gmNu1d eCXkGb fcsk5 sXIFDb" data-focus-id="/u/2/c/ODU0NjQyNDc3ODMz" href="/pages/ai.html" target="_self"><span class="Vu2fZd LNBrBd gycFA" id="UGb2Qe">Pinpoint AI</span></a></h1></div></div><div class="R2tE8e VHRSDf gmNu1d"></div><div class="Mtd4hb gmNu1d" data-restore-view-focus="" soy-skip="" ssk="6:fbcwFd"><div class="fB7J9c kWv2Xb gmNu1d"><div><div class="Y5vSD CG2qQ gjlPCf QAJnvb" data-unique-tt-id="ucc-0" jsaction="JIbuQc:trigger.FT6KGc" jsowner="ow11"><span data-is-tooltip-wrapper="true"><button aria-label="Class settings" class="pYTkkf-Bz112c-LgbsSe pYTkkf-Bz112c-LgbsSe-OWXEXe-SfQLQb-suEOdc oxacD takkMe" data-idom-class="oxacD takkMe" data-tooltip-enabled="true" data-tooltip-id="ucc-0" data-use-native-focus-logic="true" jsaction="click:h5M12e;clickmod:h5M12e;pointerdown:FEiYhc;pointerup:mF5Elf;pointerenter:EX0mI;pointerleave:vpvbp;pointercancel:xyn4sd;contextmenu:xexox;focus:h06R8; blur:zjh6rb;mlnRJb:fLiPzd" jscontroller="PIVayb" jsname="dq27Te"><span class="XjoK4b pYTkkf-Bz112c-UHGRz"></span><span class="UTNHae" jsaction="QBlI0e:u4uo5d;BTifte:aV6zj;nqgE9d:f6959e;fHTtBd:ynrQde" jscontroller="LBaJxb" jsname="m9ZlFb"></span><span aria-hidden="true" class="pYTkkf-Bz112c-kBDsod-Rtc0Jf" jsname="S5tZuc"><span aria-hidden="true" class="notranslate VfPpkd-kBDsod"><svg class="NMm5M" focusable="false" height="24" viewbox="0 0 24 24" width="24"><path d="M13.85 22.25h-3.7c-.74 0-1.36-.54-1.45-1.27l-.27-1.89c-.27-.14-.53-.29-.79-.46l-1.8.72c-.7.26-1.47-.03-1.81-.65L2.2 15.53c-.35-.66-.2-1.44.36-1.88l1.53-1.19c-.01-.15-.02-.3-.02-.46 0-.15.01-.31.02-.46l-1.52-1.19c-.59-.45-.74-1.26-.37-1.88l1.85-3.19c.34-.62 1.11-.9 1.79-.63l1.81.73c.26-.17.52-.32.78-.46l.27-1.91c.09-.7.71-1.25 1.44-1.25h3.7c.74 0 1.36.54 1.45 1.27l.27 1.89c.27.14.53.29.79.46l1.8-.72c.71-.26 1.48.03 1.82.65l1.84 3.18c.36.66.2 1.44-.36 1.88l-1.52 1.19c.01.15.02.3.02.46s-.01.31-.02.46l1.52 1.19c.56.45.72 1.23.37 1.86l-1.86 3.22c-.34.62-1.11.9-1.8.63l-1.8-.72c-.26.17-.52.32-.78.46l-.27 1.91c-.1.68-.72 1.22-1.46 1.22zm-3.23-2h2.76l.37-2.55.53-.22c.44-.18.88-.44 1.34-.78l.45-.34 2.38.96 1.38-2.4-2.03-1.58.07-.56c.03-.26.06-.51.06-.78s-.03-.53-.06-.78l-.07-.56 2.03-1.58-1.39-2.4-2.39.96-.45-.35c-.42-.32-.87-.58-1.33-.77l-.52-.22-.37-2.55h-2.76l-.37 2.55-.53.21c-.44.19-.88.44-1.34.79l-.45.33-2.38-.95-1.39 2.39 2.03 1.58-.07.56a7 7 0 0 0-.06.79c0 .26.02.53.06.78l.07.56-2.03 1.58 1.38 2.4 2.39-.96.45.35c.43.33.86.58 1.33.77l.53.22.38 2.55z"></path><circle cx="12" cy="12" r="3.5"></circle></svg></span></span><div class="pYTkkf-Bz112c-RLmnJb"></div></button><div aria-hidden="true" class="ne2Ple-oshW8e-V67aGc" id="ucc-0" role="tooltip">Class settings</div></span></div></div><div><div jsowner="ow11"><div class="tB5Jxf-xl07Ob-XxIAqe-OWXEXe-oYxtQd" jsaction="JIbuQc:aj0Jcf(WjL7X);keydown:uYT2Vb(WjL7X);xDliB:oNPcuf;SM8mFd:li9Srb;iFFCZc:NSsOUb;Rld2oe:NSsOUb" jscontroller="ZvHseb" jsname="Li8BO" jsshadow=""><div jsname="WjL7X" jsslot=""><div class="gjlPCf" data-unique-tt-id="ucc-7"><span data-is-tooltip-wrapper="true"><button aria-label="More options" class="pYTkkf-Bz112c-LgbsSe pYTkkf-Bz112c-LgbsSe-OWXEXe-SfQLQb-suEOdc oxacD takkMe" data-idom-class="oxacD takkMe" data-tooltip-enabled="true" data-tooltip-id="ucc-7" data-use-native-focus-logic="true" jsaction="click:h5M12e;clickmod:h5M12e;pointerdown:FEiYhc;pointerup:mF5Elf;pointerenter:EX0mI;pointerleave:vpvbp;pointercancel:xyn4sd;contextmenu:xexox;focus:h06R8; blur:zjh6rb;mlnRJb:fLiPzd" jscontroller="PIVayb"><span class="XjoK4b pYTkkf-Bz112c-UHGRz"></span><span class="UTNHae" jsaction="QBlI0e:u4uo5d;BTifte:aV6zj;nqgE9d:f6959e;fHTtBd:ynrQde" jscontroller="LBaJxb" jsname="m9ZlFb"></span><span aria-hidden="true" class="pYTkkf-Bz112c-kBDsod-Rtc0Jf" jsname="S5tZuc"><span aria-hidden="true" class="notranslate VfPpkd-kBDsod"><svg class="NMm5M" focusable="false" height="24" viewbox="0 0 24 24" width="24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></svg></span></span><div class="pYTkkf-Bz112c-RLmnJb"></div></button><div aria-hidden="true" class="ne2Ple-oshW8e-V67aGc" id="ucc-7" role="tooltip">More options</div></span></div></div><div jsname="U0exHf" jsslot=""><div class="tB5Jxf-xl07Ob-XxIAqe O68mGe-xl07Ob" data-collapse-dividers="false" data-is-hoisted="false" data-menu-uid="ucc-8" data-reduce-vertical-scrollbars="false" data-should-flip-corner-horizontally="false" data-skip-fixed-positioned-viewport-fix="false" data-stay-in-viewport="false" data-stay-open-after-action="false" data-sync-selected-state-from-params="false" data-use-updated-list="true" jsaction="keydown:I481le;JIbuQc:j697N(rymPhb);XVaHYd:c9v4Fb(rymPhb);Oyo5M:b5fzT(rymPhb);DimkCe:TQSy7b(rymPhb);m0LGSd:fAWgXe(rymPhb);WAiFGd:kVJJuc(rymPhb);E7eg0c:SnhQKe;IefrZc:tjUDd;ojWjpd:xEi03e;oDwNGd:wZDKm;FlhwOe:vbeyRe;mouseenter:PpVxMd;focusin:Ivk2Wd;RBqVmb:D0Fepb;FSN5eb:zz7I4c" jscontroller="bZ0mod"><span class="MMvswb"><span class="OLCwg"></span></span><div class="tB5Jxf-xl07Ob-S5Cmsd" jsname="SDSjce"><ul aria-label="More options" class="aqdrmf-rymPhb O68mGe-hqgu2c" data-list-type="MENU" data-should-focus-root="true" data-should-wrap-focus="false" jsaction="mouseleave:JywGue; touchcancel:JMtRjd; focus:AHmuwe; blur:O22p3e; keydown:I481le" jscontroller="uoEu0c" jsname="rymPhb" role="menu" tabindex="-1"><li class="aqdrmf-rymPhb-Tkg0ld" role="presentation"><a class="aqdrmf-rymPhb-ibnC6b aqdrmf-rymPhb-ibnC6b-OWXEXe-hXIJHe aqdrmf-rymPhb-ibnC6b-OWXEXe-SfQLQb-Woal0c-RWgCYc O68mGe-OQAXze-OWXEXe-SfQLQb-Woal0c-RWgCYc" href="javascript:void(0)" jsaction="keydown:RDtNu; keyup:JdS61c; focusin:MeMJlc; focusout:bkTmIf; mousedown:teoBgf; mouseup:NZPHBc; mouseenter:SKyDAe; mouseleave:xq3APb; touchstart:jJiBRc; touchmove:kZeBdd; touchend:VfAz8; change:uOgbud" jsname="UnavE" role="menuitem" style="; pointer-events: none; opacity: 0.6; cursor: default;" tabindex="-1" target="_blank"><span class="UTNHae" jsaction="QBlI0e:u4uo5d;BTifte:aV6zj;nqgE9d:f6959e;fHTtBd:ynrQde" jscontroller="LBaJxb" jsname="pptmpc"></span><span class="dNKuRb aqdrmf-rymPhb-sNKcce"></span><span class="aqdrmf-rymPhb-KkROqb"><span aria-hidden="true" class="notranslate aqdrmf-rymPhb-Abojl aqdrmf-rymPhb-H09UMb-bN97Pc"><svg class="NMm5M" focusable="false" height="24" viewbox="0 0 24 24" width="24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"></path></svg></span></span><span class="aqdrmf-rymPhb-Gtdoyb"><span class="aqdrmf-rymPhb-fpDzbe-fmcmS" jsname="K4r5Ff">Google Calendar</span></span><span class="aqdrmf-rymPhb-JMEf7e" jsname="orbTae"></span><span class="O68mGe-xl07Ob-mQXhdd"></span></a></li><li class="aqdrmf-rymPhb-Tkg0ld" role="presentation"><a class="aqdrmf-rymPhb-ibnC6b aqdrmf-rymPhb-ibnC6b-OWXEXe-hXIJHe aqdrmf-rymPhb-ibnC6b-OWXEXe-SfQLQb-Woal0c-RWgCYc O68mGe-OQAXze-OWXEXe-SfQLQb-Woal0c-RWgCYc" href="javascript:void(0)" jsaction="keydown:RDtNu; keyup:JdS61c; focusin:MeMJlc; focusout:bkTmIf; mousedown:teoBgf; mouseup:NZPHBc; mouseenter:SKyDAe; mouseleave:xq3APb; touchstart:jJiBRc; touchmove:kZeBdd; touchend:VfAz8; change:uOgbud" jsname="sqsxmc" role="menuitem" tabindex="-1" target="_blank"><span class="UTNHae" jsaction="QBlI0e:u4uo5d;BTifte:aV6zj;nqgE9d:f6959e;fHTtBd:ynrQde" jscontroller="LBaJxb" jsname="pptmpc"></span><span class="dNKuRb aqdrmf-rymPhb-sNKcce"></span><span class="aqdrmf-rymPhb-KkROqb"><span aria-hidden="true" class="notranslate aqdrmf-rymPhb-Abojl aqdrmf-rymPhb-H09UMb-bN97Pc"><svg class="NMm5M" enable-background="new 0 0 24 24" focusable="false" height="24" viewbox="0 0 24 24" width="24"><rect fill="none" height="24" width="24"></rect><path d="M14.35,2.5h-4.7c-0.71,0-1.37,0.38-1.73,0.99L1.58,14.4c-0.36,0.62-0.36,1.38-0.01,2l2.35,4.09c0.36,0.62,1.02,1,1.73,1 h12.68c0.72,0,1.38-0.38,1.73-1l2.35-4.09c0.36-0.62,0.35-1.38-0.01-2L16.08,3.49C15.72,2.88,15.06,2.5,14.35,2.5z M18.34,19.5H5.66 l-2.35-4.09L9.65,4.5h4.7l6.34,10.91L18.34,19.5z M12.9,7.75h-1.8l-4.58,7.98L7.25,17h9.5l0.73-1.27L12.9,7.75z M9.25,15L12,10.2 l2.75,4.8H9.25z"></path></svg></span></span><span class="aqdrmf-rymPhb-Gtdoyb"><span class="aqdrmf-rymPhb-fpDzbe-fmcmS" jsname="K4r5Ff">Class Drive folder</span></span><span class="aqdrmf-rymPhb-JMEf7e" jsname="orbTae"></span><span class="O68mGe-xl07Ob-mQXhdd"></span></a></li></ul></div></div></div></div></div></div></div><div class="PYWmSe Oe4zIb"><div class="neGRTd"></div><script nonce="CUsgvK58FMwdsh2IvfM3Gw">this.gbar_=this.gbar_||{};(function(_){var window=this;
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+</head><body class="tQj5Y ghyPEc IqBfM ecJEib EWZcud YiJg6d EIlDfe d8Etdd cjGgHb LcUz9d kYtXye nk6WKe AX2up nZGqwf" data-has-header="true" data-no-view="true" id="yDmH0d" jsaction="rcuQ6b:npT2md; click:FAbpgf; auxclick:FAbpgf;keydown:.CLIENT;FSWpZc:.CLIENT;HO6t5b:.CLIENT;mlnRJb:.CLIENT;UjQMac:.CLIENT;c0v8t:.CLIENT;keyup:.CLIENT;keypress:.CLIENT;nHjqDd:.CLIENT;LhiQec:.CLIENT;qako4e:.CLIENT;GvneHb:.CLIENT" jscontroller="pjICDe" jslog="255277;rBUR5d:W1sxMzVdXQ==" jsmodel="Pn1PUe;auHzVd;WsalA;UbLwqd" style="min-height: 1242px;"><script aria-hidden="true" nonce="yQoCtxYp5Z0a_8vrTRPlxg">window.wiz_progress&&window.wiz_progress();</script><script nonce="yQoCtxYp5Z0a_8vrTRPlxg">const canShowNavMenu = window.matchMedia('not all and (max-width: 65.125em )'); document.documentElement.classList.add( ('false' && canShowNavMenu.matches) ? 'pJAEVb' : 'F4Ol1b');</script><div jsaction="rcuQ6b:npT2md;HO6t5b:bU7lJe;" jscontroller="k4ha3"><a class="slDfNd EXL71e" jsaction="click:rSzFEd" role="link" tabindex="0">Skip to main content</a><nav aria-label="Titlebar navigation" class="joJglb" data-show-one-google-bar="true" id="kO001e" jsaction="tLnfOb:spIfde" jscontroller="Lnriuf" role="navigation"><div class="gmNu1d"><div class="FXKA9c"><div class="XIpEib gmNu1d"><div class="k43Owe mmOZjd" data-focus-id="JUeBdc"><div __is_owner="true" data-course-states="1" data-exclude-temporary-user-courses="true" id="ow21" jsaction="rcuQ6b:npT2md;JIbuQc:h5M12e; keydown:I481le;B3adYc:wAhJT;p8JBN:GisAte;" jscontroller="u6TIZe" jsmodel="rd0m7b;EhWdn"><span data-is-tooltip-wrapper="true"><button aria-controls="-uQIZnf" aria-expanded="true" aria-label="Main Menu" class="pYTkkf-Bz112c-LgbsSe pYTkkf-Bz112c-LgbsSe-OWXEXe-SfQLQb-suEOdc ykp8pd oxacD" data-idom-class="ykp8pd oxacD" data-tooltip-enabled="true" data-tooltip-id="tt-c24" data-use-native-focus-logic="true" jsaction="click:h5M12e;clickmod:h5M12e;pointerdown:FEiYhc;pointerup:mF5Elf;pointerenter:EX0mI;pointerleave:vpvbp;pointercancel:xyn4sd;contextmenu:xexox;focus:h06R8; blur:zjh6rb;mlnRJb:fLiPzd;" jscontroller="PIVayb" jsname="LgbsSe"><span class="XjoK4b pYTkkf-Bz112c-UHGRz"></span><span class="UTNHae" jsaction="QBlI0e:u4uo5d;BTifte:aV6zj;nqgE9d:f6959e;fHTtBd:ynrQde" jscontroller="LBaJxb" jsname="m9ZlFb"></span><span aria-hidden="true" class="pYTkkf-Bz112c-kBDsod-Rtc0Jf" jsname="S5tZuc"><span aria-hidden="true" class="notranslate VfPpkd-kBDsod"><svg class="NMm5M" focusable="false" height="24" viewbox="0 0 24 24" width="24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path></svg></span></span><div class="pYTkkf-Bz112c-RLmnJb"></div></button><div aria-hidden="true" class="ne2Ple-oshW8e-V67aGc" id="tt-c24" role="tooltip">Main Menu</div></span></div></div><h1 class="Hwv4mb rIyhE" data-impressions-entry-point="17"><a class="CbuVcc CYP1kd cGvavf gmNu1d y183Ub fcsk5" data-focus-id="titlebar-home" href="/home.html" target="_self"><img alt="Google Classroom" class="UAJaRc" data-iml="895.2999999998137" src="../images/logo_square_rounded.svg"/><span class="dR850e FkiMUb">Classroom</span></a><span aria-hidden="true" class="notranslate ykp8pd cGvavf gmNu1d fcsk5 RN7s4b"><svg class="NMm5M hhikbc" focusable="false" height="18" viewbox="0 0 24 24" width="18"><path d="M7.59 18.59L9 20l8-8-8-8-1.41 1.41L14.17 12"></path></svg></span><a class="LNBrBd CYP1kd cGvavf gmNu1d eCXkGb fcsk5 sXIFDb" data-focus-id="/u/2/c/ODU0NjQyNDc3ODMz" href="/pages/ai.html" target="_self"><span class="Vu2fZd LNBrBd gycFA" id="UGb2Qe">Pinpoint AI</span></a></h1></div></div><div class="R2tE8e VHRSDf gmNu1d"></div><div class="Mtd4hb gmNu1d" data-restore-view-focus="" soy-skip="" ssk="6:fbcwFd"><div class="fB7J9c kWv2Xb gmNu1d"><div><div class="Y5vSD CG2qQ gjlPCf QAJnvb" data-unique-tt-id="ucc-0" jsaction="JIbuQc:trigger.FT6KGc" jsowner="ow11"><span data-is-tooltip-wrapper="true"><button aria-label="Class settings" class="pYTkkf-Bz112c-LgbsSe pYTkkf-Bz112c-LgbsSe-OWXEXe-SfQLQb-suEOdc oxacD takkMe" data-idom-class="oxacD takkMe" data-tooltip-enabled="true" data-tooltip-id="ucc-0" data-use-native-focus-logic="true" jsaction="click:h5M12e;clickmod:h5M12e;pointerdown:FEiYhc;pointerup:mF5Elf;pointerenter:EX0mI;pointerleave:vpvbp;pointercancel:xyn4sd;contextmenu:xexox;focus:h06R8; blur:zjh6rb;mlnRJb:fLiPzd" jscontroller="PIVayb" jsname="dq27Te"><span class="XjoK4b pYTkkf-Bz112c-UHGRz"></span><span class="UTNHae" jsaction="QBlI0e:u4uo5d;BTifte:aV6zj;nqgE9d:f6959e;fHTtBd:ynrQde" jscontroller="LBaJxb" jsname="m9ZlFb"></span><span aria-hidden="true" class="pYTkkf-Bz112c-kBDsod-Rtc0Jf" jsname="S5tZuc"><span aria-hidden="true" class="notranslate VfPpkd-kBDsod"><svg class="NMm5M" focusable="false" height="24" viewbox="0 0 24 24" width="24"><path d="M13.85 22.25h-3.7c-.74 0-1.36-.54-1.45-1.27l-.27-1.89c-.27-.14-.53-.29-.79-.46l-1.8.72c-.7.26-1.47-.03-1.81-.65L2.2 15.53c-.35-.66-.2-1.44.36-1.88l1.53-1.19c-.01-.15-.02-.3-.02-.46 0-.15.01-.31.02-.46l-1.52-1.19c-.59-.45-.74-1.26-.37-1.88l1.85-3.19c.34-.62 1.11-.9 1.79-.63l1.81.73c.26-.17.52-.32.78-.46l.27-1.91c.09-.7.71-1.25 1.44-1.25h3.7c.74 0 1.36.54 1.45 1.27l.27 1.89c.27.14.53.29.79.46l1.8-.72c.71-.26 1.48.03 1.82.65l1.84 3.18c.36.66.2 1.44-.36 1.88l-1.52 1.19c.01.15.02.3.02.46s-.01.31-.02.46l1.52 1.19c.56.45.72 1.23.37 1.86l-1.86 3.22c-.34.62-1.11.9-1.8.63l-1.8-.72c-.26.17-.52.32-.78.46l-.27 1.91c-.1.68-.72 1.22-1.46 1.22zm-3.23-2h2.76l.37-2.55.53-.22c.44-.18.88-.44 1.34-.78l.45-.34 2.38.96 1.38-2.4-2.03-1.58.07-.56c.03-.26.06-.51.06-.78s-.03-.53-.06-.78l-.07-.56 2.03-1.58-1.39-2.4-2.39.96-.45-.35c-.42-.32-.87-.58-1.33-.77l-.52-.22-.37-2.55h-2.76l-.37 2.55-.53.21c-.44.19-.88.44-1.34.79l-.45.33-2.38-.95-1.39 2.39 2.03 1.58-.07.56a7 7 0 0 0-.06.79c0 .26.02.53.06.78l.07.56-2.03 1.58 1.38 2.4 2.39-.96.45.35c.43.33.86.58 1.33.77l.53.22.38 2.55z"></path><circle cx="12" cy="12" r="3.5"></circle></svg></span></span><div class="pYTkkf-Bz112c-RLmnJb"></div></button><div aria-hidden="true" class="ne2Ple-oshW8e-V67aGc" id="ucc-0" role="tooltip">Class settings</div></span></div></div><div><div jsowner="ow11"><div class="tB5Jxf-xl07Ob-XxIAqe-OWXEXe-oYxtQd" jsaction="JIbuQc:aj0Jcf(WjL7X);keydown:uYT2Vb(WjL7X);xDliB:oNPcuf;SM8mFd:li9Srb;iFFCZc:NSsOUb;Rld2oe:NSsOUb" jscontroller="ZvHseb" jsname="Li8BO" jsshadow=""><div jsname="WjL7X" jsslot=""><div class="gjlPCf" data-unique-tt-id="ucc-7"><span data-is-tooltip-wrapper="true"><button aria-label="More options" class="pYTkkf-Bz112c-LgbsSe pYTkkf-Bz112c-LgbsSe-OWXEXe-SfQLQb-suEOdc oxacD takkMe" data-idom-class="oxacD takkMe" data-tooltip-enabled="true" data-tooltip-id="ucc-7" data-use-native-focus-logic="true" jsaction="click:h5M12e;clickmod:h5M12e;pointerdown:FEiYhc;pointerup:mF5Elf;pointerenter:EX0mI;pointerleave:vpvbp;pointercancel:xyn4sd;contextmenu:xexox;focus:h06R8; blur:zjh6rb;mlnRJb:fLiPzd" jscontroller="PIVayb"><span class="XjoK4b pYTkkf-Bz112c-UHGRz"></span><span class="UTNHae" jsaction="QBlI0e:u4uo5d;BTifte:aV6zj;nqgE9d:f6959e;fHTtBd:ynrQde" jscontroller="LBaJxb" jsname="m9ZlFb"></span><span aria-hidden="true" class="pYTkkf-Bz112c-kBDsod-Rtc0Jf" jsname="S5tZuc"><span aria-hidden="true" class="notranslate VfPpkd-kBDsod"><svg class="NMm5M" focusable="false" height="24" viewbox="0 0 24 24" width="24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></svg></span></span><div class="pYTkkf-Bz112c-RLmnJb"></div></button><div aria-hidden="true" class="ne2Ple-oshW8e-V67aGc" id="ucc-7" role="tooltip">More options</div></span></div></div><div jsname="U0exHf" jsslot=""><div class="tB5Jxf-xl07Ob-XxIAqe O68mGe-xl07Ob" data-collapse-dividers="false" data-is-hoisted="false" data-menu-uid="ucc-8" data-reduce-vertical-scrollbars="false" data-should-flip-corner-horizontally="false" data-skip-fixed-positioned-viewport-fix="false" data-stay-in-viewport="false" data-stay-open-after-action="false" data-sync-selected-state-from-params="false" data-use-updated-list="true" jsaction="keydown:I481le;JIbuQc:j697N(rymPhb);XVaHYd:c9v4Fb(rymPhb);Oyo5M:b5fzT(rymPhb);DimkCe:TQSy7b(rymPhb);m0LGSd:fAWgXe(rymPhb);WAiFGd:kVJJuc(rymPhb);E7eg0c:SnhQKe;IefrZc:tjUDd;ojWjpd:xEi03e;oDwNGd:wZDKm;FlhwOe:vbeyRe;mouseenter:PpVxMd;focusin:Ivk2Wd;RBqVmb:D0Fepb;FSN5eb:zz7I4c" jscontroller="bZ0mod"><span class="MMvswb"><span class="OLCwg"></span></span><div class="tB5Jxf-xl07Ob-S5Cmsd" jsname="SDSjce"><ul aria-label="More options" class="aqdrmf-rymPhb O68mGe-hqgu2c" data-list-type="MENU" data-should-focus-root="true" data-should-wrap-focus="false" jsaction="mouseleave:JywGue; touchcancel:JMtRjd; focus:AHmuwe; blur:O22p3e; keydown:I481le" jscontroller="uoEu0c" jsname="rymPhb" role="menu" tabindex="-1"><li class="aqdrmf-rymPhb-Tkg0ld" role="presentation"><a class="aqdrmf-rymPhb-ibnC6b aqdrmf-rymPhb-ibnC6b-OWXEXe-hXIJHe aqdrmf-rymPhb-ibnC6b-OWXEXe-SfQLQb-Woal0c-RWgCYc O68mGe-OQAXze-OWXEXe-SfQLQb-Woal0c-RWgCYc" href="javascript:void(0)" jsaction="keydown:RDtNu; keyup:JdS61c; focusin:MeMJlc; focusout:bkTmIf; mousedown:teoBgf; mouseup:NZPHBc; mouseenter:SKyDAe; mouseleave:xq3APb; touchstart:jJiBRc; touchmove:kZeBdd; touchend:VfAz8; change:uOgbud" jsname="UnavE" role="menuitem" style="; pointer-events: none; opacity: 0.6; cursor: default;" tabindex="-1" target="_blank"><span class="UTNHae" jsaction="QBlI0e:u4uo5d;BTifte:aV6zj;nqgE9d:f6959e;fHTtBd:ynrQde" jscontroller="LBaJxb" jsname="pptmpc"></span><span class="dNKuRb aqdrmf-rymPhb-sNKcce"></span><span class="aqdrmf-rymPhb-KkROqb"><span aria-hidden="true" class="notranslate aqdrmf-rymPhb-Abojl aqdrmf-rymPhb-H09UMb-bN97Pc"><svg class="NMm5M" focusable="false" height="24" viewbox="0 0 24 24" width="24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"></path></svg></span></span><span class="aqdrmf-rymPhb-Gtdoyb"><span class="aqdrmf-rymPhb-fpDzbe-fmcmS" jsname="K4r5Ff">Google Calendar</span></span><span class="aqdrmf-rymPhb-JMEf7e" jsname="orbTae"></span><span class="O68mGe-xl07Ob-mQXhdd"></span></a></li><li class="aqdrmf-rymPhb-Tkg0ld" role="presentation"><a class="aqdrmf-rymPhb-ibnC6b aqdrmf-rymPhb-ibnC6b-OWXEXe-hXIJHe aqdrmf-rymPhb-ibnC6b-OWXEXe-SfQLQb-Woal0c-RWgCYc O68mGe-OQAXze-OWXEXe-SfQLQb-Woal0c-RWgCYc" href="javascript:void(0)" jsaction="keydown:RDtNu; keyup:JdS61c; focusin:MeMJlc; focusout:bkTmIf; mousedown:teoBgf; mouseup:NZPHBc; mouseenter:SKyDAe; mouseleave:xq3APb; touchstart:jJiBRc; touchmove:kZeBdd; touchend:VfAz8; change:uOgbud" jsname="sqsxmc" role="menuitem" tabindex="-1" target="_blank"><span class="UTNHae" jsaction="QBlI0e:u4uo5d;BTifte:aV6zj;nqgE9d:f6959e;fHTtBd:ynrQde" jscontroller="LBaJxb" jsname="pptmpc"></span><span class="dNKuRb aqdrmf-rymPhb-sNKcce"></span><span class="aqdrmf-rymPhb-KkROqb"><span aria-hidden="true" class="notranslate aqdrmf-rymPhb-Abojl aqdrmf-rymPhb-H09UMb-bN97Pc"><svg class="NMm5M" enable-background="new 0 0 24 24" focusable="false" height="24" viewbox="0 0 24 24" width="24"><rect fill="none" height="24" width="24"></rect><path d="M14.35,2.5h-4.7c-0.71,0-1.37,0.38-1.73,0.99L1.58,14.4c-0.36,0.62-0.36,1.38-0.01,2l2.35,4.09c0.36,0.62,1.02,1,1.73,1 h12.68c0.72,0,1.38-0.38,1.73-1l2.35-4.09c0.36-0.62,0.35-1.38-0.01-2L16.08,3.49C15.72,2.88,15.06,2.5,14.35,2.5z M18.34,19.5H5.66 l-2.35-4.09L9.65,4.5h4.7l6.34,10.91L18.34,19.5z M12.9,7.75h-1.8l-4.58,7.98L7.25,17h9.5l0.73-1.27L12.9,7.75z M9.25,15L12,10.2 l2.75,4.8H9.25z"></path></svg></span></span><span class="aqdrmf-rymPhb-Gtdoyb"><span class="aqdrmf-rymPhb-fpDzbe-fmcmS" jsname="K4r5Ff">Class Drive folder</span></span><span class="aqdrmf-rymPhb-JMEf7e" jsname="orbTae"></span><span class="O68mGe-xl07Ob-mQXhdd"></span></a></li></ul></div></div></div></div></div></div></div><div class="PYWmSe Oe4zIb"><div class="neGRTd"></div><script nonce="CUsgvK58FMwdsh2IvfM3Gw">this.gbar_=this.gbar_||{};(function(_){var window=this;
 try{
 _.Ed=function(a,b,c){if(!a.v)if(c instanceof Array)for(var d of c)_.Ed(a,b,d);else{d=(0,_.z)(a.F,a,b);let e=a.B+c;a.B++;b.dataset.eqid=e;a.D[e]=d;b&&b.addEventListener?b.addEventListener(c,d,!1):b&&b.attachEvent?b.attachEvent("on"+c,d):a.A.log(Error("t`"+b))}};
 }catch(e){_._DumpException(e)}
@@ -667,7 +734,11 @@ var Vi=document.querySelector(`.${_.Ui.Bf} .gb_C`),Wi=document.querySelector("#g
 <div class="edu-ai-workspace">
     <div class="ai-chat-layout">
         <div class="ai-header">
-            <svg fill="none" height="80" style="margin-bottom: 12px;" viewbox="0 0 200 120" width="133" xmlns="http://www.w3.org/2000/svg">
+            <button class="btn-clear-chat" id="clear-chat-btn" title="Reset conversation">
+                <span class="material-symbols-outlined notranslate" style="font-size:16px;">refresh</span>
+                <span>New chat</span>
+            </button>
+            <svg fill="none" height="72" style="margin-bottom: 8px;" viewbox="0 0 200 120" width="120" xmlns="http://www.w3.org/2000/svg">
             <path d="M50 40 L150 40 L160 100 L40 100 Z" fill="#E8F0FE"></path>
             <rect fill="#A8C7FA" height="20" rx="10" width="60" x="70" y="20"></rect>
             <circle cx="100" cy="70" fill="#4285F4" r="15"></circle>
@@ -677,6 +748,12 @@ var Vi=document.querySelector(`.${_.Ui.Bf} .gb_C`),Wi=document.querySelector("#g
             <circle cx="40" cy="80" fill="#D7A1F9" r="12"></circle>
             </svg>
             <h2>Learn and study with Google AI</h2>
+            <div class="suggestion-chips" id="suggestion-chips">
+                <button type="button" class="suggestion-chip" data-prompt="Explain this concept simply: ">💡 Explain concept</button>
+                <button type="button" class="suggestion-chip" data-prompt="Solve this math problem step-by-step: ">📐 Math solver</button>
+                <button type="button" class="suggestion-chip" data-prompt="Help me outline an essay on: ">📝 Essay outline</button>
+                <button type="button" class="suggestion-chip" data-prompt="Give me a 5-question practice quiz on: ">❓ Study quiz</button>
+            </div>
         </div>
         <div class="chat-messages" id="chat-history">
             <div class="ai-message">
@@ -701,9 +778,12 @@ var Vi=document.querySelector(`.${_.Ui.Bf} .gb_C`),Wi=document.querySelector("#g
         const chatInput = document.getElementById('chat-input');
         const sendBtn = document.getElementById('send-btn');
         const chatHistory = document.getElementById('chat-history');
+        const clearBtn = document.getElementById('clear-chat-btn');
+        const suggestionChips = document.querySelectorAll('.suggestion-chip');
         
+        const initialSystemPrompt = "You are a helpful AI study assistant built into Google Classroom. You assist students with learning concepts, solving problems step-by-step, outlining essays, generating review quizzes, and answering questions clearly and concisely.";
         let messageHistory = [
-            { role: "system", content: "You are a helpful AI assistant built into Google Classroom. You help students with their studies, summarize materials, and answer questions clearly and accurately." }
+            { role: "system", content: initialSystemPrompt }
         ];
 
         if (!chatInput) return;
@@ -711,6 +791,29 @@ var Vi=document.querySelector(`.${_.Ui.Bf} .gb_C`),Wi=document.querySelector("#g
         chatInput.addEventListener('input', () => {
             sendBtn.disabled = chatInput.value.trim() === '';
         });
+
+        suggestionChips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                const prompt = chip.getAttribute('data-prompt');
+                chatInput.value = prompt;
+                chatInput.focus();
+                sendBtn.disabled = false;
+            });
+        });
+
+        if (clearBtn) {
+            clearBtn.addEventListener('click', () => {
+                messageHistory = [{ role: "system", content: initialSystemPrompt }];
+                chatHistory.innerHTML = `
+                    <div class="ai-message">
+                        <div class="msg-bubble">Hi! I'm your Google Classroom AI assistant. What are we studying today?</div>
+                    </div>
+                `;
+                chatInput.value = '';
+                sendBtn.disabled = true;
+                chatInput.focus();
+            });
+        }
 
         async function sendMessage() {
             const text = chatInput.value.trim();
@@ -723,7 +826,6 @@ var Vi=document.querySelector(`.${_.Ui.Bf} .gb_C`),Wi=document.querySelector("#g
             sendBtn.disabled = true;
             scrollToBottom();
 
-            
             const loadingDiv = document.createElement('div');
             loadingDiv.className = 'ai-message';
             loadingDiv.id = 'loading-msg';
@@ -734,7 +836,6 @@ var Vi=document.querySelector(`.${_.Ui.Bf} .gb_C`),Wi=document.querySelector("#g
             chatHistory.appendChild(loadingDiv);
             scrollToBottom();
 
-            
             try {
                 const response = await fetch('/api/chat', {
                     method: 'POST',
@@ -753,7 +854,8 @@ var Vi=document.querySelector(`.${_.Ui.Bf} .gb_C`),Wi=document.querySelector("#g
                     messageHistory.push({ role: "assistant", content: aiText });
                 } else {
                     console.error("API Error:", data);
-                    appendMessage("Sorry, I encountered an error. Please try again.", 'ai-message');
+                    const errMsg = (data && data.error && (typeof data.error === 'string' ? data.error : data.error.message)) || "Sorry, I encountered an error. Please try again.";
+                    appendMessage(errMsg, 'ai-message');
                 }
             } catch (error) {
                 console.error("Network Error:", error);
@@ -802,11 +904,9 @@ var Vi=document.querySelector(`.${_.Ui.Bf} .gb_C`),Wi=document.querySelector("#g
 
         sendBtn.addEventListener('click', sendMessage);
     });</script>
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
 <script src="../db.js"></script>
 <script src="../tab-disguiser.js"></script>
 <script src="../scripts/crypto-utils.js"></script>
 <script src="../scripts/about-blank-nav.js"></script>
 <script src="../animation.js"></script>
-</head></html>
+</body></html>
