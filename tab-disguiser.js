@@ -1,3 +1,21 @@
+// Polyfill safety guards for event targets without .matches (e.g. document/window in extensions like expander.js)
+(function() {
+    try {
+        if (typeof EventTarget !== 'undefined' && !EventTarget.prototype.matches) {
+            EventTarget.prototype.matches = function() { return false; };
+        }
+        if (typeof Node !== 'undefined' && !Node.prototype.matches) {
+            Node.prototype.matches = function() { return false; };
+        }
+        if (typeof Document !== 'undefined' && !Document.prototype.matches) {
+            Document.prototype.matches = function() { return false; };
+        }
+        if (typeof Window !== 'undefined' && !Window.prototype.matches) {
+            Window.prototype.matches = function() { return false; };
+        }
+    } catch (e) {}
+})();
+
 var TabDisguiser = window.TabDisguiser || {
     currentVersion: '2026.09.23.10',
     defaultTitle: 'Home - Classroom',
@@ -381,7 +399,7 @@ var TabDisguiser = window.TabDisguiser || {
         } catch (e) {}
 
         let links = Array.from(doc.querySelectorAll("link[rel*='icon']"));
-        if (links.length === 0) {
+        if (links.length === 0 && doc.head) {
             const link1 = doc.createElement('link');
             link1.rel = 'icon';
             doc.head.appendChild(link1);
@@ -391,32 +409,10 @@ var TabDisguiser = window.TabDisguiser || {
             links = [link1, link2];
         }
 
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.onload = () => {
-            try {
-                const canvas = document.createElement('canvas');
-                canvas.width = img.width || 32;
-                canvas.height = img.height || 32;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                const dataUrl = canvas.toDataURL('image/png');
-                links.forEach(l => {
-                    l.removeAttribute('type');
-                    l.href = dataUrl;
-                });
-            } catch (err) {
-                links.forEach(l => {
-                    l.href = resolved;
-                });
-            }
-        };
-        img.onerror = () => {
-            links.forEach(l => {
-                l.href = resolved;
-            });
-        };
-        img.src = resolved;
+        links.forEach(l => {
+            l.removeAttribute('type');
+            l.href = resolved;
+        });
     },
 
     getClassConfig() {
@@ -928,8 +924,8 @@ var TabDisguiser = window.TabDisguiser || {
         const preset = localStorage.getItem('pinpoint_tab_cloak') || 'classroom';
         const presets = {
             classroom: { title: 'Home - Classroom', icon: 'favicons/google-classroom.png' },
-            drive: { title: 'My Drive - Google Drive', icon: 'https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png' },
-            docs: { title: 'Untitled document - Google Docs', icon: 'https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico' },
+            drive: { title: 'My Drive - Google Drive', icon: 'favicons/google-drive.png' },
+            docs: { title: 'Untitled document - Google Docs', icon: 'favicons/google-docs.png' },
             canvas: { title: 'Dashboard - Canvas', icon: 'https://du11hjcvx0uqb.cloudfront.net/dist/images/favicon-e10d657a73.ico' },
             desmos: { title: 'Desmos | Graphing Calculator', icon: 'https://www.desmos.com/favicon.ico' },
             khan: { title: 'Dashboard | Khan Academy', icon: 'https://www.khanacademy.org/favicon.ico' }

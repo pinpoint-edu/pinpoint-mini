@@ -10,15 +10,7 @@ export default async function handler(req, res) {
 
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) {
-    const lastUserMsg = [...messages].reverse().find(m => m.role === 'user')?.content || 'your question';
-    return res.status(200).json({
-      choices: [{
-        message: {
-          role: 'assistant',
-          content: `Hello! The live AI assistant is in preview mode because \`GROQ_API_KEY\` is not configured in this environment.\n\nOnce configured in Vercel or environment variables with Groq, I can provide full real-time answers powered by Llama 3.3 to study queries like:\n\n> *"${lastUserMsg}"*\n\nIn the meantime, feel free to explore all other Google Classroom tools and features!`
-        }
-      }]
-    });
+    return res.status(500).json({ error: 'AI service configuration error. GROQ_API_KEY is not configured.' });
   }
 
   try {

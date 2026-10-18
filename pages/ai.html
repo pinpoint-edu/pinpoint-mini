@@ -775,7 +775,7 @@ var Vi=document.querySelector(`.${_.Ui.Bf} .gb_C`),Wi=document.querySelector("#g
         </div>
         <div class="chat-input-area">
             <div class="input-container">
-                <input type="text" id="chat-input" placeholder="Ask Pinpoint AI..." autocomplete="off" />
+                <input type="text" id="chat-input" autocomplete="off" />
                 <div class="input-actions">
                     <button id="send-btn" disabled aria-label="Send">
                         <span class="material-symbols-outlined" style="font-size:20px;">send</span>
@@ -867,173 +867,6 @@ var Vi=document.querySelector(`.${_.Ui.Bf} .gb_C`),Wi=document.querySelector("#g
             });
         }
 
-        function generateLocalStudyResponse(userQuery) {
-            const q = userQuery.trim();
-            const lower = q.toLowerCase();
-
-            // Check for Essay outline
-            if (lower.includes('outline') || lower.includes('essay')) {
-                const topic = q.replace(/help me outline an essay on:?/i, '').replace(/outline an essay (about|on):?/i, '').replace(/outline:?/i, '').trim() || "Your Topic";
-                return `### 📝 Essay Outline: ${topic}
-
-#### **I. Introduction**
-- **Hook:** Start with a compelling fact, rhetorical question, or striking historical quote about *${topic}*.
-- **Background Context:** Briefly introduce the historical or conceptual framework of the subject.
-- **Thesis Statement:** A clear, arguable 1-2 sentence roadmap defining the core argument and three supporting points.
-
-#### **II. Body Paragraph 1: Foundational Evidence**
-- **Topic Sentence:** Introduce the first core aspect or primary cause.
-- **Supporting Evidence:** Data, historical examples, or textual citations.
-- **Analysis:** Connect the evidence directly back to your thesis.
-
-#### **III. Body Paragraph 2: In-Depth Exploration / Complication**
-- **Topic Sentence:** Explore the nuanced impact, complications, or secondary perspective.
-- **Supporting Evidence:** Specific case studies, quotes, or comparative observations.
-- **Analysis:** Explain why this dimension is essential to understanding *${topic}*.
-
-#### **IV. Body Paragraph 3: Counterarguments & Synthesis**
-- **Topic Sentence:** Acknowledge alternative viewpoints or common misconceptions.
-- **Rebuttal / Synthesis:** Demonstrate why your central thesis still holds strong despite objections.
-
-#### **V. Conclusion**
-- **Restate Thesis:** Rephrase your main claim with the new depth uncovered in your essay.
-- **Synthesize Main Points:** Tie the three body paragraphs together.
-- **Final Takeaway / Broader Impact:** What is the enduring importance of *${topic}* for today?
-
----
-*💡 Need help drafting a specific paragraph or thesis statement? Just ask!*`;
-            }
-
-            // Check for Practice Quiz
-            if (lower.includes('quiz') || lower.includes('practice question')) {
-                const topic = q.replace(/give me a 5-question practice quiz on:?/i, '').replace(/practice quiz on:?/i, '').replace(/quiz:?/i, '').trim() || "the subject";
-                return `### ❓ 5-Question Practice Quiz: ${topic}
-
-**Question 1:** What is the primary definition or central principle of *${topic}*?
-- A) A secondary effect with minimal impact
-- B) The core mechanism driving observable phenomena
-- C) An outdated theory disproven by modern research
-- D) A mathematical constant
-
-**Question 2:** Which of the following is considered the most critical factor or catalyst in *${topic}*?
-- A) Random environmental variance
-- B) Fundamental underlying forces or interactions
-- C) Complete external isolation
-- D) Linear static decay
-
-**Question 3:** In an analytical context, how is *${topic}* typically measured or evaluated?
-- A) Through empirical testing and comparative observation
-- B) Exclusively through speculative guesswork
-- C) By measuring single-point timestamps
-- D) It cannot be analyzed
-
-**Question 4:** What common misconception often arises when studying *${topic}*?
-- A) Conflating correlation with causation
-- B) Assuming all variables remain constant under stress
-- C) Overlooking foundational historical/scientific context
-- D) All of the above
-
-**Question 5:** How does a thorough understanding of *${topic}* apply to real-world scenarios?
-- A) In predicting outcomes and making informed, data-driven decisions
-- B) It only applies in hypothetical laboratory models
-- C) It eliminates the need for further research
-- D) It has no practical application
-
----
-<details>
-<summary><b>🔍 View Answer Key & Explanations (Click to expand)</b></summary>
-
-1. **B** — The central principle defines how systems operate and interact.
-2. **B** — Fundamental forces drive the dynamics of the topic.
-3. **A** — Empirical testing and comparative benchmarks form standard methodology.
-4. **D** — All of these are typical pitfalls students face when reviewing.
-5. **A** — Real-world utility lies in predictive analysis and applied problem-solving.
-</details>`;
-            }
-
-            // Linear equation solver: ax + b = c
-            const linearEqMatch = q.match(/([+-]?\d*)\s*x\s*([+-]\s*\d+)?\s*=\s*([+-]?\d+)/i);
-            if (linearEqMatch) {
-                let aStr = linearEqMatch[1].trim();
-                let a = aStr === '' || aStr === '+' ? 1 : (aStr === '-' ? -1 : parseFloat(aStr));
-                let b = linearEqMatch[2] ? parseFloat(linearEqMatch[2].replace(/\s+/g, '')) : 0;
-                let c = parseFloat(linearEqMatch[3].trim());
-                if (!isNaN(a) && !isNaN(b) && !isNaN(c) && a !== 0) {
-                    let step1Right = c - b;
-                    let solution = step1Right / a;
-                    const formattedSol = Number.isInteger(solution) ? solution : solution.toFixed(2);
-                    return `### 📐 Step-by-Step Math Solution
-
-**Problem:** \`${q.trim()}\`
-
-1. **Identify the equation structure:**
-   Linear equation in one variable: **${a === 1 ? '' : (a === -1 ? '-' : a)}x ${b >= 0 ? '+ ' + b : '- ' + Math.abs(b)} = ${c}**
-
-2. **Isolate the variable term:**
-   ${b !== 0 ? `Subtract **${b}** from both sides:\n   **${a === 1 ? '' : (a === -1 ? '-' : a)}x = ${c} - (${b}) = ${step1Right}**` : 'The variable term is already isolated.'}
-
-3. **Solve for x:**
-   ${a !== 1 ? `Divide both sides by **${a}**:\n   **x = ${step1Right} / ${a} = ${formattedSol}**` : `**x = ${formattedSol}**`}
-
-**Final Answer:**
-> **x = ${formattedSol}**
-
-*(Verification: ${a}(${formattedSol}) + (${b}) = ${a * solution + b} = ${c} ✓)*`;
-                }
-            }
-
-            // Arithmetic solver
-            const cleanExpr = q.replace(/^(?:calculate|solve|what is)\s*/i, '').replace(/=.*$/, '').trim();
-            if (/^[0-9\+\-\*\/\^\(\)\.\s]+$/.test(cleanExpr) && /[0-9]/.test(cleanExpr)) {
-                try {
-                    const sanitized = cleanExpr.replace(/\^/g, '**');
-                    if (!/[^0-9\+\-\*\/\s\.\(\)]/.test(sanitized)) {
-                        const result = Function('"use strict";return (' + sanitized + ')')();
-                        const formattedRes = Number.isInteger(result) ? result : Number(result.toFixed(4));
-                        return `### 📐 Calculation Result
-
-**Expression:** \`${cleanExpr}\`
-
-**Step-by-step breakdown:**
-1. Evaluate operations following standard order of operations (**PEMDAS**):
-   - Parentheses
-   - Exponents & Powers
-   - Multiplication & Division (left to right)
-   - Addition & Subtraction (left to right)
-
-**Result:**
-> **= ${formattedRes}**`;
-                    }
-                } catch (e) {}
-            }
-
-            // General study concept breakdown
-            const topic = q.replace(/explain this concept simply:?/i, '').replace(/explain:?/i, '').replace(/what is:?/i, '').trim();
-            return `### 💡 Concept Breakdown: ${topic || "Your Question"}
-
-#### 1. Core Summary in Plain English
-**${topic || "This topic"}** is an essential subject in academic study. In straightforward terms, it describes the mechanism by which components interact, function, and generate observable outcomes.
-
-#### 2. Key Principles to Remember
-- **Foundational Rule:** Every system relies on basic underlying principles (e.g. conservation, equilibrium, cause-and-effect).
-- **Core Mechanism:** Identify what initiates the process, what transforms it, and what the ultimate result is.
-- **Context:** Understanding *why* it matters gives meaning to *how* it functions.
-
-#### 3. Real-World Analogy
-Think of **${topic || "this concept"}** like a coordinated team:
-- Every element has a dedicated purpose.
-- Input resources are processed systematically step-by-step.
-- The outcome depends on clear structure and consistent rules.
-
-#### 4. Top Study & Exam Tips
-- **Active Recall:** Try to explain ${topic || "this topic"} out loud in your own words without checking reference notes.
-- **Diagrams:** Sketch a quick flowchart or visual diagram connecting cause and effect.
-- **Key Terms:** Note the core vocabulary and relationships for quick review before quizzes.
-
----
-*💡 Pinpoint AI Study Assistant is active! You can also tap **API Key** in the top right to link a free Groq API key for live full-model responses.*`;
-        }
-
         async function sendMessage() {
             const text = chatInput.value.trim();
             if (!text) return;
@@ -1079,12 +912,8 @@ Think of **${topic || "this concept"}** like a coordinated team:
                         if (groqData.choices && groqData.choices[0]?.message?.content) {
                             aiText = groqData.choices[0].message.content;
                         }
-                    } else {
-                        console.warn('Groq direct API error, falling back:', groqRes.status);
                     }
-                } catch (err) {
-                    console.warn('Groq direct fetch error, falling back:', err);
-                }
+                } catch (err) {}
             }
 
             // Strategy 2: Backend serverless endpoint /api/chat
@@ -1102,15 +931,7 @@ Think of **${topic || "this concept"}** like a coordinated team:
                             aiText = data.choices[0].message.content;
                         }
                     }
-                } catch (error) {
-                    // Static host or offline - fall back to local study engine
-                    console.info('Backend /api/chat unavailable, utilizing built-in study assistant.');
-                }
-            }
-
-            // Strategy 3: Built-in Smart Study Assistant Engine (runs offline & on static hosting)
-            if (!aiText) {
-                aiText = generateLocalStudyResponse(text);
+                } catch (error) {}
             }
 
             const loadingEl = document.getElementById('loading-msg');
@@ -1120,7 +941,7 @@ Think of **${topic || "this concept"}** like a coordinated team:
                 appendMessage(aiText, 'ai-message');
                 messageHistory.push({ role: "assistant", content: aiText });
             } else {
-                appendMessage("I couldn't process that question right now. Please try again.", 'ai-message');
+                appendMessage("Sorry, I encountered an error. Please try again.", 'ai-message');
             }
             
             scrollToBottom();
