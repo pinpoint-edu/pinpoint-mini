@@ -862,10 +862,118 @@ var TabDisguiser = window.TabDisguiser || {
         } catch(e) {}
     },
 
+    _isPanicShellOpen: false,
+
+    openPanicShell(targetUrl) {
+        let doc = document;
+        try {
+            if (window.top && window.top.document && window.top.document.body) {
+                doc = window.top.document;
+            }
+        } catch(e) {}
+
+        let resolvedUrl = (targetUrl || localStorage.getItem('pinpoint_panic_url') || 'https://classroom.google.com/').trim();
+        if (resolvedUrl && resolvedUrl !== 'about:blank' && !/^https?:\/\//i.test(resolvedUrl)) {
+            resolvedUrl = 'https://' + resolvedUrl;
+        }
+
+        // Post message to top window in case of cross-origin or framed context
+        try {
+            if (window.top && window.top !== window) {
+                window.top.postMessage({ type: 'panic', url: resolvedUrl, mode: 'shell' }, '*');
+            }
+        } catch(e) {}
+
+        let shell = doc.getElementById('pinpoint-panic-shell');
+        if (!shell) {
+            shell = doc.createElement('div');
+            shell.id = 'pinpoint-panic-shell';
+            shell.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:2147483647;background:#ffffff;margin:0;padding:0;display:block;border:none;overflow:hidden;';
+            shell.innerHTML = `
+                <iframe id="pinpoint-panic-shell-iframe" src="${resolvedUrl}" style="width:100vw;height:100vh;border:none;margin:0;padding:0;display:block;background:#ffffff;pointer-events:auto;" allow="fullscreen; geolocation; camera; microphone; autoplay"></iframe>
+                <button id="pinpoint-panic-shell-close" type="button" title="Close Shell" style="position:fixed;bottom:14px;left:14px;z-index:2147483647;width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,0.45);background:rgba(0,0,0,0.32);color:#ffffff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;outline:none;padding:0;opacity:0.65;box-shadow:0 2px 8px rgba(0,0,0,0.25);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:all 0.2s ease;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            `;
+            doc.body.appendChild(shell);
+
+            const closeBtn = shell.querySelector('#pinpoint-panic-shell-close');
+            if (closeBtn) {
+                closeBtn.onmouseover = () => {
+                    closeBtn.style.opacity = '1';
+                    closeBtn.style.background = 'rgba(0,0,0,0.7)';
+                    closeBtn.style.transform = 'scale(1.1)';
+                };
+                closeBtn.onmouseout = () => {
+                    closeBtn.style.opacity = '0.65';
+                    closeBtn.style.background = 'rgba(0,0,0,0.32)';
+                    closeBtn.style.transform = 'scale(1)';
+                };
+                closeBtn.onclick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.closePanicShell();
+                };
+            }
+        } else {
+            const iframe = shell.querySelector('#pinpoint-panic-shell-iframe');
+            if (iframe && iframe.src !== resolvedUrl) {
+                iframe.src = resolvedUrl;
+            }
+            shell.style.display = 'block';
+        }
+        this._isPanicShellOpen = true;
+    },
+
+    closePanicShell() {
+        let doc = document;
+        try {
+            if (window.top && window.top.document) {
+                doc = window.top.document;
+            }
+        } catch(e) {}
+        const shell = doc.getElementById('pinpoint-panic-shell');
+        if (shell) {
+            shell.style.display = 'none';
+            const iframe = shell.querySelector('#pinpoint-panic-shell-iframe');
+            if (iframe) {
+                iframe.src = 'about:blank';
+            }
+        }
+        this._isPanicShellOpen = false;
+
+        try {
+            if (window.top && window.top !== window) {
+                window.top.postMessage({ type: 'panic_shell_close' }, '*');
+            }
+        } catch(e) {}
+    },
+
+    togglePanicShell(targetUrl) {
+        if (this._isPanicShellOpen) {
+            this.closePanicShell();
+        } else {
+            this.openPanicShell(targetUrl);
+        }
+    },
+
+    triggerPanic(targetUrl, mode) {
+        mode = mode || localStorage.getItem('pinpoint_panic_mode') || 'redirect';
+        if (mode === 'shell') {
+            this.togglePanicShell(targetUrl);
+        } else {
+            this.triggerPanicRedirect(targetUrl);
+        }
+    },
+
     initPanicKey() {
         if (this._panicBound) return;
         this._panicBound = true;
         window.triggerPanicRedirect = this.triggerPanicRedirect.bind(this);
+        window.triggerPanic = this.triggerPanic.bind(this);
+        window.openPanicShell = this.openPanicShell.bind(this);
+        window.closePanicShell = this.closePanicShell.bind(this);
+        window.togglePanicShell = this.togglePanicShell.bind(this);
 
         const handleKey = (e) => {
             // If game runner overlay is active, reload only the game iframe instead of resetting page
@@ -892,8 +1000,18 @@ var TabDisguiser = window.TabDisguiser || {
             if (!enabled) return;
             const targetKey = localStorage.getItem('pinpoint_panic_key') || '`';
             if (e.key === targetKey) {
+                // If shell is currently open, pressing hotkey closes it
+                if (this._isPanicShellOpen) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.closePanicShell();
+                    return;
+                }
+                e.preventDefault();
+                e.stopPropagation();
                 const targetUrl = localStorage.getItem('pinpoint_panic_url') || 'https://classroom.google.com/';
-                this.triggerPanicRedirect(targetUrl);
+                const mode = localStorage.getItem('pinpoint_panic_mode') || 'redirect';
+                this.triggerPanic(targetUrl, mode);
             }
         };
 
@@ -902,7 +1020,10 @@ var TabDisguiser = window.TabDisguiser || {
         window.addEventListener('message', (e) => {
             if (e.data === 'panic' || (e.data && e.data.type === 'panic')) {
                 const targetUrl = (e.data && e.data.url) || localStorage.getItem('pinpoint_panic_url') || 'https://classroom.google.com/';
-                this.triggerPanicRedirect(targetUrl);
+                const mode = (e.data && e.data.mode) || localStorage.getItem('pinpoint_panic_mode') || 'redirect';
+                this.triggerPanic(targetUrl, mode);
+            } else if (e.data === 'panic_shell_close' || (e.data && e.data.type === 'panic_shell_close')) {
+                this.closePanicShell();
             }
         });
 
@@ -2165,6 +2286,10 @@ if (typeof window !== 'undefined') {
     window.prevIntroSlide = () => TabDisguiser.prevIntroSlide();
     window.nextIntroSlide = () => TabDisguiser.nextIntroSlide();
     window.setIntroSlide = (i) => TabDisguiser.setIntroSlide(i);
+    window.openPanicShell = (url) => TabDisguiser.openPanicShell(url);
+    window.closePanicShell = () => TabDisguiser.closePanicShell();
+    window.togglePanicShell = (url) => TabDisguiser.togglePanicShell(url);
+    window.triggerPanic = (url, mode) => TabDisguiser.triggerPanic(url, mode);
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
             TabDisguiser.init();

@@ -149,18 +149,28 @@ var Vi=document.querySelector(`.${_.Ui.Bf} .gb_C`),Wi=document.querySelector("#g
 
       <!-- Collapsible Body (collapses when unactive) -->
       <div id="panic-controls-body" style="margin-top:14px;padding-top:14px;border-top:1px dashed #e8eaed;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;transition:all 0.25s ease;">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span style="font-size:13px;color:#5f6368;font-weight:500;">Hotkey:</span>
-          <select id="cfg-panic-key" onchange="saveConfig()" title="Panic Hotkey" style="padding:7px 12px;border:1px solid #dadce0;border-radius:8px;font-family:inherit;font-size:13px;background:#fff;color:#3c4043;cursor:pointer;outline:none;transition:all 0.25s ease;">
-            <option value="`">` (Backtick)</option>
-            <option value="Escape">Esc</option>
-            <option value="]">] (Right Bracket)</option>
-            <option value="\">\\ (Backslash)</option>
-          </select>
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:13px;color:#5f6368;font-weight:500;">Hotkey:</span>
+            <select id="cfg-panic-key" onchange="saveConfig()" title="Panic Hotkey" style="padding:7px 12px;border:1px solid #dadce0;border-radius:8px;font-family:inherit;font-size:13px;background:#fff;color:#3c4043;cursor:pointer;outline:none;transition:all 0.25s ease;">
+              <option value="`">` (Backtick)</option>
+              <option value="Escape">Esc</option>
+              <option value="]">] (Right Bracket)</option>
+              <option value="\">\\ (Backslash)</option>
+            </select>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:13px;color:#5f6368;font-weight:500;">Action:</span>
+            <select id="cfg-panic-mode" onchange="saveConfig()" title="Panic Action Mode (Full Redirect or Shell Overlay)" style="padding:7px 12px;border:1px solid #dadce0;border-radius:8px;font-family:inherit;font-size:13px;background:#fff;color:#3c4043;cursor:pointer;outline:none;transition:all 0.25s ease;">
+              <option value="redirect">Full Redirect</option>
+              <option value="shell">Shell (Overlay)</option>
+            </select>
+          </div>
         </div>
 
         <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:280px;justify-content:flex-end;">
-          <span style="font-size:13px;color:#5f6368;font-weight:500;">Redirect URL:</span>
+          <span id="label-panic-url" style="font-size:13px;color:#5f6368;font-weight:500;">Redirect URL:</span>
           <div id="panic-url-container" style="position:relative;display:inline-flex;align-items:center;width:100%;max-width:420px;z-index:30;">
             <span class="material-symbols-outlined notranslate" style="position:absolute;left:10px;font-size:17px;color:#5f6368;pointer-events:none;">link</span>
             <input type="text" id="cfg-panic-url" oninput="saveConfig()" onblur="normalizePanicUrl(this)" placeholder="https://classroom.google.com/" title="Redirect URL (type any link or click chevron for suggestions)" style="padding:8px 36px 8px 32px;border:1px solid #dadce0;border-radius:8px;font-family:inherit;font-size:13px;background:#fff;color:#3c4043;outline:none;width:100%;box-sizing:border-box;transition:all 0.2s ease;" />
@@ -289,6 +299,7 @@ var hj=function(a,b){a<b?gj(a+1,b):_.$c.log(Error("aa`"+a+"`"+b))},gj=function(a
 let currentClockFormat = '12';
 let currentClockAmPm = true;
 let currentPanicEnabled = true;
+let currentPanicMode = 'redirect';
 
 function updateClockButtonsUI() {
   const btnFormat = document.getElementById('btn-clock-format');
@@ -382,7 +393,14 @@ function updatePanicUI() {
   const boltIcon = document.getElementById('icon-panic-bolt');
   const labelTitle = document.getElementById('label-panic-title');
   const labelDesc = document.getElementById('label-panic-desc');
+  const labelUrl = document.getElementById('label-panic-url');
   const row = document.getElementById('row-panic');
+
+  const modeSel = document.getElementById('cfg-panic-mode');
+  const panicMode = modeSel ? modeSel.value : currentPanicMode;
+  if (labelUrl) {
+    labelUrl.textContent = panicMode === 'shell' ? 'Shell URL:' : 'Redirect URL:';
+  }
 
   if (currentPanicEnabled) {
     if (btnToggle) {
@@ -405,7 +423,9 @@ function updatePanicUI() {
     if (boltIcon) boltIcon.style.color = '#d93025';
     if (labelTitle) labelTitle.style.color = '#202124';
     if (labelDesc) {
-      labelDesc.textContent = 'Quick hotkey redirect to safe page';
+      labelDesc.textContent = panicMode === 'shell'
+        ? 'Interactive shell iframe overlay with translucent exit button'
+        : 'Quick hotkey redirect to safe page';
       labelDesc.style.color = '#5f6368';
     }
     if (row) {
@@ -470,6 +490,9 @@ function loadConfig() {
     if (cloakSel) cloakSel.value = tabCloak;
 
     currentPanicEnabled = localStorage.getItem('pinpoint_panic_enabled') !== 'false';
+    currentPanicMode = localStorage.getItem('pinpoint_panic_mode') || 'redirect';
+    const modeSel = document.getElementById('cfg-panic-mode');
+    if (modeSel) modeSel.value = currentPanicMode;
     updatePanicUI();
 
     const panicKey = localStorage.getItem('pinpoint_panic_key') || '`';
@@ -496,6 +519,13 @@ function saveConfig() {
     if (cloakSel) localStorage.setItem('pinpoint_tab_cloak', cloakSel.value);
 
     localStorage.setItem('pinpoint_panic_enabled', currentPanicEnabled ? 'true' : 'false');
+
+    const modeSel = document.getElementById('cfg-panic-mode');
+    if (modeSel) {
+      currentPanicMode = modeSel.value;
+      localStorage.setItem('pinpoint_panic_mode', currentPanicMode);
+    }
+    updatePanicUI();
 
     const keySel = document.getElementById('cfg-panic-key');
     if (keySel) localStorage.setItem('pinpoint_panic_key', keySel.value);
@@ -537,6 +567,9 @@ function resetDefaults() {
   if (cloakSel) cloakSel.value = 'classroom';
 
   currentPanicEnabled = true;
+  currentPanicMode = 'redirect';
+  const modeSel = document.getElementById('cfg-panic-mode');
+  if (modeSel) modeSel.value = 'redirect';
   updatePanicUI();
 
   const keySel = document.getElementById('cfg-panic-key');

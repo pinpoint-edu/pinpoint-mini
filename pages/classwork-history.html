@@ -1838,10 +1838,6 @@ function updateLibraryBtnProgress(gameId, percent, title) {
   }
 }
 
-function updateDownloadBtnProgress(gameId, percent, title) {
-  updateLibraryBtnProgress(gameId, percent, title);
-}
-
 async function toggleLibrary(file, title, event) {
   if (event) event.stopPropagation();
   const gameId = file.replace(/[^a-zA-Z0-9_-]/g, '_');
@@ -2076,7 +2072,30 @@ async function renderTextbooks() {
   // Filter games based on current active tab
   let filteredGames = [];
   if (currentTab === 'all') {
-    filteredGames = [...ALL_TEXTBOOKS];
+    // Show games in the library at the top of the all games list
+    const inLibGames = [];
+    const otherGames = [];
+    ALL_TEXTBOOKS.forEach(t => {
+      const gameId = t.file.replace(/[^a-zA-Z0-9_-]/g, '_');
+      const isItemInLibrary = lib.includes(t.file) || dlMap.has(gameId);
+      if (isItemInLibrary) {
+        inLibGames.push(t);
+      } else {
+        otherGames.push(t);
+      }
+    });
+    dlRecords.forEach(rec => {
+      const exists = inLibGames.some(g => g.file === rec.fileUrl || g.file.replace(/[^a-zA-Z0-9_-]/g, '_') === rec.id) ||
+                     otherGames.some(g => g.file === rec.fileUrl || g.file.replace(/[^a-zA-Z0-9_-]/g, '_') === rec.id);
+      if (!exists) {
+        inLibGames.push({
+          title: rec.title || rec.id,
+          file: rec.fileUrl || rec.id,
+          sizeBytes: rec.sizeBytes || 0
+        });
+      }
+    });
+    filteredGames = [...inLibGames, ...otherGames];
   } else if (currentTab === 'library') {
     filteredGames = [...libraryGames];
   }
@@ -2116,7 +2135,7 @@ async function renderTextbooks() {
               <div class="game-card-title">${t.title}</div>
               <div class="game-card-sub">
                 ${sizeText ? `<span>${sizeText}</span>` : ''}
-                <span id="lib-status-${gameId}" style="${isDownloaded ? 'display:inline;' : 'display:none;'}color:#1e8e3e;font-weight:500;">• In Library</span>
+                <span id="lib-status-${gameId}" style="${isItemInLibrary ? 'display:inline;' : 'display:none;'}color:#1e8e3e;font-weight:500;">• In Library</span>
               </div>
             </div>
           </div>
