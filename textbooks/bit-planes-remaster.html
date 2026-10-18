@@ -421,7 +421,7 @@ function rewriteURL(original) {
 }
 
 </style>
-    <title>Bit Planes 2P (Split Screen Beta) — medv.io</title>
+    <title>Bit Planes Remastered — medv.io</title>
     <style>.ribbon{
     position: absolute;
     top: 42px;
@@ -1577,11 +1577,11 @@ form#game .action {
             <div class="home-left-col">
                 <h1 style="margin-bottom: 2px; text-align: left; display: flex; align-items: center; gap: 12px; font-size: clamp(34px, 3.8vw, 46px);">
                     <i class="logo"></i>
-                    <span>Bit Planes</span>
+                    <span>Bit Planes Remastered</span>
                     <i class="logo"></i>
                 </h1>
                 <div class="home-subtitle" style="font-family: 'Cormorant Garamond', serif; font-size: clamp(18px, 1.8vw, 21px); font-weight: 500; color: #555; margin-bottom: 14px;">
-                    Online: Made by Pinpoint
+                    Remaster: Made by Pinpoint
                 </div>
 
                 <!-- Flight Controls Summary Box -->
@@ -3783,22 +3783,35 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
 </div>
 
 <!-- Mini Confirmation Modal: Leave Online Match -->
-<div id="online-leave-confirm-modal" style="display: none; position: fixed; inset: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(4px); z-index: 9999999; align-items: center; justify-content: center;">
-  <div style="background: rgba(15, 23, 42, 0.95); border: 1.5px solid rgba(239, 68, 68, 0.45); border-radius: 12px; padding: 24px 28px; max-width: 420px; width: 90%; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7); text-align: center; font-family: 'Cormorant Garamond', serif; color: #ffffff;">
-    <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px;">
+<style>
+#online-leave-confirm-modal,
+#online-leave-confirm-modal *,
+#online-leave-confirm-modal button,
+#online-leave-confirm-modal span,
+#online-leave-confirm-modal p,
+#online-leave-confirm-modal div,
+#btn-cancel-leave-modal,
+#btn-confirm-leave-modal,
+#online-force-exit-banner {
+  font-family: 'Cormorant Garamond', serif !important;
+}
+</style>
+<div id="online-leave-confirm-modal" style="display: none; position: fixed; inset: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(4px); z-index: 9999999; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif !important;">
+  <div style="background: rgba(15, 23, 42, 0.95); border: 1.5px solid rgba(239, 68, 68, 0.45); border-radius: 12px; padding: 24px 28px; max-width: 420px; width: 90%; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7); text-align: center; font-family: 'Cormorant Garamond', serif !important; color: #ffffff;">
+    <div style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; font-family: 'Cormorant Garamond', serif !important;">
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-      <span style="font-size: 24px; font-weight: bold; color: #f87171;">Leave Match?</span>
+      <span style="font-size: 24px; font-weight: bold; color: #f87171; font-family: 'Cormorant Garamond', serif !important;">Leave Match?</span>
     </div>
-    <p id="online-leave-confirm-text" style="font-size: 18px; color: #cbd5e1; margin-bottom: 22px; line-height: 1.4;">
+    <p id="online-leave-confirm-text" style="font-size: 19px; color: #cbd5e1; margin-bottom: 22px; line-height: 1.4; font-family: 'Cormorant Garamond', serif !important;">
       Are you sure you want to leave? This will cancel the match for the other pilot.
     </p>
-    <div style="display: flex; gap: 14px; justify-content: center;">
-      <button type="button" id="btn-cancel-leave-modal" class="bp-btn-ghost" style="flex: 1; justify-content: center; font-size: 18px; padding: 10px 16px;">
+    <div style="display: flex; gap: 14px; justify-content: center; font-family: 'Cormorant Garamond', serif !important;">
+      <button type="button" id="btn-cancel-leave-modal" class="bp-btn-ghost" style="flex: 1; justify-content: center; font-size: 19px; padding: 10px 16px; font-family: 'Cormorant Garamond', serif !important;">
         Keep Flying
       </button>
-      <button type="button" id="btn-confirm-leave-modal" style="flex: 1; justify-content: center; font-size: 18px; padding: 10px 16px; font-weight: bold; border-radius: 8px; cursor: pointer; border: 1.5px solid rgba(239, 68, 68, 0.8); background: rgba(239, 68, 68, 0.28); color: #fca5a5; display: inline-flex; align-items: center; gap: 8px; transition: background 0.15s, transform 0.15s;">
+      <button type="button" id="btn-confirm-leave-modal" style="flex: 1; justify-content: center; font-size: 19px; padding: 10px 16px; font-weight: bold; border-radius: 8px; cursor: pointer; border: 1.5px solid rgba(239, 68, 68, 0.8); background: rgba(239, 68, 68, 0.28); color: #fca5a5; display: inline-flex; align-items: center; gap: 8px; transition: background 0.15s, transform 0.15s; font-family: 'Cormorant Garamond', serif !important;">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        <span>Leave Match</span>
+        <span style="font-family: 'Cormorant Garamond', serif !important;">Leave Match</span>
       </button>
     </div>
   </div>
@@ -4496,8 +4509,18 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
         const plane = window.__onlinePlanes[slot];
         if (plane) {
             plane.targetState = null;
-            if (window.__onlineWorld && window.__onlineWorld.has(plane)) {
-                window.__onlineWorld.delete(plane);
+            plane.isCrashed = true;
+            if (window.__onlineWorld) {
+                if (window.__onlineWorld.bodies && window.__onlineWorld.bodies.has(plane)) {
+                    window.__onlineWorld.bodies.delete(plane);
+                }
+                if (window.__origWorldDelete) {
+                    try { window.__origWorldDelete(plane); } catch(e) {}
+                }
+                if (window.__onlineWorld.delete) {
+                    try { window.__onlineWorld.delete(plane, true); } catch(e) {}
+                }
+                try { plane.destroy(); } catch(e) {}
             }
             delete window.__onlinePlanes[slot];
         }
@@ -4512,11 +4535,41 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
             window.__onlineWorld.players = window.__onlineWorld.players.filter(p => p !== player && p.slot !== slot);
         }
 
-        // Remove leaving player's barn from the world
+        // Remove leaving player's barn from the world Sets completely
         const leavingBarn = (window.__onlineBarnsBySlot && window.__onlineBarnsBySlot[slot]) ? window.__onlineBarnsBySlot[slot] : null;
-        if (leavingBarn && window.__onlineWorld) {
-            if (window.__onlineWorld.has(leavingBarn)) {
-                window.__onlineWorld.delete(leavingBarn);
+        if (window.__onlineWorld) {
+            if (window.__onlineWorld.barns) {
+                for (const b of window.__onlineWorld.barns) {
+                    if (b === leavingBarn || b.slot === slot || (player && b.pilotName === player.name)) {
+                        window.__onlineWorld.barns.delete(b);
+                        try { b.destroy(); } catch(e) {}
+                    }
+                }
+            }
+            if (window.__onlineWorld.bodies) {
+                for (const b of window.__onlineWorld.bodies) {
+                    if (b === leavingBarn || b.slot === slot || b === plane || (player && (b.player === player || (b.player && b.player.name === player.name)))) {
+                        window.__onlineWorld.bodies.delete(b);
+                        try { b.destroy(); } catch(e) {}
+                    }
+                }
+            }
+            if (window.__onlineWorld.pilots) {
+                for (const p of window.__onlineWorld.pilots) {
+                    if (player && (p.player === player || (p.player && p.player.name === player.name))) {
+                        window.__onlineWorld.pilots.delete(p);
+                        try { p.destroy(); } catch(e) {}
+                    }
+                }
+            }
+            if (leavingBarn) {
+                if (window.__origWorldDelete) {
+                    try { window.__origWorldDelete(leavingBarn); } catch(e) {}
+                }
+                if (window.__onlineWorld.delete) {
+                    try { window.__onlineWorld.delete(leavingBarn, true); } catch(e) {}
+                }
+                try { leavingBarn.destroy(); } catch(e) {}
             }
             delete window.__onlineBarnsBySlot[slot];
         }
@@ -4811,20 +4864,26 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
                 updateLobbySlots();
             }
         } else if (code === EV_STATE_SYNC) {
+            if (content && content.s && removedSlots.has(content.s)) return;
             if (actorNr && content && content.s) {
                 if (!window.__onlineActorSlots) window.__onlineActorSlots = {};
                 window.__onlineActorSlots[actorNr] = content.s;
             }
             handleRemoteState(content);
         } else if (code === EV_FIRE_BULLET) {
+            if (content && content.s && removedSlots.has(content.s)) return;
             handleRemoteBullet(content);
         } else if (code === EV_FIRE_MISSILE) {
+            if (content && content.s && removedSlots.has(content.s)) return;
             handleRemoteMissile(content);
         } else if (code === EV_BAIL_PILOT) {
+            if (content && content.s && removedSlots.has(content.s)) return;
             handleRemoteBail(content);
         } else if (code === EV_CRASH_OR_KILL) {
+            if (content && content.s && removedSlots.has(content.s)) return;
             handleRemoteCrash(content);
         } else if (code === EV_RESPAWN) {
+            if (content && content.s && removedSlots.has(content.s)) return;
             handleRemoteRespawn(content);
         } else if (code === EV_PILOT_LEFT) {
             handleRemotePilotLeft(content);
@@ -4869,7 +4928,7 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
     }
 
     function handleRemoteState(data) {
-        if (!data || data.s === localSlot) return;
+        if (!data || data.s === localSlot || removedSlots.has(data.s)) return;
         const rPlayer = window.__onlinePlayers[data.s];
         if (rPlayer) {
             if (data.k !== undefined) rPlayer.kills = data.k;
@@ -4891,7 +4950,7 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
     }
 
     function handleRemoteBullet(data) {
-        if (!data || data.s === localSlot) return;
+        if (!data || data.s === localSlot || removedSlots.has(data.s)) return;
         const plane = window.__onlinePlanes[data.s];
         if (plane && !plane.isCrashed && window.__fireBullet && window.__onlineWorld) {
             window.__fireBullet(window.__onlineWorld, plane);
@@ -4899,7 +4958,7 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
     }
 
     function handleRemoteMissile(data) {
-        if (!data || data.s === localSlot) return;
+        if (!data || data.s === localSlot || removedSlots.has(data.s)) return;
         const plane = window.__onlinePlanes[data.s];
         if (plane && !plane.isCrashed && window.__fireMissile && window.__onlineWorld) {
             if (data.x !== undefined && data.y !== undefined) {
@@ -4916,7 +4975,7 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
     }
 
     function handleRemoteBail(data) {
-        if (!data || data.s === localSlot) return;
+        if (!data || data.s === localSlot || removedSlots.has(data.s)) return;
         const player = window.__onlinePlayers[data.s];
         if (player && window.__bailPilot && window.__onlineWorld) {
             window.__bailPilot(window.__onlineWorld, player);
@@ -5089,7 +5148,7 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
     }
 
     function handleRemoteCrash(data) {
-        if (!data || data.s === localSlot) return;
+        if (!data || data.s === localSlot || removedSlots.has(data.s)) return;
         const victimSlot = data.s;
         const killerSlot = data.killer;
 
@@ -5139,7 +5198,7 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
     }
 
     function handleRemoteRespawn(data) {
-        if (!data || data.s === localSlot || !window.__onlineWorld) return;
+        if (!data || data.s === localSlot || removedSlots.has(data.s) || !window.__onlineWorld) return;
         const slotNum = data.s;
         const player = window.__onlinePlayers[slotNum];
         const prof = window.__onlineProfiles[slotNum] || { color: "#ff0015" };
@@ -5384,11 +5443,14 @@ function Q2P(M1,j1,M2,j2,t,i1,i2,e1,e2){let u,I=0,a=Object(D.h)(),y=1/60;return 
         M.players = [];
         window.__onlineWorld = M;
 
-        // Prevent local physics simulation from ever deleting remote planes
+        // Prevent local physics simulation from ever deleting remote planes unless forced
         const origWorldDelete = M.delete.bind(M);
-        M.delete = function(obj) {
-            if (window.__currentBitPlanesMode === "online-beta" && obj && obj.player && obj.player !== localPlayer) {
+        M.delete = function(obj, force = false) {
+            if (!force && window.__currentBitPlanesMode === "online-beta" && obj && obj.player && obj.player !== localPlayer) {
                 return;
+            }
+            if (obj && M.barns && M.barns.has(obj)) {
+                M.barns.delete(obj);
             }
             origWorldDelete(obj);
         };
