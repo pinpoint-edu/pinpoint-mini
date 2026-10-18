@@ -131,7 +131,7 @@ var Vi=document.querySelector(`.${_.Ui.Bf} .gb_C`),Wi=document.querySelector("#g
     </div>
 
     <!-- Panic Key Row -->
-    <div id="row-panic" style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px;gap:16px;flex-wrap:wrap;transition:all 0.25s ease;">
+    <div id="row-panic" style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid #f1f3f4;gap:16px;flex-wrap:wrap;transition:all 0.25s ease;">
       <div style="display:flex;align-items:center;gap:14px;min-width:0;">
         <span id="icon-panic-bolt" class="material-symbols-outlined" style="color:#d93025;font-size:24px;flex-shrink:0;transition:color 0.25s ease;">bolt</span>
         <div>
@@ -153,6 +153,23 @@ var Vi=document.querySelector(`.${_.Ui.Bf} .gb_C`),Wi=document.querySelector("#g
         </select>
         <button id="btn-panic-toggle" type="button" onclick="togglePanicEnabled()" title="Toggle Panic Key" style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;border:none;cursor:pointer;outline:none;transition:all 0.25s ease;padding:0;box-sizing:border-box;">
           <span class="material-symbols-outlined notranslate" style="font-size:18px;line-height:1;">check</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Introduction Tour Row -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px;gap:16px;">
+      <div style="display:flex;align-items:center;gap:14px;min-width:0;">
+        <span class="material-symbols-outlined" style="color:#1a73e8;font-size:24px;flex-shrink:0;">info</span>
+        <div>
+          <div style="font-size:14px;font-weight:500;color:#202124;">Feature Introduction</div>
+          <div style="font-size:12px;color:#5f6368;">Replay the fullscreen feature overview tour</div>
+        </div>
+      </div>
+      <div style="flex-shrink:0;">
+        <button id="btn-restart-intro" type="button" onclick="restartIntroduction()" style="padding:7px 16px;font-size:13px;font-weight:500;border:1px solid #dadce0;border-radius:8px;background:#f8f9fa;color:#1a73e8;cursor:pointer;transition:all 0.15s;outline:none;display:inline-flex;align-items:center;gap:6px;" onmouseover="this.style.background='#e8f0fe';this.style.borderColor='#d2e3fc';" onmouseout="this.style.background='#f8f9fa';this.style.borderColor='#dadce0';">
+          <span class="material-symbols-outlined notranslate" style="font-size:18px;line-height:1;">replay</span>
+          <span>Restart Introduction</span>
         </button>
       </div>
     </div>
@@ -383,6 +400,19 @@ function resetDefaults() {
 
   saveConfig();
 }
+
+function restartIntroduction() {
+  try {
+    localStorage.removeItem('pinpoint_intro_dismissed_v4');
+    sessionStorage.removeItem('pinpoint_intro_dismissed_v4');
+  } catch (e) {}
+  if (window.TabDisguiser && typeof TabDisguiser.showInfoWidget === 'function') {
+    TabDisguiser.showInfoWidget(true);
+  } else if (typeof window.showInfoWidget === 'function') {
+    window.showInfoWidget(true);
+  }
+}
+window.restartIntroduction = restartIntroduction;
 
 document.addEventListener('DOMContentLoaded', () => {
   loadConfig();

@@ -1383,28 +1383,29 @@ var TabDisguiser = window.TabDisguiser || {
                 flex-shrink: 0 !important;
             }
             .pinpoint-close-circle-btn {
-                width: 26px !important;
-                height: 26px !important;
-                min-width: 26px !important;
-                border-radius: 50% !important;
-                background: transparent !important;
-                border: none !important;
-                color: #9aa0a6 !important;
+                height: 32px !important;
+                padding: 0 14px 0 10px !important;
+                border-radius: 99px !important;
+                background: #f1f3f4 !important;
+                border: 1px solid #dadce0 !important;
+                color: #5f6368 !important;
+                font-size: 13px !important;
+                font-weight: 500 !important;
                 display: inline-flex !important;
                 align-items: center !important;
                 justify-content: center !important;
+                gap: 6px !important;
                 cursor: pointer !important;
-                opacity: 0.6 !important;
-                transition: background 0.15s ease, color 0.15s ease, opacity 0.15s ease, transform 0.1s ease !important;
-                padding: 0 !important;
+                transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.1s ease !important;
+                user-select: none !important;
             }
             .pinpoint-close-circle-btn:hover {
-                background: #f1f3f4 !important;
-                color: #3c4043 !important;
-                opacity: 1 !important;
+                background: #e8eaed !important;
+                color: #1f1f1f !important;
+                border-color: #c4c7c5 !important;
             }
             .pinpoint-close-circle-btn:active {
-                transform: scale(0.92) !important;
+                transform: scale(0.96) !important;
             }
             .pinpoint-intro-body {
                 display: flex !important;
@@ -1594,10 +1595,11 @@ var TabDisguiser = window.TabDisguiser || {
         container.className = 'pinpoint-intro-fullscreen';
 
         container.innerHTML = `
-            <!-- Top Row: Small subtle close button in top-left, no tags -->
+            <!-- Top Row: Close button with icon and text in top-left -->
             <div class="pinpoint-intro-top-row">
                 <button id="pinpoint-info-dismiss-btn" class="pinpoint-close-circle-btn" type="button" onclick="TabDisguiser.closeInfoWidget(event)" title="Close" aria-label="Close">
                     <span class="material-symbols-sharp notranslate" style="font-size:16px;line-height:1;pointer-events:none;">close</span>
+                    <span>Close</span>
                 </button>
             </div>
 
@@ -1647,7 +1649,7 @@ var TabDisguiser = window.TabDisguiser || {
                     <div class="pinpoint-intro-header-left">
                         <h1 class="pinpoint-intro-title">Bit Planes: Major Updates</h1>
                         <p class="pinpoint-intro-subtitle">
-                            The aerial combat dogfight game has been overhauled with widescreen graphics, local split-screen, and online multiplayer.
+                            The classic pixel plane game has been overhauled with widescreen graphics, local split-screen, and online multiplayer.
                         </p>
                     </div>
                     <div class="pinpoint-bullet-list">
@@ -1666,7 +1668,7 @@ var TabDisguiser = window.TabDisguiser || {
                             </div>
                             <div class="pinpoint-bullet-content">
                                 <div class="pinpoint-bullet-title">1v1 Local Split-Screen</div>
-                                <div class="pinpoint-bullet-desc">Battle your classmates in real-time dogfights side-by-side on the exact same keyboard.</div>
+                                <div class="pinpoint-bullet-desc">Fly and battle against a friend side-by-side on the exact same keyboard.</div>
                             </div>
                         </div>
                         <div class="pinpoint-bullet-item">
@@ -1675,7 +1677,7 @@ var TabDisguiser = window.TabDisguiser || {
                             </div>
                             <div class="pinpoint-bullet-content">
                                 <div class="pinpoint-bullet-title">Real-Time Online Mode</div>
-                                <div class="pinpoint-bullet-desc">Join public multiplayer lobbies or create custom room codes to dogfight players anywhere.</div>
+                                <div class="pinpoint-bullet-desc">Join public multiplayer lobbies or create custom room codes to battle players anywhere.</div>
                             </div>
                         </div>
                     </div>
