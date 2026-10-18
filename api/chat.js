@@ -13,13 +13,15 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'AI service configuration error. GROQ_API_KEY is not configured.' });
   }
 
-  // Model fallback chain: universally supported production models on Groq
+  // Avoid decommissioned models (llama3-8b-8192 / llama3-70b-8192 were retired by Groq)
+  const envModel = process.env.GROQ_MODEL;
+  const isDecommissioned = envModel && (envModel.includes('llama3-8b') || envModel.includes('llama3-70b'));
+
   const modelsToTry = [
-    process.env.GROQ_MODEL,
+    (!isDecommissioned ? envModel : null),
     'llama-3.1-8b-instant',
-    'llama3-8b-8192',
-    'llama3-70b-8192',
-    'mixtral-8x7b-32768'
+    'mixtral-8x7b-32768',
+    'gemma2-9b-it'
   ].filter(Boolean);
 
   let lastError = null;
@@ -48,8 +50,15 @@ export default async function handler(req, res) {
       const errorText = await response.text();
       lastError = { status: response.status, details: errorText };
 
-      // If model not found or access denied, try next model in the chain
-      if (response.status === 404 || errorText.includes('model_not_found') || errorText.includes('does not exist')) {
+      // If model not found, decommissioned, or access denied, try next model in the chain
+      if (
+        response.status === 404 ||
+        response.status === 400 ||
+        errorText.includes('model_not_found') ||
+        errorText.includes('model_decommissioned') ||
+        errorText.includes('decommissioned') ||
+        errorText.includes('does not exist')
+      ) {
         continue;
       }
 
