@@ -681,10 +681,11 @@ var TabDisguiser = window.TabDisguiser || {
             }
         }
 
-        const hamburgerBtn = document.getElementById('pinpoint-hamburger-btn');
+        const hamburgerBtn = document.getElementById('pinpoint-hamburger-btn') || document.querySelector('button[aria-label="Main Menu"]');
         if (hamburgerBtn) {
             hamburgerBtn.onclick = (e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 const html = document.documentElement;
                 if (html.classList.contains('F4Ol1b')) {
                     html.classList.remove('F4Ol1b');
@@ -1142,6 +1143,12 @@ var TabDisguiser = window.TabDisguiser || {
         try {
             // Avoid showing inside textbook game iframes
             if (window.location.pathname.includes('/textbooks/')) return;
+            const playOnHome = sessionStorage.getItem('pinpoint_play_intro_on_home') === 'true';
+            if (playOnHome) {
+                sessionStorage.removeItem('pinpoint_play_intro_on_home');
+                this.showInfoWidget(true);
+                return;
+            }
             const widgetDismissed = localStorage.getItem('pinpoint_intro_dismissed_v4') === 'true';
             if (!widgetDismissed) {
                 this.showInfoWidget();
@@ -1287,6 +1294,11 @@ var TabDisguiser = window.TabDisguiser || {
         if (!force) {
             const dismissed = localStorage.getItem('pinpoint_intro_dismissed_v4') === 'true';
             if (dismissed) return;
+        } else {
+            try {
+                localStorage.removeItem('pinpoint_intro_dismissed_v4');
+                sessionStorage.removeItem('pinpoint_intro_dismissed_v4');
+            } catch (e) {}
         }
 
         if (!document.body) {
@@ -1473,14 +1485,20 @@ var TabDisguiser = window.TabDisguiser || {
                 height: 46px !important;
                 min-width: 46px !important;
                 border-radius: 50% !important;
-                background: #f1f3f4 !important;
-                border: 1px solid #dadce0 !important;
-                color: #444746 !important;
+                background: #f1f3f4;
+                border: 1px solid #dadce0;
+                color: #444746;
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
                 flex-shrink: 0 !important;
                 margin-top: 2px !important;
+                box-shadow: 0 1px 3px rgba(60,64,67,0.08) !important;
+                transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+            }
+            .pinpoint-bullet-item:hover .pinpoint-bullet-circle {
+                transform: scale(1.08) !important;
+                box-shadow: 0 3px 8px rgba(60,64,67,0.16) !important;
             }
             .pinpoint-bullet-content {
                 display: flex !important;
@@ -1615,8 +1633,8 @@ var TabDisguiser = window.TabDisguiser || {
                     </div>
                     <div class="pinpoint-bullet-list">
                         <div class="pinpoint-bullet-item">
-                            <div class="pinpoint-bullet-circle">
-                                <span class="material-symbols-sharp notranslate">flash_on</span>
+                            <div class="pinpoint-bullet-circle" style="background:#fef7e0; border-color:#fce8b2; color:#ea8600;">
+                                <span class="material-symbols-sharp notranslate" style="color:#ea8600;">flash_on</span>
                             </div>
                             <div class="pinpoint-bullet-content">
                                 <div class="pinpoint-bullet-title">Zero Latency</div>
@@ -1624,8 +1642,8 @@ var TabDisguiser = window.TabDisguiser || {
                             </div>
                         </div>
                         <div class="pinpoint-bullet-item">
-                            <div class="pinpoint-bullet-circle">
-                                <span class="material-symbols-sharp notranslate">wifi_off</span>
+                            <div class="pinpoint-bullet-circle" style="background:#e8f0fe; border-color:#d2e3fc; color:#1a73e8;">
+                                <span class="material-symbols-sharp notranslate" style="color:#1a73e8;">wifi_off</span>
                             </div>
                             <div class="pinpoint-bullet-content">
                                 <div class="pinpoint-bullet-title">Works 100% Offline</div>
@@ -1633,8 +1651,8 @@ var TabDisguiser = window.TabDisguiser || {
                             </div>
                         </div>
                         <div class="pinpoint-bullet-item">
-                            <div class="pinpoint-bullet-circle">
-                                <span class="material-symbols-sharp notranslate">timer</span>
+                            <div class="pinpoint-bullet-circle" style="background:#e6f4ea; border-color:#ceead6; color:#137333;">
+                                <span class="material-symbols-sharp notranslate" style="color:#137333;">timer</span>
                             </div>
                             <div class="pinpoint-bullet-content">
                                 <div class="pinpoint-bullet-title">Instant Loading Times</div>
@@ -1654,8 +1672,8 @@ var TabDisguiser = window.TabDisguiser || {
                     </div>
                     <div class="pinpoint-bullet-list">
                         <div class="pinpoint-bullet-item">
-                            <div class="pinpoint-bullet-circle">
-                                <span class="material-symbols-sharp notranslate">aspect_ratio</span>
+                            <div class="pinpoint-bullet-circle" style="background:#f3e8fd; border-color:#e8d0fb; color:#9334e6;">
+                                <span class="material-symbols-sharp notranslate" style="color:#9334e6;">aspect_ratio</span>
                             </div>
                             <div class="pinpoint-bullet-content">
                                 <div class="pinpoint-bullet-title">Redesigned Widescreen UI</div>
@@ -1663,8 +1681,8 @@ var TabDisguiser = window.TabDisguiser || {
                             </div>
                         </div>
                         <div class="pinpoint-bullet-item">
-                            <div class="pinpoint-bullet-circle">
-                                <span class="material-symbols-sharp notranslate">sports_esports</span>
+                            <div class="pinpoint-bullet-circle" style="background:#fce8e6; border-color:#fad2cf; color:#d93025;">
+                                <span class="material-symbols-sharp notranslate" style="color:#d93025;">sports_esports</span>
                             </div>
                             <div class="pinpoint-bullet-content">
                                 <div class="pinpoint-bullet-title">1v1 Local Split-Screen</div>
@@ -1672,8 +1690,8 @@ var TabDisguiser = window.TabDisguiser || {
                             </div>
                         </div>
                         <div class="pinpoint-bullet-item">
-                            <div class="pinpoint-bullet-circle">
-                                <span class="material-symbols-sharp notranslate">public</span>
+                            <div class="pinpoint-bullet-circle" style="background:#e0f2fe; border-color:#bae6fd; color:#0284c7;">
+                                <span class="material-symbols-sharp notranslate" style="color:#0284c7;">public</span>
                             </div>
                             <div class="pinpoint-bullet-content">
                                 <div class="pinpoint-bullet-title">Real-Time Online Mode</div>
@@ -1693,8 +1711,8 @@ var TabDisguiser = window.TabDisguiser || {
                     </div>
                     <div class="pinpoint-bullet-list">
                         <div class="pinpoint-bullet-item">
-                            <div class="pinpoint-bullet-circle">
-                                <span class="material-symbols-sharp notranslate">link</span>
+                            <div class="pinpoint-bullet-circle" style="background:#e8f0fe; border-color:#d2e3fc; color:#1a73e8;">
+                                <span class="material-symbols-sharp notranslate" style="color:#1a73e8;">link</span>
                             </div>
                             <div class="pinpoint-bullet-content">
                                 <div class="pinpoint-bullet-title">Step 1: Copy and open this link in a new tab</div>
@@ -1714,8 +1732,8 @@ var TabDisguiser = window.TabDisguiser || {
                             </div>
                         </div>
                         <div class="pinpoint-bullet-item">
-                            <div class="pinpoint-bullet-circle">
-                                <span class="material-symbols-sharp notranslate">sort</span>
+                            <div class="pinpoint-bullet-circle" style="background:#fff3e0; border-color:#ffe0b2; color:#e65100;">
+                                <span class="material-symbols-sharp notranslate" style="color:#e65100;">sort</span>
                             </div>
                             <div class="pinpoint-bullet-content">
                                 <div class="pinpoint-bullet-title">Step 2: Change "Sort by" to "Data stored"</div>
@@ -1723,8 +1741,8 @@ var TabDisguiser = window.TabDisguiser || {
                             </div>
                         </div>
                         <div class="pinpoint-bullet-item">
-                            <div class="pinpoint-bullet-circle">
-                                <span class="material-symbols-sharp notranslate">delete</span>
+                            <div class="pinpoint-bullet-circle" style="background:#fee2e2; border-color:#fecaca; color:#dc2626;">
+                                <span class="material-symbols-sharp notranslate" style="color:#dc2626;">delete</span>
                             </div>
                             <div class="pinpoint-bullet-content">
                                 <div class="pinpoint-bullet-title">Step 3: Delete data for blocked or unused game sites</div>
