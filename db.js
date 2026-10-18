@@ -6,6 +6,35 @@ const GAME_CACHE_NAME = 'pinpoint-game-cache';
 const RECOMMENDED_LIMIT_BYTES = 100 * 1024 * 1024; // 100 MB
 
 const GAME_MANIFESTS = {
+    "textbooks/plants-vs-zombies/index.html": [
+        "/textbooks/plants-vs-zombies/index.html",
+        "/textbooks/plants-vs-zombies/",
+        "/textbooks/plants-vs-zombies/pvz_9_15.swf",
+        "/textbooks/ruffle/ruffle.js",
+        "/textbooks/ruffle/core.ruffle.e1ab5671fe9d69a41e55.js",
+        "/textbooks/ruffle/f9db7455c2c80fac021b.wasm"
+    ],
+    "textbooks/getaway-shootout/index.html": [
+        "/textbooks/getaway-shootout/index.html",
+        "/textbooks/getaway-shootout/",
+        "/textbooks/getaway-shootout/Build/loader-v2.js",
+        "/textbooks/getaway-shootout/Build/frame.js",
+        "/textbooks/getaway-shootout/Build/864872d3e8c17c58e54028c101dae7a5.data.br",
+        "/textbooks/getaway-shootout/Build/c0f8b2f06ae4c7c89b1e883b3d07ca8f.wasm.wasm",
+        "/textbooks/getaway-shootout/crazygames-sdk-v3-done.js",
+        "/textbooks/getaway-shootout/StreamingAssets/Music.aac"
+    ],
+    "textbooks/getaway-shootout.html": [
+        "/textbooks/getaway-shootout.html",
+        "/textbooks/getaway-shootout/index.html",
+        "/textbooks/getaway-shootout/",
+        "/textbooks/getaway-shootout/Build/loader-v2.js",
+        "/textbooks/getaway-shootout/Build/frame.js",
+        "/textbooks/getaway-shootout/Build/864872d3e8c17c58e54028c101dae7a5.data.br",
+        "/textbooks/getaway-shootout/Build/c0f8b2f06ae4c7c89b1e883b3d07ca8f.wasm.wasm",
+        "/textbooks/getaway-shootout/crazygames-sdk-v3-done.js",
+        "/textbooks/getaway-shootout/StreamingAssets/Music.aac"
+    ],
     "textbooks/sprinter/index.html": [
         "/textbooks/sprinter/index.html",
         "/textbooks/sprinter/",
