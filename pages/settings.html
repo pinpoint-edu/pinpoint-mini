@@ -97,28 +97,7 @@ var Vi=document.querySelector(`.${_.Ui.Bf} .gb_C`),Wi=document.querySelector("#g
     </div>
   </div>
 
-  <!-- Card 1: Appearance & Theme -->
-  <div class="settings-card" style="background:#ffffff;border:1px solid #dadce0;border-radius:16px;padding:22px 26px;margin-bottom:18px;box-shadow:0 1px 3px rgba(60,64,67,0.08);display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">
-    <div style="display:flex;align-items:center;gap:18px;min-width:240px;flex:1;">
-      <div style="width:46px;height:46px;border-radius:12px;background:#f3e8fd;color:#8430ce;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-        <span class="material-symbols-outlined notranslate" style="font-size:26px;">palette</span>
-      </div>
-      <div>
-        <div style="font-size:16px;font-weight:500;color:#202124;margin-bottom:3px;">Appearance & Theme</div>
-        <div style="font-size:13px;color:#5f6368;line-height:1.4;">Select visual theme across Google Classroom and pinpoint tools</div>
-      </div>
-    </div>
-    <div style="flex-shrink:0;">
-      <select id="cfg-theme-mode" onchange="saveConfig()" style="padding:9px 16px;border:1px solid #dadce0;border-radius:10px;font-family:inherit;font-size:14px;font-weight:500;background:#ffffff;color:#3c4043;cursor:pointer;outline:none;transition:border-color 0.2s, box-shadow 0.2s;">
-        <option value="auto_time">Automatic (Day Light / Night Dark)</option>
-        <option value="system">Follow System Preference</option>
-        <option value="light">Always Light</option>
-        <option value="dark">Always Dark</option>
-      </select>
-    </div>
-  </div>
-
-  <!-- Card 2: Navbar Clock -->
+  <!-- Card 1: Navbar Clock -->
   <div class="settings-card" style="background:#ffffff;border:1px solid #dadce0;border-radius:16px;padding:22px 26px;margin-bottom:18px;box-shadow:0 1px 3px rgba(60,64,67,0.08);display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">
     <div style="display:flex;align-items:center;gap:18px;min-width:240px;flex:1;">
       <div style="width:46px;height:46px;border-radius:12px;background:#e8f0fe;color:#1a73e8;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
@@ -535,10 +514,6 @@ function toggleClockAmPm() {
 
 function loadConfig() {
   try {
-    const theme = localStorage.getItem('pinpoint_theme') || 'auto_time';
-    const themeSel = document.getElementById('cfg-theme-mode');
-    if (themeSel) themeSel.value = theme;
-
     currentClockFormat = localStorage.getItem('pinpoint_clock_format') || '12';
     currentClockAmPm = localStorage.getItem('pinpoint_clock_ampm') !== 'false';
     updateClockButtonsUI();
@@ -565,14 +540,6 @@ function loadConfig() {
 
 function saveConfig() {
   try {
-    const themeSel = document.getElementById('cfg-theme-mode');
-    if (themeSel) {
-      localStorage.setItem('pinpoint_theme', themeSel.value);
-      if (window.ThemeManager && typeof ThemeManager.setSetting === 'function') {
-        ThemeManager.setSetting(themeSel.value);
-      }
-    }
-
     // Live clock and display seconds are always enabled
     localStorage.setItem('pinpoint_navbar_clock', 'true');
     localStorage.setItem('pinpoint_navbar_time', 'true');
@@ -625,13 +592,6 @@ function normalizePanicUrl(input) {
 }
 
 function resetDefaults() {
-  const themeSel = document.getElementById('cfg-theme-mode');
-  if (themeSel) themeSel.value = 'auto_time';
-  localStorage.setItem('pinpoint_theme', 'auto_time');
-  if (window.ThemeManager && typeof ThemeManager.setSetting === 'function') {
-    ThemeManager.setSetting('auto_time');
-  }
-
   currentClockFormat = '12';
   currentClockAmPm = true;
   updateClockButtonsUI();
