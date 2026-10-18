@@ -1129,7 +1129,7 @@ var TabDisguiser = window.TabDisguiser || {
         try {
             // Avoid showing inside textbook game iframes
             if (window.location.pathname.includes('/textbooks/')) return;
-            const widgetDismissed = localStorage.getItem('pinpoint_info_widget_dismissed_v5') === 'true';
+            const widgetDismissed = localStorage.getItem('pinpoint_info_widget_dismissed_v6') === 'true';
             if (!widgetDismissed) {
                 this.showInfoWidget();
             }
@@ -1143,8 +1143,8 @@ var TabDisguiser = window.TabDisguiser || {
             if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
         }
         try {
-            localStorage.setItem('pinpoint_info_widget_dismissed_v5', 'true');
-            sessionStorage.setItem('pinpoint_info_widget_dismissed_v5', 'true');
+            localStorage.setItem('pinpoint_info_widget_dismissed_v6', 'true');
+            sessionStorage.setItem('pinpoint_info_widget_dismissed_v6', 'true');
         } catch (err) {}
         const widget = document.getElementById('pinpoint-info-widget');
         if (widget) {
@@ -1156,7 +1156,7 @@ var TabDisguiser = window.TabDisguiser || {
 
     showInfoWidget(force = false) {
         if (!force) {
-            const dismissed = localStorage.getItem('pinpoint_info_widget_dismissed_v5') === 'true';
+            const dismissed = localStorage.getItem('pinpoint_info_widget_dismissed_v6') === 'true';
             if (dismissed) return;
         }
 
@@ -1167,7 +1167,7 @@ var TabDisguiser = window.TabDisguiser || {
 
         let existing = document.getElementById('pinpoint-info-widget');
         if (existing) {
-            if (!force && localStorage.getItem('pinpoint_info_widget_dismissed_v5') === 'true') {
+            if (!force && localStorage.getItem('pinpoint_info_widget_dismissed_v6') === 'true') {
                 existing.remove();
                 return;
             }
@@ -1375,17 +1375,17 @@ var TabDisguiser = window.TabDisguiser || {
                     <div id="info-script-toast" style="display:none;font-size:10.5px;color:#137333;font-weight:500;">✓ Script link copied to clipboard!</div>
                 </div>
 
-                <!-- 1. Flash & Ruffle Save Manager -->
+                <!-- 1. Bloons TD 1-4 Save & Auto-Resume -->
                 <div class="pinpoint-list-item">
                     <div class="pinpoint-item-head">
                         <div class="pinpoint-item-title">
                             <span class="material-symbols-outlined notranslate" style="font-size:16px;color:#e37400;line-height:1;">flash_on</span>
-                            <span>Flash & Ruffle Save Manager</span>
+                            <span>Bloons TD 1-4 Save & Auto-Resume</span>
                         </div>
                         <span class="pinpoint-badge pinpoint-badge-addition">Addition</span>
                     </div>
                     <div class="pinpoint-item-desc">
-                        Proper save file export and import now supported for all Flash & Ruffle games (Bloons TD 1, 2, 3, 4, Bloxorz, Happy Wheels, Sprinter) directly from the runner topbar.
+                        Full save downloader, uploader, and automatic game resume now supported for all Bloons TD games (Bloons TD 1, 2, 3, 4) and all Flash & Ruffle games! When you load your save, the game automatically resumes right where you left off.
                     </div>
                 </div>
 
@@ -1582,6 +1582,7 @@ var TabDisguiser = window.TabDisguiser || {
   </div>
   <iframe id="game-frame" class="game-iframe" src="${gameSrc}" allow="clipboard-write; clipboard-read; fullscreen; gamepad; autoplay" allowfullscreen></iframe>
   <script src="${currentOrigin}/scripts/save-manager.js"></script>
+  <script src="${currentOrigin}/scripts/btd-save-sync.js"></script>
   <script>
     const LOCKED_POPOUT_TITLE = ${JSON.stringify(popoutTitle)};
     try {
