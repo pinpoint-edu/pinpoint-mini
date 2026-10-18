@@ -1385,7 +1385,7 @@ var TabDisguiser = window.TabDisguiser || {
                         <span class="pinpoint-badge pinpoint-badge-addition">Addition</span>
                     </div>
                     <div class="pinpoint-item-desc">
-                        Proper save file export and import now supported for all Flash & Ruffle games (Bloons TD, Happy Wheels, Sprinter) directly from the runner topbar.
+                        Proper save file export and import now supported for all Flash & Ruffle games (Bloons TD 1, 2, 3, 4, Bloxorz, Happy Wheels, Sprinter) directly from the runner topbar.
                     </div>
                 </div>
 
@@ -1654,15 +1654,21 @@ var TabDisguiser = window.TabDisguiser || {
       };
       reader.readAsText(file);
     }
-    try {
-      const sm = (typeof PinpointSaveManager !== 'undefined' && PinpointSaveManager) || (window.opener && window.opener.PinpointSaveManager);
-      if (sm && sm.isSupported(TARGET_FILE)) {
-        const exp = document.getElementById('popout-save-export');
-        const imp = document.getElementById('popout-save-import');
-        if (exp) exp.style.display = 'inline-flex';
-        if (imp) imp.style.display = 'inline-flex';
-      }
-    } catch(e) {}
+    function checkPopoutSaveSupport() {
+      try {
+        const sm = (typeof PinpointSaveManager !== 'undefined' && PinpointSaveManager) || (window.opener && window.opener.PinpointSaveManager);
+        if (sm && sm.isSupported(TARGET_FILE)) {
+          const exp = document.getElementById('popout-save-export');
+          const imp = document.getElementById('popout-save-import');
+          if (exp) exp.style.display = 'inline-flex';
+          if (imp) imp.style.display = 'inline-flex';
+        }
+      } catch(e) {}
+    }
+    checkPopoutSaveSupport();
+    window.addEventListener('load', checkPopoutSaveSupport);
+    setTimeout(checkPopoutSaveSupport, 200);
+    setTimeout(checkPopoutSaveSupport, 800);
 
     function returnToWebsite() {
       try {
