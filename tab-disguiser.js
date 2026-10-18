@@ -1105,6 +1105,15 @@ var TabDisguiser = window.TabDisguiser || {
     },
 
     initCleanupReminder() {
+        // Preload sharp icons eagerly with display=block so text never flashes
+        if (!document.getElementById('pinpoint-sharp-icons-font')) {
+            const link = document.createElement('link');
+            link.id = 'pinpoint-sharp-icons-font';
+            link.rel = 'stylesheet';
+            link.href = 'https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block';
+            document.head.appendChild(link);
+        }
+
         // Global capture listener for dismiss button
         document.addEventListener('click', (e) => {
             const dismiss = e.target.closest('#pinpoint-info-dismiss-btn');
@@ -1274,7 +1283,7 @@ var TabDisguiser = window.TabDisguiser || {
         }
     },
 
-    showInfoWidget(force = false) {
+    async showInfoWidget(force = false) {
         if (!force) {
             const dismissed = localStorage.getItem('pinpoint_intro_dismissed_v4') === 'true';
             if (dismissed) return;
@@ -1284,6 +1293,25 @@ var TabDisguiser = window.TabDisguiser || {
             document.addEventListener('DOMContentLoaded', () => this.showInfoWidget(force));
             return;
         }
+
+        // Ensure Material Symbols Sharp is loaded with display=block so raw text never displays
+        if (!document.getElementById('pinpoint-sharp-icons-font')) {
+            const link = document.createElement('link');
+            link.id = 'pinpoint-sharp-icons-font';
+            link.rel = 'stylesheet';
+            link.href = 'https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block';
+            document.head.appendChild(link);
+        }
+
+        // Wait for font to load before creating intro DOM so ligature text is never displayed
+        try {
+            if (document.fonts && document.fonts.load) {
+                await Promise.race([
+                    document.fonts.load('24px "Material Symbols Sharp"'),
+                    new Promise(resolve => setTimeout(resolve, 600))
+                ]);
+            }
+        } catch (e) {}
 
         let existing = document.getElementById('pinpoint-info-widget');
         if (existing) {
@@ -1295,15 +1323,6 @@ var TabDisguiser = window.TabDisguiser || {
             existing.style.setProperty('display', 'flex', 'important');
             this.setIntroSlide(0);
             return;
-        }
-
-        // Ensure Material Symbols Sharp is loaded
-        if (!document.getElementById('pinpoint-sharp-icons-font')) {
-            const link = document.createElement('link');
-            link.id = 'pinpoint-sharp-icons-font';
-            link.rel = 'stylesheet';
-            link.href = 'https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200';
-            document.head.appendChild(link);
         }
 
         // Add or update style for fullscreen introduction
@@ -1333,6 +1352,11 @@ var TabDisguiser = window.TabDisguiser || {
                 -webkit-font-feature-settings: 'liga';
                 -webkit-font-smoothing: antialiased;
                 font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
+                overflow: hidden !important;
+                width: 1em !important;
+                height: 1em !important;
+                text-align: center !important;
+                vertical-align: middle !important;
             }
             .pinpoint-intro-fullscreen {
                 position: fixed !important;
@@ -1344,7 +1368,7 @@ var TabDisguiser = window.TabDisguiser || {
                 display: flex !important;
                 flex-direction: column !important;
                 justify-content: space-between !important;
-                padding: clamp(24px, 4vw, 44px) clamp(24px, 5vw, 64px) !important;
+                padding: clamp(20px, 3.5vw, 40px) clamp(24px, 5vw, 64px) !important;
                 box-sizing: border-box !important;
                 overflow-y: auto !important;
                 font-family: 'Google Sans Text', 'Google Sans', Roboto, -apple-system, BlinkMacSystemFont, Arial, sans-serif !important;
@@ -1353,32 +1377,34 @@ var TabDisguiser = window.TabDisguiser || {
             .pinpoint-intro-top-row {
                 display: flex !important;
                 align-items: center !important;
-                justify-content: space-between !important;
+                justify-content: flex-start !important;
                 width: 100% !important;
                 box-sizing: border-box !important;
                 flex-shrink: 0 !important;
             }
             .pinpoint-close-circle-btn {
-                width: 48px !important;
-                height: 48px !important;
-                min-width: 48px !important;
+                width: 26px !important;
+                height: 26px !important;
+                min-width: 26px !important;
                 border-radius: 50% !important;
-                background: #f1f3f4 !important;
-                border: 1px solid #dadce0 !important;
-                color: #444746 !important;
+                background: transparent !important;
+                border: none !important;
+                color: #9aa0a6 !important;
                 display: inline-flex !important;
                 align-items: center !important;
                 justify-content: center !important;
                 cursor: pointer !important;
-                transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease !important;
+                opacity: 0.6 !important;
+                transition: background 0.15s ease, color 0.15s ease, opacity 0.15s ease, transform 0.1s ease !important;
                 padding: 0 !important;
             }
             .pinpoint-close-circle-btn:hover {
-                background: #e3e5e8 !important;
-                color: #1f1f1f !important;
+                background: #f1f3f4 !important;
+                color: #3c4043 !important;
+                opacity: 1 !important;
             }
             .pinpoint-close-circle-btn:active {
-                transform: scale(0.95) !important;
+                transform: scale(0.92) !important;
             }
             .pinpoint-intro-body {
                 display: flex !important;
@@ -1391,14 +1417,17 @@ var TabDisguiser = window.TabDisguiser || {
             .pinpoint-intro-slide {
                 display: flex !important;
                 flex-direction: column !important;
+                align-items: flex-start !important;
+                text-align: left !important;
                 width: 100% !important;
             }
-            .pinpoint-intro-header-right {
+            .pinpoint-intro-header-left {
                 display: flex !important;
                 flex-direction: column !important;
-                align-items: flex-end !important;
-                text-align: right !important;
+                align-items: flex-start !important;
+                text-align: left !important;
                 width: 100% !important;
+                max-width: 960px !important;
                 box-sizing: border-box !important;
             }
             .pinpoint-intro-title {
@@ -1408,6 +1437,7 @@ var TabDisguiser = window.TabDisguiser || {
                 line-height: 1.15 !important;
                 letter-spacing: -0.5px !important;
                 margin: 0 !important;
+                text-align: left !important;
             }
             .pinpoint-intro-subtitle {
                 font-size: clamp(15px, 1.6vw, 20px) !important;
@@ -1416,6 +1446,7 @@ var TabDisguiser = window.TabDisguiser || {
                 line-height: 1.5 !important;
                 max-width: 820px !important;
                 margin: 12px 0 0 0 !important;
+                text-align: left !important;
             }
             .pinpoint-bullet-list {
                 display: flex !important;
@@ -1423,8 +1454,9 @@ var TabDisguiser = window.TabDisguiser || {
                 gap: 24px !important;
                 margin-top: 40px !important;
                 width: 100% !important;
-                max-width: 900px !important;
-                margin-left: auto !important;
+                max-width: 960px !important;
+                margin-left: 0 !important;
+                margin-right: auto !important;
                 box-sizing: border-box !important;
             }
             .pinpoint-bullet-item {
@@ -1454,18 +1486,21 @@ var TabDisguiser = window.TabDisguiser || {
                 flex-direction: column !important;
                 gap: 4px !important;
                 flex: 1 !important;
+                text-align: left !important;
             }
             .pinpoint-bullet-title {
                 font-size: clamp(17px, 1.7vw, 21px) !important;
                 font-weight: 500 !important;
                 color: #1f1f1f !important;
                 line-height: 1.3 !important;
+                text-align: left !important;
             }
             .pinpoint-bullet-desc {
                 font-size: clamp(14px, 1.35vw, 16px) !important;
                 font-weight: 400 !important;
                 color: #5f6368 !important;
                 line-height: 1.5 !important;
+                text-align: left !important;
             }
             .pinpoint-copy-circle-btn {
                 background: #f1f3f4 !important;
@@ -1551,16 +1586,6 @@ var TabDisguiser = window.TabDisguiser || {
                 .pinpoint-intro-fullscreen {
                     padding: 20px !important;
                 }
-                .pinpoint-intro-header-right {
-                    align-items: flex-start !important;
-                    text-align: left !important;
-                }
-                .pinpoint-intro-title, .pinpoint-intro-subtitle {
-                    text-align: left !important;
-                }
-                .pinpoint-bullet-list {
-                    margin-left: 0 !important;
-                }
             }
         `;
 
@@ -1569,10 +1594,10 @@ var TabDisguiser = window.TabDisguiser || {
         container.className = 'pinpoint-intro-fullscreen';
 
         container.innerHTML = `
-            <!-- Top Row: Close button circle in top-left, no tags -->
+            <!-- Top Row: Small subtle close button in top-left, no tags -->
             <div class="pinpoint-intro-top-row">
                 <button id="pinpoint-info-dismiss-btn" class="pinpoint-close-circle-btn" type="button" onclick="TabDisguiser.closeInfoWidget(event)" title="Close" aria-label="Close">
-                    <span class="material-symbols-sharp notranslate" style="font-size:24px;line-height:1;pointer-events:none;">close</span>
+                    <span class="material-symbols-sharp notranslate" style="font-size:16px;line-height:1;pointer-events:none;">close</span>
                 </button>
             </div>
 
@@ -1580,7 +1605,7 @@ var TabDisguiser = window.TabDisguiser || {
             <div class="pinpoint-intro-body">
                 <!-- Slide 0: Fast Offline Library -->
                 <div id="pinpoint-intro-slide-0" class="pinpoint-intro-slide" style="display:flex;">
-                    <div class="pinpoint-intro-header-right">
+                    <div class="pinpoint-intro-header-left">
                         <h1 class="pinpoint-intro-title">Instant Offline Library</h1>
                         <p class="pinpoint-intro-subtitle">
                             The Library downloads games directly to your device storage so they load locally without network latency.
@@ -1619,7 +1644,7 @@ var TabDisguiser = window.TabDisguiser || {
 
                 <!-- Slide 1: Bit Planes Major Updates -->
                 <div id="pinpoint-intro-slide-1" class="pinpoint-intro-slide" style="display:none;">
-                    <div class="pinpoint-intro-header-right">
+                    <div class="pinpoint-intro-header-left">
                         <h1 class="pinpoint-intro-title">Bit Planes: Major Updates</h1>
                         <p class="pinpoint-intro-subtitle">
                             The aerial combat dogfight game has been overhauled with widescreen graphics, local split-screen, and online multiplayer.
@@ -1658,7 +1683,7 @@ var TabDisguiser = window.TabDisguiser || {
 
                 <!-- Slide 2: Clear Unused Game Data -->
                 <div id="pinpoint-intro-slide-2" class="pinpoint-intro-slide" style="display:none;">
-                    <div class="pinpoint-intro-header-right">
+                    <div class="pinpoint-intro-header-left">
                         <h1 class="pinpoint-intro-title">Clear Unused Game Data</h1>
                         <p class="pinpoint-intro-subtitle">
                             Keep your browser fast and prevent storage errors by deleting data from old game sites in 3 easy steps:
