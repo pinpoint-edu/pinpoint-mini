@@ -131,38 +131,102 @@ var Vi=document.querySelector(`.${_.Ui.Bf} .gb_C`),Wi=document.querySelector("#g
     </div>
 
     <!-- Panic Key Row -->
-    <div id="row-panic" style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid #f1f3f4;gap:16px;flex-wrap:wrap;transition:all 0.25s ease;">
-      <div style="display:flex;align-items:center;gap:14px;min-width:0;">
-        <span id="icon-panic-bolt" class="material-symbols-outlined" style="color:#d93025;font-size:24px;flex-shrink:0;transition:color 0.25s ease;">bolt</span>
-        <div>
-          <div id="label-panic-title" style="font-size:14px;font-weight:500;color:#202124;transition:color 0.25s ease;">Panic Escape</div>
-          <div id="label-panic-desc" style="font-size:12px;color:#5f6368;transition:color 0.25s ease;">Quick hotkey redirect to safe page</div>
+    <div id="row-panic" style="padding:18px 20px;border-bottom:1px solid #f1f3f4;transition:all 0.25s ease;">
+      <!-- Panic Header with Active/Unactive Button in Top Right -->
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
+        <div style="display:flex;align-items:center;gap:14px;min-width:0;">
+          <span id="icon-panic-bolt" class="material-symbols-outlined" style="color:#d93025;font-size:24px;flex-shrink:0;transition:color 0.25s ease;">bolt</span>
+          <div>
+            <div id="label-panic-title" style="font-size:14px;font-weight:500;color:#202124;transition:color 0.25s ease;">Panic Escape</div>
+            <div id="label-panic-desc" style="font-size:12px;color:#5f6368;transition:color 0.25s ease;">Quick hotkey redirect to safe page</div>
+          </div>
         </div>
-      </div>
-      <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">
-        <select id="cfg-panic-key" onchange="saveConfig()" title="Panic Hotkey" style="padding:7px 10px;border:1px solid #dadce0;border-radius:8px;font-family:inherit;font-size:13px;background:#fff;color:#3c4043;cursor:pointer;outline:none;transition:all 0.25s ease;">
-          <option value="`">` (Backtick)</option>
-          <option value="Escape">Esc</option>
-          <option value="]">] (Right Bracket)</option>
-          <option value="\">\\ (Backslash)</option>
-        </select>
-        <div style="position:relative;display:inline-flex;align-items:center;">
-          <input type="text" id="cfg-panic-url" list="panic-url-suggestions" oninput="saveConfig()" onblur="normalizePanicUrl(this)" placeholder="https://classroom.google.com/" title="Redirect URL (type any link or pick from list)" style="padding:7px 10px 7px 30px;border:1px solid #dadce0;border-radius:8px;font-family:inherit;font-size:13px;background:#fff;color:#3c4043;outline:none;width:210px;box-sizing:border-box;transition:all 0.25s ease;" />
-          <span class="material-symbols-outlined notranslate" style="position:absolute;left:8px;font-size:16px;color:#5f6368;pointer-events:none;">link</span>
-          <datalist id="panic-url-suggestions">
-            <option value="https://classroom.google.com/">Google Classroom</option>
-            <option value="https://docs.google.com/">Google Docs</option>
-            <option value="https://drive.google.com/">Google Drive</option>
-            <option value="https://google.com/">Google Search</option>
-            <option value="https://canvas.instructure.com/">Canvas LMS</option>
-            <option value="https://desmos.com/calculator">Desmos Calculator</option>
-            <option value="https://en.wikipedia.org/">Wikipedia</option>
-            <option value="about:blank">about:blank</option>
-          </datalist>
-        </div>
-        <button id="btn-panic-toggle" type="button" onclick="togglePanicEnabled()" title="Toggle Panic Key" style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;border:none;cursor:pointer;outline:none;transition:all 0.25s ease;padding:0;box-sizing:border-box;">
-          <span class="material-symbols-outlined notranslate" style="font-size:18px;line-height:1;">check</span>
+        <button id="btn-panic-toggle" type="button" onclick="togglePanicEnabled()" title="Toggle Panic Key" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;border:1px solid #ceead6;background:#e6f4ea;color:#137333;cursor:pointer;outline:none;font-family:inherit;font-size:13px;font-weight:500;transition:all 0.2s ease;flex-shrink:0;">
+          <span id="icon-panic-toggle" class="material-symbols-outlined notranslate" style="font-size:20px;line-height:1;">toggle_on</span>
+          <span id="text-panic-toggle">Active</span>
         </button>
+      </div>
+
+      <!-- Collapsible Body (collapses when unactive) -->
+      <div id="panic-controls-body" style="margin-top:14px;padding-top:14px;border-top:1px dashed #e8eaed;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;transition:all 0.25s ease;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:13px;color:#5f6368;font-weight:500;">Hotkey:</span>
+          <select id="cfg-panic-key" onchange="saveConfig()" title="Panic Hotkey" style="padding:7px 12px;border:1px solid #dadce0;border-radius:8px;font-family:inherit;font-size:13px;background:#fff;color:#3c4043;cursor:pointer;outline:none;transition:all 0.25s ease;">
+            <option value="`">` (Backtick)</option>
+            <option value="Escape">Esc</option>
+            <option value="]">] (Right Bracket)</option>
+            <option value="\">\\ (Backslash)</option>
+          </select>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:280px;justify-content:flex-end;">
+          <span style="font-size:13px;color:#5f6368;font-weight:500;">Redirect URL:</span>
+          <div id="panic-url-container" style="position:relative;display:inline-flex;align-items:center;width:100%;max-width:380px;">
+            <span class="material-symbols-outlined notranslate" style="position:absolute;left:10px;font-size:17px;color:#5f6368;pointer-events:none;">link</span>
+            <input type="text" id="cfg-panic-url" oninput="saveConfig()" onblur="normalizePanicUrl(this)" placeholder="https://classroom.google.com/" title="Redirect URL (type any link or click chevron for suggestions)" style="padding:8px 36px 8px 32px;border:1px solid #dadce0;border-radius:8px;font-family:inherit;font-size:13px;background:#fff;color:#3c4043;outline:none;width:100%;box-sizing:border-box;transition:all 0.2s ease;" />
+            <button id="btn-panic-chevron" type="button" onclick="togglePanicDropdown(event)" title="Choose redirect destination" style="position:absolute;right:4px;width:28px;height:28px;border-radius:8px;border:none;background:transparent;color:#5f6368;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;outline:none;transition:all 0.15s ease;padding:0;" onmouseover="this.style.background='#e8f0fe';this.style.color='#1a73e8';" onmouseout="if(!window._panicDropdownOpen){this.style.background='transparent';this.style.color='#5f6368';}">
+              <span class="material-symbols-outlined notranslate" id="icon-panic-chevron" style="font-size:20px;transition:transform 0.2s ease;pointer-events:none;">expand_more</span>
+            </button>
+            <div id="panic-url-menu" style="display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;background:#ffffff;border:1px solid #dadce0;border-radius:8px;box-shadow:0 4px 16px rgba(60,64,67,0.18);z-index:1000;max-height:260px;overflow-y:auto;padding:4px 0;">
+              <div class="panic-menu-item" onclick="selectPanicUrl('https://classroom.google.com/')" style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;font-size:13px;color:#3c4043;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='#f1f3f4'" onmouseout="this.style.background='transparent'">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span class="material-symbols-outlined notranslate" style="font-size:16px;color:#1a73e8;">school</span>
+                  <span style="font-weight:500;">Google Classroom</span>
+                </div>
+                <span style="font-size:11px;color:#80868b;margin-left:8px;">classroom.google.com</span>
+              </div>
+              <div class="panic-menu-item" onclick="selectPanicUrl('https://docs.google.com/')" style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;font-size:13px;color:#3c4043;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='#f1f3f4'" onmouseout="this.style.background='transparent'">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span class="material-symbols-outlined notranslate" style="font-size:16px;color:#1a73e8;">description</span>
+                  <span style="font-weight:500;">Google Docs</span>
+                </div>
+                <span style="font-size:11px;color:#80868b;margin-left:8px;">docs.google.com</span>
+              </div>
+              <div class="panic-menu-item" onclick="selectPanicUrl('https://drive.google.com/')" style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;font-size:13px;color:#3c4043;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='#f1f3f4'" onmouseout="this.style.background='transparent'">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span class="material-symbols-outlined notranslate" style="font-size:16px;color:#1a73e8;">add_to_drive</span>
+                  <span style="font-weight:500;">Google Drive</span>
+                </div>
+                <span style="font-size:11px;color:#80868b;margin-left:8px;">drive.google.com</span>
+              </div>
+              <div class="panic-menu-item" onclick="selectPanicUrl('https://google.com/')" style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;font-size:13px;color:#3c4043;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='#f1f3f4'" onmouseout="this.style.background='transparent'">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span class="material-symbols-outlined notranslate" style="font-size:16px;color:#1a73e8;">search</span>
+                  <span style="font-weight:500;">Google Search</span>
+                </div>
+                <span style="font-size:11px;color:#80868b;margin-left:8px;">google.com</span>
+              </div>
+              <div class="panic-menu-item" onclick="selectPanicUrl('https://canvas.instructure.com/')" style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;font-size:13px;color:#3c4043;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='#f1f3f4'" onmouseout="this.style.background='transparent'">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span class="material-symbols-outlined notranslate" style="font-size:16px;color:#1a73e8;">assignment</span>
+                  <span style="font-weight:500;">Canvas LMS</span>
+                </div>
+                <span style="font-size:11px;color:#80868b;margin-left:8px;">canvas.instructure.com</span>
+              </div>
+              <div class="panic-menu-item" onclick="selectPanicUrl('https://desmos.com/calculator')" style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;font-size:13px;color:#3c4043;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='#f1f3f4'" onmouseout="this.style.background='transparent'">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span class="material-symbols-outlined notranslate" style="font-size:16px;color:#1a73e8;">calculate</span>
+                  <span style="font-weight:500;">Desmos Calculator</span>
+                </div>
+                <span style="font-size:11px;color:#80868b;margin-left:8px;">desmos.com</span>
+              </div>
+              <div class="panic-menu-item" onclick="selectPanicUrl('https://en.wikipedia.org/')" style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;font-size:13px;color:#3c4043;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='#f1f3f4'" onmouseout="this.style.background='transparent'">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span class="material-symbols-outlined notranslate" style="font-size:16px;color:#1a73e8;">menu_book</span>
+                  <span style="font-weight:500;">Wikipedia</span>
+                </div>
+                <span style="font-size:11px;color:#80868b;margin-left:8px;">en.wikipedia.org</span>
+              </div>
+              <div class="panic-menu-item" onclick="selectPanicUrl('about:blank')" style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;font-size:13px;color:#3c4043;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='#f1f3f4'" onmouseout="this.style.background='transparent'">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span class="material-symbols-outlined notranslate" style="font-size:16px;color:#1a73e8;">web_asset</span>
+                  <span style="font-weight:500;">Blank Tab</span>
+                </div>
+                <span style="font-size:11px;color:#80868b;margin-left:8px;">about:blank</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -245,70 +309,134 @@ function updateClockButtonsUI() {
   }
 }
 
+window._panicDropdownOpen = false;
+
+function togglePanicDropdown(e) {
+  if (e) {
+    e.stopPropagation();
+    e.preventDefault();
+  }
+  const menu = document.getElementById('panic-url-menu');
+  const chevron = document.getElementById('icon-panic-chevron');
+  const btn = document.getElementById('btn-panic-chevron');
+  if (!menu) return;
+  
+  window._panicDropdownOpen = !window._panicDropdownOpen;
+  if (window._panicDropdownOpen) {
+    menu.style.display = 'block';
+    if (chevron) chevron.style.transform = 'rotate(180deg)';
+    if (btn) {
+      btn.style.background = '#e8f0fe';
+      btn.style.color = '#1a73e8';
+    }
+  } else {
+    menu.style.display = 'none';
+    if (chevron) chevron.style.transform = 'rotate(0deg)';
+    if (btn) {
+      btn.style.background = 'transparent';
+      btn.style.color = '#5f6368';
+    }
+  }
+}
+
+function closePanicDropdown() {
+  const menu = document.getElementById('panic-url-menu');
+  const chevron = document.getElementById('icon-panic-chevron');
+  const btn = document.getElementById('btn-panic-chevron');
+  window._panicDropdownOpen = false;
+  if (menu) menu.style.display = 'none';
+  if (chevron) chevron.style.transform = 'rotate(0deg)';
+  if (btn) {
+    btn.style.background = 'transparent';
+    btn.style.color = '#5f6368';
+  }
+}
+
+function selectPanicUrl(url) {
+  const urlSel = document.getElementById('cfg-panic-url');
+  if (urlSel) {
+    urlSel.value = url;
+    saveConfig();
+  }
+  closePanicDropdown();
+}
+
+document.addEventListener('click', (e) => {
+  const container = document.getElementById('panic-url-container');
+  if (container && !container.contains(e.target)) {
+    closePanicDropdown();
+  }
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && window._panicDropdownOpen) {
+    closePanicDropdown();
+  }
+});
+
 function updatePanicUI() {
   const btnToggle = document.getElementById('btn-panic-toggle');
-  const row = document.getElementById('row-panic');
+  const iconToggle = document.getElementById('icon-panic-toggle');
+  const textToggle = document.getElementById('text-panic-toggle');
+  const controlsBody = document.getElementById('panic-controls-body');
   const boltIcon = document.getElementById('icon-panic-bolt');
   const labelTitle = document.getElementById('label-panic-title');
   const labelDesc = document.getElementById('label-panic-desc');
-  const keySelect = document.getElementById('cfg-panic-key');
-  const urlSelect = document.getElementById('cfg-panic-url');
+  const row = document.getElementById('row-panic');
 
   if (currentPanicEnabled) {
-    // ON: White icon on light green background
     if (btnToggle) {
-      btnToggle.style.backgroundColor = '#188038';
-      btnToggle.title = 'Panic key is enabled (Click to turn off)';
-      const icon = btnToggle.querySelector('.material-symbols-outlined');
-      if (icon) {
-        icon.textContent = 'check';
-        icon.style.color = '#ffffff';
-      }
+      btnToggle.style.backgroundColor = '#e6f4ea';
+      btnToggle.style.borderColor = '#ceead6';
+      btnToggle.style.color = '#137333';
+      btnToggle.title = 'Panic key is active (Click to disable and collapse)';
     }
-    if (row) {
-      row.style.backgroundColor = 'transparent';
-      row.style.opacity = '1';
+    if (iconToggle) {
+      iconToggle.textContent = 'toggle_on';
+      iconToggle.style.color = '#188038';
+    }
+    if (textToggle) {
+      textToggle.textContent = 'Active';
+      textToggle.style.color = '#137333';
+    }
+    if (controlsBody) {
+      controlsBody.style.display = 'flex';
     }
     if (boltIcon) boltIcon.style.color = '#d93025';
     if (labelTitle) labelTitle.style.color = '#202124';
-    if (labelDesc) labelDesc.style.color = '#5f6368';
-    if (keySelect) {
-      keySelect.disabled = false;
-      keySelect.style.opacity = '1';
-      keySelect.style.cursor = 'pointer';
-    }
-    if (urlSelect) {
-      urlSelect.disabled = false;
-      urlSelect.style.opacity = '1';
-      urlSelect.style.cursor = 'pointer';
-    }
-  } else {
-    // OFF: Light grey icon on dark grey background, darkens out the entire UI
-    if (btnToggle) {
-      btnToggle.style.backgroundColor = '#5f6368';
-      btnToggle.title = 'Panic key is disabled (Click to turn on)';
-      const icon = btnToggle.querySelector('.material-symbols-outlined');
-      if (icon) {
-        icon.textContent = 'close';
-        icon.style.color = '#e8eaed';
-      }
+    if (labelDesc) {
+      labelDesc.textContent = 'Quick hotkey redirect to safe page';
+      labelDesc.style.color = '#5f6368';
     }
     if (row) {
-      row.style.backgroundColor = '#f1f3f4';
-      row.style.opacity = '0.65';
+      row.style.backgroundColor = 'transparent';
+    }
+  } else {
+    if (btnToggle) {
+      btnToggle.style.backgroundColor = '#f1f3f4';
+      btnToggle.style.borderColor = '#dadce0';
+      btnToggle.style.color = '#5f6368';
+      btnToggle.title = 'Panic key is unactive (Click to enable)';
+    }
+    if (iconToggle) {
+      iconToggle.textContent = 'toggle_off';
+      iconToggle.style.color = '#5f6368';
+    }
+    if (textToggle) {
+      textToggle.textContent = 'Unactive';
+      textToggle.style.color = '#5f6368';
+    }
+    if (controlsBody) {
+      controlsBody.style.display = 'none'; // Collapses to only show the header!
     }
     if (boltIcon) boltIcon.style.color = '#80868b';
     if (labelTitle) labelTitle.style.color = '#5f6368';
-    if (labelDesc) labelDesc.style.color = '#80868b';
-    if (keySelect) {
-      keySelect.disabled = true;
-      keySelect.style.opacity = '0.6';
-      keySelect.style.cursor = 'not-allowed';
+    if (labelDesc) {
+      labelDesc.textContent = 'Disabled — click Unactive to configure';
+      labelDesc.style.color = '#80868b';
     }
-    if (urlSelect) {
-      urlSelect.disabled = true;
-      urlSelect.style.opacity = '0.6';
-      urlSelect.style.cursor = 'not-allowed';
+    if (row) {
+      row.style.backgroundColor = '#fafafa';
     }
   }
 }
