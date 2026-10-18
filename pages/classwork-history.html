@@ -1532,9 +1532,9 @@ let catalogLoadFailed = false;
 async function loadTextbooksCatalog() {
   if (hasLoadedCatalog && ALL_TEXTBOOKS.length > 0 && !catalogLoadFailed) return ALL_TEXTBOOKS;
 
+  const localUrls = ['/games.json', '../games.json'];
   const rawUrl = 'https://raw.githubusercontent.com/pinpoint-edu/assets/main/games.json';
   const cdnUrl = 'https://cdn.jsdelivr.net/gh/pinpoint-edu/assets@main/games.json';
-  const localUrl = '/games.json';
 
   function fetchWithTimeout(url, timeoutMs = 3500) {
     const controller = new AbortController();
@@ -1544,18 +1544,32 @@ async function loadTextbooksCatalog() {
   }
 
   let list = null;
-  // 1. Try raw GitHub mirror (fastest)
-  try {
-    const res = await fetchWithTimeout(rawUrl, 3500);
-    if (res.ok) {
-      const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) list = data;
-    }
-  } catch(e) {
-    console.warn('Failed to fetch games.json from raw.githubusercontent:', e);
+  // 1. Try local games.json first (fastest, matches current deployed app)
+  for (const url of localUrls) {
+    if (list) break;
+    try {
+      const res = await fetchWithTimeout(url, 2000);
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) list = data;
+      }
+    } catch(e) {}
   }
 
-  // 2. Try jsDelivr mirror
+  // 2. Try raw GitHub mirror
+  if (!list) {
+    try {
+      const res = await fetchWithTimeout(rawUrl, 3500);
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) list = data;
+      }
+    } catch(e) {
+      console.warn('Failed to fetch games.json from raw.githubusercontent:', e);
+    }
+  }
+
+  // 3. Try jsDelivr mirror
   if (!list) {
     try {
       const res = await fetchWithTimeout(cdnUrl, 3500);
@@ -1565,19 +1579,6 @@ async function loadTextbooksCatalog() {
       }
     } catch(e) {
       console.warn('Failed to fetch games.json from jsDelivr:', e);
-    }
-  }
-
-  // 3. Try local Vercel fallback
-  if (!list) {
-    try {
-      const res = await fetchWithTimeout(localUrl, 2000);
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) list = data;
-      }
-    } catch(e) {
-      console.warn('Failed to fetch local games.json:', e);
     }
   }
 
