@@ -863,6 +863,99 @@ var TabDisguiser = window.TabDisguiser || {
     },
 
     _isPanicShellOpen: false,
+    _shellClockInterval: null,
+
+    isShellDark() {
+        const pref = localStorage.getItem('pinpoint_shell_dark');
+        if (pref !== null) {
+            return pref === 'true';
+        }
+        if (window.ThemeManager && typeof window.ThemeManager.isDark === 'function') {
+            return window.ThemeManager.isDark();
+        }
+        const theme = localStorage.getItem('pinpoint_theme');
+        if (theme === 'dark') return true;
+        if (theme === 'light') return false;
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) return true;
+        const hr = new Date().getHours();
+        return hr >= 21 || hr < 7;
+    },
+
+    setShellDark(isDark) {
+        localStorage.setItem('pinpoint_shell_dark', isDark ? 'true' : 'false');
+        let doc = document;
+        try {
+            if (window.top && window.top.document) doc = window.top.document;
+        } catch(e) {}
+        const shell = doc.getElementById('pinpoint-panic-shell');
+        if (shell) {
+            this.applyShellTheme(shell, isDark);
+        }
+    },
+
+    getFormattedShellTime() {
+        const now = new Date();
+        const fmt = localStorage.getItem('pinpoint_clock_format') || '12';
+        const showAmPm = localStorage.getItem('pinpoint_clock_ampm') !== 'false';
+        let h = now.getHours();
+        const m = String(now.getMinutes()).padStart(2, '0');
+        if (fmt === '24') {
+            return `${String(h).padStart(2, '0')}:${m}`;
+        }
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        h = h % 12 || 12;
+        return showAmPm ? `${h}:${m} ${ampm}` : `${h}:${m}`;
+    },
+
+    applyShellTheme(shell, isDark) {
+        if (!shell) return;
+        shell.style.backgroundColor = isDark ? '#202124' : '#ffffff';
+        const header = shell.querySelector('#pinpoint-panic-shell-header');
+        if (header) {
+            header.style.backgroundColor = isDark ? '#202124' : '#ffffff';
+            header.style.borderBottomColor = isDark ? '#3c4043' : '#dadce0';
+        }
+        const omnibox = shell.querySelector('#pinpoint-shell-omnibox');
+        if (omnibox) {
+            omnibox.style.backgroundColor = isDark ? '#303134' : '#f1f3f4';
+            omnibox.style.borderColor = isDark ? '#5f6368' : '#dadce0';
+        }
+        const urlInput = shell.querySelector('#pinpoint-shell-url-input');
+        if (urlInput) {
+            urlInput.style.color = isDark ? '#e8eaed' : '#202124';
+        }
+        const lockIcon = shell.querySelector('#pinpoint-shell-lock-icon');
+        if (lockIcon) {
+            lockIcon.style.color = isDark ? '#9aa0a6' : '#5f6368';
+        }
+        const navBtns = shell.querySelectorAll('.pinpoint-shell-btn');
+        navBtns.forEach(btn => {
+            btn.style.color = isDark ? '#e8eaed' : '#5f6368';
+        });
+        const clockEl = shell.querySelector('#pinpoint-panic-shell-clock');
+        if (clockEl) {
+            clockEl.style.backgroundColor = isDark ? '#303134' : '#f8f9fa';
+            clockEl.style.borderColor = isDark ? '#3c4043' : '#dadce0';
+            clockEl.style.color = isDark ? '#e8eaed' : '#3c4043';
+        }
+        const batteryEl = shell.querySelector('#pinpoint-panic-shell-battery');
+        if (batteryEl) {
+            batteryEl.style.backgroundColor = isDark ? '#303134' : '#f8f9fa';
+            batteryEl.style.borderColor = isDark ? '#3c4043' : '#dadce0';
+            batteryEl.style.color = isDark ? '#e8eaed' : '#3c4043';
+        }
+        const themeBtn = shell.querySelector('#pinpoint-shell-btn-theme');
+        if (themeBtn) {
+            themeBtn.title = isDark ? 'Shell theme: Dark (Click for Light)' : 'Shell theme: Light (Click for Dark)';
+            themeBtn.innerHTML = isDark
+                ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>'
+                : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+        }
+        const iframe = shell.querySelector('#pinpoint-panic-shell-iframe');
+        if (iframe) {
+            iframe.style.backgroundColor = isDark ? '#121212' : '#ffffff';
+        }
+    },
 
     openPanicShell(targetUrl) {
         let doc = document;
@@ -877,36 +970,182 @@ var TabDisguiser = window.TabDisguiser || {
             resolvedUrl = 'https://' + resolvedUrl;
         }
 
-        // Post message to top window in case of cross-origin or framed context
+        // Broadcast panic_shell_open without triggering full location replace
         try {
             if (window.top && window.top !== window) {
-                window.top.postMessage({ type: 'panic', url: resolvedUrl, mode: 'shell' }, '*');
+                window.top.postMessage({ type: 'panic_shell_open', url: resolvedUrl, mode: 'shell' }, '*');
             }
         } catch(e) {}
 
         let shell = doc.getElementById('pinpoint-panic-shell');
         if (!shell) {
+            const isDark = this.isShellDark();
             shell = doc.createElement('div');
             shell.id = 'pinpoint-panic-shell';
-            shell.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:2147483647;background:#ffffff;margin:0;padding:0;display:block;border:none;overflow:hidden;';
+            shell.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:2147483647;background:' + (isDark ? '#202124' : '#ffffff') + ';margin:0;padding:0;display:flex;flex-direction:column;border:none;overflow:hidden;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Google Sans",Roboto,"Segoe UI",Arial,sans-serif;';
             shell.innerHTML = `
-                <iframe id="pinpoint-panic-shell-iframe" src="${resolvedUrl}" style="width:100vw;height:100vh;border:none;margin:0;padding:0;display:block;background:#ffffff;pointer-events:auto;" allow="fullscreen; geolocation; camera; microphone; autoplay"></iframe>
-                <button id="pinpoint-panic-shell-close" type="button" title="Close Shell" style="position:fixed;bottom:14px;left:14px;z-index:2147483647;width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,0.45);background:rgba(0,0,0,0.32);color:#ffffff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;outline:none;padding:0;opacity:0.65;box-shadow:0 2px 8px rgba(0,0,0,0.25);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:all 0.2s ease;">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                <div id="pinpoint-panic-shell-header" style="height:48px;flex-shrink:0;width:100vw;display:flex;align-items:center;justify-content:space-between;padding:0 12px;gap:10px;box-sizing:border-box;background:${isDark ? '#202124' : '#ffffff'};border-bottom:1px solid ${isDark ? '#3c4043' : '#dadce0'};user-select:none;">
+                    <!-- Left: Navigation Controls -->
+                    <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;">
+                        <button id="pinpoint-shell-btn-back" class="pinpoint-shell-btn" type="button" title="Back" style="width:32px;height:32px;border:none;background:transparent;border-radius:50%;color:${isDark ? '#e8eaed' : '#5f6368'};cursor:pointer;display:inline-flex;align-items:center;justify-content:center;outline:none;padding:0;transition:background 0.15s;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;"><path d="M15 18l-6-6 6-6"/></svg>
+                        </button>
+                        <button id="pinpoint-shell-btn-forward" class="pinpoint-shell-btn" type="button" title="Forward" style="width:32px;height:32px;border:none;background:transparent;border-radius:50%;color:${isDark ? '#e8eaed' : '#5f6368'};cursor:pointer;display:inline-flex;align-items:center;justify-content:center;outline:none;padding:0;transition:background 0.15s;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;"><path d="M9 18l6-6-6-6"/></svg>
+                        </button>
+                        <button id="pinpoint-shell-btn-reload" class="pinpoint-shell-btn" type="button" title="Reload page" style="width:32px;height:32px;border:none;background:transparent;border-radius:50%;color:${isDark ? '#e8eaed' : '#5f6368'};cursor:pointer;display:inline-flex;align-items:center;justify-content:center;outline:none;padding:0;transition:background 0.15s;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                        </button>
+                        <button id="pinpoint-shell-btn-home" class="pinpoint-shell-btn" type="button" title="Default Safe Page" style="width:32px;height:32px;border:none;background:transparent;border-radius:50%;color:${isDark ? '#e8eaed' : '#5f6368'};cursor:pointer;display:inline-flex;align-items:center;justify-content:center;outline:none;padding:0;transition:background 0.15s;">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                        </button>
+                    </div>
+
+                    <!-- Center: Omnibox / Search & Address Bar -->
+                    <div id="pinpoint-shell-omnibox" style="display:flex;align-items:center;flex:1;max-width:620px;height:34px;border-radius:18px;padding:0 12px;gap:8px;border:1px solid ${isDark ? '#5f6368' : '#dadce0'};background:${isDark ? '#303134' : '#f1f3f4'};transition:all 0.2s;">
+                        <span id="pinpoint-shell-lock-icon" style="color:${isDark ? '#9aa0a6' : '#5f6368'};display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        </span>
+                        <input id="pinpoint-shell-url-input" type="text" value="${resolvedUrl}" placeholder="Search Google or enter URL" style="flex:1;border:none;outline:none;background:transparent;font-size:13px;font-family:inherit;color:${isDark ? '#e8eaed' : '#202124'};min-width:60px;" />
+                        <button id="pinpoint-shell-btn-go" type="button" title="Navigate" style="width:24px;height:24px;border:none;background:transparent;border-radius:50%;color:${isDark ? '#e8eaed' : '#5f6368'};cursor:pointer;display:inline-flex;align-items:center;justify-content:center;outline:none;padding:0;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                        </button>
+                    </div>
+
+                    <!-- Right: Personal Local Details & Quick Controls -->
+                    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                        <!-- Theme Toggle Button -->
+                        <button id="pinpoint-shell-btn-theme" class="pinpoint-shell-btn" type="button" title="${isDark ? 'Theme: Dark (Click for Light)' : 'Theme: Light (Click for Dark)'}" style="width:32px;height:32px;border:none;background:transparent;border-radius:50%;color:${isDark ? '#e8eaed' : '#5f6368'};cursor:pointer;display:inline-flex;align-items:center;justify-content:center;outline:none;padding:0;transition:background 0.15s;">
+                            ${isDark
+                                ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>'
+                                : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+                            }
+                        </button>
+
+                        <!-- Local Clock Pill -->
+                        <div id="pinpoint-panic-shell-clock" title="Local Time" style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:14px;border:1px solid ${isDark ? '#3c4043' : '#dadce0'};background:${isDark ? '#303134' : '#f8f9fa'};color:${isDark ? '#e8eaed' : '#3c4043'};font-size:12px;font-weight:500;white-space:nowrap;">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            <span>${this.getFormattedShellTime()}</span>
+                        </div>
+
+                        <!-- Battery Pill (shown if supported) -->
+                        <div id="pinpoint-panic-shell-battery" title="Battery Status" style="display:none;align-items:center;gap:5px;padding:4px 10px;border-radius:14px;border:1px solid ${isDark ? '#3c4043' : '#dadce0'};background:${isDark ? '#303134' : '#f8f9fa'};color:${isDark ? '#e8eaed' : '#3c4043'};font-size:12px;font-weight:500;white-space:nowrap;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;flex-shrink:0;"><rect x="1" y="6" width="18" height="12" rx="2" ry="2"/><line x1="23" y1="13" x2="23" y2="11"/></svg>
+                            <span>100%</span>
+                        </div>
+
+                        <!-- Top Close Button -->
+                        <button id="pinpoint-shell-btn-top-close" class="pinpoint-shell-btn" type="button" title="Close Shell (Esc)" style="width:32px;height:32px;border:none;background:transparent;border-radius:50%;color:${isDark ? '#e8eaed' : '#5f6368'};cursor:pointer;display:inline-flex;align-items:center;justify-content:center;outline:none;padding:0;transition:background 0.15s;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Iframe Viewport -->
+                <iframe id="pinpoint-panic-shell-iframe" src="${resolvedUrl}" style="flex:1;width:100vw;height:calc(100vh - 48px);border:none;margin:0;padding:0;display:block;background:${isDark ? '#121212' : '#ffffff'};pointer-events:auto;" allow="fullscreen; geolocation; camera; microphone; autoplay"></iframe>
+
+                <!-- Translucent Bottom-Left Exit Button -->
+                <button id="pinpoint-panic-shell-close" type="button" title="Exit Shell" style="position:fixed;bottom:14px;left:14px;z-index:2147483647;width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,0.45);background:rgba(0,0,0,0.38);color:#ffffff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;outline:none;padding:0;opacity:0.75;box-shadow:0 4px 14px rgba(0,0,0,0.3);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:all 0.2s ease;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
             `;
             doc.body.appendChild(shell);
+
+            // Wire up navigation logic
+            const iframe = shell.querySelector('#pinpoint-panic-shell-iframe');
+            const urlInput = shell.querySelector('#pinpoint-shell-url-input');
+
+            const navigateShell = (dest) => {
+                if (!dest) return;
+                dest = dest.trim();
+                let finalUrl = dest;
+                if (dest.startsWith('http://') || dest.startsWith('https://') || dest.startsWith('data:') || dest === 'about:blank') {
+                    finalUrl = dest;
+                } else if (dest.includes('.') && !dest.includes(' ') && !dest.includes('\t')) {
+                    finalUrl = 'https://' + dest;
+                } else {
+                    finalUrl = 'https://www.google.com/search?q=' + encodeURIComponent(dest);
+                }
+                if (urlInput) urlInput.value = finalUrl;
+                if (iframe) iframe.src = finalUrl;
+            };
+
+            if (urlInput) {
+                urlInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        navigateShell(urlInput.value);
+                    }
+                });
+            }
+
+            const goBtn = shell.querySelector('#pinpoint-shell-btn-go');
+            if (goBtn) {
+                goBtn.onclick = () => {
+                    if (urlInput) navigateShell(urlInput.value);
+                };
+            }
+
+            const backBtn = shell.querySelector('#pinpoint-shell-btn-back');
+            if (backBtn) {
+                backBtn.onclick = () => {
+                    try { iframe.contentWindow.history.back(); } catch(e) {}
+                };
+            }
+
+            const fwdBtn = shell.querySelector('#pinpoint-shell-btn-forward');
+            if (fwdBtn) {
+                fwdBtn.onclick = () => {
+                    try { iframe.contentWindow.history.forward(); } catch(e) {}
+                };
+            }
+
+            const reloadBtn = shell.querySelector('#pinpoint-shell-btn-reload');
+            if (reloadBtn) {
+                reloadBtn.onclick = () => {
+                    try {
+                        if (iframe.contentWindow) iframe.contentWindow.location.reload();
+                        else iframe.src = iframe.src;
+                    } catch(e) {
+                        iframe.src = iframe.src;
+                    }
+                };
+            }
+
+            const homeBtn = shell.querySelector('#pinpoint-shell-btn-home');
+            if (homeBtn) {
+                homeBtn.onclick = () => {
+                    const defaultUrl = (localStorage.getItem('pinpoint_panic_url') || 'https://classroom.google.com/').trim();
+                    navigateShell(defaultUrl);
+                };
+            }
+
+            const themeBtn = shell.querySelector('#pinpoint-shell-btn-theme');
+            if (themeBtn) {
+                themeBtn.onclick = () => {
+                    const currentDark = this.isShellDark();
+                    this.setShellDark(!currentDark);
+                };
+            }
+
+            const topCloseBtn = shell.querySelector('#pinpoint-shell-btn-top-close');
+            if (topCloseBtn) {
+                topCloseBtn.onclick = (e) => {
+                    e.preventDefault();
+                    this.closePanicShell();
+                };
+            }
 
             const closeBtn = shell.querySelector('#pinpoint-panic-shell-close');
             if (closeBtn) {
                 closeBtn.onmouseover = () => {
                     closeBtn.style.opacity = '1';
-                    closeBtn.style.background = 'rgba(0,0,0,0.7)';
+                    closeBtn.style.background = 'rgba(0,0,0,0.75)';
                     closeBtn.style.transform = 'scale(1.1)';
                 };
                 closeBtn.onmouseout = () => {
-                    closeBtn.style.opacity = '0.65';
-                    closeBtn.style.background = 'rgba(0,0,0,0.32)';
+                    closeBtn.style.opacity = '0.75';
+                    closeBtn.style.background = 'rgba(0,0,0,0.38)';
                     closeBtn.style.transform = 'scale(1)';
                 };
                 closeBtn.onclick = (e) => {
@@ -915,17 +1154,54 @@ var TabDisguiser = window.TabDisguiser || {
                     this.closePanicShell();
                 };
             }
+
+            // Battery status listener
+            if (typeof navigator !== 'undefined' && navigator.getBattery) {
+                navigator.getBattery().then(bat => {
+                    const updateBat = () => {
+                        const bEl = shell.querySelector('#pinpoint-panic-shell-battery');
+                        if (!bEl) return;
+                        const level = Math.round(bat.level * 100);
+                        const charging = bat.charging ? '⚡' : '';
+                        bEl.style.display = 'inline-flex';
+                        const span = bEl.querySelector('span');
+                        if (span) span.textContent = `${charging}${level}%`;
+                    };
+                    updateBat();
+                    bat.addEventListener('levelchange', updateBat);
+                    bat.addEventListener('chargingchange', updateBat);
+                }).catch(() => {});
+            }
         } else {
             const iframe = shell.querySelector('#pinpoint-panic-shell-iframe');
             if (iframe && iframe.src !== resolvedUrl) {
                 iframe.src = resolvedUrl;
             }
-            shell.style.display = 'block';
+            const urlInput = shell.querySelector('#pinpoint-shell-url-input');
+            if (urlInput) {
+                urlInput.value = resolvedUrl;
+            }
+            this.applyShellTheme(shell, this.isShellDark());
+            shell.style.display = 'flex';
         }
+
+        // Live clock updater
+        if (this._shellClockInterval) clearInterval(this._shellClockInterval);
+        this._shellClockInterval = setInterval(() => {
+            const clockEl = shell.querySelector('#pinpoint-panic-shell-clock span');
+            if (clockEl) {
+                clockEl.textContent = this.getFormattedShellTime();
+            }
+        }, 1000);
+
         this._isPanicShellOpen = true;
     },
 
     closePanicShell() {
+        if (this._shellClockInterval) {
+            clearInterval(this._shellClockInterval);
+            this._shellClockInterval = null;
+        }
         let doc = document;
         try {
             if (window.top && window.top.document) {
@@ -999,14 +1275,13 @@ var TabDisguiser = window.TabDisguiser || {
             const enabled = localStorage.getItem('pinpoint_panic_enabled') !== 'false';
             if (!enabled) return;
             const targetKey = localStorage.getItem('pinpoint_panic_key') || '`';
+            if (this._isPanicShellOpen && (e.key === 'Escape' || e.key === targetKey)) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.closePanicShell();
+                return;
+            }
             if (e.key === targetKey) {
-                // If shell is currently open, pressing hotkey closes it
-                if (this._isPanicShellOpen) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    this.closePanicShell();
-                    return;
-                }
                 e.preventDefault();
                 e.stopPropagation();
                 const targetUrl = localStorage.getItem('pinpoint_panic_url') || 'https://classroom.google.com/';
@@ -1022,6 +1297,8 @@ var TabDisguiser = window.TabDisguiser || {
                 const targetUrl = (e.data && e.data.url) || localStorage.getItem('pinpoint_panic_url') || 'https://classroom.google.com/';
                 const mode = (e.data && e.data.mode) || localStorage.getItem('pinpoint_panic_mode') || 'redirect';
                 this.triggerPanic(targetUrl, mode);
+            } else if (e.data && e.data.type === 'panic_shell_open') {
+                this.openPanicShell(e.data.url);
             } else if (e.data === 'panic_shell_close' || (e.data && e.data.type === 'panic_shell_close')) {
                 this.closePanicShell();
             }
@@ -2191,6 +2468,8 @@ var TabDisguiser = window.TabDisguiser || {
 
     window.addEventListener('message', (e) => {
       if (e.data === 'panic' || e.data?.type === 'panic') {
+        const mode = e.data?.mode || localStorage.getItem('pinpoint_panic_mode') || 'redirect';
+        if (mode === 'shell') return;
         triggerPopoutPanic(e.data?.url);
       }
     });

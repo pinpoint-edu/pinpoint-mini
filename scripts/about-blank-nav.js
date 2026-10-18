@@ -286,6 +286,11 @@
         // Listen for panic messages so top about:blank window exits cleanly
         window.addEventListener('message', function(e) {
             if (e.data === 'panic' || (e.data && e.data.type === 'panic')) {
+                const mode = (e.data && e.data.mode) || localStorage.getItem('pinpoint_panic_mode') || 'redirect';
+                if (mode === 'shell') {
+                    // In shell mode, do not trigger page replacement or exit about:blank
+                    return;
+                }
                 window.__IS_PANIC_TRIGGERED__ = true;
                 const targetUrl = (e.data && e.data.url) || localStorage.getItem('pinpoint_panic_url') || 'https://classroom.google.com/';
                 if (window.__originalLocationReplace) {

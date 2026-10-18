@@ -79,8 +79,10 @@ var ThemeManager = window.ThemeManager || {
                     .textbook-item:hover { background-color: #222222 !important; border-color: #555555 !important; }
                     .textbook-title { color: #ffffff !important; text-decoration: none !important; }
                     .textbook-title:hover { text-decoration: none !important; }
-                    .textbook-desc { color: #aaaaaa !important; }
-                    .settings-category, .version-box, #drop-zone, .card { background-color: #121212 !important; color: #ffffff !important; border-color: #333333 !important; }
+                    .settings-category, .settings-card, .version-box, #drop-zone, .card { background-color: #1e1e1e !important; color: #ffffff !important; border-color: #333333 !important; }
+                    #panic-url-menu { background-color: #242424 !important; border-color: #444444 !important; }
+                    .panic-menu-item:hover { background-color: #333333 !important; }
+                    #panic-mode-info { background-color: #252525 !important; border-color: #383838 !important; color: #cccccc !important; }
                     ul.result-list { background-color: #121212 !important; border-color: #333333 !important; }
                     ul.result-list li { border-bottom-color: #262626 !important; color: #ffffff !important; }
                     .badge-success { background-color: #0f381e !important; color: #4ade80 !important; border-color: #1e5a32 !important; }
