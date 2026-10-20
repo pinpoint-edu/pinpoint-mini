@@ -17,7 +17,7 @@
 })();
 
 var TabDisguiser = window.TabDisguiser || {
-    currentVersion: '2026.09.23.10',
+    currentVersion: '2026.09.23.11',
     defaultTitle: 'Home - Classroom',
     defaultFavicon: 'favicons/google-classroom.png',
 
@@ -906,6 +906,22 @@ var TabDisguiser = window.TabDisguiser || {
 
     transferLocalDataToIframe(iframe) {
         if (!iframe) return;
+        // Never force dark color-scheme on games or internal runner iframes!
+        // Games (like Bit Planes) have light canvases/art styles and forcing dark color-scheme in Chrome/Chromebooks inverts text/input rendering causing text to fade invisible.
+        const isGameIframe = iframe.id === 'runner-iframe' || 
+                             iframe.id === 'game-frame' || 
+                             (iframe.src && (iframe.src.includes('/textbooks/') || iframe.src.includes('pages/classwork-history.html')));
+
+        if (isGameIframe) {
+            try {
+                iframe.style.colorScheme = 'light';
+                if (iframe.contentDocument && iframe.contentDocument.documentElement) {
+                    iframe.contentDocument.documentElement.style.colorScheme = 'light';
+                }
+            } catch(e) {}
+            return;
+        }
+
         const isDark = (window.ThemeManager && typeof window.ThemeManager.isDark === 'function') 
             ? window.ThemeManager.isDark() 
             : (localStorage.getItem('pinpoint_theme') === 'dark' || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches));
@@ -2037,10 +2053,14 @@ var TabDisguiser = window.TabDisguiser || {
         const faviconUrl = cleanOrigin ? `${cleanOrigin}/favicons/google-classroom.png` : 'favicons/google-classroom.png';
         const isFavorited = (function() {
             try {
+                let clean = file.split('?')[0];
+                while (clean.startsWith('../')) clean = clean.slice(3);
+                while (clean.startsWith('./')) clean = clean.slice(2);
+                while (clean.startsWith('/')) clean = clean.slice(1);
                 const lib = localStorage.getItem('pinpoint_library');
-                if (lib && JSON.parse(lib).includes(file)) return true;
+                if (lib && (JSON.parse(lib).includes(file) || JSON.parse(lib).includes(clean))) return true;
                 const raw = localStorage.getItem('pinpoint_favorites');
-                if (raw) return JSON.parse(raw).includes(file);
+                if (raw && (JSON.parse(raw).includes(file) || JSON.parse(raw).includes(clean))) return true;
             } catch(e) {}
             return false;
         })();
@@ -2304,8 +2324,24 @@ var TabDisguiser = window.TabDisguiser || {
     .runner-header [data-tooltip-pos="left"]:hover::after { transform: translateY(0) scale(1); }
     .game-iframe { width: 100%; flex: 1; border: none; background: #ffffff; }
     span.material-symbols-outlined { font-family: 'Material Symbols Outlined' !important; font-size: 20px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; }
+    @keyframes runner-spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .runner-saving-icon {
+      animation: runner-spin 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .runner-pill-btn.saving {
+      color: #1a73e8 !important;
+      background: #e8f0fe !important;
+      border-color: #1a73e8 !important;
+    }
   </style>
-  ${cleanOrigin ? `<script src="${cleanOrigin}/scripts/about-blank-nav.js"><\/script>` : ''}
+  ${cleanOrigin ? `<script src="${cleanOrigin}/db.js"><\/script>` : '<script src="db.js"><\/script>'}
+  ${cleanOrigin ? `<script src="${cleanOrigin}/scripts/about-blank-nav.js"><\/script>` : '<script src="scripts/about-blank-nav.js"><\/script>'}
 </head>
 <body>
   <div class="runner-header">
@@ -2327,7 +2363,7 @@ var TabDisguiser = window.TabDisguiser || {
         <button id="mono-lvl-2" onclick="setMonochromeLevel(2)" tabindex="-1" class="runner-mono-btn" aria-label="60% Monochrome (2)">2</button>
         <button id="mono-lvl-3" onclick="setMonochromeLevel(3)" tabindex="-1" class="runner-mono-btn" aria-label="100% Monochrome (3)">3</button>
       </div>
-      <button id="runner-lib-btn" onclick="togglePopoutFav()" tabindex="-1" class="runner-pill-btn runner-pill-btn-primary ${isFavorited ? 'starred' : ''}" data-tooltip="Save to Library" aria-label="Library">
+      <button id="runner-lib-btn" onclick="togglePopoutFav()" tabindex="-1" class="runner-pill-btn runner-pill-btn-primary ${isFavorited ? 'starred' : ''}" data-tooltip="${isFavorited ? 'In Library (Click to remove)' : 'Save to Library'}" aria-label="Library">
         <span class="material-symbols-outlined notranslate" id="popout-fav-icon" aria-hidden="true" style="font-size:19px;line-height:1;${isFavorited ? "font-variation-settings:'FILL' 1;color:#1a73e8;" : ""}">${isFavorited ? 'bookmark' : 'bookmark_border'}</span>
         <span id="popout-fav-text">${isFavorited ? 'In Library' : 'Add to Library'}</span>
       </button>
@@ -2477,38 +2513,200 @@ var TabDisguiser = window.TabDisguiser || {
     setInterval(updateClocks, 1000);
     updateClocks();
 
-    function togglePopoutFav() {
-      try {
+    async function togglePopoutFav() {
+      const btn = document.getElementById('runner-lib-btn');
+      const icon = document.getElementById('popout-fav-icon');
+      const text = document.getElementById('popout-fav-text');
+
+      let cleanFile = TARGET_FILE.split('?')[0];
+      while (cleanFile.startsWith('../')) cleanFile = cleanFile.slice(3);
+      while (cleanFile.startsWith('./')) cleanFile = cleanFile.slice(2);
+      while (cleanFile.startsWith('/')) cleanFile = cleanFile.slice(1);
+      const fullPath = '/' + cleanFile;
+      const gameId = cleanFile.split('').map(c => /[a-zA-Z0-9_-]/.test(c) ? c : '_').join('');
+
+      // 1. If currently saving / downloading, clicking cancels
+      if (typeof PinpointGameStorage !== 'undefined' && PinpointGameStorage.isDownloading && PinpointGameStorage.isDownloading(gameId)) {
+        PinpointGameStorage.cancelDownload(gameId);
         let favs = [];
+        try {
+          const raw = localStorage.getItem('pinpoint_library') || localStorage.getItem('pinpoint_favorites');
+          if (raw) favs = JSON.parse(raw);
+          favs = favs.filter(f => f !== TARGET_FILE && f !== cleanFile);
+          localStorage.setItem('pinpoint_library', JSON.stringify(favs));
+          localStorage.setItem('pinpoint_favorites', JSON.stringify(favs));
+        } catch(e) {}
+        if (btn) {
+          btn.classList.remove('starred', 'saving');
+          btn.removeAttribute('style');
+          btn.setAttribute('data-tooltip', 'Save to Library');
+          btn.setAttribute('aria-label', 'Library');
+        }
+        if (icon) {
+          icon.className = 'material-symbols-outlined notranslate';
+          icon.textContent = 'bookmark_border';
+          icon.style.color = '#5f6368';
+          icon.style.fontVariationSettings = "'FILL' 0";
+        }
+        if (text) text.textContent = 'Add to Library';
+        return;
+      }
+
+      // 2. Check if already in library / downloaded
+      let favs = [];
+      try {
         const raw = localStorage.getItem('pinpoint_library') || localStorage.getItem('pinpoint_favorites');
         if (raw) favs = JSON.parse(raw);
-        const idx = favs.indexOf(TARGET_FILE);
+      } catch(e) {}
+
+      let isDownloaded = false;
+      if (typeof PinpointGameStorage !== 'undefined' && PinpointGameStorage.isDownloaded) {
+        try {
+          isDownloaded = await PinpointGameStorage.isDownloaded(gameId);
+        } catch(e) {}
+      }
+      const inLib = favs.includes(TARGET_FILE) || favs.includes(cleanFile) || isDownloaded;
+
+      if (inLib) {
+        // Remove from library and delete offline assets
+        favs = favs.filter(f => f !== TARGET_FILE && f !== cleanFile);
+        try {
+          localStorage.setItem('pinpoint_library', JSON.stringify(favs));
+          localStorage.setItem('pinpoint_favorites', JSON.stringify(favs));
+        } catch(e) {}
+        if (typeof PinpointGameStorage !== 'undefined' && PinpointGameStorage.deleteGame) {
+          try {
+            await PinpointGameStorage.deleteGame(gameId, fullPath);
+          } catch(e) {}
+        }
+        if (btn) {
+          btn.classList.remove('starred', 'saving');
+          btn.removeAttribute('style');
+          btn.setAttribute('data-tooltip', 'Save to Library');
+          btn.setAttribute('aria-label', 'Library');
+        }
+        if (icon) {
+          icon.className = 'material-symbols-outlined notranslate';
+          icon.textContent = 'bookmark_border';
+          icon.style.color = '#5f6368';
+          icon.style.fontVariationSettings = "'FILL' 0";
+        }
+        if (text) text.textContent = 'Add to Library';
+        return;
+      }
+
+      // 3. Not in library -> Add to library and start download
+      if (!favs.includes(TARGET_FILE)) favs.push(TARGET_FILE);
+      if (!favs.includes(cleanFile)) favs.push(cleanFile);
+      try {
+        localStorage.setItem('pinpoint_library', JSON.stringify(favs));
+        localStorage.setItem('pinpoint_favorites', JSON.stringify(favs));
+      } catch(e) {}
+
+      // Trigger animated saving state
+      if (btn) {
+        btn.classList.add('saving');
+        btn.classList.remove('starred');
+        btn.setAttribute('data-tooltip', 'Saving to Library: 1% (Click to cancel)');
+        btn.setAttribute('aria-label', 'Saving 1%');
+      }
+      if (icon) {
+        icon.className = 'material-symbols-outlined notranslate runner-saving-icon';
+        icon.textContent = 'hourglass_top';
+        icon.style.color = '#1a73e8';
+        icon.style.fontVariationSettings = "'FILL' 0";
+      }
+      if (text) text.textContent = 'Saving 1%...';
+
+      let downloadSuccess = true;
+      if (typeof PinpointGameStorage !== 'undefined' && PinpointGameStorage.downloadGame) {
+        try {
+          await PinpointGameStorage.downloadGame(gameId, LOCKED_POPOUT_TITLE, fullPath, (prog) => {
+            const pct = (prog && prog.percent !== undefined) ? prog.percent : 1;
+            if (btn) {
+              btn.setAttribute('data-tooltip', 'Saving to Library: ' + pct + '% (Click to cancel)');
+              btn.setAttribute('aria-label', 'Saving ' + pct + '%');
+            }
+            if (text) text.textContent = 'Saving ' + pct + '%...';
+          });
+        } catch(err) {
+          if (err && err.name === 'AbortError') return;
+          console.warn('Popout download error:', err);
+          downloadSuccess = false;
+        }
+      }
+
+      if (downloadSuccess) {
+        if (btn) {
+          btn.classList.remove('saving');
+          btn.classList.add('starred');
+          btn.removeAttribute('style');
+          btn.setAttribute('data-tooltip', 'In Library (Click to remove)');
+          btn.setAttribute('aria-label', 'In Library');
+        }
+        if (icon) {
+          icon.className = 'material-symbols-outlined notranslate';
+          icon.textContent = 'bookmark';
+          icon.style.color = '#1a73e8';
+          icon.style.fontVariationSettings = "'FILL' 1";
+        }
+        if (text) text.textContent = 'In Library';
+      } else {
+        // Revert on error
+        favs = favs.filter(f => f !== TARGET_FILE && f !== cleanFile);
+        try {
+          localStorage.setItem('pinpoint_library', JSON.stringify(favs));
+          localStorage.setItem('pinpoint_favorites', JSON.stringify(favs));
+        } catch(e) {}
+        if (btn) {
+          btn.classList.remove('starred', 'saving');
+          btn.removeAttribute('style');
+          btn.setAttribute('data-tooltip', 'Save to Library');
+          btn.setAttribute('aria-label', 'Library');
+        }
+        if (icon) {
+          icon.className = 'material-symbols-outlined notranslate';
+          icon.textContent = 'bookmark_border';
+          icon.style.color = '#5f6368';
+          icon.style.fontVariationSettings = "'FILL' 0";
+        }
+        if (text) text.textContent = 'Add to Library';
+      }
+    }
+
+    async function initPopoutFavBtn() {
+      let cleanFile = TARGET_FILE.split('?')[0];
+      while (cleanFile.startsWith('../')) cleanFile = cleanFile.slice(3);
+      while (cleanFile.startsWith('./')) cleanFile = cleanFile.slice(2);
+      while (cleanFile.startsWith('/')) cleanFile = cleanFile.slice(1);
+      const gameId = cleanFile.split('').map(c => /[a-zA-Z0-9_-]/.test(c) ? c : '_').join('');
+
+      let isDownloaded = false;
+      if (typeof PinpointGameStorage !== 'undefined' && PinpointGameStorage.isDownloaded) {
+        try { isDownloaded = await PinpointGameStorage.isDownloaded(gameId); } catch(e) {}
+      }
+      let favs = [];
+      try {
+        const raw = localStorage.getItem('pinpoint_library') || localStorage.getItem('pinpoint_favorites');
+        if (raw) favs = JSON.parse(raw);
+      } catch(e) {}
+      if (favs.includes(TARGET_FILE) || favs.includes(cleanFile) || isDownloaded) {
         const btn = document.getElementById('runner-lib-btn');
         const icon = document.getElementById('popout-fav-icon');
         const text = document.getElementById('popout-fav-text');
-        if (idx !== -1) {
-          favs.splice(idx, 1);
-          if (btn) btn.classList.remove('starred');
-          if (icon) {
-            icon.textContent = 'bookmark_border';
-            icon.style.color = '#5f6368';
-            icon.style.fontVariationSettings = "'FILL' 0";
-          }
-          if (text) text.textContent = 'Add to Library';
-        } else {
-          favs.push(TARGET_FILE);
-          if (btn) btn.classList.add('starred');
-          if (icon) {
-            icon.textContent = 'bookmark';
-            icon.style.color = '#1a73e8';
-            icon.style.fontVariationSettings = "'FILL' 1";
-          }
-          if (text) text.textContent = 'In Library';
+        if (btn) {
+          btn.classList.add('starred');
+          btn.setAttribute('data-tooltip', 'In Library (Click to remove)');
         }
-        localStorage.setItem('pinpoint_library', JSON.stringify(favs));
-        localStorage.setItem('pinpoint_favorites', JSON.stringify(favs));
-      } catch (e) {}
+        if (icon) {
+          icon.textContent = 'bookmark';
+          icon.style.color = '#1a73e8';
+          icon.style.fontVariationSettings = "'FILL' 1";
+        }
+        if (text) text.textContent = 'In Library';
+      }
     }
+    initPopoutFavBtn();
 
     function toggleFullscreen() {
       const iframe = document.getElementById('game-frame');
