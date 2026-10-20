@@ -29,6 +29,82 @@
     }
   </style>
   <script>
+    // 1. Hardware fill-rate optimization: Cap devicePixelRatio on high-DPI / Chromebook screens
+    try {
+      if (window.devicePixelRatio > 1) {
+        Object.defineProperty(window, 'devicePixelRatio', {
+          get: function() { return 1; },
+          configurable: true
+        });
+      }
+    } catch(e) {}
+
+    // 2. High-performance offline asset interceptor:
+    // Intercepts all remote CDN requests initiated by the Flash SWF and serves them
+    // instantly from local preloaded memory or local disk, eliminating network latency,
+    // 403 Forbidden errors, and streaming stutter.
+    const localMusicFiles = [
+      'cerebrawl', 'chooseyourseeds', 'conveyor', 'crazydave',
+      'grasswalk', 'loonboon', 'losemusic', 'moongrains',
+      'winmusic', 'zengarden'
+    ];
+
+    function mapPvzAssetUrl(url) {
+      if (!url || typeof url !== 'string') return null;
+      if (url.includes('resources.swf')) return 'resources.swf';
+      if (url.includes('data.xml')) return 'data.xml';
+      if (url.includes('externalStrings.txt')) return 'properties/externalStrings.txt';
+      for (const m of localMusicFiles) {
+        if (url.includes(m + '.mp3')) return 'music/' + m + '.mp3';
+      }
+      return null;
+    }
+
+    const preloadedBuffers = {};
+    const origFetch = window.fetch;
+    window.fetch = function(input, init) {
+      let url = typeof input === 'string' ? input : (input && input.url ? input.url : '');
+      const localTarget = mapPvzAssetUrl(url);
+      if (localTarget) {
+        if (preloadedBuffers[localTarget]) {
+          const mime = localTarget.endsWith('.xml') ? 'application/xml' :
+                       localTarget.endsWith('.swf') ? 'application/x-shockwave-flash' :
+                       localTarget.endsWith('.mp3') ? 'audio/mpeg' : 'text/plain';
+          return Promise.resolve(new Response(preloadedBuffers[localTarget], {
+            status: 200,
+            headers: { 'Content-Type': mime }
+          }));
+        }
+        return origFetch(localTarget, init);
+      }
+      return origFetch.apply(this, arguments);
+    };
+
+    const origXhrOpen = XMLHttpRequest.prototype.open;
+    XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
+      if (typeof url === 'string') {
+        const localTarget = mapPvzAssetUrl(url);
+        if (localTarget) {
+          url = localTarget;
+        }
+      }
+      return origXhrOpen.call(this, method, url, async, user, password);
+    };
+
+    // Preload key SWF data & resources in parallel immediately
+    (async function preloadPvzAssets() {
+      const files = ['resources.swf', 'data.xml', 'properties/externalStrings.txt'];
+      await Promise.all(files.map(async (file) => {
+        try {
+          const res = await origFetch(file);
+          if (res.ok) {
+            preloadedBuffers[file] = await res.arrayBuffer();
+          }
+        } catch(e) {}
+      }));
+    })();
+
+    // 3. Ruffle configuration for smooth performance
     let baseOrigin = (window.location.origin && window.location.origin !== "null" && !window.location.origin.startsWith("blob")) ? window.location.origin : "";
     try {
       if ((!baseOrigin || baseOrigin.startsWith("blob")) && window.parent && window.parent.location && window.parent.location.origin && window.parent.location.origin !== "null" && !window.parent.location.origin.startsWith("blob")) {
@@ -57,6 +133,9 @@
       letterbox: "on",
       contextMenu: false,
       warnOnUnsupportedContent: false,
+      quality: "low",
+      powerPreference: "high-performance",
+      wmode: "opaque",
       publicPath: (baseOrigin ? baseOrigin + "/textbooks/ruffle/" : ruffleDir)
     };
   </script>
@@ -107,13 +186,13 @@
 
         let buf = null;
         try {
-          const res = await fetch(localUrl);
+          const res = await origFetch(localUrl);
           if (res.ok) buf = await res.arrayBuffer();
         } catch(e) {}
 
         if (!buf && baseOrigin) {
           try {
-            const res = await fetch(baseOrigin + "/textbooks/plants-vs-zombies/" + localUrl);
+            const res = await origFetch(baseOrigin + "/textbooks/plants-vs-zombies/" + localUrl);
             if (res.ok) buf = await res.arrayBuffer();
           } catch(e) {}
         }
@@ -127,7 +206,7 @@
 
         if (!buf) {
           try {
-            const res = await fetch(cdnUrl);
+            const res = await origFetch(cdnUrl);
             if (res.ok) buf = await res.arrayBuffer();
           } catch(e) {}
         }

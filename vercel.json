@@ -129,12 +129,20 @@
       "destination": "/textbooks/crazy-pixel-apocalypse-9/index.html"
     },
     {
+      "source": "/textbooks/gumspin.html",
+      "destination": "/textbooks/gumspin/index.html"
+    },
+    {
+      "source": "/textbooks/gumspin",
+      "destination": "/textbooks/gumspin/index.html"
+    },
+    {
       "source": "/textbooks/monspin.html",
-      "destination": "/textbooks/monspin/index.html"
+      "destination": "/textbooks/gumspin/index.html"
     },
     {
       "source": "/textbooks/monspin",
-      "destination": "/textbooks/monspin/index.html"
+      "destination": "/textbooks/gumspin/index.html"
     }
   ],
   "headers": [
