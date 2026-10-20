@@ -276,11 +276,19 @@
         }, true);
 
         window.addEventListener('beforeunload', function(e) {
-            if (!window.__IS_PANIC_TRIGGERED__ && (!window.top || !window.top.__IS_PANIC_TRIGGERED__)) {
-                e.preventDefault();
-                e.returnValue = '';
-                return '';
+            if (window.__IS_PANIC_TRIGGERED__ || (window.top && window.top.__IS_PANIC_TRIGGERED__)) {
+                delete e.returnValue;
+                return;
             }
+            try {
+                if (document.getElementById('pinpoint-panic-shell') || (window.top && window.top.document && window.top.document.getElementById('pinpoint-panic-shell'))) {
+                    delete e.returnValue;
+                    return;
+                }
+            } catch(err) {}
+            e.preventDefault();
+            e.returnValue = '';
+            return '';
         });
 
         // Listen for panic messages so top about:blank window exits cleanly

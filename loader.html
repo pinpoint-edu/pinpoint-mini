@@ -35,19 +35,53 @@
 
   <script>
     (function() {
+      try {
+        var params = new URLSearchParams(window.location.search);
+        var target = params.get('target') || params.get('url') || params.get('page') || params.get('to');
+        if (target) {
+          var frame = document.getElementById('app-frame');
+          if (frame) frame.src = target;
+        }
+      } catch(e) {}
+
       function triggerPanic(url) {
+        window.__IS_PANIC_TRIGGERED__ = true;
+        window.onbeforeunload = null;
+
+        const stopUnload = function(e) {
+          e.stopImmediatePropagation();
+          delete e.returnValue;
+        };
+        window.addEventListener('beforeunload', stopUnload, true);
+
+        // Remove panic shell if present so iframes like Desmos cannot block with beforeunload prompts
+        try {
+          var shell = document.getElementById('pinpoint-panic-shell');
+          if (shell) {
+            try {
+              var ifr = shell.querySelector('iframe');
+              if (ifr && ifr.contentWindow) {
+                try { ifr.contentWindow.onbeforeunload = null; } catch(err) {}
+              }
+            } catch(err) {}
+            shell.remove();
+          }
+        } catch(e) {}
+
         var targetUrl = (url || localStorage.getItem('pinpoint_panic_url') || 'https://classroom.google.com/').trim();
         if (targetUrl && targetUrl !== 'about:blank' && !/^https?:\/\//i.test(targetUrl)) {
           targetUrl = 'https://' + targetUrl;
         }
-        try {
-          window.location.href = targetUrl;
-          return;
-        } catch(e) {}
-        try {
-          window.location.replace(targetUrl);
-          return;
-        } catch(e) {}
+        setTimeout(function() {
+          try {
+            window.location.href = targetUrl;
+            return;
+          } catch(e) {}
+          try {
+            window.location.replace(targetUrl);
+            return;
+          } catch(e) {}
+        }, 10);
       }
 
       // Sync title, favicon, panic key, and navigation from iframe
@@ -73,6 +107,8 @@
           if (frame) frame.src = e.data.url;
         }
         if (e.data === 'panic' || (e.data && e.data.type === 'panic')) {
+          var mode = (e.data && e.data.mode) || localStorage.getItem('pinpoint_panic_mode') || 'redirect';
+          if (mode === 'shell') return;
           triggerPanic(e.data && e.data.url);
         }
       });
@@ -118,6 +154,14 @@
         if (!enabled) return;
         var targetKey = localStorage.getItem('pinpoint_panic_key') || String.fromCharCode(96);
         if (e.key === targetKey) {
+          var mode = localStorage.getItem('pinpoint_panic_mode') || 'redirect';
+          if (mode === 'shell') {
+            var frame = document.getElementById('app-frame');
+            if (frame && frame.contentWindow) {
+              frame.contentWindow.postMessage({ type: 'panic', mode: 'shell' }, '*');
+            }
+            return;
+          }
           triggerPanic();
         }
       }
@@ -133,11 +177,19 @@
       }, true);
 
       window.addEventListener('beforeunload', function(e) {
-        if (!window.__IS_PANIC_TRIGGERED__) {
-          e.preventDefault();
-          e.returnValue = '';
-          return '';
+        if (window.__IS_PANIC_TRIGGERED__) {
+          delete e.returnValue;
+          return;
         }
+        try {
+          if (document.getElementById('pinpoint-panic-shell')) {
+            delete e.returnValue;
+            return;
+          }
+        } catch(err) {}
+        e.preventDefault();
+        e.returnValue = '';
+        return '';
       });
 
       // Attach keydown directly to child frame so hotkey is caught when frame has focus

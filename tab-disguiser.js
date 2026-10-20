@@ -43,6 +43,7 @@ var TabDisguiser = window.TabDisguiser || {
 
         // Walkthrough is opt-in, not a gate — never force-redirect to home
 
+        this.checkLoaderRedirect();
         this.initTitleProtection();
         this.apply();
         this.injectNavigation();
@@ -54,6 +55,22 @@ var TabDisguiser = window.TabDisguiser || {
         this.initAutoRefresh();
         this.interceptLinks();
         this.initCleanupReminder();
+    },
+
+    checkLoaderRedirect() {
+        try {
+            if (window.self !== window.top) return; // Inside iframe (e.g. loader.html)
+            if (window.location.protocol === 'about:' || window.location.href.startsWith('about:')) return; // In about:blank
+            const path = window.location.pathname || '';
+            const lowerPath = path.toLowerCase();
+            if (lowerPath === '' || lowerPath === '/' || lowerPath.endsWith('/index.html') || lowerPath === 'index.html' || lowerPath.endsWith('/loader.html') || lowerPath === 'loader.html' || lowerPath.endsWith('/redirect.html') || lowerPath === 'redirect.html') {
+                return;
+            }
+            const target = window.location.pathname + window.location.search;
+            const origin = window.location.origin || '';
+            const cleanOrigin = origin.endsWith('/') ? origin : origin + '/';
+            window.location.replace(cleanOrigin + 'index.html?target=' + encodeURIComponent(target));
+        } catch(e) {}
     },
 
     interceptLinks() {
@@ -795,6 +812,34 @@ var TabDisguiser = window.TabDisguiser || {
         try { if (window.top) window.top.__IS_PANIC_TRIGGERED__ = true; } catch(e) {}
         try { if (window.parent) window.parent.__IS_PANIC_TRIGGERED__ = true; } catch(e) {}
 
+        window.onbeforeunload = null;
+        try { if (window.top) window.top.onbeforeunload = null; } catch(e) {}
+        try { if (window.parent) window.parent.onbeforeunload = null; } catch(e) {}
+
+        // Add capturing event listener to prevent any beforeunload dialog (e.g. Desmos)
+        const stopUnload = (e) => {
+            e.stopImmediatePropagation();
+            delete e.returnValue;
+        };
+        window.addEventListener('beforeunload', stopUnload, true);
+        try { if (window.top) window.top.addEventListener('beforeunload', stopUnload, true); } catch(e) {}
+        try { if (window.parent) window.parent.addEventListener('beforeunload', stopUnload, true); } catch(e) {}
+
+        // Remove any open panic shell before navigating so iframes like Desmos cannot block with beforeunload prompts
+        try {
+            const doc = (window.top && window.top.document) || document;
+            const shell = doc.getElementById('pinpoint-panic-shell') || document.getElementById('pinpoint-panic-shell');
+            if (shell) {
+                try {
+                    const ifr = shell.querySelector('iframe');
+                    if (ifr && ifr.contentWindow) {
+                        try { ifr.contentWindow.onbeforeunload = null; } catch(err) {}
+                    }
+                } catch(err) {}
+                shell.remove();
+            }
+        } catch(e) {}
+
         let resolvedUrl = (targetUrl || localStorage.getItem('pinpoint_panic_url') || 'https://classroom.google.com/').trim();
         if (resolvedUrl && resolvedUrl !== 'about:blank' && !/^https?:\/\//i.test(resolvedUrl)) {
             resolvedUrl = 'https://' + resolvedUrl;
@@ -833,33 +878,28 @@ var TabDisguiser = window.TabDisguiser || {
                 topWin.__originalLocationReplace.call(topWin.location, targetUrl);
                 return;
             }
-        } catch(e) {}
+        } catch(err) {}
         try {
             if (topWin.__origLocationHrefSet) {
                 topWin.__origLocationHrefSet.call(topWin.location, targetUrl);
                 return;
             }
-        } catch(e) {}
+        } catch(err) {}
 
-        // 4. Directly redirect top window out of about:blank
-        try {
-            topWin.location.href = targetUrl;
-            return;
-        } catch(e) {}
-        try {
-            topWin.location.replace(targetUrl);
-            return;
-        } catch(e) {}
-
-        // 5. Fallback on current window
-        try {
-            window.location.href = targetUrl;
-            return;
-        } catch(e) {}
-        try {
-            window.location.replace(targetUrl);
-            return;
-        } catch(e) {}
+        // 4. Default native replace with brief delay so frame detachment takes effect
+        setTimeout(() => {
+            try {
+                topWin.location.replace(targetUrl);
+                return;
+            } catch(e) {}
+            try {
+                topWin.location.href = targetUrl;
+                return;
+            } catch(e) {}
+            try {
+                window.location.replace(targetUrl);
+            } catch(e) {}
+        }, 10);
     },
 
     _isPanicShellOpen: false,
@@ -986,13 +1026,15 @@ var TabDisguiser = window.TabDisguiser || {
                 doc = window.top.document;
             }
         } catch(e) {}
-        const shell = doc.getElementById('pinpoint-panic-shell');
+        const shell = doc.getElementById('pinpoint-panic-shell') || document.getElementById('pinpoint-panic-shell');
         if (shell) {
-            shell.style.display = 'none';
-            const iframe = shell.querySelector('#pinpoint-panic-shell-iframe');
-            if (iframe) {
-                iframe.src = 'about:blank';
-            }
+            try {
+                const ifr = shell.querySelector('iframe');
+                if (ifr && ifr.contentWindow) {
+                    try { ifr.contentWindow.onbeforeunload = null; } catch(err) {}
+                }
+            } catch(e) {}
+            shell.remove();
         }
         this._isPanicShellOpen = false;
 
@@ -1955,8 +1997,11 @@ var TabDisguiser = window.TabDisguiser || {
     openPopout(file, title) {
         if (!file) return null;
         const resolvedTitle = title || 'Textbook';
-        const currentOrigin = (window.location.origin && window.location.origin !== 'null') ? window.location.origin : '';
-        const currentUrl = (window.location.href && !window.location.href.startsWith('about:')) ? window.location.href : (currentOrigin + '/pages/classwork-history.html');
+        const currentOrigin = (window.location.origin && window.location.origin !== 'null' && !window.location.origin.startsWith('about:')) 
+            ? window.location.origin 
+            : (localStorage.getItem('pinpoint_entry_origin') || localStorage.getItem('pinpoint_return_origin') || '');
+        const cleanOrigin = currentOrigin ? currentOrigin.replace(/\/$/, '') : '';
+        const currentUrl = (window.location.href && !window.location.href.startsWith('about:')) ? window.location.href : (cleanOrigin ? (cleanOrigin + '/pages/classwork-history.html') : 'pages/classwork-history.html');
         const currentHost = window.location.host || window.location.hostname || 'pinpoint-edu';
 
         try {
@@ -1968,13 +2013,13 @@ var TabDisguiser = window.TabDisguiser || {
         let gameSrc = file;
         if (!file.startsWith('http://') && !file.startsWith('https://')) {
             if (file.startsWith('../')) {
-                gameSrc = currentOrigin + '/' + file.replace(/^\.\.\//, '');
+                gameSrc = cleanOrigin + '/' + file.replace(/^\.\.\//, '');
             } else if (file.startsWith('./')) {
-                gameSrc = currentOrigin + '/' + file.replace(/^\.\//, '');
+                gameSrc = cleanOrigin + '/' + file.replace(/^\.\//, '');
             } else if (!file.startsWith('/')) {
-                gameSrc = currentOrigin + '/' + file;
+                gameSrc = cleanOrigin + '/' + file;
             } else {
-                gameSrc = currentOrigin + file;
+                gameSrc = cleanOrigin + file;
             }
         }
 
@@ -1989,7 +2034,7 @@ var TabDisguiser = window.TabDisguiser || {
         }
 
         const popoutTitle = (this.getCanonicalPageTitle && this.getCanonicalPageTitle()) || 'Classwork for World History - Classroom';
-        const faviconUrl = currentOrigin ? `${currentOrigin}/favicons/google-classroom.png` : 'favicons/google-classroom.png';
+        const faviconUrl = cleanOrigin ? `${cleanOrigin}/favicons/google-classroom.png` : 'favicons/google-classroom.png';
         const isFavorited = (function() {
             try {
                 const lib = localStorage.getItem('pinpoint_library');
@@ -2000,11 +2045,14 @@ var TabDisguiser = window.TabDisguiser || {
             return false;
         })();
 
+        const baseHref = cleanOrigin ? (cleanOrigin + '/') : '';
+
         const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  ${baseHref ? `<base href="${baseHref}">` : ''}
   <title>${popoutTitle}</title>
   <link rel="icon" type="image/png" href="${faviconUrl}">
   <link rel="shortcut icon" type="image/png" href="${faviconUrl}">
@@ -2015,48 +2063,275 @@ var TabDisguiser = window.TabDisguiser || {
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { width: 100%; height: 100%; overflow: hidden; background: #ffffff; font-family: 'Google Sans', Roboto, Arial, sans-serif; display: flex; flex-direction: column; }
-    .topbar { height: 56px; min-height: 56px; border-bottom: 1px solid #dadce0; background: #ffffff; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; user-select: none; z-index: 100; position: relative; }
-    .topbar-left { display: flex; align-items: center; gap: 16px; flex: 1; min-width: 0; }
-    .topbar-center { display: flex; align-items: center; justify-content: center; flex: 1; min-width: 0; }
-    .topbar-right { display: flex; align-items: center; justify-content: flex-end; gap: 12px; flex: 1; min-width: 0; }
-    .share-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 14px; background: #f1f3f4; border: 1px solid #dadce0; border-radius: 16px; font-size: 13px; font-weight: 500; color: #3c4043; user-select: none; white-space: nowrap; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-    .back-btn { background: none; border: none; cursor: pointer; padding: 8px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #5f6368; transition: background-color 0.2s; }
-    .back-btn:hover { background-color: #f1f3f4; color: #202124; }
-    .topbar-title { font-size: 18px; font-weight: 500; color: #202124; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 30vw; font-family: inherit; }
-    .time-badge { font-size: 14px; font-weight: 500; color: #5f6368; font-variant-numeric: tabular-nums; margin-left: 8px; padding-left: 8px; border-left: 1px solid #dadce0; font-family: inherit; }
-    .action-btn { height: 36px; padding: 0 14px; font-size: 14px; font-weight: 500; cursor: pointer; border-radius: 4px; border: 1px solid #dadce0; background: #ffffff; color: #5f6368; font-family: inherit; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-sizing: border-box; transition: background-color 0.2s; }
-    .action-btn:hover { background-color: #f1f3f4; }
-    .action-btn.primary { color: #1a73e8; }
-    .action-btn.starred { color: #b06000; background: #fef7e0; border-color: #f9ab00; }
+    .runner-header {
+      min-height: 48px;
+      height: 48px;
+      border-bottom: 1px solid #dadce0;
+      background: #fafbfc;
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-sizing: border-box;
+      user-select: none;
+      gap: 8px;
+      position: relative;
+      z-index: 100;
+    }
+    .runner-title {
+      font-family: 'Google Sans', Roboto, Arial, sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      color: #202124;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 26vw;
+      margin: 0 4px;
+    }
+    .runner-back-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #5f6368;
+      transition: all 0.18s ease;
+      outline: none;
+      padding: 0;
+      flex-shrink: 0;
+    }
+    .runner-back-btn:hover {
+      background: #f1f3f4;
+      color: #202124;
+    }
+    .runner-circle-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid #dadce0;
+      background: #ffffff;
+      color: #5f6368;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      font-family: 'Google Sans', Roboto, Arial, sans-serif;
+      box-sizing: border-box;
+      text-decoration: none;
+      outline: none;
+      padding: 0;
+      flex-shrink: 0;
+    }
+    .runner-circle-btn:hover {
+      background: #f1f3f4;
+      border-color: #dadce0;
+      color: #202124;
+    }
+    .runner-circle-btn-primary {
+      color: #1a73e8;
+    }
+    .runner-circle-btn-primary:hover {
+      background: #e8f0fe;
+      color: #1a73e8;
+      border-color: #d2e3fc;
+    }
+    .runner-pill-btn {
+      height: 34px;
+      border-radius: 18px;
+      border: 1px solid #dadce0;
+      background: #ffffff;
+      color: #3c4043;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 12px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      font-family: 'Google Sans', Roboto, Arial, sans-serif;
+      box-sizing: border-box;
+      text-decoration: none;
+      outline: none;
+      flex-shrink: 0;
+      user-select: none;
+      white-space: nowrap;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .runner-pill-btn:hover {
+      background: #f1f3f4;
+      border-color: #dadce0;
+      color: #202124;
+    }
+    .runner-pill-btn-danger {
+      color: #d93025;
+      border-color: #fce8e6;
+      background: #fdf2f2;
+    }
+    .runner-pill-btn-danger:hover {
+      background: #fce8e6;
+      border-color: #fad2cf;
+      color: #c5221f;
+    }
+    .runner-pill-btn-primary {
+      color: #1a73e8;
+      border-color: #dadce0;
+      background: #ffffff;
+    }
+    .runner-pill-btn-primary:hover {
+      background: #e8f0fe;
+      border-color: #d2e3fc;
+      color: #1a73e8;
+    }
+    .runner-pill-btn.starred {
+      color: #b06000;
+      background: #fef7e0;
+      border-color: #f9ab00;
+    }
+    .runner-mono-segment {
+      display: inline-flex;
+      align-items: center;
+      background: #eef2f6;
+      border-radius: 20px;
+      padding: 3px 4px;
+      gap: 2px;
+      border: 1px solid #e0e4e9;
+      box-sizing: border-box;
+      height: 34px;
+      flex-shrink: 0;
+    }
+    .runner-mono-label {
+      display: inline-flex;
+      align-items: center;
+      color: #5f6368;
+      padding: 0 4px;
+    }
+    .runner-mono-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 12px;
+      border: none;
+      background: transparent;
+      color: #5f6368;
+      font-size: 12px;
+      font-weight: 500;
+      font-family: 'Google Sans', Roboto, Arial, sans-serif;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.18s ease;
+      padding: 0;
+      outline: none;
+    }
+    .runner-mono-btn:hover {
+      color: #202124;
+      background: rgba(255, 255, 255, 0.6);
+    }
+    .runner-mono-btn.active {
+      background: #ffffff;
+      color: #1a73e8;
+      font-weight: 500;
+      box-shadow: 0 1px 3px rgba(60,64,67,0.15), 0 1px 2px rgba(60,64,67,0.1);
+    }
+    .runner-clock-pill {
+      font-size: 13px;
+      font-weight: 500;
+      color: #3c4043;
+      font-family: 'Google Sans', Roboto, Arial, sans-serif;
+      font-variant-numeric: tabular-nums;
+      background: #eef2f6;
+      border-radius: 18px;
+      padding: 6px 12px;
+      white-space: nowrap;
+      border: 1px solid #e0e4e9;
+      display: inline-flex;
+      align-items: center;
+      margin-left: 4px;
+      user-select: none;
+    }
+    .runner-header [data-tooltip] { position: relative; }
+    .runner-header [data-tooltip]::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      top: calc(100% + 7px);
+      left: 50%;
+      transform: translateX(-50%) translateY(-3px) scale(0.95);
+      background: #ffffff;
+      color: #202124;
+      font-family: 'Google Sans', Roboto, Arial, sans-serif;
+      font-size: 11.5px;
+      font-weight: 500;
+      white-space: nowrap;
+      padding: 4px 9px;
+      border-radius: 6px;
+      border: 1px solid #dadce0;
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
+      z-index: 1000000;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.14);
+    }
+    .runner-header [data-tooltip]::before {
+      content: '';
+      position: absolute;
+      top: calc(100% + 2px);
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 5px;
+      border-style: solid;
+      border-color: transparent transparent #ffffff transparent;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.15s ease, visibility 0.15s ease;
+      pointer-events: none;
+      z-index: 1000000;
+    }
+    .runner-header [data-tooltip]:hover::after { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0) scale(1); }
+    .runner-header [data-tooltip]:hover::before { opacity: 1; visibility: visible; }
+    .runner-header [data-tooltip-pos="right"]::after { left: auto; right: 0; transform: translateY(-3px) scale(0.95); }
+    .runner-header [data-tooltip-pos="right"]::before { left: auto; right: 12px; transform: none; }
+    .runner-header [data-tooltip-pos="right"]:hover::after { transform: translateY(0) scale(1); }
+    .runner-header [data-tooltip-pos="left"]::after { left: 0; transform: translateY(-3px) scale(0.95); }
+    .runner-header [data-tooltip-pos="left"]::before { left: 14px; transform: none; }
+    .runner-header [data-tooltip-pos="left"]:hover::after { transform: translateY(0) scale(1); }
     .game-iframe { width: 100%; flex: 1; border: none; background: #ffffff; }
     span.material-symbols-outlined { font-family: 'Material Symbols Outlined' !important; font-size: 20px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; }
   </style>
+  ${cleanOrigin ? `<script src="${cleanOrigin}/scripts/about-blank-nav.js"><\/script>` : ''}
 </head>
 <body>
-  <div class="topbar">
-    <div class="topbar-left">
-      <button class="back-btn" onclick="returnToWebsite()" title="Return to Website">
-        <span class="material-symbols-outlined" style="font-size:24px;">arrow_back</span>
+  <div class="runner-header">
+    <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;">
+      <button onclick="returnToWebsite()" tabindex="-1" class="runner-back-btn" data-tooltip="Close & Return" data-tooltip-pos="left" aria-label="Close & Return">
+        <span class="material-symbols-outlined" aria-hidden="true" style="font-size:22px;line-height:1;">arrow_back</span>
       </button>
-      <span class="topbar-title">${resolvedTitle}</span>
-      <span id="popout-time" class="time-badge"></span>
+      <span id="runner-title" class="runner-title">${resolvedTitle}</span>
+      <a href="https://forms.gle/EnzAhDYTACGkM2oYA" target="_blank" rel="noopener noreferrer" tabindex="-1" class="runner-pill-btn runner-pill-btn-danger" data-tooltip="Leave Feedback" aria-label="Feedback">
+        <span class="material-symbols-outlined notranslate" style="font-size:18px;line-height:1;">description</span>
+        <span>Feedback</span>
+      </a>
+      <span id="runner-clock" class="runner-clock-pill" data-tooltip="Live Clock" aria-label="Live Clock"></span>
     </div>
-    <div class="topbar-center">
-      <div class="share-pill">
-        <span class="material-symbols-outlined" style="font-size:16px;color:#ea4335;">description</span>
-        <span>pls fill this out gng😭: <a href="https://forms.gle/EnzAhDYTACGkM2oYA" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline;font-weight:600;">https://forms.gle/EnzAhDYTACGkM2oYA</a></span>
+    <div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;flex:1;min-width:0;white-space:nowrap;">
+      <div class="runner-mono-segment" data-tooltip="Color Filter">
+        <span class="material-symbols-outlined notranslate runner-mono-label" style="font-size:16px;line-height:1;" aria-label="Monochrome Filter">contrast</span>
+        <button id="mono-lvl-1" onclick="setMonochromeLevel(1)" tabindex="-1" class="runner-mono-btn active" aria-label="Full Color (1)">1</button>
+        <button id="mono-lvl-2" onclick="setMonochromeLevel(2)" tabindex="-1" class="runner-mono-btn" aria-label="60% Monochrome (2)">2</button>
+        <button id="mono-lvl-3" onclick="setMonochromeLevel(3)" tabindex="-1" class="runner-mono-btn" aria-label="100% Monochrome (3)">3</button>
       </div>
-    </div>
-    <div class="topbar-right">
-      <button id="popout-fav-btn" class="action-btn ${isFavorited ? 'starred' : ''}" onclick="togglePopoutFav()">
-        <span class="material-symbols-outlined" id="popout-fav-icon" style="${isFavorited ? "font-variation-settings:'FILL' 1;color:#1a73e8;" : ""}">
-          ${isFavorited ? 'bookmark' : 'bookmark_border'}
-        </span>
-        <span id="popout-fav-text">${isFavorited ? 'In Library' : 'Library'}</span>
+      <button id="runner-lib-btn" onclick="togglePopoutFav()" tabindex="-1" class="runner-pill-btn runner-pill-btn-primary ${isFavorited ? 'starred' : ''}" data-tooltip="Save to Library" aria-label="Library">
+        <span class="material-symbols-outlined notranslate" id="popout-fav-icon" aria-hidden="true" style="font-size:19px;line-height:1;${isFavorited ? "font-variation-settings:'FILL' 1;color:#1a73e8;" : ""}">${isFavorited ? 'bookmark' : 'bookmark_border'}</span>
+        <span id="popout-fav-text">${isFavorited ? 'In Library' : 'Add to Library'}</span>
       </button>
-      <button class="action-btn primary" onclick="toggleFullscreen()">
-        <span class="material-symbols-outlined" style="font-size:18px;">fullscreen</span>
-        <span>Fullscreen</span>
+      <button onclick="toggleFullscreen()" tabindex="-1" class="runner-circle-btn runner-circle-btn-primary" data-tooltip="Fullscreen" data-tooltip-pos="right" aria-label="Fullscreen">
+        <span class="material-symbols-outlined" aria-hidden="true" style="font-size:20px;line-height:1;">fullscreen</span>
       </button>
     </div>
   </div>
@@ -2108,22 +2383,60 @@ var TabDisguiser = window.TabDisguiser || {
     const TARGET_FILE = ${JSON.stringify(file)};
     let returnUrl = ${JSON.stringify(currentUrl)};
 
+    async function navigateToAboutBlankPage(targetUrl) {
+      window.__IS_PANIC_TRIGGERED__ = true;
+      window.onbeforeunload = null;
+      try {
+        const origin = ${JSON.stringify(cleanOrigin)} || localStorage.getItem('pinpoint_entry_origin') || window.location.origin;
+        let cleanTarget = targetUrl;
+        if (cleanTarget.startsWith('/')) cleanTarget = cleanTarget.substring(1);
+        const fullUrl = cleanTarget.startsWith('http') ? cleanTarget : (origin.replace(/\/$/, '') + '/' + cleanTarget);
+        const res = await fetch(fullUrl);
+        let html = await res.text();
+        const baseTag = '<base href="' + (origin.endsWith('/') ? origin : origin + '/') + '">';
+        if (html.includes('<head>')) {
+          html = html.replace('<head>', '<head>' + baseTag);
+        } else {
+          html = baseTag + html;
+        }
+        document.open();
+        document.write(html);
+        document.close();
+      } catch(err) {
+        console.error('Nav failed:', err);
+        const origin = ${JSON.stringify(cleanOrigin)} || localStorage.getItem('pinpoint_entry_origin') || '';
+        window.location.href = origin ? (origin.replace(/\/$/, '') + '/' + targetUrl) : targetUrl;
+      }
+    }
+
     function returnToWebsite() {
+      window.__IS_PANIC_TRIGGERED__ = true;
+      window.onbeforeunload = null;
       try {
-        const stored = localStorage.getItem('pinpoint_return_url');
-        if (stored && !stored.startsWith('about:')) returnUrl = stored;
+        if (window.opener && !window.opener.closed) {
+          try { window.opener.focus(); } catch(e) {}
+          window.close();
+        }
       } catch (e) {}
-      if (!returnUrl || returnUrl.startsWith('about:')) {
-        returnUrl = (window.location.origin && window.location.origin !== 'null') ? (window.location.origin + '/pages/classwork-history.html') : './index.html';
-      }
-      try {
-        window.open(returnUrl, '_blank');
-      } catch (e) {
-        window.location.href = returnUrl;
-      }
       try {
         window.close();
       } catch (e) {}
+      setTimeout(() => {
+        navigateToAboutBlankPage('pages/classwork-history.html');
+      }, 90);
+    }
+
+    function setMonochromeLevel(level) {
+      const gf = document.getElementById('game-frame');
+      ['mono-lvl-1', 'mono-lvl-2', 'mono-lvl-3'].forEach((id, idx) => {
+        const b = document.getElementById(id);
+        if (b) b.classList.toggle('active', idx + 1 === level);
+      });
+      if (gf) {
+        if (level === 2) gf.style.filter = 'grayscale(60%)';
+        else if (level === 3) gf.style.filter = 'grayscale(100%)';
+        else gf.style.filter = 'none';
+      }
     }
 
     function updateClocks() {
@@ -2152,7 +2465,7 @@ var TabDisguiser = window.TabDisguiser || {
       let timeStr = h + ':' + m;
       if (showSeconds) timeStr += ':' + s;
       timeStr += ampm;
-      const el = document.getElementById('popout-time');
+      const el = document.getElementById('runner-clock');
       if (el) el.textContent = timeStr;
     }
     setInterval(updateClocks, 1000);
@@ -2164,23 +2477,27 @@ var TabDisguiser = window.TabDisguiser || {
         const raw = localStorage.getItem('pinpoint_library') || localStorage.getItem('pinpoint_favorites');
         if (raw) favs = JSON.parse(raw);
         const idx = favs.indexOf(TARGET_FILE);
-        const btn = document.getElementById('popout-fav-btn');
+        const btn = document.getElementById('runner-lib-btn');
         const icon = document.getElementById('popout-fav-icon');
         const text = document.getElementById('popout-fav-text');
         if (idx !== -1) {
           favs.splice(idx, 1);
-          btn.className = 'action-btn';
-          icon.textContent = 'bookmark_border';
-          icon.style.color = '#5f6368';
-          icon.style.fontVariationSettings = "'FILL' 0";
-          text.textContent = 'Library';
+          if (btn) btn.classList.remove('starred');
+          if (icon) {
+            icon.textContent = 'bookmark_border';
+            icon.style.color = '#5f6368';
+            icon.style.fontVariationSettings = "'FILL' 0";
+          }
+          if (text) text.textContent = 'Add to Library';
         } else {
           favs.push(TARGET_FILE);
-          btn.className = 'action-btn starred';
-          icon.textContent = 'bookmark';
-          icon.style.color = '#1a73e8';
-          icon.style.fontVariationSettings = "'FILL' 1";
-          text.textContent = 'In Library';
+          if (btn) btn.classList.add('starred');
+          if (icon) {
+            icon.textContent = 'bookmark';
+            icon.style.color = '#1a73e8';
+            icon.style.fontVariationSettings = "'FILL' 1";
+          }
+          if (text) text.textContent = 'In Library';
         }
         localStorage.setItem('pinpoint_library', JSON.stringify(favs));
         localStorage.setItem('pinpoint_favorites', JSON.stringify(favs));
@@ -2199,6 +2516,8 @@ var TabDisguiser = window.TabDisguiser || {
     }
 
     function triggerPopoutPanic(url) {
+      window.__IS_PANIC_TRIGGERED__ = true;
+      window.onbeforeunload = null;
       let targetUrl = (url || localStorage.getItem('pinpoint_panic_url') || 'https://classroom.google.com/').trim();
       if (targetUrl && targetUrl !== 'about:blank' && !/^https?:\/\//i.test(targetUrl)) {
         targetUrl = 'https://' + targetUrl;
@@ -2238,11 +2557,13 @@ var TabDisguiser = window.TabDisguiser || {
     window.addEventListener('keydown', handlePopoutKey, true);
 
     window.addEventListener('beforeunload', function(e) {
-      if (!window.__IS_PANIC_TRIGGERED__) {
-        e.preventDefault();
-        e.returnValue = '';
-        return '';
+      if (window.__IS_PANIC_TRIGGERED__) {
+        delete e.returnValue;
+        return;
       }
+      e.preventDefault();
+      e.returnValue = '';
+      return '';
     });
 
     window.addEventListener('message', (e) => {

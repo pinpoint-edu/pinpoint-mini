@@ -45,43 +45,92 @@
         localStorage.setItem('pinpoint_entry_origin', window.location.origin);
       } catch (e) {}
 
-      // Fallback if classroom.google.com cannot be loaded in frame
-      const iframe = document.getElementById('classroom-iframe');
-      if (iframe) {
-        iframe.addEventListener('error', function() {
-          try {
-            iframe.src = 'home.html';
-          } catch (err) {}
-        });
+      let cachedLoaderHtml = null;
+      fetch('loader.html').then(r => r.text()).then(t => { cachedLoaderHtml = t; }).catch(() => {});
+
+      let launched = false;
+
+      async function launchAboutBlank() {
+        if (launched) return;
+        launched = true;
+
+        // Open window synchronously in the user gesture handler to avoid popup blockers
+        let win = null;
+        try {
+          win = window.open('about:blank', '_blank');
+        } catch(e) {}
+
+        try {
+          const origin = window.location.origin;
+          const params = new URLSearchParams(window.location.search);
+          let target = params.get('target') || params.get('url') || params.get('page') || params.get('to');
+          if (target && target.startsWith('/')) {
+            target = target.substring(1);
+          }
+
+          let html = cachedLoaderHtml;
+          if (!html) {
+            const res = await fetch('loader.html');
+            html = await res.text();
+          }
+          
+          const baseTag = `<base href="${origin.endsWith('/') ? origin : origin + '/'}">`;
+          let injectedHtml = html;
+          if (injectedHtml.includes('<head>')) {
+            injectedHtml = injectedHtml.replace('<head>', '<head>' + baseTag);
+          } else {
+            injectedHtml = baseTag + injectedHtml;
+          }
+
+          if (target) {
+            injectedHtml = injectedHtml.replace('src="home.html"', 'src="' + target + '"');
+          }
+
+          if (win) {
+            win.document.open();
+            win.document.write(injectedHtml);
+            win.document.close();
+
+            try {
+              window.close();
+            } catch (e) {}
+            try {
+              window.location.replace('https://classroom.google.com');
+            } catch (e) {}
+          } else {
+            window.location.href = target ? ('loader.html?target=' + encodeURIComponent(target)) : 'loader.html';
+          }
+        } catch(err) {
+          console.error('Failed to load loader.html into about:blank:', err);
+          if (win) {
+            try { win.close(); } catch(e) {}
+          }
+          window.location.href = 'home.html';
+        }
       }
 
-      let redirected = false;
-
-      function redirectToHome(e) {
-        if (redirected) return;
-        redirected = true;
-
+      function handleTrigger(e) {
         if (e) {
           try {
             e.preventDefault();
             e.stopPropagation();
           } catch (err) {}
         }
-        window.location.href = 'home.html';
+        launchAboutBlank();
       }
 
       const overlay = document.getElementById('click-overlay');
       if (overlay) {
-        overlay.addEventListener('pointerdown', redirectToHome);
-        overlay.addEventListener('mousedown', redirectToHome);
-        overlay.addEventListener('click', redirectToHome);
-        overlay.addEventListener('touchstart', redirectToHome, { passive: false });
+        overlay.addEventListener('pointerdown', handleTrigger);
+        overlay.addEventListener('mousedown', handleTrigger);
+        overlay.addEventListener('click', handleTrigger);
+        overlay.addEventListener('touchstart', handleTrigger, { passive: false });
       }
-      window.addEventListener('pointerdown', redirectToHome);
-      window.addEventListener('mousedown', redirectToHome);
-      window.addEventListener('click', redirectToHome);
-      window.addEventListener('touchstart', redirectToHome, { passive: false });
-      window.addEventListener('keydown', redirectToHome);
+      window.addEventListener('pointerdown', handleTrigger);
+      window.addEventListener('mousedown', handleTrigger);
+      window.addEventListener('click', handleTrigger);
+      window.addEventListener('touchstart', handleTrigger, { passive: false });
+      window.addEventListener('keydown', handleTrigger);
     })();
   </script>
 </body>
