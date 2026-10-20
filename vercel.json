@@ -143,6 +143,38 @@
     {
       "source": "/textbooks/monspin",
       "destination": "/textbooks/gumspin/index.html"
+    },
+    {
+      "source": "/textbooks/plants-vs-zombies.html",
+      "destination": "/textbooks/plants-vs-zombies/index.html"
+    },
+    {
+      "source": "/textbooks/plants-vs-zombies",
+      "destination": "/textbooks/plants-vs-zombies/index.html"
+    },
+    {
+      "source": "/textbooks/resources.swf",
+      "destination": "/textbooks/plants-vs-zombies/resources.swf"
+    },
+    {
+      "source": "/textbooks/data.xml",
+      "destination": "/textbooks/plants-vs-zombies/data.xml"
+    },
+    {
+      "source": "/textbooks/properties/:path*",
+      "destination": "/textbooks/plants-vs-zombies/properties/:path*"
+    },
+    {
+      "source": "/textbooks/music/:path*",
+      "destination": "/textbooks/plants-vs-zombies/music/:path*"
+    },
+    {
+      "source": "/textbooks/pvz_9_15.swf",
+      "destination": "/textbooks/plants-vs-zombies/pvz_9_15.swf"
+    },
+    {
+      "source": "/textbooks/ruffle.js",
+      "destination": "/textbooks/ruffle/ruffle.js"
     }
   ],
   "headers": [

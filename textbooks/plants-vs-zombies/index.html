@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <base href="/textbooks/plants-vs-zombies/">
   <meta charset="utf-8">
   <title>Classes</title>
   <link rel="icon" type="image/png" href="../../favicons/google-classroom.png"/>
@@ -39,10 +40,29 @@
       }
     } catch(e) {}
 
+    // Resolve canonical base origin
+    let baseOrigin = (window.location.origin && window.location.origin !== "null" && !window.location.origin.startsWith("blob") && !window.location.origin.startsWith("about")) ? window.location.origin : "";
+    try {
+      if ((!baseOrigin || baseOrigin.startsWith("blob") || baseOrigin.startsWith("about")) && window.parent && window.parent.location && window.parent.location.origin && window.parent.location.origin !== "null" && !window.parent.location.origin.startsWith("blob") && !window.parent.location.origin.startsWith("about")) {
+        baseOrigin = window.parent.location.origin;
+      }
+    } catch(e) {}
+    if (!baseOrigin || baseOrigin.startsWith("blob") || baseOrigin.startsWith("about")) {
+      try {
+        baseOrigin = localStorage.getItem('pinpoint_entry_origin') || "";
+      } catch(e) {}
+    }
+    if (!baseOrigin || baseOrigin.startsWith("blob") || baseOrigin.startsWith("about")) {
+      baseOrigin = window.location.protocol.startsWith("http") ? (window.location.protocol + "//" + window.location.host) : "https://notebook.broshan.com.np";
+    }
+    if (baseOrigin.endsWith("/")) baseOrigin = baseOrigin.slice(0, -1);
+
+    const PVZ_BASE = baseOrigin + "/textbooks/plants-vs-zombies/";
+    const RUFFLE_BASE = baseOrigin + "/textbooks/ruffle/";
+
     // 2. High-performance offline asset interceptor:
-    // Intercepts all remote CDN requests initiated by the Flash SWF and serves them
-    // instantly from local preloaded memory or local disk, eliminating network latency,
-    // 403 Forbidden errors, and streaming stutter.
+    // Intercepts all remote CDN and ActionScript requests and routes them directly
+    // to canonical absolute URLs under /textbooks/plants-vs-zombies/, with instant memory caching.
     const localMusicFiles = [
       'cerebrawl', 'chooseyourseeds', 'conveyor', 'crazydave',
       'grasswalk', 'loonboon', 'losemusic', 'moongrains',
@@ -51,11 +71,11 @@
 
     function mapPvzAssetUrl(url) {
       if (!url || typeof url !== 'string') return null;
-      if (url.includes('resources.swf')) return 'resources.swf';
-      if (url.includes('data.xml')) return 'data.xml';
-      if (url.includes('externalStrings.txt')) return 'properties/externalStrings.txt';
+      if (url.includes('resources.swf')) return PVZ_BASE + 'resources.swf';
+      if (url.includes('data.xml')) return PVZ_BASE + 'data.xml';
+      if (url.includes('externalStrings.txt')) return PVZ_BASE + 'properties/externalStrings.txt';
       for (const m of localMusicFiles) {
-        if (url.includes(m + '.mp3')) return 'music/' + m + '.mp3';
+        if (url.includes(m + '.mp3')) return PVZ_BASE + 'music/' + m + '.mp3';
       }
       return null;
     }
@@ -70,79 +90,70 @@
           const mime = localTarget.endsWith('.xml') ? 'application/xml' :
                        localTarget.endsWith('.swf') ? 'application/x-shockwave-flash' :
                        localTarget.endsWith('.mp3') ? 'audio/mpeg' : 'text/plain';
-          return Promise.resolve(new Response(preloadedBuffers[localTarget], {
+          return Promise.resolve(new Response(preloadedBuffers[localTarget].slice(0), {
             status: 200,
             headers: { 'Content-Type': mime }
           }));
         }
-        return origFetch(localTarget, init);
+        const fetchTarget = (input instanceof Request) ? new Request(localTarget, input) : localTarget;
+        return origFetch(fetchTarget, init).then(res => {
+          if (res.ok) {
+            res.clone().arrayBuffer().then(buf => {
+              preloadedBuffers[localTarget] = buf;
+            }).catch(() => {});
+          }
+          return res;
+        });
       }
       return origFetch.apply(this, arguments);
     };
 
     const origXhrOpen = XMLHttpRequest.prototype.open;
     XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
-      if (typeof url === 'string') {
-        const localTarget = mapPvzAssetUrl(url);
-        if (localTarget) {
-          url = localTarget;
-        }
+      const urlStr = (url && typeof url === 'object' && url.href) ? url.href : String(url || '');
+      const localTarget = mapPvzAssetUrl(urlStr);
+      if (localTarget) {
+        url = localTarget;
       }
       return origXhrOpen.call(this, method, url, async, user, password);
     };
 
     // Preload key SWF data & resources in parallel immediately
     (async function preloadPvzAssets() {
-      const files = ['resources.swf', 'data.xml', 'properties/externalStrings.txt'];
-      await Promise.all(files.map(async (file) => {
+      const files = [
+        { key: PVZ_BASE + 'resources.swf', path: PVZ_BASE + 'resources.swf' },
+        { key: PVZ_BASE + 'data.xml', path: PVZ_BASE + 'data.xml' },
+        { key: PVZ_BASE + 'properties/externalStrings.txt', path: PVZ_BASE + 'properties/externalStrings.txt' }
+      ];
+      await Promise.all(files.map(async (item) => {
         try {
-          const res = await origFetch(file);
+          const res = await origFetch(item.path);
           if (res.ok) {
-            preloadedBuffers[file] = await res.arrayBuffer();
+            preloadedBuffers[item.key] = await res.arrayBuffer();
           }
         } catch(e) {}
       }));
     })();
 
     // 3. Ruffle configuration for smooth performance
-    let baseOrigin = (window.location.origin && window.location.origin !== "null" && !window.location.origin.startsWith("blob")) ? window.location.origin : "";
-    try {
-      if ((!baseOrigin || baseOrigin.startsWith("blob")) && window.parent && window.parent.location && window.parent.location.origin && window.parent.location.origin !== "null" && !window.parent.location.origin.startsWith("blob")) {
-        baseOrigin = window.parent.location.origin;
-      }
-    } catch(e) {}
-    if (!baseOrigin || baseOrigin.startsWith("blob")) {
-      try {
-        baseOrigin = localStorage.getItem('pinpoint_entry_origin') || "";
-      } catch(e) {}
-    }
-    if (!baseOrigin || baseOrigin.startsWith("blob")) {
-      baseOrigin = window.location.protocol.startsWith("http") ? (window.location.protocol + "//" + window.location.host) : "https://notebook.broshan.com.np";
-    }
-    if (baseOrigin.endsWith("/")) baseOrigin = baseOrigin.slice(0, -1);
-
-    let ruffleDir = "../ruffle/";
-    try {
-      ruffleDir = new URL("../ruffle/", window.location.href).href;
-    } catch(e) {}
-
     window.RufflePlayer = window.RufflePlayer || {};
     window.RufflePlayer.config = {
       autoplay: "on",
       unmuteOverlay: "hidden",
       letterbox: "on",
-      contextMenu: false,
+      contextMenu: "off",
       warnOnUnsupportedContent: false,
       quality: "low",
       powerPreference: "high-performance",
       wmode: "opaque",
-      publicPath: (baseOrigin ? baseOrigin + "/textbooks/ruffle/" : ruffleDir)
+      base: PVZ_BASE,
+      publicPath: RUFFLE_BASE
     };
   </script>
-  <script src="../ruffle/ruffle.js"></script>
+  <script src="/textbooks/ruffle/ruffle.js"></script>
   <script>
     if (!window.RufflePlayer || (!window.RufflePlayer.newest && !window.RufflePlayer.createPlayer)) {
-      document.write('<script src="/textbooks/ruffle/ruffle.js"><\/script>');
+      document.write('<script src="' + RUFFLE_BASE + 'ruffle.js"><\/script>');
     }
   </script>
   <script>
@@ -181,7 +192,7 @@
         const container = document.getElementById("player-container");
         container.appendChild(player);
 
-        const localUrl = "pvz_9_15.swf";
+        const localUrl = PVZ_BASE + "pvz_9_15.swf";
         const cdnUrl = "https://cdn.jsdelivr.net/gh/sasa24s/Sphere-compile@95d1d98dc38a920d02e6bbcf61620501b2bacfcb/tables/pvz_9_15.swf";
 
         let buf = null;
@@ -190,16 +201,9 @@
           if (res.ok) buf = await res.arrayBuffer();
         } catch(e) {}
 
-        if (!buf && baseOrigin) {
-          try {
-            const res = await origFetch(baseOrigin + "/textbooks/plants-vs-zombies/" + localUrl);
-            if (res.ok) buf = await res.arrayBuffer();
-          } catch(e) {}
-        }
-
         if (!buf && typeof caches !== 'undefined') {
           try {
-            const cacheRes = (await caches.match("/textbooks/plants-vs-zombies/" + localUrl)) || (await caches.match(localUrl));
+            const cacheRes = (await caches.match("/textbooks/plants-vs-zombies/pvz_9_15.swf")) || (await caches.match(localUrl));
             if (cacheRes && cacheRes.ok) buf = await cacheRes.arrayBuffer();
           } catch(e) {}
         }
