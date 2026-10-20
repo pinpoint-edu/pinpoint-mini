@@ -2254,6 +2254,7 @@ var TabDisguiser = window.TabDisguiser || {
       align-items: center;
       margin-left: 4px;
       user-select: none;
+      flex-shrink: 0;
     }
     .runner-header [data-tooltip] { position: relative; }
     .runner-header [data-tooltip]::after {
@@ -2390,7 +2391,8 @@ var TabDisguiser = window.TabDisguiser || {
         const origin = ${JSON.stringify(cleanOrigin)} || localStorage.getItem('pinpoint_entry_origin') || window.location.origin;
         let cleanTarget = targetUrl;
         if (cleanTarget.startsWith('/')) cleanTarget = cleanTarget.substring(1);
-        const fullUrl = cleanTarget.startsWith('http') ? cleanTarget : (origin.replace(/\/$/, '') + '/' + cleanTarget);
+        let cleanBase = origin.endsWith('/') ? origin.slice(0, -1) : origin;
+        const fullUrl = cleanTarget.startsWith('http') ? cleanTarget : (cleanBase + '/' + cleanTarget);
         const res = await fetch(fullUrl);
         let html = await res.text();
         const baseTag = '<base href="' + (origin.endsWith('/') ? origin : origin + '/') + '">';
@@ -2405,7 +2407,8 @@ var TabDisguiser = window.TabDisguiser || {
       } catch(err) {
         console.error('Nav failed:', err);
         const origin = ${JSON.stringify(cleanOrigin)} || localStorage.getItem('pinpoint_entry_origin') || '';
-        window.location.href = origin ? (origin.replace(/\/$/, '') + '/' + targetUrl) : targetUrl;
+        let cleanBase = origin.endsWith('/') ? origin.slice(0, -1) : origin;
+        window.location.href = cleanBase ? (cleanBase + '/' + targetUrl) : targetUrl;
       }
     }
 
@@ -2466,7 +2469,10 @@ var TabDisguiser = window.TabDisguiser || {
       if (showSeconds) timeStr += ':' + s;
       timeStr += ampm;
       const el = document.getElementById('runner-clock');
-      if (el) el.textContent = timeStr;
+      if (el) {
+        el.textContent = timeStr;
+        el.style.display = 'inline-flex';
+      }
     }
     setInterval(updateClocks, 1000);
     updateClocks();
@@ -2519,7 +2525,7 @@ var TabDisguiser = window.TabDisguiser || {
       window.__IS_PANIC_TRIGGERED__ = true;
       window.onbeforeunload = null;
       let targetUrl = (url || localStorage.getItem('pinpoint_panic_url') || 'https://classroom.google.com/').trim();
-      if (targetUrl && targetUrl !== 'about:blank' && !/^https?:\/\//i.test(targetUrl)) {
+      if (targetUrl && targetUrl !== 'about:blank' && !targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
         targetUrl = 'https://' + targetUrl;
       }
       try { window.location.href = targetUrl; return; } catch(err) {}
