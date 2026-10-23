@@ -231,6 +231,13 @@
         // Intercept global link and element clicks
         document.addEventListener('click', function(e) {
             if (window.__IS_PANIC_TRIGGERED__ || (window.top && window.top.__IS_PANIC_TRIGGERED__)) return;
+            if (e.target.closest && e.target.closest('[data-fake-class="true"]')) {
+                if (!e.target.closest('[data-class-options-btn="true"]')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                return;
+            }
             let anchor = e.target.closest('a');
             let clickable = anchor || e.target.closest('[data-href], [onclick], .game-row, .uTwgne, .slDfNd');
             

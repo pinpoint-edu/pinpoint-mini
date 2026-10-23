@@ -2425,8 +2425,16 @@ function adjustTextbooksHeight() {
 
 document.addEventListener('DOMContentLoaded', () => {
   TabDisguiser.init();
+  if (typeof TabDisguiser.applyClassConfig === 'function') {
+    TabDisguiser.applyClassConfig();
+  }
   renderTextbooks();
   adjustTextbooksHeight();
+});
+window.addEventListener('storage', (e) => {
+  if (e.key === 'pinpoint_classroom_config' && typeof TabDisguiser !== 'undefined' && typeof TabDisguiser.applyClassConfig === 'function') {
+    TabDisguiser.applyClassConfig();
+  }
 });
 window.addEventListener('resize', adjustTextbooksHeight);
 window.addEventListener('keydown', (e) => {

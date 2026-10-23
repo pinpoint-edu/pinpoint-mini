@@ -74,7 +74,43 @@ var TabDisguiser = window.TabDisguiser || {
     },
 
     interceptLinks() {
+        if (this._linksIntercepted) return;
+        this._linksIntercepted = true;
+        if (!this._storageClassBound) {
+            this._storageClassBound = true;
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'pinpoint_classroom_config') {
+                    this.applyClassConfig();
+                }
+            });
+        }
         document.addEventListener('click', (e) => {
+            const addBtn = e.target.closest('button[jsname="mSMdM"], .XGLVqf button[aria-label="Create or join a class"], .XGLVqf button[aria-label="Join class"], li[jsname="SLuNwd"], li[jsname="svCv4e"], [data-open-class-manager="true"]');
+            if (addBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+                this.openClassManagerModal();
+                return;
+            }
+
+            const optBtn = e.target.closest('[data-class-options-btn="true"]');
+            if (optBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+                const cid = optBtn.getAttribute('data-class-id') || null;
+                this.openClassManagerModal(cid);
+                return;
+            }
+
+            if (e.target.closest('[data-fake-class="true"]')) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+                return;
+            }
+
             const link = e.target.closest('a');
             if (!link) return;
 
@@ -432,33 +468,107 @@ var TabDisguiser = window.TabDisguiser || {
         });
     },
 
+    escapeHtml(str) {
+        return String(str == null ? '' : str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    },
+
+    normalizeClassesConfig(parsed) {
+        if (!parsed || typeof parsed !== 'object') parsed = {};
+        if (parsed.english) {
+            if (parsed.english.name === 'English I_Third' || parsed.english.name === 'English 1' || parsed.english.name === 'English') parsed.english.name = 'World History';
+            if (parsed.english.sec === 'Third' || parsed.english.sec === 'Period 3') parsed.english.sec = '';
+            if (parsed.english.teacher && (parsed.english.teacher.includes('Wukotich') || parsed.english.teacher.includes('Allison'))) parsed.english.teacher = '';
+        }
+        if (parsed.history) {
+            if (parsed.history.name === '4th Period World History' || parsed.history.name === 'World History_Fourth') parsed.history.name = 'World History';
+            if (parsed.history.sec === '4th Period' || parsed.history.sec === 'Period 4') parsed.history.sec = '';
+            if (parsed.history.teacher && (parsed.history.teacher.includes('Jenkins') || parsed.history.teacher.includes('Jim'))) parsed.history.teacher = '';
+        }
+        if (parsed.music) {
+            if (parsed.music.teacher) parsed.music.teacher = '';
+        }
+
+        const baseHistory = parsed.history || parsed.english || {
+            name: 'World History',
+            sec: '',
+            teacher: '',
+            room: '',
+            banner: 'WorldHistory.jpg'
+        };
+
+        if (!Array.isArray(parsed.classes) || parsed.classes.length === 0) {
+            parsed.classes = [
+                {
+                    id: 'class_default',
+                    name: (baseHistory.name || 'World History').trim() || 'World History',
+                    teacher: (baseHistory.teacher || '').trim(),
+                    sec: (baseHistory.sec || '').trim(),
+                    banner: ((baseHistory.banner || 'WorldHistory.jpg') + '').replace(/^(\.\.\/|\.\/)?images\//, ''),
+                    hasGames: true
+                }
+            ];
+        } else {
+            let foundGames = false;
+            parsed.classes = parsed.classes.map((cls, idx) => {
+                const cObj = cls && typeof cls === 'object' ? cls : {};
+                const isGames = !foundGames && !!cObj.hasGames;
+                if (isGames) foundGames = true;
+                return {
+                    id: String(cObj.id || ('class_' + (idx + 1))),
+                    name: String(cObj.name || 'World History').trim() || 'World History',
+                    teacher: String(cObj.teacher || '').trim(),
+                    sec: String(cObj.sec || '').trim(),
+                    banner: String(cObj.banner || 'WorldHistory.jpg').replace(/^(\.\.\/|\.\/)?images\//, ''),
+                    hasGames: isGames
+                };
+            });
+            if (!foundGames && parsed.classes.length > 0) {
+                parsed.classes[0].hasGames = true;
+            }
+        }
+
+        const activeGamesClass = parsed.classes.find(c => c.hasGames) || parsed.classes[0];
+        parsed.gamesClassId = activeGamesClass.id;
+        parsed.history = {
+            name: activeGamesClass.name,
+            sec: activeGamesClass.sec || '',
+            teacher: activeGamesClass.teacher || '',
+            room: '',
+            banner: activeGamesClass.banner || 'WorldHistory.jpg'
+        };
+        parsed.english = Object.assign({}, parsed.history);
+        if (!parsed.music) {
+            parsed.music = { name: 'Music Production', sec: '', teacher: '', room: '' };
+        }
+        if (parsed.navbarClock === undefined) {
+            parsed.navbarClock = true;
+        }
+        return parsed;
+    },
+
     getClassConfig() {
         try {
             const raw = localStorage.getItem('pinpoint_classroom_config');
             if (raw) {
                 const parsed = JSON.parse(raw);
-                if (parsed.english) {
-                    if (parsed.english.name === 'English I_Third' || parsed.english.name === 'English 1' || parsed.english.name === 'English') parsed.english.name = 'World History';
-                    if (parsed.english.sec === 'Third' || parsed.english.sec === 'Period 3') parsed.english.sec = '';
-                    if (parsed.english.teacher && (parsed.english.teacher.includes('Wukotich') || parsed.english.teacher.includes('Allison'))) parsed.english.teacher = '';
-                }
-                if (parsed.history) {
-                    if (parsed.history.name === '4th Period World History' || parsed.history.name === 'World History_Fourth') parsed.history.name = 'World History';
-                    if (parsed.history.sec === '4th Period' || parsed.history.sec === 'Period 4') parsed.history.sec = '';
-                    if (parsed.history.teacher && (parsed.history.teacher.includes('Jenkins') || parsed.history.teacher.includes('Jim'))) parsed.history.teacher = '';
-                }
-                if (parsed.music) {
-                    if (parsed.music.teacher) parsed.music.teacher = '';
-                }
-                return parsed;
+                return this.normalizeClassesConfig(parsed);
             }
         } catch (e) {}
-        return {
-            english: { name: 'World History', sec: '', teacher: '', room: '', banner: 'WorldHistory.jpg' },
-            history: { name: 'World History', sec: '', teacher: '', room: '', banner: 'WorldHistory.jpg' },
-            music: { name: 'Music Production', sec: '', teacher: '', room: '' },
-            navbarClock: true
-        };
+        return this.normalizeClassesConfig({});
+    },
+
+    saveClassConfig(cfg) {
+        const normalized = this.normalizeClassesConfig(cfg);
+        try {
+            localStorage.setItem('pinpoint_classroom_config', JSON.stringify(normalized));
+        } catch (e) {}
+        this.applyClassConfig();
+        return normalized;
     },
 
     getBannerColor(bannerFileName) {
@@ -474,6 +584,25 @@ var TabDisguiser = window.TabDisguiser || {
         };
     },
 
+    CLASSROOM_BANNERS: [
+        { id: 'WorldHistory.jpg', name: 'World History' },
+        { id: 'english.jpg', name: 'English' },
+        { id: 'Math.jpg', name: 'Math' },
+        { id: 'Chemistry.jpg', name: 'Chemistry' },
+        { id: 'Geometry.jpg', name: 'Geometry' },
+        { id: 'SocialStudies.jpg', name: 'Social Studies' },
+        { id: 'Design.jpg', name: 'Design' },
+        { id: 'music.jpg', name: 'Music' },
+        { id: 'img_backtoschool.jpg', name: 'Back to School' },
+        { id: 'img_bookclub.jpg', name: 'Book Club' },
+        { id: 'img_breakfast.jpg', name: 'Cooking' },
+        { id: 'img_code.jpg', name: 'Coding' },
+        { id: 'img_gamenight.jpg', name: 'Game Night' },
+        { id: 'img_learninstrument.jpg', name: 'Instruments' },
+        { id: 'img_learnlanguage.jpg', name: 'Languages' },
+        { id: 'img_read.jpg', name: 'Reading' }
+    ],
+
     getClassThemeColor(name, bannerFileName) {
         const bColors = this.getBannerColor(bannerFileName);
         return {
@@ -485,24 +614,214 @@ var TabDisguiser = window.TabDisguiser || {
         };
     },
 
+    buildSidebarClassesHtml(cfg, activePage, historyNavUrl) {
+        const normalized = this.normalizeClassesConfig(cfg || this.getClassConfig());
+        const classes = normalized.classes || [];
+        const isHistoryActive = (activePage === 'history' || activePage === 'english');
+
+        return classes.map((cls) => {
+            const cName = (cls.name || 'Untitled Class').trim();
+            const safeName = this.escapeHtml(cName);
+            const letter = this.escapeHtml((cName[0] || 'C').toUpperCase());
+            const bannerFile = (cls.banner || 'WorldHistory.jpg').replace(/^(\.\.\/|\.\/)?images\//, '');
+            const circleTheme = this.getClassThemeColor(cName, bannerFile);
+
+            if (cls.hasGames) {
+                const selectedClass = isHistoryActive ? 'selected' : '';
+                const textClass = isHistoryActive ? 'XL4gNd' : 'GRvzhf';
+                return '<a aria-current="' + (isHistoryActive ? 'page' : 'false') + '" aria-label="' + safeName + '" class="uTwgne ' + selectedClass + '" data-id="854642477833" data-class-id="' + this.escapeHtml(cls.id) + '" href="' + historyNavUrl + '" role="menuitem" tabindex="0">' +
+                    '<div class="pzaVke"><span class="dNKuRb NJyEeb"></span><div class="NsMoi"></div></div>' +
+                    '<div class="kWQ5wd"><div class="CNpREd"><div aria-hidden="true" class="JShLh TGnLfc VjRxGc FeltXd uUMf4c" style="background-color:' + circleTheme.bg + ' !important; color:' + circleTheme.text + ' !important;">' + letter + '</div></div></div>' +
+                    '<div class="Ij01W"><div class="' + textClass + ' YVvGBb">' + safeName + '</div></div>' +
+                    '</a>';
+            } else {
+                return '<a aria-current="false" aria-label="' + safeName + '" class="uTwgne" data-fake-class="true" data-class-id="' + this.escapeHtml(cls.id) + '" href="javascript:void(0)" onclick="event.preventDefault(); event.stopPropagation(); return false;" role="menuitem" tabindex="0" style="cursor:pointer;">' +
+                    '<div class="pzaVke"><span class="dNKuRb NJyEeb"></span><div class="NsMoi"></div></div>' +
+                    '<div class="kWQ5wd"><div class="CNpREd"><div aria-hidden="true" class="JShLh TGnLfc VjRxGc FeltXd uUMf4c" style="background-color:' + circleTheme.bg + ' !important; color:' + circleTheme.text + ' !important;">' + letter + '</div></div></div>' +
+                    '<div class="Ij01W"><div class="GRvzhf YVvGBb">' + safeName + '</div></div>' +
+                    '</a>';
+            }
+        }).join('');
+    },
+
+    renderSidebarClasses() {
+        const path = (window.__CURRENT_PAGE__ || window.location.pathname || '').toLowerCase();
+        const isPages = path.includes('/pages/') || path.includes('\\pages\\') || path.startsWith('pages/');
+        const isMediaMarketing = path.includes('media-marketing');
+        const isRoot = !isPages && !isMediaMarketing;
+        const isFile = window.location.protocol === 'file:';
+        const isAboutBlank = (window.location.protocol === 'about:' || window.location.href === 'about:blank' || window.location.href.startsWith('about:'));
+        const pagesPrefix = isAboutBlank ? '#pages' : (isFile ? (isPages ? '.' : (isRoot ? './pages' : '../pages')) : '/pages');
+        const historyNavUrl = isAboutBlank ? '#pages/history.html' : (pagesPrefix + '/history.html');
+
+        let activePage = 'home';
+        if (path.includes('classwork-history') || path.includes('classwork-english') || path.includes('classwork') || path.includes('history') || path.includes('english')) {
+            activePage = 'history';
+        } else if (path.includes('ai')) {
+            activePage = 'ai';
+        } else if (path.includes('settings')) {
+            activePage = 'settings';
+        }
+
+        const cfg = this.getClassConfig();
+        const classesHtml = this.buildSidebarClassesHtml(cfg, activePage, historyNavUrl);
+        const todoHtml = '<a aria-current="false" aria-label="To-do" class="uTwgne nav-decorative" href="javascript:void(0)" role="menuitem" style="pointer-events:none;opacity:0.5;cursor:default;" tabindex="-1"><div class="pzaVke"><span class="dNKuRb NJyEeb"></span><div class="NsMoi"></div></div><div class="npdi5 ykp8pd"><svg class="NMm5M" enable-background="new 0 0 24 24" focusable="false" height="24" viewBox="0 0 24 24" width="24"><g><rect fill="none" height="24" width="24"></rect></g><g><g><path d="M20,3H4C2.9,3,2,3.9,2,5v14c0,1.1,0.9,2,2,2h16c1.1,0,2-0.9,2-2V5 C22,3.9,21.1,3,20,3z M20,19H4V5h16V19z" fill-rule="evenodd"></path><polygon fill-rule="evenodd" points="19.41,10.42 17.99,9 14.82,12.17 13.41,10.75 12,12.16 14.82,15"></polygon><rect fill-rule="evenodd" height="2" width="5" x="5" y="7"></rect><rect fill-rule="evenodd" height="2" width="5" x="5" y="15"></rect><rect fill-rule="evenodd" height="2" width="5" x="5" y="15"></rect></g></g></svg></div><div class="Ij01W"><div class="GRvzhf YVvGBb">To-do</div></div></a>';
+
+        document.querySelectorAll('nav.STek2d div[aria-label="Enrolled"][role="group"], .ETRkCe div[aria-label="Enrolled"][role="group"]').forEach(group => {
+            group.innerHTML = todoHtml + classesHtml;
+        });
+
+        this.fitSidebarButtons();
+    },
+
+    renderHomeClassCards() {
+        const listEl = document.querySelector('ol.JwPp0e.J9ecJc');
+        if (!listEl) return;
+
+        const path = (window.__CURRENT_PAGE__ || window.location.pathname || '').toLowerCase();
+        const isPages = path.includes('/pages/') || path.includes('\\pages\\') || path.startsWith('pages/');
+        const isFile = window.location.protocol === 'file:';
+        const isAboutBlank = (window.location.protocol === 'about:' || window.location.href === 'about:blank' || window.location.href.startsWith('about:'));
+
+        const historyHref = isAboutBlank ? '#pages/history.html' : (isFile ? './pages/history.html' : '/pages/history.html');
+        const classworkHref = isAboutBlank ? '#pages/classwork-history.html' : (isFile ? './pages/classwork-history.html' : '/pages/classwork-history.html');
+        const imgPrefix = isPages ? '../images/' : './images/';
+
+        const cfg = this.getClassConfig();
+        const classes = cfg.classes || [];
+
+        const cardsHtml = classes.map((cls) => {
+            const cName = (cls.name || 'Untitled Class').trim();
+            const safeName = this.escapeHtml(cName);
+            const teacher = (cls.teacher !== undefined ? cls.teacher : (cls.sec || '')).trim();
+            const safeTeacher = this.escapeHtml(teacher);
+            const bannerFile = (cls.banner || 'WorldHistory.jpg').replace(/^(\.\.\/|\.\/)?images\//, '');
+            const bannerUrl = imgPrefix + bannerFile;
+            const safeClassId = this.escapeHtml(cls.id);
+
+            if (cls.hasGames) {
+                return '<li class="gHz6xd riU7le rZXyy" data-draggable-item-id="854642477833" data-user-id="10000000001" data-course-id="854642477833" data-class-id="' + safeClassId + '">' +
+                    '<div class="Tc9hUd CNpREd g2MItd">' +
+                        '<div class="OjOEXb" style="background-image: url(&quot;' + bannerUrl + '&quot;) !important;"></div>' +
+                        '<div class="ZizeYd ml1ZL lmPo4" style="display:none !important;opacity:0 !important;"></div>' +
+                        '<div class="R4EiSb">' +
+                            '<a class="slDfNd ZmqAt z07MGc" target="_self" aria-hidden="true" tabindex="-1" href="' + historyHref + '"></a>' +
+                            '<h2 class="prWPdf">' +
+                                '<a class="slDfNd Vu2fZd z07MGc" target="_self" href="' + historyHref + '" data-focus-id="/u/2/c/ODU0NjQyNDc3ODMz">' +
+                                    '<div class="ScpeUc Vu2fZd XwD7Ke">' + safeName + '</div>' +
+                                    '<div class="FWGURc Vu2fZd Svw0vd"></div>' +
+                                '</a>' +
+                                '<a class="slDfNd z07MGc" target="_self" aria-hidden="true" tabindex="-1" href="' + historyHref + '"> </a>' +
+                            '</h2>' +
+                            '<div class="gmNu1d">' +
+                                '<div class="z07MGc Vu2fZd jJIbcc T30lh">' + safeTeacher + '</div>' +
+                                '<div class="lJv9ke"></div>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="joT7of"><div class="TQYOZc"><div><div class="xo2x2e AX2up"><span class="Y5vSD">No work due soon</span><span class="nforOe">Woohoo, no work due soon!</span></div></div></div></div>' +
+                    '<div class="SZ0kZe">' +
+                        '<span data-is-tooltip-wrapper="true">' +
+                            '<div class="pYTkkf-Bz112c-LgbsSe pYTkkf-Bz112c-LgbsSe-OWXEXe-SfQLQb-suEOdc" style="cursor:pointer;position:relative;" onclick="if(window.navigateToAboutBlankPage){window.navigateToAboutBlankPage(\'pages/classwork-history.html\');return false;}">' +
+                                '<span class="UTNHae"></span>' +
+                                '<span aria-hidden="true" class="pYTkkf-Bz112c-kBDsod-Rtc0Jf"><span class="notranslate VfPpkd-kBDsod" aria-hidden="true"><svg focusable="false" width="24" height="24" viewBox="0 0 24 24" class="NMm5M"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7.55 0c.14-.15.33-.25.55-.25s.41.1.55.25c.12.13.2.31.2.5 0 .41-.34.75-.75.75s-.75-.34-.75-.75c0-.19.08-.37.2-.5zM19 5v10.79C16.52 14.37 13.23 14 12 14s-4.52.37-7 1.79V5h14zM5 19v-.77C6.74 16.66 10.32 16 12 16s5.26.66 7 2.23V19H5z"/><path d="M12 13c1.94 0 3.5-1.56 3.5-3.5S13.94 6 12 6 8.5 7.56 8.5 9.5 10.06 13 12 13zm0-5c.83 0 1.5.67 1.5 1.5S12.83 11 12 11s-1.5-.67-1.5-1.5S11.17 8 12 8z"/></svg></span></span>' +
+                                '<a class="pYTkkf-Bz112c-mRLv6 pYTkkf-Bz112c-RLmnJb" href="' + classworkHref + '" aria-label="Open your work for &quot;' + safeName + '&quot;" style="position:absolute;inset:0;width:100%;height:100%;z-index:10;cursor:pointer;"></a>' +
+                                '<span class="XjoK4b pYTkkf-Bz112c-UHGRz"></span>' +
+                            '</div>' +
+                        '</span>' +
+                        '<div><span data-is-tooltip-wrapper="true">' +
+                            '<div class="pYTkkf-Bz112c-LgbsSe pYTkkf-Bz112c-LgbsSe-OWXEXe-SfQLQb-suEOdc dNcx9b" style="cursor:pointer;position:relative;" onclick="event.preventDefault();event.stopPropagation();return false;">' +
+                                '<span class="UTNHae"></span>' +
+                                '<span aria-hidden="true" class="pYTkkf-Bz112c-kBDsod-Rtc0Jf"><span class="notranslate VfPpkd-kBDsod" aria-hidden="true"><svg focusable="false" width="24" height="24" viewBox="0 0 24 24" class="NMm5M"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg></span></span>' +
+                                '<a class="pYTkkf-Bz112c-mRLv6 pYTkkf-Bz112c-RLmnJb" href="javascript:void(0)" onclick="event.preventDefault();event.stopPropagation();return false;" aria-label="Open folder for &quot;' + safeName + '&quot; in Google Drive" style="position:absolute;inset:0;width:100%;height:100%;z-index:10;cursor:pointer;"></a>' +
+                                '<span class="XjoK4b pYTkkf-Bz112c-UHGRz"></span>' +
+                            '</div>' +
+                        '</span></div>' +
+                        '<div><div class="tB5Jxf-xl07Ob-XxIAqe-OWXEXe-oYxtQd">' +
+                            '<div><span data-is-tooltip-wrapper="true">' +
+                                '<button class="pYTkkf-Bz112c-LgbsSe pYTkkf-Bz112c-LgbsSe-OWXEXe-SfQLQb-suEOdc" type="button" data-class-options-btn="true" data-class-id="' + safeClassId + '" onclick="event.preventDefault();event.stopPropagation();TabDisguiser.openClassManagerModal(\'' + safeClassId + '\');return false;" aria-label="Class options for ' + safeName + '" title="Manage class">' +
+                                    '<span class="XjoK4b pYTkkf-Bz112c-UHGRz"></span>' +
+                                    '<span class="UTNHae"></span>' +
+                                    '<span aria-hidden="true" class="pYTkkf-Bz112c-kBDsod-Rtc0Jf"><span class="notranslate VfPpkd-kBDsod" aria-hidden="true"><svg focusable="false" width="24" height="24" viewBox="0 0 24 24" class="NMm5M"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" fill="currentColor"/></svg></span></span>' +
+                                    '<div class="pYTkkf-Bz112c-RLmnJb"></div>' +
+                                '</button>' +
+                            '</span></div>' +
+                        '</div></div>' +
+                    '</div>' +
+                '</li>';
+            } else {
+                return '<li class="gHz6xd riU7le rZXyy" data-fake-class="true" data-draggable-item-id="' + safeClassId + '" data-user-id="10000000001" data-course-id="' + safeClassId + '" data-class-id="' + safeClassId + '">' +
+                    '<div class="Tc9hUd CNpREd g2MItd" data-fake-class="true">' +
+                        '<div class="OjOEXb" style="background-image: url(&quot;' + bannerUrl + '&quot;) !important;"></div>' +
+                        '<div class="ZizeYd ml1ZL lmPo4" style="display:none !important;opacity:0 !important;"></div>' +
+                        '<div class="R4EiSb" data-fake-class="true">' +
+                            '<a class="slDfNd ZmqAt z07MGc" data-fake-class="true" target="_self" aria-hidden="true" tabindex="-1" href="javascript:void(0)" onclick="event.preventDefault();event.stopPropagation();return false;" style="cursor:pointer;"></a>' +
+                            '<h2 class="prWPdf">' +
+                                '<a class="slDfNd Vu2fZd z07MGc" data-fake-class="true" target="_self" href="javascript:void(0)" onclick="event.preventDefault();event.stopPropagation();return false;" style="cursor:pointer;">' +
+                                    '<div class="ScpeUc Vu2fZd XwD7Ke">' + safeName + '</div>' +
+                                    '<div class="FWGURc Vu2fZd Svw0vd"></div>' +
+                                '</a>' +
+                                '<a class="slDfNd z07MGc" data-fake-class="true" target="_self" aria-hidden="true" tabindex="-1" href="javascript:void(0)" onclick="event.preventDefault();event.stopPropagation();return false;"> </a>' +
+                            '</h2>' +
+                            '<div class="gmNu1d">' +
+                                '<div class="z07MGc Vu2fZd jJIbcc T30lh">' + safeTeacher + '</div>' +
+                                '<div class="lJv9ke"></div>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="joT7of" data-fake-class="true"><div class="TQYOZc"><div><div class="xo2x2e AX2up"><span class="Y5vSD">No work due soon</span><span class="nforOe">Woohoo, no work due soon!</span></div></div></div></div>' +
+                    '<div class="SZ0kZe" data-fake-class="true">' +
+                        '<span data-is-tooltip-wrapper="true">' +
+                            '<div class="pYTkkf-Bz112c-LgbsSe pYTkkf-Bz112c-LgbsSe-OWXEXe-SfQLQb-suEOdc" data-fake-class="true" style="cursor:pointer;position:relative;" onclick="event.preventDefault();event.stopPropagation();return false;">' +
+                                '<span class="UTNHae"></span>' +
+                                '<span aria-hidden="true" class="pYTkkf-Bz112c-kBDsod-Rtc0Jf"><span class="notranslate VfPpkd-kBDsod" aria-hidden="true"><svg focusable="false" width="24" height="24" viewBox="0 0 24 24" class="NMm5M"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7.55 0c.14-.15.33-.25.55-.25s.41.1.55.25c.12.13.2.31.2.5 0 .41-.34.75-.75.75s-.75-.34-.75-.75c0-.19.08-.37.2-.5zM19 5v10.79C16.52 14.37 13.23 14 12 14s-4.52.37-7 1.79V5h14zM5 19v-.77C6.74 16.66 10.32 16 12 16s5.26.66 7 2.23V19H5z"/><path d="M12 13c1.94 0 3.5-1.56 3.5-3.5S13.94 6 12 6 8.5 7.56 8.5 9.5 10.06 13 12 13zm0-5c.83 0 1.5.67 1.5 1.5S12.83 11 12 11s-1.5-.67-1.5-1.5S11.17 8 12 8z"/></svg></span></span>' +
+                                '<a class="pYTkkf-Bz112c-mRLv6 pYTkkf-Bz112c-RLmnJb" data-fake-class="true" href="javascript:void(0)" onclick="event.preventDefault();event.stopPropagation();return false;" aria-label="Open your work for &quot;' + safeName + '&quot;" style="position:absolute;inset:0;width:100%;height:100%;z-index:10;cursor:pointer;"></a>' +
+                                '<span class="XjoK4b pYTkkf-Bz112c-UHGRz"></span>' +
+                            '</div>' +
+                        '</span>' +
+                        '<div><span data-is-tooltip-wrapper="true">' +
+                            '<div class="pYTkkf-Bz112c-LgbsSe pYTkkf-Bz112c-LgbsSe-OWXEXe-SfQLQb-suEOdc dNcx9b" data-fake-class="true" style="cursor:pointer;position:relative;" onclick="event.preventDefault();event.stopPropagation();return false;">' +
+                                '<span class="UTNHae"></span>' +
+                                '<span aria-hidden="true" class="pYTkkf-Bz112c-kBDsod-Rtc0Jf"><span class="notranslate VfPpkd-kBDsod" aria-hidden="true"><svg focusable="false" width="24" height="24" viewBox="0 0 24 24" class="NMm5M"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg></span></span>' +
+                                '<a class="pYTkkf-Bz112c-mRLv6 pYTkkf-Bz112c-RLmnJb" data-fake-class="true" href="javascript:void(0)" onclick="event.preventDefault();event.stopPropagation();return false;" aria-label="Open folder for &quot;' + safeName + '&quot; in Google Drive" style="position:absolute;inset:0;width:100%;height:100%;z-index:10;cursor:pointer;"></a>' +
+                                '<span class="XjoK4b pYTkkf-Bz112c-UHGRz"></span>' +
+                            '</div>' +
+                        '</span></div>' +
+                        '<div><div class="tB5Jxf-xl07Ob-XxIAqe-OWXEXe-oYxtQd">' +
+                            '<div><span data-is-tooltip-wrapper="true">' +
+                                '<button class="pYTkkf-Bz112c-LgbsSe pYTkkf-Bz112c-LgbsSe-OWXEXe-SfQLQb-suEOdc" type="button" data-class-options-btn="true" data-class-id="' + safeClassId + '" onclick="event.preventDefault();event.stopPropagation();TabDisguiser.openClassManagerModal(\'' + safeClassId + '\');return false;" aria-label="Class options for ' + safeName + '" title="Manage class">' +
+                                    '<span class="XjoK4b pYTkkf-Bz112c-UHGRz"></span>' +
+                                    '<span class="UTNHae"></span>' +
+                                    '<span aria-hidden="true" class="pYTkkf-Bz112c-kBDsod-Rtc0Jf"><span class="notranslate VfPpkd-kBDsod" aria-hidden="true"><svg focusable="false" width="24" height="24" viewBox="0 0 24 24" class="NMm5M"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" fill="currentColor"/></svg></span></span>' +
+                                    '<div class="pYTkkf-Bz112c-RLmnJb"></div>' +
+                                '</button>' +
+                            '</span></div>' +
+                        '</div></div>' +
+                    '</div>' +
+                '</li>';
+            }
+        }).join('');
+
+        listEl.innerHTML = cardsHtml;
+    },
+
+    bindHomeAddClassButtons() {
+        document.querySelectorAll('button[jsname="mSMdM"], .XGLVqf button, li[jsname="SLuNwd"], li[jsname="svCv4e"], [data-open-class-manager="true"]').forEach(btn => {
+            if (btn._pinpointClassMgrBound) return;
+            btn._pinpointClassMgrBound = true;
+            btn.setAttribute('data-open-class-manager', 'true');
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+                this.openClassManagerModal();
+            }, true);
+        });
+    },
+
     applyClassConfig() {
         const cfg = this.getClassConfig();
         const historyCfg = cfg.history || cfg.english || {};
-        const cardTitles = document.querySelectorAll('.ScpeUc.Vu2fZd.XwD7Ke');
-        if (cardTitles.length >= 1 && historyCfg.name) {
-            cardTitles[0].textContent = historyCfg.name;
-        }
-        if (cardTitles.length >= 2 && cfg.music && cfg.music.name) {
-            cardTitles[1].textContent = cfg.music.name;
-        }
-
-        const cardTeachers = document.querySelectorAll('.z07MGc.Vu2fZd.jJIbcc.T30lh');
-        if (cardTeachers.length >= 1) {
-            cardTeachers[0].textContent = historyCfg.teacher || '';
-        }
-        if (cardTeachers.length >= 2 && cfg.music && cfg.music.teacher !== undefined) {
-            cardTeachers[1].textContent = cfg.music.teacher;
-        }
 
         const rawPath = window.__CURRENT_PAGE__ || window.location.pathname || '';
         const path = rawPath.toLowerCase();
@@ -510,7 +829,10 @@ var TabDisguiser = window.TabDisguiser || {
         const isHistory = !isClasswork && (path.includes('history') || path.includes('english'));
         const isEnglish = !isClasswork && path.includes('english');
         const isMusic = path.includes('music');
-        const isMediaMarketing = path.includes('media-marketing');
+
+        this.renderHomeClassCards();
+        this.bindHomeAddClassButtons();
+        this.renderSidebarClasses();
 
         const pageHeader = document.querySelector('h1.tNGpbb');
         if (pageHeader) {
@@ -527,30 +849,24 @@ var TabDisguiser = window.TabDisguiser || {
         }
 
         const secEl = document.querySelector('.FWGURc.Vu2fZd');
-        if (secEl) {
-            if (isEnglish && cfg.english && cfg.english.sec) secEl.textContent = cfg.english.sec;
-            if (isHistory && cfg.history && cfg.history.sec) secEl.textContent = cfg.history.sec;
-            if (isMusic && cfg.music && cfg.music.sec) secEl.textContent = cfg.music.sec;
+        if (secEl && (isHistory || isEnglish || isMusic)) {
+            if (isEnglish && cfg.english && cfg.english.sec !== undefined) secEl.textContent = cfg.english.sec;
+            if (isHistory && cfg.history && cfg.history.sec !== undefined) secEl.textContent = cfg.history.sec;
+            if (isMusic && cfg.music && cfg.music.sec !== undefined) secEl.textContent = cfg.music.sec;
         }
 
-        document.querySelectorAll('.GRvzhf.YVvGBb, .XL4gNd.YVvGBb').forEach(el => {
-            const txt = el.textContent.trim();
-            if (txt.includes('English') || txt === 'English 1') {
-                if (cfg.english && cfg.english.name) el.textContent = cfg.english.name;
-            } else if (txt.includes('History') || txt === 'World History') {
-                if (cfg.history && cfg.history.name) el.textContent = cfg.history.name;
-            } else if (txt.includes('Music') || txt === 'Music Production') {
-                if (cfg.music && cfg.music.name) el.textContent = cfg.music.name;
-            }
-        });
+        const bannerSec = document.getElementById('banner-teacher-section') || document.querySelector('.T4tcpe .XbzULd');
+        if (bannerSec && (isHistory || isEnglish)) {
+            bannerSec.textContent = historyCfg.teacher || historyCfg.sec || '';
+        }
 
         this.setTitle(this.getCanonicalPageTitle());
 
         const bannerFile = (historyCfg.banner || 'WorldHistory.jpg').replace(/^(\.\.\/|\.\/)?images\//, '');
-        const isPagesPath = path.includes('/pages/') || path.includes('\\pages\\');
+        const isPagesPath = path.includes('/pages/') || path.includes('\\pages\\') || path.startsWith('pages/');
         const bannerUrl = (isPagesPath ? '../images/' : './images/') + bannerFile;
-        document.querySelectorAll('.PFLqgc.KFl4Z, .OjOEXb').forEach(b => {
-            b.style.backgroundImage = 'url("' + bannerUrl + '")';
+        document.querySelectorAll('.PFLqgc, li[data-course-id="854642477833"] .OjOEXb').forEach(b => {
+            b.style.setProperty('background-image', 'url("' + bannerUrl + '")', 'important');
         });
 
         // Remove tint overlay on home card
@@ -563,10 +879,25 @@ var TabDisguiser = window.TabDisguiser || {
         const letter = (activeTitle[0] || 'W').toUpperCase();
         const themeColor = this.getClassThemeColor(activeTitle, bannerFile);
 
-        document.querySelectorAll('nav.STek2d a[data-id="854642477833"] .JShLh, nav.STek2d .CNpREd .JShLh, .sidebar .JShLh, .kWQ5wd .JShLh').forEach(c => {
+        const fastStyle = document.getElementById('pinpoint-fast-cache-style');
+        if (fastStyle) {
+            fastStyle.textContent =
+                '.PFLqgc, .PFLqgc.KFl4Z, li[data-course-id="854642477833"] .OjOEXb, .qyN25 [style*="WorldHistory.jpg"] { background-image: url("' + bannerUrl + '") !important; } ' +
+                '.Tc9hUd .ZizeYd, .Tc9hUd .ZizeYd.ml1ZL, .Tc9hUd .lmPo4 { display: none !important; opacity: 0 !important; } ' +
+                'nav.STek2d a[data-id="854642477833"] .JShLh { background-color: ' + themeColor.bg + ' !important; color: ' + themeColor.text + ' !important; } ' +
+                'nav.STek2d a.uTwgne[aria-current="page"], nav.STek2d a.uTwgne.selected { background-color: ' + themeColor.sidebarBg + ' !important; } ' +
+                'nav.STek2d a.uTwgne[aria-current="page"]:hover, nav.STek2d a.uTwgne.selected:hover { background-color: ' + themeColor.sidebarHover + ' !important; } ' +
+                '#stream-announcement-avatar, .JZicYb .Cxyznd.MwOlIe { background-color: ' + themeColor.bg + ' !important; } ' +
+                '#stream-announcement-icon, .JZicYb .Cxyznd.MwOlIe .material-symbols-outlined { color: ' + themeColor.text + ' !important; fill: ' + themeColor.text + ' !important; } ';
+        }
+
+        document.querySelectorAll('nav.STek2d a[data-id="854642477833"] .JShLh').forEach(c => {
             c.textContent = letter;
             c.style.setProperty('background-color', themeColor.bg, 'important');
             c.style.setProperty('color', themeColor.text, 'important');
+        });
+        document.querySelectorAll('nav.STek2d a[data-id="854642477833"] .YVvGBb').forEach(el => {
+            el.textContent = activeTitle;
         });
 
         document.querySelectorAll('#stream-announcement-avatar, .JZicYb .Cxyznd.MwOlIe').forEach(c => {
@@ -649,12 +980,15 @@ var TabDisguiser = window.TabDisguiser || {
 
         let breadcrumbHtml = '';
         if (subpageTitle) {
-            breadcrumbHtml = '<span aria-hidden="true" class="notranslate ykp8pd cGvavf gmNu1d fcsk5 RN7s4b"><svg class="NMm5M hhikbc" focusable="false" height="18" viewBox="0 0 24 24" width="18"><path d="M7.59 18.59L9 20l8-8-8-8-1.41 1.41L14.17 12"></path></svg></span><a class="LNBrBd CYP1kd cGvavf gmNu1d eCXkGb fcsk5 sXIFDb" href="' + subpageUrl + '" target="_self"><span class="Vu2fZd LNBrBd gycFA" id="UGb2Qe">' + subpageTitle + '</span></a>';
+            breadcrumbHtml = '<span aria-hidden="true" class="notranslate ykp8pd cGvavf gmNu1d fcsk5 RN7s4b"><svg class="NMm5M hhikbc" focusable="false" height="18" viewBox="0 0 24 24" width="18"><path d="M7.59 18.59L9 20l8-8-8-8-1.41 1.41L14.17 12"></path></svg></span><a class="LNBrBd CYP1kd cGvavf gmNu1d eCXkGb fcsk5 sXIFDb" href="' + subpageUrl + '" target="_self"><span class="Vu2fZd LNBrBd gycFA" id="UGb2Qe">' + this.escapeHtml(subpageTitle) + '</span></a>';
         }
 
         const headerNav = document.querySelector('nav.joJglb');
         if (headerNav) {
-            headerNav.innerHTML = '<div class="gmNu1d"><div class="FXKA9c"><div class="XIpEib gmNu1d"><div class="k43Owe mmOZjd" data-focus-id="JUeBdc"><div id="ow21"><span data-is-tooltip-wrapper="true"><button id="pinpoint-hamburger-btn" aria-controls="-uQIZnf" aria-expanded="true" aria-label="Main Menu" class="pYTkkf-Bz112c-LgbsSe pYTkkf-Bz112c-LgbsSe-OWXEXe-SfQLQb-suEOdc ykp8pd oxacD" style="cursor:pointer;" type="button"><span class="XjoK4b pYTkkf-Bz112c-UHGRz"></span><span class="UTNHae"></span><span aria-hidden="true" class="pYTkkf-Bz112c-kBDsod-Rtc0Jf"><span aria-hidden="true" class="notranslate VfPpkd-kBDsod"><svg class="NMm5M" focusable="false" height="24" viewBox="0 0 24 24" width="24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path></svg></span></span><div class="pYTkkf-Bz112c-RLmnJb"></div></button></span></div></div><h1 class="Hwv4mb rIyhE" data-impressions-entry-point="17"><a class="CbuVcc CYP1kd cGvavf gmNu1d y183Ub fcsk5" data-focus-id="titlebar-home" href="' + homeUrl + '" target="_self"><img alt="Google Classroom" class="UAJaRc" src="' + (isFile ? (rootPrefix + '/images/logo_square_rounded.svg') : '/images/logo_square_rounded.svg') + '"/><span class="dR850e FkiMUb">Classroom</span></a>' + breadcrumbHtml + '</h1></div></div><div class="R2tE8e VHRSDf gmNu1d"></div><div class="Mtd4hb gmNu1d" style="display:flex;align-items:center;gap:16px;padding-right:24px;"><div id="nav-clock-display" class="static-clock-display" style="font-size:14px;font-weight:500;color:#5f6368;font-variant-numeric:tabular-nums;font-family:\'Google Sans\',Roboto,sans-serif;display:inline-flex;align-items:center;cursor:pointer;user-select:none;" title="Fullscreen Clock"></div><svg class="NMm5M" focusable="false" height="24" viewBox="0 0 24 24" width="24" style="color:#5f6368;fill:#5f6368;cursor:pointer;"><path d="M6,8c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM12,20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM6,20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM6,14c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM12,14c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM16,6c0,1.1 0.9,2 2,2s2,-0.9 2,-2 -0.9,-2 -2,-2 -2,0.9 -2,2zM12,8c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM18,14c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM18,20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2z"></path></svg><img src="https://lh3.googleusercontent.com/a/default-user=s40-c" alt="Avatar" style="width:32px;height:32px;border-radius:50%;cursor:pointer;"></div></div>';
+            const topAddClassBtnHtml = (activePage === 'home')
+                ? '<button type="button" data-open-class-manager="true" onclick="TabDisguiser.openClassManagerModal(); return false;" aria-label="Create or join a class" title="Add or manage classes" style="width:40px;height:40px;border-radius:50%;border:none;background:transparent;color:#5f6368;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background=\'rgba(60,64,67,0.08)\'" onmouseout="this.style.background=\'transparent\'"><svg focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></button>'
+                : '';
+            headerNav.innerHTML = '<div class="gmNu1d"><div class="FXKA9c"><div class="XIpEib gmNu1d"><div class="k43Owe mmOZjd" data-focus-id="JUeBdc"><div id="ow21"><span data-is-tooltip-wrapper="true"><button id="pinpoint-hamburger-btn" aria-controls="-uQIZnf" aria-expanded="true" aria-label="Main Menu" class="pYTkkf-Bz112c-LgbsSe pYTkkf-Bz112c-LgbsSe-OWXEXe-SfQLQb-suEOdc ykp8pd oxacD" style="cursor:pointer;" type="button"><span class="XjoK4b pYTkkf-Bz112c-UHGRz"></span><span class="UTNHae"></span><span aria-hidden="true" class="pYTkkf-Bz112c-kBDsod-Rtc0Jf"><span aria-hidden="true" class="notranslate VfPpkd-kBDsod"><svg class="NMm5M" focusable="false" height="24" viewBox="0 0 24 24" width="24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path></svg></span></span><div class="pYTkkf-Bz112c-RLmnJb"></div></button></span></div></div><h1 class="Hwv4mb rIyhE" data-impressions-entry-point="17"><a class="CbuVcc CYP1kd cGvavf gmNu1d y183Ub fcsk5" data-focus-id="titlebar-home" href="' + homeUrl + '" target="_self"><img alt="Google Classroom" class="UAJaRc" src="' + (isFile ? (rootPrefix + '/images/logo_square_rounded.svg') : '/images/logo_square_rounded.svg') + '"/><span class="dR850e FkiMUb">Classroom</span></a>' + breadcrumbHtml + '</h1></div></div><div class="R2tE8e VHRSDf gmNu1d"></div><div class="Mtd4hb gmNu1d" style="display:flex;align-items:center;gap:12px;padding-right:24px;"><div id="nav-clock-display" class="static-clock-display" style="font-size:14px;font-weight:500;color:#5f6368;font-variant-numeric:tabular-nums;font-family:\'Google Sans\',Roboto,sans-serif;display:inline-flex;align-items:center;cursor:pointer;user-select:none;" title="Fullscreen Clock"></div>' + topAddClassBtnHtml + '<svg class="NMm5M" focusable="false" height="24" viewBox="0 0 24 24" width="24" style="color:#5f6368;fill:#5f6368;cursor:pointer;"><path d="M6,8c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM12,20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM6,20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM6,14c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM12,14c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM16,6c0,1.1 0.9,2 2,2s2,-0.9 2,-2 -0.9,-2 -2,-2 -2,0.9 -2,2zM12,8c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM18,14c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM18,20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2z"></path></svg><img src="https://lh3.googleusercontent.com/a/default-user=s40-c" alt="Avatar" style="width:32px;height:32px;border-radius:50%;cursor:pointer;"></div></div>';
             const navClock = document.getElementById('nav-clock-display');
             if (navClock) {
                 navClock.onclick = (e) => {
@@ -670,10 +1004,7 @@ var TabDisguiser = window.TabDisguiser || {
             const historyNavUrl = isAboutBlank ? '#pages/history.html' : (pagesPrefix + '/history.html');
             const settingsNavUrl = isAboutBlank ? '#pages/settings.html' : (pagesPrefix + '/settings.html');
 
-                const circleLetter = (hisTitle.trim()[0] || 'W').toUpperCase();
-                const hisBanner = (cfg.history && cfg.history.banner) || 'WorldHistory.jpg';
-                const circleTheme = this.getClassThemeColor(hisTitle, hisBanner);
-                const classItemHtml = '<a aria-current="' + (activePage === 'history' || activePage === 'english' ? 'page' : 'false') + '" aria-label="' + hisTitle + '" class="uTwgne ' + (activePage === 'history' || activePage === 'english' ? 'selected' : '') + '" data-id="854642477833" href="' + historyNavUrl + '" role="menuitem" tabindex="0"><div class="pzaVke"><span class="dNKuRb NJyEeb"></span><div class="NsMoi"></div></div><div class="kWQ5wd"><div class="CNpREd"><div aria-hidden="true" class="JShLh TGnLfc VjRxGc FeltXd uUMf4c" style="background-color:' + circleTheme.bg + ' !important; color:' + circleTheme.text + ' !important;">' + circleLetter + '</div></div></div><div class="Ij01W"><div class="' + (activePage === 'history' || activePage === 'english' ? 'XL4gNd' : 'GRvzhf') + ' YVvGBb">' + hisTitle + '</div></div></a>';
+            const classItemHtml = this.buildSidebarClassesHtml(cfg, activePage, historyNavUrl);
 
             const baseNavHtml = '<a aria-current="' + (activePage === 'home' ? 'page' : 'false') + '" aria-label="Home" class="uTwgne TbJ0Pc ' + (activePage === 'home' ? 'selected' : '') + '" href="' + homeUrl + '" role="menuitem" tabindex="0"><div class="pzaVke"><span class="dNKuRb NJyEeb"></span><div class="NsMoi"></div></div><div class="npdi5 ykp8pd"><svg class="NMm5M" focusable="false" height="24" viewBox="0 0 24 24" width="24"><path d="M12 3L4 9v12h16V9l-8-6zm6 16h-3v-6H9v6H6v-9l6-4.5 6 4.5v9z"></path></svg></div><div class="Ij01W"><div class="' + (activePage === 'home' ? 'XL4gNd' : 'GRvzhf') + ' YVvGBb">Home</div></div></a>' +
                 '<a aria-current="false" aria-label="Calendar" class="uTwgne TbJ0Pc nav-decorative" href="javascript:void(0)" role="menuitem" style="pointer-events:none;opacity:0.5;cursor:default;" tabindex="-1"><div class="pzaVke"><span class="dNKuRb NJyEeb"></span><div class="NsMoi"></div></div><div class="npdi5 ykp8pd"><svg class="NMm5M" focusable="false" height="24" viewBox="0 0 24 24" width="24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"></path></svg></div><div class="Ij01W"><div class="GRvzhf YVvGBb">Calendar</div></div></a>' +
@@ -697,6 +1028,9 @@ var TabDisguiser = window.TabDisguiser || {
                 new ResizeObserver(() => this.fitSidebarButtons()).observe(sidebarNav);
             }
         }
+
+        this.bindHomeAddClassButtons();
+        this.renderHomeClassCards();
 
         const hamburgerBtn = document.getElementById('pinpoint-hamburger-btn') || document.querySelector('button[aria-label="Main Menu"]');
         if (hamburgerBtn) {
@@ -2010,6 +2344,650 @@ var TabDisguiser = window.TabDisguiser || {
         this.setIntroSlide(0);
     },
 
+    _cmEditingClassId: null,
+    _cmSelectedBanner: 'WorldHistory.jpg',
+    _cmMakeGamesClass: false,
+
+    async ensureClassManagerStyles() {
+        if (!document.getElementById('pinpoint-sharp-icons-font')) {
+            const link = document.createElement('link');
+            link.id = 'pinpoint-sharp-icons-font';
+            link.rel = 'stylesheet';
+            link.href = 'https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block';
+            document.head.appendChild(link);
+        }
+        try {
+            if (document.fonts && document.fonts.load) {
+                await Promise.race([
+                    document.fonts.load('24px "Material Symbols Sharp"'),
+                    new Promise(resolve => setTimeout(resolve, 350))
+                ]);
+            }
+        } catch (e) {}
+
+        let style = document.getElementById('pinpoint-class-manager-style');
+        if (!style) {
+            style = document.createElement('style');
+            style.id = 'pinpoint-class-manager-style';
+            document.head.appendChild(style);
+        }
+        style.textContent = `
+            @keyframes pinpointIntroFade {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            .material-symbols-sharp {
+                font-family: 'Material Symbols Sharp' !important;
+                font-weight: normal !important;
+                font-style: normal !important;
+                font-size: 24px;
+                line-height: 1;
+                letter-spacing: normal;
+                text-transform: none;
+                display: inline-block;
+                white-space: nowrap;
+                word-wrap: normal;
+                direction: ltr;
+                -webkit-font-feature-settings: 'liga';
+                -webkit-font-smoothing: antialiased;
+                font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
+                overflow: hidden !important;
+                width: 1em !important;
+                height: 1em !important;
+                text-align: center !important;
+                vertical-align: middle !important;
+            }
+            .pinpoint-intro-fullscreen {
+                position: fixed !important;
+                inset: 0 !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                background: #ffffff !important;
+                z-index: 2147483647 !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: space-between !important;
+                padding: clamp(20px, 3.5vw, 40px) clamp(24px, 5vw, 64px) !important;
+                box-sizing: border-box !important;
+                overflow-y: auto !important;
+                font-family: 'Google Sans Text', 'Google Sans', Roboto, -apple-system, BlinkMacSystemFont, Arial, sans-serif !important;
+                animation: pinpointIntroFade 0.2s ease-out !important;
+            }
+            .pinpoint-intro-top-row {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: flex-start !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+                flex-shrink: 0 !important;
+            }
+            .pinpoint-close-circle-btn {
+                height: 32px !important;
+                padding: 0 14px 0 10px !important;
+                border-radius: 99px !important;
+                background: #f1f3f4 !important;
+                border: 1px solid #dadce0 !important;
+                color: #5f6368 !important;
+                font-size: 13px !important;
+                font-weight: 500 !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                gap: 6px !important;
+                cursor: pointer !important;
+                transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.1s ease !important;
+                user-select: none !important;
+            }
+            .pinpoint-close-circle-btn:hover {
+                background: #e8eaed !important;
+                color: #1f1f1f !important;
+                border-color: #c4c7c5 !important;
+            }
+            .pinpoint-intro-body {
+                display: flex !important;
+                flex-direction: column !important;
+                width: 100% !important;
+                margin: auto 0 !important;
+                padding: 20px 0 !important;
+                box-sizing: border-box !important;
+            }
+            .pinpoint-intro-header-left {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                text-align: left !important;
+                width: 100% !important;
+                max-width: 1180px !important;
+                box-sizing: border-box !important;
+            }
+            .pinpoint-intro-title {
+                font-size: clamp(28px, 3.6vw, 46px) !important;
+                font-weight: 500 !important;
+                color: #1f1f1f !important;
+                line-height: 1.15 !important;
+                letter-spacing: -0.5px !important;
+                margin: 0 !important;
+                text-align: left !important;
+            }
+            .pinpoint-intro-subtitle {
+                font-size: clamp(14px, 1.4vw, 18px) !important;
+                font-weight: 400 !important;
+                color: #5f6368 !important;
+                line-height: 1.5 !important;
+                max-width: 900px !important;
+                margin: 10px 0 0 0 !important;
+                text-align: left !important;
+            }
+            .pinpoint-bullet-circle {
+                width: 46px !important;
+                height: 46px !important;
+                min-width: 46px !important;
+                border-radius: 50% !important;
+                background: #f1f3f4;
+                border: 1px solid #dadce0;
+                color: #444746;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                flex-shrink: 0 !important;
+                box-shadow: 0 1px 3px rgba(60,64,67,0.08) !important;
+                font-weight: 600 !important;
+                font-size: 18px !important;
+            }
+            .pinpoint-copy-circle-btn {
+                background: #f1f3f4 !important;
+                border: 1px solid #dadce0 !important;
+                border-radius: 20px !important;
+                padding: 7px 16px !important;
+                font-size: 13px !important;
+                font-weight: 500 !important;
+                color: #3c4043 !important;
+                cursor: pointer !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                gap: 6px !important;
+                font-family: inherit !important;
+                transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease, border-color 0.15s ease !important;
+                white-space: nowrap !important;
+            }
+            .pinpoint-copy-circle-btn:hover {
+                background: #e3e5e8 !important;
+                color: #1f1f1f !important;
+            }
+            .pinpoint-copy-circle-btn:active {
+                transform: scale(0.96) !important;
+            }
+            .pinpoint-intro-bottom-row {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+                padding-top: 16px !important;
+                margin-top: auto !important;
+                flex-shrink: 0 !important;
+            }
+            .pinpoint-nav-circle-btn {
+                width: 64px !important;
+                height: 64px !important;
+                min-width: 64px !important;
+                border-radius: 50% !important;
+                background: #f1f3f4 !important;
+                border: 1px solid #dadce0 !important;
+                color: #3c4043 !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                cursor: pointer !important;
+                transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease, border-color 0.15s ease !important;
+                user-select: none !important;
+                padding: 0 !important;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06) !important;
+            }
+            .pinpoint-nav-circle-btn:hover {
+                background: #e3e5e8 !important;
+                color: #1f1f1f !important;
+                border-color: #c4c7c5 !important;
+                transform: translateY(-1px) !important;
+            }
+            .pinpoint-cm-grid {
+                display: grid !important;
+                grid-template-columns: 1.05fr 1fr !important;
+                gap: 32px !important;
+                width: 100% !important;
+                max-width: 1240px !important;
+                margin-top: 28px !important;
+                align-items: start !important;
+            }
+            @media (max-width: 960px) {
+                .pinpoint-cm-grid {
+                    grid-template-columns: 1fr !important;
+                }
+            }
+            .pinpoint-cm-panel {
+                background: #f8f9fa !important;
+                border: 1px solid #dadce0 !important;
+                border-radius: 24px !important;
+                padding: 24px !important;
+                box-sizing: border-box !important;
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 16px !important;
+            }
+            .pinpoint-cm-class-row {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                gap: 14px !important;
+                background: #ffffff !important;
+                border: 1px solid #dadce0 !important;
+                border-radius: 18px !important;
+                padding: 14px 16px !important;
+                transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+                flex-wrap: wrap !important;
+            }
+            .pinpoint-cm-class-row.is-games-class {
+                border: 2px solid #1a73e8 !important;
+                box-shadow: 0 2px 10px rgba(26,115,232,0.10) !important;
+            }
+            .pinpoint-cm-input {
+                width: 100% !important;
+                padding: 11px 16px !important;
+                border: 1px solid #dadce0 !important;
+                border-radius: 14px !important;
+                font-size: 14px !important;
+                font-family: inherit !important;
+                color: #1f1f1f !important;
+                background: #ffffff !important;
+                box-sizing: border-box !important;
+                outline: none !important;
+                transition: border-color 0.15s ease !important;
+            }
+            .pinpoint-cm-input:focus {
+                border-color: #1a73e8 !important;
+            }
+            .pinpoint-cm-banners {
+                display: grid !important;
+                grid-template-columns: repeat(4, 1fr) !important;
+                gap: 8px !important;
+            }
+            @media (max-width: 520px) {
+                .pinpoint-cm-banners {
+                    grid-template-columns: repeat(2, 1fr) !important;
+                }
+            }
+        `;
+    },
+
+    async openClassManagerModal(editClassId = null) {
+        await this.ensureClassManagerStyles();
+
+        const cfg = this.getClassConfig();
+        const classes = cfg.classes || [];
+
+        if (editClassId) {
+            const target = classes.find(c => c.id === editClassId);
+            if (target) {
+                this._cmEditingClassId = target.id;
+                this._cmSelectedBanner = (target.banner || 'WorldHistory.jpg').replace(/^(\.\.\/|\.\/)?images\//, '');
+                this._cmMakeGamesClass = !!target.hasGames;
+            } else {
+                this._cmEditingClassId = null;
+                this._cmSelectedBanner = 'Math.jpg';
+                this._cmMakeGamesClass = false;
+            }
+        } else {
+            this._cmEditingClassId = null;
+            this._cmSelectedBanner = 'Math.jpg';
+            this._cmMakeGamesClass = false;
+        }
+
+        let modal = document.getElementById('pinpoint-class-manager-modal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'pinpoint-class-manager-modal';
+            modal.className = 'pinpoint-intro-fullscreen';
+            document.body.appendChild(modal);
+        }
+        modal.style.setProperty('display', 'flex', 'important');
+        this.renderClassManagerContent();
+    },
+
+    closeClassManagerModal(e) {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        const modal = document.getElementById('pinpoint-class-manager-modal');
+        if (modal) {
+            modal.remove();
+        }
+    },
+
+    renderClassManagerContent() {
+        const modal = document.getElementById('pinpoint-class-manager-modal');
+        if (!modal) return;
+
+        const path = (window.__CURRENT_PAGE__ || window.location.pathname || '').toLowerCase();
+        const isPages = path.includes('/pages/') || path.includes('\\pages\\') || path.startsWith('pages/');
+        const imgPrefix = isPages ? '../images/' : './images/';
+
+        const cfg = this.getClassConfig();
+        const classes = cfg.classes || [];
+        const editingCls = this._cmEditingClassId ? classes.find(c => c.id === this._cmEditingClassId) : null;
+
+        const nameInputEl = document.getElementById('cm-class-name');
+        const teacherInputEl = document.getElementById('cm-class-teacher');
+        const currentNameVal = editingCls
+            ? (nameInputEl && modal.getAttribute('data-editing-id') === editingCls.id ? nameInputEl.value : (editingCls.name || ''))
+            : (nameInputEl && !modal.getAttribute('data-editing-id') ? nameInputEl.value : '');
+        const currentTeacherVal = editingCls
+            ? (teacherInputEl && modal.getAttribute('data-editing-id') === editingCls.id ? teacherInputEl.value : (editingCls.teacher || editingCls.sec || ''))
+            : (teacherInputEl && !modal.getAttribute('data-editing-id') ? teacherInputEl.value : '');
+
+        modal.setAttribute('data-editing-id', editingCls ? editingCls.id : '');
+
+        const activeGamesCls = classes.find(c => c.hasGames) || classes[0];
+        const fakeCount = classes.filter(c => !c.hasGames).length;
+
+        const classesListHtml = classes.map((cls) => {
+            const cName = (cls.name || 'Untitled Class').trim();
+            const safeName = this.escapeHtml(cName);
+            const teacher = (cls.teacher || cls.sec || '').trim();
+            const safeTeacher = this.escapeHtml(teacher);
+            const letter = this.escapeHtml((cName[0] || 'C').toUpperCase());
+            const bannerFile = (cls.banner || 'WorldHistory.jpg').replace(/^(\.\.\/|\.\/)?images\//, '');
+            const theme = this.getClassThemeColor(cName, bannerFile);
+            const safeId = this.escapeHtml(cls.id);
+
+            const statusBadge = cls.hasGames
+                ? '<span style="display:inline-flex;align-items:center;gap:5px;background:#e8f0fe;color:#1a73e8;border:1px solid #d2e3fc;border-radius:99px;padding:3px 10px;font-size:11.5px;font-weight:600;"><span class="material-symbols-sharp notranslate" style="font-size:14px;color:#1a73e8;">sports_esports</span>Games Class (Redirects to Games)</span>'
+                : '<span style="display:inline-flex;align-items:center;gap:5px;background:#f1f3f4;color:#5f6368;border:1px solid #dadce0;border-radius:99px;padding:3px 10px;font-size:11.5px;font-weight:500;"><span class="material-symbols-sharp notranslate" style="font-size:14px;color:#5f6368;">block</span>Fake Placeholder (No Redirect)</span>';
+
+            const setGamesBtn = cls.hasGames
+                ? '<button type="button" class="pinpoint-copy-circle-btn" style="background:#e6f4ea !important;border-color:#ceead6 !important;color:#137333 !important;cursor:default !important;" disabled><span class="material-symbols-sharp notranslate" style="font-size:16px;color:#137333;">check_circle</span><span>Has Games</span></button>'
+                : '<button type="button" class="pinpoint-copy-circle-btn" style="background:#e8f0fe !important;border-color:#d2e3fc !important;color:#1a73e8 !important;" onclick="TabDisguiser.setGamesClass(\'' + safeId + '\')"><span class="material-symbols-sharp notranslate" style="font-size:16px;color:#1a73e8;">sports_esports</span><span>Put Games Here</span></button>';
+
+            const deleteBtn = classes.length > 1
+                ? '<button type="button" class="pinpoint-copy-circle-btn" style="background:#fce8e6 !important;border-color:#fad2cf !important;color:#c5221f !important;padding:7px 11px !important;" onclick="TabDisguiser.deleteClassInManager(\'' + safeId + '\')" title="Remove class"><span class="material-symbols-sharp notranslate" style="font-size:16px;color:#c5221f;">delete</span></button>'
+                : '';
+
+            return '<div class="pinpoint-cm-class-row ' + (cls.hasGames ? 'is-games-class' : '') + '">' +
+                '<div style="display:flex;align-items:center;gap:14px;min-width:0;flex:1;">' +
+                    '<div class="pinpoint-bullet-circle" style="background:' + theme.bg + ';border-color:' + theme.bg + ';color:' + theme.text + ';">' + letter + '</div>' +
+                    '<div style="display:flex;flex-direction:column;gap:4px;min-width:0;flex:1;">' +
+                        '<div style="font-size:16px;font-weight:500;color:#1f1f1f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + safeName + '</div>' +
+                        (safeTeacher ? '<div style="font-size:13px;color:#5f6368;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + safeTeacher + '</div>' : '') +
+                        '<div style="margin-top:2px;">' + statusBadge + '</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+                    setGamesBtn +
+                    '<button type="button" class="pinpoint-copy-circle-btn" onclick="TabDisguiser.editClassInManager(\'' + safeId + '\')">' +
+                        '<span class="material-symbols-sharp notranslate" style="font-size:16px;">edit</span>' +
+                        '<span>Edit</span>' +
+                    '</button>' +
+                    deleteBtn +
+                '</div>' +
+            '</div>';
+        }).join('');
+
+        const bannersHtml = this.CLASSROOM_BANNERS.map((b) => {
+            const isSelected = (b.id === this._cmSelectedBanner);
+            const bUrl = imgPrefix + b.id;
+            return '<div onclick="TabDisguiser.selectClassManagerBanner(\'' + b.id + '\')" style="height:56px;border-radius:12px;cursor:pointer;position:relative;background-image:url(\'' + bUrl + '\');background-size:cover;background-position:center;transition:all 0.15s ease;box-shadow:0 1px 3px rgba(0,0,0,0.12);' + (isSelected ? 'outline:3px solid #1a73e8;outline-offset:1px;' : 'outline:1px solid rgba(0,0,0,0.1);') + '">' +
+                '<div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 65%);border-radius:12px;pointer-events:none;"></div>' +
+                '<div style="position:absolute;bottom:4px;left:7px;right:7px;font-size:11px;font-weight:500;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px rgba(0,0,0,0.8);">' + this.escapeHtml(b.name) + '</div>' +
+                (isSelected ? '<span class="material-symbols-sharp notranslate" style="position:absolute;top:4px;right:4px;font-size:14px;background:#1a73e8;color:#fff;border-radius:50%;padding:2px;width:18px !important;height:18px !important;display:inline-flex !important;align-items:center !important;justify-content:center !important;">check</span>' : '') +
+            '</div>';
+        }).join('');
+
+        modal.innerHTML = `
+            <div class="pinpoint-intro-top-row">
+                <button class="pinpoint-close-circle-btn" type="button" onclick="TabDisguiser.closeClassManagerModal(event)" title="Close" aria-label="Close">
+                    <span class="material-symbols-sharp notranslate" style="font-size:16px;line-height:1;pointer-events:none;">close</span>
+                    <span>Close</span>
+                </button>
+            </div>
+
+            <div class="pinpoint-intro-body">
+                <div class="pinpoint-intro-header-left">
+                    <h1 class="pinpoint-intro-title">Manage Classes</h1>
+                    <p class="pinpoint-intro-subtitle">
+                        Create fake placeholder classes (which never redirect anywhere when clicked) and choose which class holds your games.
+                    </p>
+                </div>
+
+                <div class="pinpoint-cm-grid">
+                    <!-- Left Column: Class List & Active Games Selector -->
+                    <div class="pinpoint-cm-panel">
+                        <div style="display:flex;align-items:center;gap:14px;">
+                            <div class="pinpoint-bullet-circle" style="background:#e8f0fe;border-color:#d2e3fc;color:#1a73e8;">
+                                <span class="material-symbols-sharp notranslate" style="color:#1a73e8;">sports_esports</span>
+                            </div>
+                            <div>
+                                <div style="font-size:18px;font-weight:500;color:#1f1f1f;">Your Classes &amp; Games Location</div>
+                                <div style="font-size:13.5px;color:#5f6368;">Click <b>Put Games Here</b> on any class to move your games into it. All other classes stay on Home without redirecting.</div>
+                            </div>
+                        </div>
+
+                        <div style="display:flex;flex-direction:column;gap:10px;max-height:420px;overflow-y:auto;padding-right:2px;">
+                            ${classesListHtml}
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Add Fake Class / Edit Class Form -->
+                    <div class="pinpoint-cm-panel">
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+                            <div style="display:flex;align-items:center;gap:14px;">
+                                <div class="pinpoint-bullet-circle" style="background:${editingCls ? '#fef7e0' : '#e6f4ea'};border-color:${editingCls ? '#fce8b2' : '#ceead6'};color:${editingCls ? '#ea8600' : '#137333'};">
+                                    <span class="material-symbols-sharp notranslate" style="color:${editingCls ? '#ea8600' : '#137333'};">${editingCls ? 'edit' : 'add'}</span>
+                                </div>
+                                <div>
+                                    <div style="font-size:18px;font-weight:500;color:#1f1f1f;">${editingCls ? 'Edit Class' : 'Add Fake Class'}</div>
+                                    <div style="font-size:13.5px;color:#5f6368;">${editingCls ? 'Update the name, teacher, banner, or game status for this class.' : 'Create a realistic placeholder class card and sidebar item.'}</div>
+                                </div>
+                            </div>
+                            ${editingCls ? `
+                                <button type="button" class="pinpoint-copy-circle-btn" onclick="TabDisguiser.cancelEditClassInManager()">
+                                    <span class="material-symbols-sharp notranslate" style="font-size:16px;">close</span>
+                                    <span>Cancel Edit</span>
+                                </button>
+                            ` : ''}
+                        </div>
+
+                        <div style="display:flex;flex-direction:column;gap:12px;">
+                            <div>
+                                <label style="display:block;font-size:12.5px;font-weight:500;color:#5f6368;margin-bottom:6px;">Class Name</label>
+                                <input id="cm-class-name" class="pinpoint-cm-input" type="text" placeholder="e.g. AP Chemistry, Algebra II, English 10" value="${this.escapeHtml(currentNameVal)}" />
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:12.5px;font-weight:500;color:#5f6368;margin-bottom:6px;">Teacher / Section <span style="font-weight:400;color:#80868b;">(optional)</span></label>
+                                <input id="cm-class-teacher" class="pinpoint-cm-input" type="text" placeholder="e.g. Period 4 • Mrs. Davis" value="${this.escapeHtml(currentTeacherVal)}" />
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:12.5px;font-weight:500;color:#5f6368;margin-bottom:6px;">Class Behavior</label>
+                                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                                    <button type="button" class="pinpoint-copy-circle-btn" style="${!this._cmMakeGamesClass ? 'background:#1f1f1f !important;border-color:#1f1f1f !important;color:#ffffff !important;' : ''}" onclick="TabDisguiser.setClassManagerRole(false)">
+                                        <span class="material-symbols-sharp notranslate" style="font-size:16px;color:${!this._cmMakeGamesClass ? '#ffffff' : '#5f6368'};">block</span>
+                                        <span>Fake Placeholder (No Redirect)</span>
+                                    </button>
+                                    <button type="button" class="pinpoint-copy-circle-btn" style="${this._cmMakeGamesClass ? 'background:#1a73e8 !important;border-color:#1a73e8 !important;color:#ffffff !important;' : ''}" onclick="TabDisguiser.setClassManagerRole(true)">
+                                        <span class="material-symbols-sharp notranslate" style="font-size:16px;color:${this._cmMakeGamesClass ? '#ffffff' : '#1a73e8'};">sports_esports</span>
+                                        <span>Put Games in This Class</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:12.5px;font-weight:500;color:#5f6368;margin-bottom:8px;">Banner Theme</label>
+                                <div id="cm-banners-grid" class="pinpoint-cm-banners">
+                                    ${bannersHtml}
+                                </div>
+                            </div>
+                            <div style="display:flex;justify-content:flex-end;margin-top:4px;">
+                                <button type="button" class="pinpoint-copy-circle-btn" style="background:#1a73e8 !important;border-color:#1a73e8 !important;color:#ffffff !important;padding:10px 22px !important;font-size:14px !important;" onclick="TabDisguiser.submitClassManagerForm()">
+                                    <span class="material-symbols-sharp notranslate" style="font-size:18px;color:#ffffff;">${editingCls ? 'save' : 'add_circle'}</span>
+                                    <span>${editingCls ? 'Save Class Changes' : 'Add Class'}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pinpoint-intro-bottom-row">
+                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                    <span style="background:#f1f3f4;border:1px solid #dadce0;border-radius:99px;padding:6px 14px;font-size:13px;color:#3c4043;font-weight:500;">
+                        Active games class: <b style="color:#1a73e8;">${this.escapeHtml(activeGamesCls ? activeGamesCls.name : 'World History')}</b> • ${fakeCount} fake placeholder ${fakeCount === 1 ? 'class' : 'classes'}
+                    </span>
+                </div>
+                <div class="pinpoint-intro-nav-circles">
+                    <button class="pinpoint-nav-circle-btn" type="button" onclick="TabDisguiser.closeClassManagerModal(event)" title="Done" aria-label="Done">
+                        <span class="material-symbols-sharp notranslate" style="font-size:32px;line-height:1;pointer-events:none;">check</span>
+                    </button>
+                </div>
+            </div>
+        `;
+    },
+
+    selectClassManagerBanner(bannerId) {
+        this._cmSelectedBanner = bannerId;
+        this.renderClassManagerContent();
+    },
+
+    setClassManagerRole(makeGames) {
+        this._cmMakeGamesClass = !!makeGames;
+        this.renderClassManagerContent();
+    },
+
+    editClassInManager(classId) {
+        const cfg = this.getClassConfig();
+        const target = (cfg.classes || []).find(c => c.id === classId);
+        if (!target) return;
+        this._cmEditingClassId = target.id;
+        this._cmSelectedBanner = (target.banner || 'WorldHistory.jpg').replace(/^(\.\.\/|\.\/)?images\//, '');
+        this._cmMakeGamesClass = !!target.hasGames;
+        const modal = document.getElementById('pinpoint-class-manager-modal');
+        if (modal) modal.removeAttribute('data-editing-id');
+        this.renderClassManagerContent();
+    },
+
+    cancelEditClassInManager() {
+        this._cmEditingClassId = null;
+        this._cmSelectedBanner = 'Math.jpg';
+        this._cmMakeGamesClass = false;
+        const modal = document.getElementById('pinpoint-class-manager-modal');
+        if (modal) {
+            modal.removeAttribute('data-editing-id');
+            const n = document.getElementById('cm-class-name');
+            const t = document.getElementById('cm-class-teacher');
+            if (n) n.value = '';
+            if (t) t.value = '';
+        }
+        this.renderClassManagerContent();
+    },
+
+    setGamesClass(classId) {
+        const cfg = this.getClassConfig();
+        if (!Array.isArray(cfg.classes)) return;
+        cfg.classes.forEach(c => {
+            c.hasGames = (c.id === classId);
+        });
+        this.saveClassConfig(cfg);
+        if (this._cmEditingClassId === classId) {
+            this._cmMakeGamesClass = true;
+        } else if (this._cmEditingClassId) {
+            this._cmMakeGamesClass = false;
+        }
+        this.renderClassManagerContent();
+        if (typeof window.showPinpointToast === 'function') {
+            const active = cfg.classes.find(c => c.id === classId);
+            window.showPinpointToast('Games moved to "' + (active ? active.name : 'Class') + '"', 'success');
+        }
+    },
+
+    deleteClassInManager(classId) {
+        const cfg = this.getClassConfig();
+        if (!Array.isArray(cfg.classes) || cfg.classes.length <= 1) return;
+        const removed = cfg.classes.find(c => c.id === classId);
+        cfg.classes = cfg.classes.filter(c => c.id !== classId);
+        if (!cfg.classes.some(c => c.hasGames)) {
+            cfg.classes[0].hasGames = true;
+        }
+        this.saveClassConfig(cfg);
+        if (this._cmEditingClassId === classId) {
+            this._cmEditingClassId = null;
+            this._cmSelectedBanner = 'Math.jpg';
+            this._cmMakeGamesClass = false;
+        }
+        this.renderClassManagerContent();
+        if (typeof window.showPinpointToast === 'function' && removed) {
+            window.showPinpointToast('Removed class "' + removed.name + '"', 'info');
+        }
+    },
+
+    submitClassManagerForm() {
+        const nameInput = document.getElementById('cm-class-name');
+        const teacherInput = document.getElementById('cm-class-teacher');
+        const nameVal = (nameInput ? nameInput.value.trim() : '') || 'Untitled Class';
+        const teacherVal = teacherInput ? teacherInput.value.trim() : '';
+        const bannerVal = this._cmSelectedBanner || 'WorldHistory.jpg';
+
+        const cfg = this.getClassConfig();
+        if (!Array.isArray(cfg.classes)) cfg.classes = [];
+
+        if (this._cmEditingClassId) {
+            const target = cfg.classes.find(c => c.id === this._cmEditingClassId);
+            if (target) {
+                target.name = nameVal;
+                target.teacher = teacherVal;
+                target.sec = teacherVal;
+                target.banner = bannerVal;
+                if (this._cmMakeGamesClass) {
+                    cfg.classes.forEach(c => { c.hasGames = (c.id === target.id); });
+                } else if (target.hasGames && cfg.classes.length > 1) {
+                    target.hasGames = false;
+                    const fallback = cfg.classes.find(c => c.id !== target.id);
+                    if (fallback) fallback.hasGames = true;
+                }
+            }
+            this._cmEditingClassId = null;
+            this._cmSelectedBanner = 'Math.jpg';
+            this._cmMakeGamesClass = false;
+            this.saveClassConfig(cfg);
+            const modal = document.getElementById('pinpoint-class-manager-modal');
+            if (modal) modal.removeAttribute('data-editing-id');
+            if (nameInput) nameInput.value = '';
+            if (teacherInput) teacherInput.value = '';
+            this.renderClassManagerContent();
+            if (typeof window.showPinpointToast === 'function') {
+                window.showPinpointToast('Updated "' + nameVal + '"', 'success');
+            }
+        } else {
+            const newId = 'class_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+            if (this._cmMakeGamesClass) {
+                cfg.classes.forEach(c => { c.hasGames = false; });
+            }
+            cfg.classes.push({
+                id: newId,
+                name: nameVal,
+                teacher: teacherVal,
+                sec: teacherVal,
+                banner: bannerVal,
+                hasGames: !!this._cmMakeGamesClass
+            });
+            this._cmSelectedBanner = 'Math.jpg';
+            this._cmMakeGamesClass = false;
+            this.saveClassConfig(cfg);
+            if (nameInput) nameInput.value = '';
+            if (teacherInput) teacherInput.value = '';
+            this.renderClassManagerContent();
+            if (typeof window.showPinpointToast === 'function') {
+                window.showPinpointToast('Added class "' + nameVal + '"', 'success');
+            }
+        }
+    },
+
     openPopout(file, title) {
         if (!file) return null;
         const resolvedTitle = title || 'Textbook';
@@ -2859,6 +3837,8 @@ if (typeof window !== 'undefined') {
     }
 
     window.TabDisguiser = TabDisguiser;
+    window.openClassManagerModal = (id) => TabDisguiser.openClassManagerModal(id);
+    window.closeClassManagerModal = (e) => TabDisguiser.closeClassManagerModal(e);
     window.openFullscreenClock = () => TabDisguiser.openFullscreenClock();
     window.closeFullscreenClock = () => TabDisguiser.closeFullscreenClock();
     window.closeInfoWidget = (e) => TabDisguiser.closeInfoWidget(e);

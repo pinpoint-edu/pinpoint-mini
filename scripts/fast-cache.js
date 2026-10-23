@@ -33,7 +33,13 @@
   try {
     var raw = localStorage.getItem('pinpoint_classroom_config');
     var cfg = raw ? JSON.parse(raw) : null;
-    var c = (cfg && (cfg.history || cfg.english)) ? (cfg.history || cfg.english) : null;
+    var c = null;
+    if (cfg && Array.isArray(cfg.classes) && cfg.classes.length > 0) {
+      c = cfg.classes.find(function(item) { return item && item.hasGames; }) || cfg.classes[0];
+    }
+    if (!c) {
+      c = (cfg && (cfg.history || cfg.english)) ? (cfg.history || cfg.english) : null;
+    }
     if (!c) c = { name: 'World History', teacher: '', banner: 'WorldHistory.jpg' };
 
     var name = (c.name || 'World History').trim();
@@ -64,7 +70,10 @@
       if (e.key === 'pinpoint_classroom_config') {
         try {
           var updatedCfg = JSON.parse(e.newValue || '{}');
-          var updated = (updatedCfg.history || updatedCfg.english || {}).name;
+          var activeCls = (Array.isArray(updatedCfg.classes) && updatedCfg.classes.length > 0)
+            ? (updatedCfg.classes.find(function(item) { return item && item.hasGames; }) || updatedCfg.classes[0])
+            : (updatedCfg.history || updatedCfg.english || {});
+          var updated = activeCls.name;
           if (updated && !isHome) {
             var isCw = window.location.pathname.includes('classwork');
             var updatedTitle = (isCw ? ('Classwork for ' + updated) : updated) + ' - Classroom';
@@ -73,7 +82,7 @@
               window.top.postMessage({ type: 'set-title', title: updatedTitle }, '*');
             }
           }
-          var updatedBanner = (updatedCfg.history || updatedCfg.english || {}).banner;
+          var updatedBanner = activeCls.banner;
           if (updatedBanner) {
             var updatedColors = getBannerColor(updatedBanner);
             var av = document.getElementById('stream-announcement-avatar') || document.querySelector('.JZicYb .Cxyznd.MwOlIe');
@@ -92,10 +101,10 @@
     var css = '';
     // Remove dark/color tint overlay from home card banner
     css += '.Tc9hUd .ZizeYd, .Tc9hUd .ZizeYd.ml1ZL, .Tc9hUd .lmPo4 { display: none !important; opacity: 0 !important; } ';
-    // Banner background
-    css += '.PFLqgc.KFl4Z, .OjOEXb { background-image: url("' + bannerUrl + '") !important; } ';
-    // Sidebar circular icon background behind letter
-    css += 'nav.STek2d .JShLh, .sidebar .JShLh, .kWQ5wd .JShLh { background-color: ' + bannerColors.circleBg + ' !important; color: ' + bannerColors.circleText + ' !important; } ';
+    // Banner background (scoped to stream banner and active games class card)
+    css += '.PFLqgc.KFl4Z, li[data-course-id="854642477833"] .OjOEXb { background-image: url("' + bannerUrl + '") !important; } ';
+    // Sidebar circular icon background behind letter for active games class
+    css += 'nav.STek2d a[data-id="854642477833"] .JShLh { background-color: ' + bannerColors.circleBg + ' !important; color: ' + bannerColors.circleText + ' !important; } ';
     // Stream announcement megaphone icon & background
     css += '#stream-announcement-avatar, .JZicYb .Cxyznd.MwOlIe { background-color: ' + bannerColors.circleBg + ' !important; } ';
     css += '#stream-announcement-icon, .JZicYb .Cxyznd.MwOlIe .material-symbols-outlined { color: ' + bannerColors.circleText + ' !important; fill: ' + bannerColors.circleText + ' !important; } ';
@@ -111,6 +120,7 @@
     // 3. Fast node patcher
     function patchNode(node) {
       if (!node || node.nodeType !== 1) return;
+      if (node.closest && node.closest('[data-fake-class="true"]')) return;
       var cl = node.classList;
 
       // Class Title in Page / Card / Breadcrumb
@@ -133,9 +143,12 @@
 
       // Sidebar circular icon
       if (cl && cl.contains('JShLh')) {
-        if (node.textContent !== letter) node.textContent = letter;
-        node.style.setProperty('background-color', bannerColors.circleBg, 'important');
-        node.style.setProperty('color', bannerColors.circleText, 'important');
+        var pCircle = node.closest ? node.closest('a[data-id="854642477833"]') : null;
+        if (pCircle) {
+          if (node.textContent !== letter) node.textContent = letter;
+          node.style.setProperty('background-color', bannerColors.circleBg, 'important');
+          node.style.setProperty('color', bannerColors.circleText, 'important');
+        }
       }
 
       // Stream announcement megaphone icon & background
