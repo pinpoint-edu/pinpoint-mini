@@ -1,5 +1,10 @@
 [
   {
+    "title": "2048",
+    "file": "textbooks/2048.html",
+    "sizeBytes": 46342
+  },
+  {
     "title": "Awesome Tanks",
     "file": "textbooks/awesome-tanks.html",
     "sizeBytes": 9825933
@@ -58,6 +63,11 @@
     "title": "Car Soccer",
     "file": "textbooks/car-soccer/",
     "sizeBytes": 130837204
+  },
+  {
+    "title": "Chess",
+    "file": "textbooks/chess.html",
+    "sizeBytes": 6914845
   },
   {
     "title": "Cluster Rush",

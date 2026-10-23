@@ -175,6 +175,22 @@
     {
       "source": "/textbooks/ruffle.js",
       "destination": "/textbooks/ruffle/ruffle.js"
+    },
+    {
+      "source": "/textbooks/chess.html",
+      "destination": "/textbooks/chess.html"
+    },
+    {
+      "source": "/textbooks/chess",
+      "destination": "/textbooks/chess.html"
+    },
+    {
+      "source": "/textbooks/2048.html",
+      "destination": "/textbooks/2048.html"
+    },
+    {
+      "source": "/textbooks/2048",
+      "destination": "/textbooks/2048.html"
     }
   ],
   "headers": [
