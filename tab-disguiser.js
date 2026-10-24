@@ -2205,7 +2205,7 @@ var TabDisguiser = window.TabDisguiser || {
                 this.showInfoWidget(true);
                 return;
             }
-            const widgetDismissed = localStorage.getItem('pinpoint_intro_dismissed_v4') === 'true';
+            const widgetDismissed = localStorage.getItem('pinpoint_intro_dismissed_v5_classes') === 'true';
             if (!widgetDismissed) {
                 this.showInfoWidget();
             }
@@ -2221,8 +2221,9 @@ var TabDisguiser = window.TabDisguiser || {
             if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
         }
         try {
+            localStorage.setItem('pinpoint_intro_dismissed_v5_classes', 'true');
+            sessionStorage.setItem('pinpoint_intro_dismissed_v5_classes', 'true');
             localStorage.setItem('pinpoint_intro_dismissed_v4', 'true');
-            sessionStorage.setItem('pinpoint_intro_dismissed_v4', 'true');
             localStorage.setItem('pinpoint_info_widget_dismissed_v3', 'true');
         } catch (err) {}
         const widget = document.getElementById('pinpoint-info-widget');
@@ -2231,72 +2232,60 @@ var TabDisguiser = window.TabDisguiser || {
             widget.style.setProperty('display', 'none', 'important');
             widget.remove();
         }
+        this.highlightNavbarAddClassButton();
+    },
+
+    highlightNavbarAddClassButton() {
+        if (!document.getElementById('pinpoint-add-btn-pulse-style')) {
+            const st = document.createElement('style');
+            st.id = 'pinpoint-add-btn-pulse-style';
+            st.textContent = `
+                @keyframes pinpointAddClassPulseRing {
+                    0% {
+                        box-shadow: 0 0 0 0 rgba(26, 115, 232, 0.75), 0 0 0 4px rgba(26, 115, 232, 0.35);
+                        transform: scale(1);
+                    }
+                    50% {
+                        box-shadow: 0 0 0 12px rgba(26, 115, 232, 0), 0 0 0 6px rgba(26, 115, 232, 0.55);
+                        transform: scale(1.08);
+                    }
+                    100% {
+                        box-shadow: 0 0 0 0 rgba(26, 115, 232, 0), 0 0 0 4px rgba(26, 115, 232, 0.25);
+                        transform: scale(1);
+                    }
+                }
+                .pinpoint-navbar-add-pulse {
+                    background: #e8f0fe !important;
+                    color: #1a73e8 !important;
+                    border: 2px solid #1a73e8 !important;
+                    animation: pinpointAddClassPulseRing 1.6s infinite ease-in-out !important;
+                    z-index: 1000 !important;
+                }
+            `;
+            document.head.appendChild(st);
+        }
+        document.querySelectorAll('nav.joJglb [data-open-class-manager="true"], button[jsname="mSMdM"]').forEach(btn => {
+            btn.classList.add('pinpoint-navbar-add-pulse');
+            btn.addEventListener('click', () => {
+                btn.classList.remove('pinpoint-navbar-add-pulse');
+            }, { once: true });
+        });
     },
 
     setIntroSlide(index) {
-        if (index < 0) index = 0;
-        if (index > 2) index = 2;
-        this.introCurrentSlide = index;
-
-        for (let i = 0; i < 3; i++) {
-            const slide = document.getElementById(`pinpoint-intro-slide-${i}`);
-            const dot = document.getElementById(`pinpoint-intro-dot-${i}`);
-            if (slide) {
-                slide.style.setProperty('display', (i === index) ? 'flex' : 'none', 'important');
-            }
-            if (dot) {
-                if (i === index) {
-                    dot.style.setProperty('width', '28px', 'important');
-                    dot.style.setProperty('border-radius', '99px', 'important');
-                    dot.style.setProperty('background', '#3c4043', 'important');
-                    dot.style.setProperty('opacity', '1', 'important');
-                } else {
-                    dot.style.setProperty('width', '8px', 'important');
-                    dot.style.setProperty('border-radius', '50%', 'important');
-                    dot.style.setProperty('background', '#dadce0', 'important');
-                    dot.style.setProperty('opacity', '0.8', 'important');
-                }
-            }
-        }
-
-        const prevBtn = document.getElementById('pinpoint-intro-prev-btn');
-        const nextBtn = document.getElementById('pinpoint-intro-next-btn');
-
-        if (prevBtn) {
-            if (index === 0) {
-                prevBtn.style.setProperty('display', 'none', 'important');
-            } else {
-                prevBtn.style.setProperty('display', 'inline-flex', 'important');
-            }
-        }
-
-        if (nextBtn) {
-            if (index === 2) {
-                // Checkmark button on last slide - circular grey button
-                nextBtn.setAttribute('title', 'Done');
-                nextBtn.setAttribute('aria-label', 'Done');
-                nextBtn.innerHTML = `<span class="material-symbols-sharp notranslate" style="font-size:32px;line-height:1;pointer-events:none;">check</span>`;
-            } else {
-                // Right arrow button - circular grey button
-                nextBtn.setAttribute('title', 'Next');
-                nextBtn.setAttribute('aria-label', 'Next');
-                nextBtn.innerHTML = `<span class="material-symbols-sharp notranslate" style="font-size:32px;line-height:1;pointer-events:none;">arrow_forward</span>`;
-            }
+        this.introCurrentSlide = 0;
+        const slide = document.getElementById('pinpoint-intro-slide-0');
+        if (slide) {
+            slide.style.setProperty('display', 'flex', 'important');
         }
     },
 
     prevIntroSlide() {
-        if (this.introCurrentSlide > 0) {
-            this.setIntroSlide(this.introCurrentSlide - 1);
-        }
+        this.setIntroSlide(0);
     },
 
     nextIntroSlide() {
-        if (this.introCurrentSlide < 2) {
-            this.setIntroSlide(this.introCurrentSlide + 1);
-        } else {
-            this.closeInfoWidget();
-        }
+        this.closeInfoWidget();
     },
 
     copyChromeSettingsLink(e) {
@@ -2348,12 +2337,12 @@ var TabDisguiser = window.TabDisguiser || {
 
     async showInfoWidget(force = false) {
         if (!force) {
-            const dismissed = localStorage.getItem('pinpoint_intro_dismissed_v4') === 'true';
+            const dismissed = localStorage.getItem('pinpoint_intro_dismissed_v5_classes') === 'true';
             if (dismissed) return;
         } else {
             try {
-                localStorage.removeItem('pinpoint_intro_dismissed_v4');
-                sessionStorage.removeItem('pinpoint_intro_dismissed_v4');
+                localStorage.removeItem('pinpoint_intro_dismissed_v5_classes');
+                sessionStorage.removeItem('pinpoint_intro_dismissed_v5_classes');
             } catch (e) {}
         }
 
@@ -2383,7 +2372,7 @@ var TabDisguiser = window.TabDisguiser || {
 
         let existing = document.getElementById('pinpoint-info-widget');
         if (existing) {
-            if (!force && localStorage.getItem('pinpoint_intro_dismissed_v4') === 'true') {
+            if (!force && localStorage.getItem('pinpoint_intro_dismissed_v5_classes') === 'true') {
                 existing.remove();
                 return;
             }
@@ -2404,6 +2393,24 @@ var TabDisguiser = window.TabDisguiser || {
             @keyframes pinpointIntroFade {
                 from { opacity: 0; }
                 to { opacity: 1; }
+            }
+            @keyframes pinpointBigAddPulse {
+                0% {
+                    box-shadow: 0 0 0 0 rgba(26, 115, 232, 0.65), 0 0 0 10px rgba(26, 115, 232, 0.25);
+                    transform: scale(1);
+                }
+                50% {
+                    box-shadow: 0 0 0 26px rgba(26, 115, 232, 0), 0 0 0 18px rgba(26, 115, 232, 0.18);
+                    transform: scale(1.07);
+                }
+                100% {
+                    box-shadow: 0 0 0 0 rgba(26, 115, 232, 0), 0 0 0 10px rgba(26, 115, 232, 0);
+                    transform: scale(1);
+                }
+            }
+            @keyframes pinpointArrowBounce {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-7px); }
             }
             .material-symbols-sharp {
                 font-family: 'Material Symbols Sharp' !important;
@@ -2480,7 +2487,7 @@ var TabDisguiser = window.TabDisguiser || {
                 flex-direction: column !important;
                 width: 100% !important;
                 margin: auto 0 !important;
-                padding: 24px 0 !important;
+                padding: 20px 0 !important;
                 box-sizing: border-box !important;
             }
             .pinpoint-intro-slide {
@@ -2496,11 +2503,11 @@ var TabDisguiser = window.TabDisguiser || {
                 align-items: flex-start !important;
                 text-align: left !important;
                 width: 100% !important;
-                max-width: 960px !important;
+                max-width: 1080px !important;
                 box-sizing: border-box !important;
             }
             .pinpoint-intro-title {
-                font-size: clamp(32px, 4.4vw, 56px) !important;
+                font-size: clamp(30px, 4vw, 50px) !important;
                 font-weight: 500 !important;
                 color: #1f1f1f !important;
                 line-height: 1.15 !important;
@@ -2509,30 +2516,40 @@ var TabDisguiser = window.TabDisguiser || {
                 text-align: left !important;
             }
             .pinpoint-intro-subtitle {
-                font-size: clamp(15px, 1.6vw, 20px) !important;
+                font-size: clamp(15px, 1.5vw, 19px) !important;
                 font-weight: 400 !important;
                 color: #5f6368 !important;
                 line-height: 1.5 !important;
-                max-width: 820px !important;
-                margin: 12px 0 0 0 !important;
+                max-width: 860px !important;
+                margin: 10px 0 0 0 !important;
                 text-align: left !important;
+            }
+            .pinpoint-intro-split {
+                display: grid !important;
+                grid-template-columns: 1.05fr 0.95fr !important;
+                gap: 36px !important;
+                width: 100% !important;
+                max-width: 1240px !important;
+                margin-top: 32px !important;
+                align-items: center !important;
+            }
+            @media (max-width: 960px) {
+                .pinpoint-intro-split {
+                    grid-template-columns: 1fr !important;
+                }
             }
             .pinpoint-bullet-list {
                 display: flex !important;
                 flex-direction: column !important;
-                gap: 24px !important;
-                margin-top: 40px !important;
+                gap: 22px !important;
                 width: 100% !important;
-                max-width: 960px !important;
-                margin-left: 0 !important;
-                margin-right: auto !important;
                 box-sizing: border-box !important;
             }
             .pinpoint-bullet-item {
                 display: flex !important;
                 flex-direction: row !important;
                 align-items: flex-start !important;
-                gap: 20px !important;
+                gap: 18px !important;
                 text-align: left !important;
                 box-sizing: border-box !important;
             }
@@ -2564,17 +2581,17 @@ var TabDisguiser = window.TabDisguiser || {
                 text-align: left !important;
             }
             .pinpoint-bullet-title {
-                font-size: clamp(17px, 1.7vw, 21px) !important;
+                font-size: clamp(16px, 1.55vw, 20px) !important;
                 font-weight: 500 !important;
                 color: #1f1f1f !important;
                 line-height: 1.3 !important;
                 text-align: left !important;
             }
             .pinpoint-bullet-desc {
-                font-size: clamp(14px, 1.35vw, 16px) !important;
+                font-size: clamp(13.5px, 1.25vw, 15.5px) !important;
                 font-weight: 400 !important;
                 color: #5f6368 !important;
-                line-height: 1.5 !important;
+                line-height: 1.45 !important;
                 text-align: left !important;
             }
             .pinpoint-copy-circle-btn {
@@ -2599,6 +2616,50 @@ var TabDisguiser = window.TabDisguiser || {
             .pinpoint-copy-circle-btn:active {
                 transform: scale(0.96) !important;
             }
+            .pinpoint-intro-graphic-card {
+                background: #f8f9fa !important;
+                border: 1px solid #dadce0 !important;
+                border-radius: 28px !important;
+                padding: 28px !important;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                justify-content: center !important;
+                gap: 22px !important;
+                box-shadow: 0 12px 36px rgba(60,64,67,0.08) !important;
+                position: relative !important;
+                overflow: hidden !important;
+            }
+            .pinpoint-intro-mock-navbar {
+                width: 100% !important;
+                background: #ffffff !important;
+                border: 1px solid #dadce0 !important;
+                border-radius: 20px !important;
+                padding: 16px 22px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                box-shadow: 0 4px 18px rgba(60,64,67,0.08) !important;
+                box-sizing: border-box !important;
+            }
+            .pinpoint-intro-big-plus-btn {
+                width: 68px !important;
+                height: 68px !important;
+                border-radius: 50% !important;
+                background: #1a73e8 !important;
+                border: 4px solid #d2e3fc !important;
+                color: #ffffff !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                cursor: pointer !important;
+                animation: pinpointBigAddPulse 1.6s infinite ease-in-out !important;
+                position: relative !important;
+                flex-shrink: 0 !important;
+            }
+            .pinpoint-intro-big-plus-btn:hover {
+                background: #1557b0 !important;
+            }
             .pinpoint-intro-bottom-row {
                 display: flex !important;
                 align-items: center !important;
@@ -2608,16 +2669,6 @@ var TabDisguiser = window.TabDisguiser || {
                 padding-top: 16px !important;
                 margin-top: auto !important;
                 flex-shrink: 0 !important;
-            }
-            .pinpoint-intro-dots {
-                display: flex !important;
-                align-items: center !important;
-                gap: 10px !important;
-            }
-            .pinpoint-intro-dot {
-                height: 8px !important;
-                transition: all 0.25s ease !important;
-                cursor: pointer !important;
             }
             .pinpoint-intro-nav-circles {
                 display: flex !important;
@@ -2679,149 +2730,98 @@ var TabDisguiser = window.TabDisguiser || {
 
             <!-- Body Area -->
             <div class="pinpoint-intro-body">
-                <!-- Slide 0: Fast Offline Library -->
                 <div id="pinpoint-intro-slide-0" class="pinpoint-intro-slide" style="display:flex;">
                     <div class="pinpoint-intro-header-left">
-                        <h1 class="pinpoint-intro-title">Instant Offline Library</h1>
+                        <h1 class="pinpoint-intro-title">Fake Classes &amp; Custom Disguise</h1>
                         <p class="pinpoint-intro-subtitle">
-                            The Library downloads games directly to your device storage so they load locally without network latency.
+                            Build a realistic Google Classroom schedule with fake decoy classes, custom cropped banners, and drag-and-drop class ordering.
                         </p>
                     </div>
-                    <div class="pinpoint-bullet-list">
-                        <div class="pinpoint-bullet-item">
-                            <div class="pinpoint-bullet-circle" style="background:#fef7e0; border-color:#fce8b2; color:#ea8600;">
-                                <span class="material-symbols-sharp notranslate" style="color:#ea8600;">flash_on</span>
-                            </div>
-                            <div class="pinpoint-bullet-content">
-                                <div class="pinpoint-bullet-title">Zero Latency</div>
-                                <div class="pinpoint-bullet-desc">Eliminates stream delays and proxy lag so games respond instantly to your inputs.</div>
-                            </div>
-                        </div>
-                        <div class="pinpoint-bullet-item">
-                            <div class="pinpoint-bullet-circle" style="background:#e8f0fe; border-color:#d2e3fc; color:#1a73e8;">
-                                <span class="material-symbols-sharp notranslate" style="color:#1a73e8;">wifi_off</span>
-                            </div>
-                            <div class="pinpoint-bullet-content">
-                                <div class="pinpoint-bullet-title">Works 100% Offline</div>
-                                <div class="pinpoint-bullet-desc">Downloaded games run entirely on your machine without needing active school Wi-Fi.</div>
-                            </div>
-                        </div>
-                        <div class="pinpoint-bullet-item">
-                            <div class="pinpoint-bullet-circle" style="background:#e6f4ea; border-color:#ceead6; color:#137333;">
-                                <span class="material-symbols-sharp notranslate" style="color:#137333;">timer</span>
-                            </div>
-                            <div class="pinpoint-bullet-content">
-                                <div class="pinpoint-bullet-title">Instant Loading Times</div>
-                                <div class="pinpoint-bullet-desc">Launches games immediately from local storage cache without waiting for re-downloads.</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Slide 1: Bit Planes Major Updates -->
-                <div id="pinpoint-intro-slide-1" class="pinpoint-intro-slide" style="display:none;">
-                    <div class="pinpoint-intro-header-left">
-                        <h1 class="pinpoint-intro-title">Bit Planes: Major Updates</h1>
-                        <p class="pinpoint-intro-subtitle">
-                            The classic pixel plane game has been overhauled with widescreen graphics, local split-screen, and online multiplayer.
-                        </p>
-                    </div>
-                    <div class="pinpoint-bullet-list">
-                        <div class="pinpoint-bullet-item">
-                            <div class="pinpoint-bullet-circle" style="background:#f3e8fd; border-color:#e8d0fb; color:#9334e6;">
-                                <span class="material-symbols-sharp notranslate" style="color:#9334e6;">aspect_ratio</span>
+                    <div class="pinpoint-intro-split">
+                        <!-- Left Column: Feature Bullets -->
+                        <div class="pinpoint-bullet-list">
+                            <div class="pinpoint-bullet-item">
+                                <div class="pinpoint-bullet-circle" style="background:#e8f0fe; border-color:#d2e3fc; color:#1a73e8;">
+                                    <span class="material-symbols-sharp notranslate" style="color:#1a73e8;">add_circle</span>
+                                </div>
+                                <div class="pinpoint-bullet-content">
+                                    <div class="pinpoint-bullet-title">Create Fake Placeholder Classes</div>
+                                    <div class="pinpoint-bullet-desc">Click the <b>+</b> button in the top-right bar to add realistic decoy classes that never redirect anywhere when clicked.</div>
+                                </div>
                             </div>
-                            <div class="pinpoint-bullet-content">
-                                <div class="pinpoint-bullet-title">Redesigned Widescreen UI</div>
-                                <div class="pinpoint-bullet-desc">Modernized interface with crisp HD graphics, smooth flight animations, and responsive controls.</div>
+                            <div class="pinpoint-bullet-item">
+                                <div class="pinpoint-bullet-circle" style="background:#e6f4ea; border-color:#ceead6; color:#137333;">
+                                    <span class="material-symbols-sharp notranslate" style="color:#137333;">sports_esports</span>
+                                </div>
+                                <div class="pinpoint-bullet-content">
+                                    <div class="pinpoint-bullet-title">Hide Games in Any Class</div>
+                                    <div class="pinpoint-bullet-desc">Choose which class holds your games at any time. All other classes act as harmless decoys on Home and the sidebar.</div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="pinpoint-bullet-item">
-                            <div class="pinpoint-bullet-circle" style="background:#fce8e6; border-color:#fad2cf; color:#d93025;">
-                                <span class="material-symbols-sharp notranslate" style="color:#d93025;">sports_esports</span>
-                            </div>
-                            <div class="pinpoint-bullet-content">
-                                <div class="pinpoint-bullet-title">1v1 Local Split-Screen</div>
-                                <div class="pinpoint-bullet-desc">Fly and battle against a friend side-by-side on the exact same keyboard.</div>
-                            </div>
-                        </div>
-                        <div class="pinpoint-bullet-item">
-                            <div class="pinpoint-bullet-circle" style="background:#e0f2fe; border-color:#bae6fd; color:#0284c7;">
-                                <span class="material-symbols-sharp notranslate" style="color:#0284c7;">public</span>
-                            </div>
-                            <div class="pinpoint-bullet-content">
-                                <div class="pinpoint-bullet-title">Real-Time Online Mode</div>
-                                <div class="pinpoint-bullet-desc">Join public multiplayer lobbies or create custom room codes to battle players anywhere.</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Slide 2: Clear Unused Game Data -->
-                <div id="pinpoint-intro-slide-2" class="pinpoint-intro-slide" style="display:none;">
-                    <div class="pinpoint-intro-header-left">
-                        <h1 class="pinpoint-intro-title">Clear Unused Game Data</h1>
-                        <p class="pinpoint-intro-subtitle">
-                            Keep your browser fast and prevent storage errors by deleting data from old game sites in 3 easy steps:
-                        </p>
-                    </div>
-                    <div class="pinpoint-bullet-list">
-                        <div class="pinpoint-bullet-item">
-                            <div class="pinpoint-bullet-circle" style="background:#e8f0fe; border-color:#d2e3fc; color:#1a73e8;">
-                                <span class="material-symbols-sharp notranslate" style="color:#1a73e8;">link</span>
-                            </div>
-                            <div class="pinpoint-bullet-content">
-                                <div class="pinpoint-bullet-title">Step 1: Copy and open this link in a new tab</div>
-                                <div class="pinpoint-bullet-desc">Open a new Chrome tab and paste this link into the address bar:</div>
-                                <div style="display:flex; align-items:center; gap:12px; margin-top:8px; flex-wrap:wrap;">
-                                    <div style="background:#f8f9fa; border:1px solid #dadce0; border-radius:20px; padding:7px 16px; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:13.5px; color:#1f1f1f; user-select:all;">
-                                        chrome://settings/content/all
-                                    </div>
-                                    <button id="pinpoint-copy-settings-btn" class="pinpoint-copy-circle-btn" type="button" onclick="TabDisguiser.copyChromeSettingsLink(event)">
-                                        <span class="material-symbols-sharp notranslate" style="font-size:18px;line-height:1;">content_copy</span>
-                                        <span>Copy Link</span>
-                                    </button>
-                                    <div id="pinpoint-settings-toast" style="display:none; font-size:12.5px; color:#1e8e3e; font-weight:500;">
-                                        ✓ Copied to clipboard!
-                                    </div>
+                            <div class="pinpoint-bullet-item">
+                                <div class="pinpoint-bullet-circle" style="background:#fef7e0; border-color:#fce8b2; color:#ea8600;">
+                                    <span class="material-symbols-sharp notranslate" style="color:#ea8600;">crop</span>
+                                </div>
+                                <div class="pinpoint-bullet-content">
+                                    <div class="pinpoint-bullet-title">Drag to Reorder &amp; Custom Cropped Banners</div>
+                                    <div class="pinpoint-bullet-desc">Drag class cards directly on the Home page to rearrange them, and upload custom high-res cropped banner images.</div>
                                 </div>
                             </div>
                         </div>
-                        <div class="pinpoint-bullet-item">
-                            <div class="pinpoint-bullet-circle" style="background:#fff3e0; border-color:#ffe0b2; color:#e65100;">
-                                <span class="material-symbols-sharp notranslate" style="color:#e65100;">sort</span>
+
+                        <!-- Right Column: Big Graphic of the Add Class (+) Button with Pulsing Blue Ring -->
+                        <div class="pinpoint-intro-graphic-card">
+                            <div style="font-size:12.5px;font-weight:600;letter-spacing:0.6px;text-transform:uppercase;color:#1a73e8;background:#e8f0fe;border:1px solid #d2e3fc;padding:5px 14px;border-radius:99px;">
+                                Look for this button in the top-right corner
                             </div>
-                            <div class="pinpoint-bullet-content">
-                                <div class="pinpoint-bullet-title">Step 2: Change "Sort by" to "Data stored"</div>
-                                <div class="pinpoint-bullet-desc">This immediately puts all the largest and heaviest websites straight to the very top.</div>
+
+                            <!-- Enlarged Classroom Top Bar Graphic -->
+                            <div class="pinpoint-intro-mock-navbar">
+                                <div style="display:flex;align-items:center;gap:12px;">
+                                    <span class="material-symbols-sharp notranslate" style="font-size:24px;color:#5f6368;">menu</span>
+                                    <span style="font-size:19px;font-weight:500;color:#3c4043;">Classroom</span>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:18px;">
+                                    <div style="position:relative;display:inline-flex;align-items:center;justify-content:center;">
+                                        <button type="button" class="pinpoint-intro-big-plus-btn" onclick="TabDisguiser.closeInfoWidget(event); TabDisguiser.openClassManagerModal();" title="Click to open Manage Classes">
+                                            <svg focusable="false" width="36" height="36" viewBox="0 0 24 24" fill="#ffffff">
+                                                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <svg width="26" height="26" viewBox="0 0 24 24" fill="#5f6368" style="opacity:0.55;">
+                                        <path d="M6,8c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM12,20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM6,20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM6,14c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM12,14c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM16,6c0,1.1 0.9,2 2,2s2,-0.9 2,-2 -0.9,-2 -2,-2 -2,0.9 -2,2zM12,8c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM18,14c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM18,20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2z"/>
+                                    </svg>
+                                    <div style="width:36px;height:36px;border-radius:50%;background:#dadce0;opacity:0.65;"></div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="pinpoint-bullet-item">
-                            <div class="pinpoint-bullet-circle" style="background:#fee2e2; border-color:#fecaca; color:#dc2626;">
-                                <span class="material-symbols-sharp notranslate" style="color:#dc2626;">delete</span>
-                            </div>
-                            <div class="pinpoint-bullet-content">
-                                <div class="pinpoint-bullet-title">Step 3: Delete data for blocked or unused game sites</div>
-                                <div class="pinpoint-bullet-desc">Keep school websites untouched, and clear out old bloated game websites you don't use.</div>
+
+                            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;">
+                                <div style="display:inline-flex;align-items:center;gap:6px;color:#1a73e8;font-weight:600;font-size:15px;animation:pinpointArrowBounce 1.4s infinite ease-in-out;">
+                                    <span class="material-symbols-sharp notranslate" style="font-size:20px;color:#1a73e8;">arrow_upward</span>
+                                    <span>Click the pulsing <b>+</b> button to add &amp; customize classes</span>
+                                </div>
+                                <button type="button" class="pinpoint-copy-circle-btn" style="background:#1a73e8 !important;border-color:#1a73e8 !important;color:#ffffff !important;padding:10px 22px !important;font-size:14px !important;margin-top:4px;" onclick="TabDisguiser.closeInfoWidget(event); TabDisguiser.openClassManagerModal();">
+                                    <span class="material-symbols-sharp notranslate" style="font-size:18px;color:#ffffff;">add_circle</span>
+                                    <span>Open Class Manager Now</span>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Bottom Row: Progress dots on left, big grey circle navigation buttons on right -->
+            <!-- Bottom Row -->
             <div class="pinpoint-intro-bottom-row">
-                <div class="pinpoint-intro-dots">
-                    <div id="pinpoint-intro-dot-0" class="pinpoint-intro-dot" onclick="TabDisguiser.setIntroSlide(0)" title="Slide 1" style="width:28px; border-radius:99px; background:#3c4043; opacity:1;"></div>
-                    <div id="pinpoint-intro-dot-1" class="pinpoint-intro-dot" onclick="TabDisguiser.setIntroSlide(1)" title="Slide 2" style="width:8px; border-radius:50%; background:#dadce0; opacity:0.8;"></div>
-                    <div id="pinpoint-intro-dot-2" class="pinpoint-intro-dot" onclick="TabDisguiser.setIntroSlide(2)" title="Slide 3" style="width:8px; border-radius:50%; background:#dadce0; opacity:0.8;"></div>
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <span style="background:#f1f3f4;border:1px solid #dadce0;border-radius:99px;padding:6px 14px;font-size:13px;color:#3c4043;font-weight:500;">
+                        Tip: You can also click the <b>⋮</b> icon on any class card to edit it
+                    </span>
                 </div>
                 <div class="pinpoint-intro-nav-circles">
-                    <button id="pinpoint-intro-prev-btn" class="pinpoint-nav-circle-btn" type="button" onclick="TabDisguiser.prevIntroSlide()" title="Previous slide" aria-label="Previous slide" style="display:none;">
-                        <span class="material-symbols-sharp notranslate" style="font-size:32px;line-height:1;pointer-events:none;">arrow_back</span>
-                    </button>
-                    <button id="pinpoint-intro-next-btn" class="pinpoint-nav-circle-btn" type="button" onclick="TabDisguiser.nextIntroSlide()" title="Next" aria-label="Next">
-                        <span class="material-symbols-sharp notranslate" style="font-size:32px;line-height:1;pointer-events:none;">arrow_forward</span>
+                    <button id="pinpoint-intro-next-btn" class="pinpoint-nav-circle-btn" type="button" onclick="TabDisguiser.closeInfoWidget(event)" title="Got it" aria-label="Got it">
+                        <span class="material-symbols-sharp notranslate" style="font-size:32px;line-height:1;pointer-events:none;">check</span>
                     </button>
                 </div>
             </div>

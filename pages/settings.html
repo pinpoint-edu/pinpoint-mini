@@ -616,6 +616,8 @@ function resetDefaults() {
 
 function restartIntroduction() {
   try {
+    localStorage.removeItem('pinpoint_intro_dismissed_v5_classes');
+    sessionStorage.removeItem('pinpoint_intro_dismissed_v5_classes');
     localStorage.removeItem('pinpoint_intro_dismissed_v4');
     sessionStorage.removeItem('pinpoint_intro_dismissed_v4');
     sessionStorage.setItem('pinpoint_play_intro_on_home', 'true');
