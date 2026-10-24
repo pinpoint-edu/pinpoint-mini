@@ -597,54 +597,50 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 <div id="customize-modal" class="pinpoint-intro-fullscreen" style="display:none;">
-  <div class="pinpoint-intro-top-row" style="justify-content:space-between !important;gap:12px !important;">
-    <div style="display:flex;align-items:center;gap:14px;min-width:0;flex-wrap:wrap;">
-      <button class="pinpoint-close-circle-btn" type="button" onclick="closeCustomizeModal()" title="Close" aria-label="Close">
-        <span class="material-symbols-sharp notranslate" style="font-size:16px;line-height:1;pointer-events:none;">close</span>
-        <span>Close</span>
-      </button>
-      <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;">
-        <h1 class="pinpoint-intro-title">Customize Class</h1>
-        <p class="pinpoint-intro-subtitle" style="margin:0 !important;">
-          Update your class name, teacher, and header banner or upload a custom image.
-        </p>
-      </div>
-    </div>
-    <span style="background:#f1f3f4;border:1px solid #dadce0;border-radius:9999px;padding:5px 12px;font-size:12px;color:#3c4043;font-weight:500;white-space:nowrap;">
-      Changes sync across Home, Stream, and Classwork
-    </span>
+  <div class="pinpoint-intro-top-row">
+    <button class="pinpoint-close-circle-btn" type="button" onclick="closeCustomizeModal()" title="Close" aria-label="Close">
+      <span class="material-symbols-sharp notranslate" style="font-size:16px;line-height:1;pointer-events:none;">close</span>
+      <span>Close</span>
+    </button>
   </div>
 
   <div class="pinpoint-intro-body">
-    <div class="pinpoint-cm-grid" style="grid-template-columns: 0.88fr 1.12fr !important;margin-top:4px !important;">
+    <div class="pinpoint-intro-header-left">
+      <h1 class="pinpoint-intro-title">Customize Class</h1>
+      <p class="pinpoint-intro-subtitle">
+        Update your class name, teacher, and header banner or upload a custom image.
+      </p>
+    </div>
+
+    <div class="pinpoint-cm-grid" style="grid-template-columns: 0.9fr 1.1fr !important;">
       <!-- Left Panel: Class Details -->
       <div class="pinpoint-cm-panel">
-        <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
-          <div class="pinpoint-bullet-circle" style="width:36px !important;height:36px !important;min-width:36px !important;max-width:36px !important;border-radius:9999px !important;background:#e8f0fe;border-color:#d2e3fc;color:#1a73e8;">
-            <span class="material-symbols-sharp notranslate" style="font-size:19px;color:#1a73e8;">edit_square</span>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div class="pinpoint-bullet-circle" style="width:42px !important;height:42px !important;min-width:42px !important;max-width:42px !important;border-radius:9999px !important;background:#e8f0fe;border-color:#d2e3fc;color:#1a73e8;">
+            <span class="material-symbols-sharp notranslate" style="color:#1a73e8;">edit_square</span>
           </div>
           <div>
-            <div style="font-size:15.5px;font-weight:500;color:#1f1f1f;line-height:1.2;">Class Info</div>
-            <div style="font-size:12px;color:#5f6368;">Set the title and teacher shown on the header and sidebar.</div>
+            <div style="font-size:16px;font-weight:500;color:#1f1f1f;">Class Info</div>
+            <div style="font-size:12.5px;color:#5f6368;">Set the title and teacher shown on the header and sidebar.</div>
           </div>
         </div>
 
-        <div style="display:flex;flex-direction:column;gap:10px;margin-top:2px;">
+        <div style="display:flex;flex-direction:column;gap:12px;margin-top:2px;">
           <div>
-            <label style="display:block;font-size:11.5px;font-weight:500;color:#5f6368;margin-bottom:4px;">Class Name</label>
+            <label style="display:block;font-size:12px;font-weight:500;color:#5f6368;margin-bottom:4px;">Class Name</label>
             <input id="cust-name" class="pinpoint-cm-input" type="text" placeholder="e.g. World History" />
           </div>
           <div>
-            <label style="display:block;font-size:11.5px;font-weight:500;color:#5f6368;margin-bottom:4px;">Teacher / Section <span style="font-weight:400;color:#80868b;">(optional)</span></label>
+            <label style="display:block;font-size:12px;font-weight:500;color:#5f6368;margin-bottom:4px;">Teacher / Section <span style="font-weight:400;color:#80868b;">(optional)</span></label>
             <input id="cust-teacher" class="pinpoint-cm-input" type="text" placeholder="e.g. Period 3 • Mr. Johnson" />
           </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:4px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:4px;flex-wrap:wrap;">
             <button type="button" class="pinpoint-copy-circle-btn" onclick="if(typeof TabDisguiser!=='undefined'){closeCustomizeModal();TabDisguiser.openClassManagerModal();}">
-              <span class="material-symbols-sharp notranslate" style="font-size:14px;color:#1a73e8;">reorder</span>
+              <span class="material-symbols-sharp notranslate" style="font-size:15px;color:#1a73e8;">reorder</span>
               <span>Manage All Classes</span>
             </button>
-            <button type="button" class="pinpoint-copy-circle-btn" style="background:#1a73e8 !important;border-color:#1a73e8 !important;color:#ffffff !important;padding:7px 16px !important;font-size:12.5px !important;" onclick="saveCustomization()">
-              <span class="material-symbols-sharp notranslate" style="font-size:15px;color:#ffffff;">save</span>
+            <button type="button" class="pinpoint-copy-circle-btn" style="background:#1a73e8 !important;border-color:#1a73e8 !important;color:#ffffff !important;padding:8px 18px !important;font-size:13px !important;" onclick="saveCustomization()">
+              <span class="material-symbols-sharp notranslate" style="font-size:16px;color:#ffffff;">save</span>
               <span>Save Changes</span>
             </button>
           </div>
@@ -653,14 +649,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
       <!-- Right Panel: Header Banner Theme & Custom Image Upload -->
       <div class="pinpoint-cm-panel">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;flex-shrink:0;">
-          <div style="display:flex;align-items:center;gap:10px;">
-            <div class="pinpoint-bullet-circle" style="width:36px !important;height:36px !important;min-width:36px !important;max-width:36px !important;border-radius:9999px !important;background:#e6f4ea;border-color:#ceead6;color:#137333;">
-              <span class="material-symbols-sharp notranslate" style="font-size:19px;color:#137333;">image</span>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div class="pinpoint-bullet-circle" style="width:42px !important;height:42px !important;min-width:42px !important;max-width:42px !important;border-radius:9999px !important;background:#e6f4ea;border-color:#ceead6;color:#137333;">
+              <span class="material-symbols-sharp notranslate" style="color:#137333;">image</span>
             </div>
             <div>
-              <div style="font-size:15.5px;font-weight:500;color:#1f1f1f;line-height:1.2;">Header Banner</div>
-              <div style="font-size:12px;color:#5f6368;">Pick a preset theme or upload your own banner image.</div>
+              <div style="font-size:16px;font-weight:500;color:#1f1f1f;">Header Banner</div>
+              <div style="font-size:12.5px;color:#5f6368;">Pick a preset theme or upload your own banner image.</div>
             </div>
           </div>
           <div>
@@ -672,15 +668,20 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </div>
 
-        <div id="cust-banners-grid" class="pinpoint-cm-banners"></div>
+        <div id="cust-banners-grid" class="pinpoint-cm-banners" style="max-height:210px !important;"></div>
       </div>
     </div>
   </div>
 
-  <div class="pinpoint-intro-bottom-row" style="justify-content:flex-end !important;padding-top:2px !important;">
+  <div class="pinpoint-intro-bottom-row">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <span style="background:#f1f3f4;border:1px solid #dadce0;border-radius:99px;padding:6px 14px;font-size:13px;color:#3c4043;font-weight:500;">
+        Changes sync across Home, Stream, and Classwork
+      </span>
+    </div>
     <div class="pinpoint-intro-nav-circles">
       <button class="pinpoint-nav-circle-btn" type="button" onclick="saveCustomization()" title="Save &amp; Close" aria-label="Save &amp; Close">
-        <span class="material-symbols-sharp notranslate" style="font-size:24px;line-height:1;pointer-events:none;">check</span>
+        <span class="material-symbols-sharp notranslate" style="font-size:28px;line-height:1;pointer-events:none;">check</span>
       </button>
     </div>
   </div>
