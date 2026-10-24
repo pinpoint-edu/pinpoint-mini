@@ -231,6 +231,11 @@
         // Intercept global link and element clicks
         document.addEventListener('click', function(e) {
             if (window.__IS_PANIC_TRIGGERED__ || (window.top && window.top.__IS_PANIC_TRIGGERED__)) return;
+            if (window._pinpointJustDraggedCard) {
+                e.preventDefault();
+                e.stopPropagation();
+                return;
+            }
             if (e.target.closest && e.target.closest('[data-fake-class="true"]')) {
                 if (!e.target.closest('[data-class-options-btn="true"]')) {
                     e.preventDefault();

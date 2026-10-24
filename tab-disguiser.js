@@ -79,12 +79,18 @@ var TabDisguiser = window.TabDisguiser || {
         if (!this._storageClassBound) {
             this._storageClassBound = true;
             window.addEventListener('storage', (e) => {
-                if (e.key === 'pinpoint_classroom_config') {
+                if (e.key === 'pinpoint_classroom_config' || e.key === 'pinpoint_custom_banners') {
                     this.applyClassConfig();
                 }
             });
         }
         document.addEventListener('click', (e) => {
+            if (window._pinpointJustDraggedCard) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+                return;
+            }
             const addBtn = e.target.closest('button[jsname="mSMdM"], .XGLVqf button[aria-label="Create or join a class"], .XGLVqf button[aria-label="Join class"], li[jsname="SLuNwd"], li[jsname="svCv4e"], [data-open-class-manager="true"]');
             if (addBtn) {
                 e.preventDefault();
@@ -501,6 +507,14 @@ var TabDisguiser = window.TabDisguiser || {
             banner: 'WorldHistory.jpg'
         };
 
+        const cleanBannerKey = (val) => {
+            const s = String(val || 'WorldHistory.jpg').trim();
+            if (s.startsWith('data:') || s.startsWith('blob:') || s.startsWith('http://') || s.startsWith('https://') || s.startsWith('custom_')) {
+                return s;
+            }
+            return s.replace(/^(\.\.\/|\.\/)?images\//, '');
+        };
+
         if (!Array.isArray(parsed.classes) || parsed.classes.length === 0) {
             parsed.classes = [
                 {
@@ -508,7 +522,7 @@ var TabDisguiser = window.TabDisguiser || {
                     name: (baseHistory.name || 'World History').trim() || 'World History',
                     teacher: (baseHistory.teacher || '').trim(),
                     sec: (baseHistory.sec || '').trim(),
-                    banner: ((baseHistory.banner || 'WorldHistory.jpg') + '').replace(/^(\.\.\/|\.\/)?images\//, ''),
+                    banner: cleanBannerKey(baseHistory.banner || 'WorldHistory.jpg'),
                     hasGames: true
                 }
             ];
@@ -523,7 +537,7 @@ var TabDisguiser = window.TabDisguiser || {
                     name: String(cObj.name || 'World History').trim() || 'World History',
                     teacher: String(cObj.teacher || '').trim(),
                     sec: String(cObj.sec || '').trim(),
-                    banner: String(cObj.banner || 'WorldHistory.jpg').replace(/^(\.\.\/|\.\/)?images\//, ''),
+                    banner: cleanBannerKey(cObj.banner || 'WorldHistory.jpg'),
                     hasGames: isGames
                 };
             });
@@ -571,10 +585,52 @@ var TabDisguiser = window.TabDisguiser || {
         return normalized;
     },
 
+    getCustomBanners() {
+        try {
+            const raw = localStorage.getItem('pinpoint_custom_banners');
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed)) return parsed;
+            }
+        } catch (e) {}
+        return [];
+    },
+
+    saveCustomBanners(list) {
+        try {
+            localStorage.setItem('pinpoint_custom_banners', JSON.stringify(Array.isArray(list) ? list : []));
+        } catch (e) {
+            if (typeof window.showPinpointToast === 'function') {
+                window.showPinpointToast('Storage full: please remove an older custom banner first.', 'error');
+            }
+        }
+    },
+
+    resolveBannerUrl(bannerFileName, isPagesPath) {
+        const val = String(bannerFileName || 'WorldHistory.jpg').trim();
+        if (val.startsWith('data:') || val.startsWith('blob:') || val.startsWith('http://') || val.startsWith('https://')) {
+            return val;
+        }
+        if (val.startsWith('custom_')) {
+            const customList = this.getCustomBanners();
+            const found = customList.find(item => item && item.id === val && item.dataUrl);
+            if (found) return found.dataUrl;
+            return (isPagesPath ? '../images/' : './images/') + 'WorldHistory.jpg';
+        }
+        const cleanFile = val.replace(/^(\.\.\/|\.\/)?images\//, '');
+        return (isPagesPath ? '../images/' : './images/') + cleanFile;
+    },
+
     getBannerColor(bannerFileName) {
-        if (window.getBannerColor) return window.getBannerColor(bannerFileName);
+        const val = String(bannerFileName || 'WorldHistory.jpg').trim();
+        if (val.startsWith('custom_') || val.startsWith('data:')) {
+            const customList = this.getCustomBanners();
+            const found = customList.find(item => item && (item.id === val || item.dataUrl === val) && item.colors);
+            if (found) return found.colors;
+        }
+        if (window.getBannerColor) return window.getBannerColor(val);
         const map = window.BANNER_COLOR_MAP || {};
-        const key = (bannerFileName || 'WorldHistory.jpg').replace(/^(\.\.\/|\.\/)?images\//, '');
+        const key = val.replace(/^(\.\.\/|\.\/)?images\//, '');
         return map[key] || {
             dominant: '#e06050',
             sidebarBg: '#f5ecea',
@@ -582,6 +638,133 @@ var TabDisguiser = window.TabDisguiser || {
             circleBg: '#f0d5d1',
             circleText: '#792115'
         };
+    },
+
+    processUploadedBannerFile(file) {
+        return new Promise((resolve, reject) => {
+            if (!file || !file.type || !file.type.startsWith('image/')) {
+                reject(new Error('Please select a valid image file.'));
+                return;
+            }
+            const reader = new FileReader();
+            reader.onerror = () => reject(new Error('Failed to read image file.'));
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onerror = () => reject(new Error('Invalid image format.'));
+                img.onload = () => {
+                    try {
+                        const maxW = 1100;
+                        const maxH = 360;
+                        let w = img.width || 800;
+                        let h = img.height || 240;
+                        const scale = Math.min(1, maxW / w, maxH / Math.max(h, 1));
+                        w = Math.max(1, Math.round(w * scale));
+                        h = Math.max(1, Math.round(h * scale));
+
+                        const canvas = document.createElement('canvas');
+                        canvas.width = w;
+                        canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+
+                        // Extract average color to generate matching badge/sidebar palette
+                        let rSum = 0, gSum = 0, bSum = 0, count = 0;
+                        try {
+                            const data = ctx.getImageData(0, 0, w, h).data;
+                            const step = Math.max(4, Math.floor((data.length / 4) / 400) * 4);
+                            for (let i = 0; i < data.length; i += step) {
+                                if (data[i + 3] < 128) continue;
+                                rSum += data[i];
+                                gSum += data[i + 1];
+                                bSum += data[i + 2];
+                                count++;
+                            }
+                        } catch (err) {}
+
+                        let r = count ? Math.round(rSum / count) : 26;
+                        let g = count ? Math.round(gSum / count) : 115;
+                        let b = count ? Math.round(bSum / count) : 232;
+
+                        const toHex = (n) => Math.max(0, Math.min(255, Math.round(n))).toString(16).padStart(2, '0');
+                        const mixWhite = (c, ratio) => Math.round(c + (255 - c) * ratio);
+                        const darken = (c, ratio) => Math.round(c * ratio);
+
+                        const colors = {
+                            dominant: '#' + toHex(r) + toHex(g) + toHex(b),
+                            sidebarBg: '#' + toHex(mixWhite(r, 0.88)) + toHex(mixWhite(g, 0.88)) + toHex(mixWhite(b, 0.88)),
+                            sidebarHover: '#' + toHex(mixWhite(r, 0.78)) + toHex(mixWhite(g, 0.78)) + toHex(mixWhite(b, 0.78)),
+                            circleBg: '#' + toHex(mixWhite(r, 0.74)) + toHex(mixWhite(g, 0.74)) + toHex(mixWhite(b, 0.74)),
+                            circleText: '#' + toHex(darken(r, 0.42)) + toHex(darken(g, 0.42)) + toHex(darken(b, 0.42))
+                        };
+
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.84);
+                        const rawName = (file.name || 'Custom Banner').replace(/\.[^/.]+$/, '').trim() || 'Custom Banner';
+                        const item = {
+                            id: 'custom_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+                            name: rawName.slice(0, 24),
+                            dataUrl,
+                            colors
+                        };
+                        const list = this.getCustomBanners();
+                        list.unshift(item);
+                        this.saveCustomBanners(list);
+                        resolve(item);
+                    } catch (err) {
+                        reject(err);
+                    }
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    },
+
+    deleteCustomBanner(bannerId, e) {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        const list = this.getCustomBanners().filter(b => b && b.id !== bannerId);
+        this.saveCustomBanners(list);
+
+        const cfg = this.getClassConfig();
+        let changedCfg = false;
+        if (Array.isArray(cfg.classes)) {
+            cfg.classes.forEach(c => {
+                if (c.banner === bannerId) {
+                    c.banner = 'WorldHistory.jpg';
+                    changedCfg = true;
+                }
+            });
+        }
+        if (this._cmSelectedBanner === bannerId) {
+            this._cmSelectedBanner = 'WorldHistory.jpg';
+        }
+        if (changedCfg) {
+            this.saveClassConfig(cfg);
+        } else {
+            this.applyClassConfig();
+        }
+        this.renderClassManagerContent();
+    },
+
+    reorderClasses(fromClassId, toClassId, insertAfter = false) {
+        if (!fromClassId || !toClassId || fromClassId === toClassId) return;
+        const cfg = this.getClassConfig();
+        if (!Array.isArray(cfg.classes) || cfg.classes.length < 2) return;
+        const fromIdx = cfg.classes.findIndex(c => c.id === fromClassId);
+        const toIdx = cfg.classes.findIndex(c => c.id === toClassId);
+        if (fromIdx === -1 || toIdx === -1) return;
+
+        const [moved] = cfg.classes.splice(fromIdx, 1);
+        let newTargetIdx = cfg.classes.findIndex(c => c.id === toClassId);
+        if (newTargetIdx === -1) {
+            cfg.classes.push(moved);
+        } else {
+            if (insertAfter) newTargetIdx += 1;
+            cfg.classes.splice(newTargetIdx, 0, moved);
+        }
+        this.saveClassConfig(cfg);
     },
 
     CLASSROOM_BANNERS: [
@@ -623,7 +806,7 @@ var TabDisguiser = window.TabDisguiser || {
             const cName = (cls.name || 'Untitled Class').trim();
             const safeName = this.escapeHtml(cName);
             const letter = this.escapeHtml((cName[0] || 'C').toUpperCase());
-            const bannerFile = (cls.banner || 'WorldHistory.jpg').replace(/^(\.\.\/|\.\/)?images\//, '');
+            const bannerFile = cls.banner || 'WorldHistory.jpg';
             const circleTheme = this.getClassThemeColor(cName, bannerFile);
 
             if (cls.hasGames) {
@@ -685,7 +868,6 @@ var TabDisguiser = window.TabDisguiser || {
 
         const historyHref = isAboutBlank ? '#pages/history.html' : (isFile ? './pages/history.html' : '/pages/history.html');
         const classworkHref = isAboutBlank ? '#pages/classwork-history.html' : (isFile ? './pages/classwork-history.html' : '/pages/classwork-history.html');
-        const imgPrefix = isPages ? '../images/' : './images/';
 
         const cfg = this.getClassConfig();
         const classes = cfg.classes || [];
@@ -695,23 +877,22 @@ var TabDisguiser = window.TabDisguiser || {
             const safeName = this.escapeHtml(cName);
             const teacher = (cls.teacher !== undefined ? cls.teacher : (cls.sec || '')).trim();
             const safeTeacher = this.escapeHtml(teacher);
-            const bannerFile = (cls.banner || 'WorldHistory.jpg').replace(/^(\.\.\/|\.\/)?images\//, '');
-            const bannerUrl = imgPrefix + bannerFile;
+            const bannerUrl = this.resolveBannerUrl(cls.banner || 'WorldHistory.jpg', isPages);
             const safeClassId = this.escapeHtml(cls.id);
 
             if (cls.hasGames) {
-                return '<li class="gHz6xd riU7le rZXyy" data-draggable-item-id="854642477833" data-user-id="10000000001" data-course-id="854642477833" data-class-id="' + safeClassId + '">' +
+                return '<li class="gHz6xd riU7le rZXyy" draggable="true" data-draggable-item-id="854642477833" data-user-id="10000000001" data-course-id="854642477833" data-class-id="' + safeClassId + '" style="cursor:grab;">' +
                     '<div class="Tc9hUd CNpREd g2MItd">' +
                         '<div class="OjOEXb" style="background-image: url(&quot;' + bannerUrl + '&quot;) !important;"></div>' +
                         '<div class="ZizeYd ml1ZL lmPo4" style="display:none !important;opacity:0 !important;"></div>' +
                         '<div class="R4EiSb">' +
-                            '<a class="slDfNd ZmqAt z07MGc" target="_self" aria-hidden="true" tabindex="-1" href="' + historyHref + '"></a>' +
+                            '<a class="slDfNd ZmqAt z07MGc" draggable="false" target="_self" aria-hidden="true" tabindex="-1" href="' + historyHref + '"></a>' +
                             '<h2 class="prWPdf">' +
-                                '<a class="slDfNd Vu2fZd z07MGc" target="_self" href="' + historyHref + '" data-focus-id="/u/2/c/ODU0NjQyNDc3ODMz">' +
+                                '<a class="slDfNd Vu2fZd z07MGc" draggable="false" target="_self" href="' + historyHref + '" data-focus-id="/u/2/c/ODU0NjQyNDc3ODMz">' +
                                     '<div class="ScpeUc Vu2fZd XwD7Ke">' + safeName + '</div>' +
                                     '<div class="FWGURc Vu2fZd Svw0vd"></div>' +
                                 '</a>' +
-                                '<a class="slDfNd z07MGc" target="_self" aria-hidden="true" tabindex="-1" href="' + historyHref + '"> </a>' +
+                                '<a class="slDfNd z07MGc" draggable="false" target="_self" aria-hidden="true" tabindex="-1" href="' + historyHref + '"> </a>' +
                             '</h2>' +
                             '<div class="gmNu1d">' +
                                 '<div class="z07MGc Vu2fZd jJIbcc T30lh">' + safeTeacher + '</div>' +
@@ -725,7 +906,7 @@ var TabDisguiser = window.TabDisguiser || {
                             '<div class="pYTkkf-Bz112c-LgbsSe pYTkkf-Bz112c-LgbsSe-OWXEXe-SfQLQb-suEOdc" style="cursor:pointer;position:relative;" onclick="if(window.navigateToAboutBlankPage){window.navigateToAboutBlankPage(\'pages/classwork-history.html\');return false;}">' +
                                 '<span class="UTNHae"></span>' +
                                 '<span aria-hidden="true" class="pYTkkf-Bz112c-kBDsod-Rtc0Jf"><span class="notranslate VfPpkd-kBDsod" aria-hidden="true"><svg focusable="false" width="24" height="24" viewBox="0 0 24 24" class="NMm5M"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7.55 0c.14-.15.33-.25.55-.25s.41.1.55.25c.12.13.2.31.2.5 0 .41-.34.75-.75.75s-.75-.34-.75-.75c0-.19.08-.37.2-.5zM19 5v10.79C16.52 14.37 13.23 14 12 14s-4.52.37-7 1.79V5h14zM5 19v-.77C6.74 16.66 10.32 16 12 16s5.26.66 7 2.23V19H5z"/><path d="M12 13c1.94 0 3.5-1.56 3.5-3.5S13.94 6 12 6 8.5 7.56 8.5 9.5 10.06 13 12 13zm0-5c.83 0 1.5.67 1.5 1.5S12.83 11 12 11s-1.5-.67-1.5-1.5S11.17 8 12 8z"/></svg></span></span>' +
-                                '<a class="pYTkkf-Bz112c-mRLv6 pYTkkf-Bz112c-RLmnJb" href="' + classworkHref + '" aria-label="Open your work for &quot;' + safeName + '&quot;" style="position:absolute;inset:0;width:100%;height:100%;z-index:10;cursor:pointer;"></a>' +
+                                '<a class="pYTkkf-Bz112c-mRLv6 pYTkkf-Bz112c-RLmnJb" draggable="false" href="' + classworkHref + '" aria-label="Open your work for &quot;' + safeName + '&quot;" style="position:absolute;inset:0;width:100%;height:100%;z-index:10;cursor:pointer;"></a>' +
                                 '<span class="XjoK4b pYTkkf-Bz112c-UHGRz"></span>' +
                             '</div>' +
                         '</span>' +
@@ -733,7 +914,7 @@ var TabDisguiser = window.TabDisguiser || {
                             '<div class="pYTkkf-Bz112c-LgbsSe pYTkkf-Bz112c-LgbsSe-OWXEXe-SfQLQb-suEOdc dNcx9b" style="cursor:pointer;position:relative;" onclick="event.preventDefault();event.stopPropagation();return false;">' +
                                 '<span class="UTNHae"></span>' +
                                 '<span aria-hidden="true" class="pYTkkf-Bz112c-kBDsod-Rtc0Jf"><span class="notranslate VfPpkd-kBDsod" aria-hidden="true"><svg focusable="false" width="24" height="24" viewBox="0 0 24 24" class="NMm5M"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg></span></span>' +
-                                '<a class="pYTkkf-Bz112c-mRLv6 pYTkkf-Bz112c-RLmnJb" href="javascript:void(0)" onclick="event.preventDefault();event.stopPropagation();return false;" aria-label="Open folder for &quot;' + safeName + '&quot; in Google Drive" style="position:absolute;inset:0;width:100%;height:100%;z-index:10;cursor:pointer;"></a>' +
+                                '<a class="pYTkkf-Bz112c-mRLv6 pYTkkf-Bz112c-RLmnJb" draggable="false" href="javascript:void(0)" onclick="event.preventDefault();event.stopPropagation();return false;" aria-label="Open folder for &quot;' + safeName + '&quot; in Google Drive" style="position:absolute;inset:0;width:100%;height:100%;z-index:10;cursor:pointer;"></a>' +
                                 '<span class="XjoK4b pYTkkf-Bz112c-UHGRz"></span>' +
                             '</div>' +
                         '</span></div>' +
@@ -750,18 +931,18 @@ var TabDisguiser = window.TabDisguiser || {
                     '</div>' +
                 '</li>';
             } else {
-                return '<li class="gHz6xd riU7le rZXyy" data-fake-class="true" data-draggable-item-id="' + safeClassId + '" data-user-id="10000000001" data-course-id="' + safeClassId + '" data-class-id="' + safeClassId + '">' +
+                return '<li class="gHz6xd riU7le rZXyy" draggable="true" data-fake-class="true" data-draggable-item-id="' + safeClassId + '" data-user-id="10000000001" data-course-id="' + safeClassId + '" data-class-id="' + safeClassId + '" style="cursor:grab;">' +
                     '<div class="Tc9hUd CNpREd g2MItd" data-fake-class="true">' +
                         '<div class="OjOEXb" style="background-image: url(&quot;' + bannerUrl + '&quot;) !important;"></div>' +
                         '<div class="ZizeYd ml1ZL lmPo4" style="display:none !important;opacity:0 !important;"></div>' +
                         '<div class="R4EiSb" data-fake-class="true">' +
-                            '<a class="slDfNd ZmqAt z07MGc" data-fake-class="true" target="_self" aria-hidden="true" tabindex="-1" href="javascript:void(0)" onclick="event.preventDefault();event.stopPropagation();return false;" style="cursor:pointer;"></a>' +
+                            '<a class="slDfNd ZmqAt z07MGc" draggable="false" data-fake-class="true" target="_self" aria-hidden="true" tabindex="-1" href="javascript:void(0)" onclick="event.preventDefault();event.stopPropagation();return false;" style="cursor:pointer;"></a>' +
                             '<h2 class="prWPdf">' +
-                                '<a class="slDfNd Vu2fZd z07MGc" data-fake-class="true" target="_self" href="javascript:void(0)" onclick="event.preventDefault();event.stopPropagation();return false;" style="cursor:pointer;">' +
+                                '<a class="slDfNd Vu2fZd z07MGc" draggable="false" data-fake-class="true" target="_self" href="javascript:void(0)" onclick="event.preventDefault();event.stopPropagation();return false;" style="cursor:pointer;">' +
                                     '<div class="ScpeUc Vu2fZd XwD7Ke">' + safeName + '</div>' +
                                     '<div class="FWGURc Vu2fZd Svw0vd"></div>' +
                                 '</a>' +
-                                '<a class="slDfNd z07MGc" data-fake-class="true" target="_self" aria-hidden="true" tabindex="-1" href="javascript:void(0)" onclick="event.preventDefault();event.stopPropagation();return false;"> </a>' +
+                                '<a class="slDfNd z07MGc" draggable="false" data-fake-class="true" target="_self" aria-hidden="true" tabindex="-1" href="javascript:void(0)" onclick="event.preventDefault();event.stopPropagation();return false;"> </a>' +
                             '</h2>' +
                             '<div class="gmNu1d">' +
                                 '<div class="z07MGc Vu2fZd jJIbcc T30lh">' + safeTeacher + '</div>' +
@@ -775,7 +956,7 @@ var TabDisguiser = window.TabDisguiser || {
                             '<div class="pYTkkf-Bz112c-LgbsSe pYTkkf-Bz112c-LgbsSe-OWXEXe-SfQLQb-suEOdc" data-fake-class="true" style="cursor:pointer;position:relative;" onclick="event.preventDefault();event.stopPropagation();return false;">' +
                                 '<span class="UTNHae"></span>' +
                                 '<span aria-hidden="true" class="pYTkkf-Bz112c-kBDsod-Rtc0Jf"><span class="notranslate VfPpkd-kBDsod" aria-hidden="true"><svg focusable="false" width="24" height="24" viewBox="0 0 24 24" class="NMm5M"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7.55 0c.14-.15.33-.25.55-.25s.41.1.55.25c.12.13.2.31.2.5 0 .41-.34.75-.75.75s-.75-.34-.75-.75c0-.19.08-.37.2-.5zM19 5v10.79C16.52 14.37 13.23 14 12 14s-4.52.37-7 1.79V5h14zM5 19v-.77C6.74 16.66 10.32 16 12 16s5.26.66 7 2.23V19H5z"/><path d="M12 13c1.94 0 3.5-1.56 3.5-3.5S13.94 6 12 6 8.5 7.56 8.5 9.5 10.06 13 12 13zm0-5c.83 0 1.5.67 1.5 1.5S12.83 11 12 11s-1.5-.67-1.5-1.5S11.17 8 12 8z"/></svg></span></span>' +
-                                '<a class="pYTkkf-Bz112c-mRLv6 pYTkkf-Bz112c-RLmnJb" data-fake-class="true" href="javascript:void(0)" onclick="event.preventDefault();event.stopPropagation();return false;" aria-label="Open your work for &quot;' + safeName + '&quot;" style="position:absolute;inset:0;width:100%;height:100%;z-index:10;cursor:pointer;"></a>' +
+                                '<a class="pYTkkf-Bz112c-mRLv6 pYTkkf-Bz112c-RLmnJb" draggable="false" data-fake-class="true" href="javascript:void(0)" onclick="event.preventDefault();event.stopPropagation();return false;" aria-label="Open your work for &quot;' + safeName + '&quot;" style="position:absolute;inset:0;width:100%;height:100%;z-index:10;cursor:pointer;"></a>' +
                                 '<span class="XjoK4b pYTkkf-Bz112c-UHGRz"></span>' +
                             '</div>' +
                         '</span>' +
@@ -783,7 +964,7 @@ var TabDisguiser = window.TabDisguiser || {
                             '<div class="pYTkkf-Bz112c-LgbsSe pYTkkf-Bz112c-LgbsSe-OWXEXe-SfQLQb-suEOdc dNcx9b" data-fake-class="true" style="cursor:pointer;position:relative;" onclick="event.preventDefault();event.stopPropagation();return false;">' +
                                 '<span class="UTNHae"></span>' +
                                 '<span aria-hidden="true" class="pYTkkf-Bz112c-kBDsod-Rtc0Jf"><span class="notranslate VfPpkd-kBDsod" aria-hidden="true"><svg focusable="false" width="24" height="24" viewBox="0 0 24 24" class="NMm5M"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg></span></span>' +
-                                '<a class="pYTkkf-Bz112c-mRLv6 pYTkkf-Bz112c-RLmnJb" data-fake-class="true" href="javascript:void(0)" onclick="event.preventDefault();event.stopPropagation();return false;" aria-label="Open folder for &quot;' + safeName + '&quot; in Google Drive" style="position:absolute;inset:0;width:100%;height:100%;z-index:10;cursor:pointer;"></a>' +
+                                '<a class="pYTkkf-Bz112c-mRLv6 pYTkkf-Bz112c-RLmnJb" draggable="false" data-fake-class="true" href="javascript:void(0)" onclick="event.preventDefault();event.stopPropagation();return false;" aria-label="Open folder for &quot;' + safeName + '&quot; in Google Drive" style="position:absolute;inset:0;width:100%;height:100%;z-index:10;cursor:pointer;"></a>' +
                                 '<span class="XjoK4b pYTkkf-Bz112c-UHGRz"></span>' +
                             '</div>' +
                         '</span></div>' +
@@ -803,6 +984,79 @@ var TabDisguiser = window.TabDisguiser || {
         }).join('');
 
         listEl.innerHTML = cardsHtml;
+        this.bindHomeCardDragAndDrop(listEl);
+    },
+
+    bindHomeCardDragAndDrop(listEl) {
+        if (!listEl || listEl._pinpointDragBound) return;
+        listEl._pinpointDragBound = true;
+
+        let draggedClassId = null;
+
+        listEl.addEventListener('dragstart', (e) => {
+            const card = e.target.closest('li.gHz6xd[data-class-id]');
+            if (!card) return;
+            draggedClassId = card.getAttribute('data-class-id');
+            if (!draggedClassId) return;
+            window._pinpointJustDraggedCard = true;
+            if (e.dataTransfer) {
+                e.dataTransfer.effectAllowed = 'move';
+                try { e.dataTransfer.setData('text/plain', draggedClassId); } catch (err) {}
+            }
+            setTimeout(() => {
+                card.style.opacity = '0.45';
+            }, 0);
+        });
+
+        listEl.addEventListener('dragover', (e) => {
+            if (!draggedClassId) return;
+            const targetCard = e.target.closest('li.gHz6xd[data-class-id]');
+            if (!targetCard) return;
+            e.preventDefault();
+            if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+            const targetId = targetCard.getAttribute('data-class-id');
+            listEl.querySelectorAll('li.gHz6xd[data-class-id]').forEach(li => {
+                if (li.getAttribute('data-class-id') === targetId && targetId !== draggedClassId) {
+                    li.style.outline = '2px dashed #1a73e8';
+                    li.style.outlineOffset = '4px';
+                } else {
+                    li.style.outline = '';
+                    li.style.outlineOffset = '';
+                }
+            });
+        });
+
+        listEl.addEventListener('drop', (e) => {
+            if (!draggedClassId) return;
+            e.preventDefault();
+            e.stopPropagation();
+            const targetCard = e.target.closest('li.gHz6xd[data-class-id]');
+            listEl.querySelectorAll('li.gHz6xd[data-class-id]').forEach(li => {
+                li.style.outline = '';
+                li.style.outlineOffset = '';
+                li.style.opacity = '';
+            });
+            if (targetCard) {
+                const targetId = targetCard.getAttribute('data-class-id');
+                if (targetId && targetId !== draggedClassId) {
+                    const rect = targetCard.getBoundingClientRect();
+                    const insertAfter = (e.clientX - rect.left) > (rect.width / 2);
+                    this.reorderClasses(draggedClassId, targetId, insertAfter);
+                }
+            }
+            draggedClassId = null;
+            setTimeout(() => { window._pinpointJustDraggedCard = false; }, 160);
+        });
+
+        listEl.addEventListener('dragend', () => {
+            draggedClassId = null;
+            listEl.querySelectorAll('li.gHz6xd[data-class-id]').forEach(li => {
+                li.style.outline = '';
+                li.style.outlineOffset = '';
+                li.style.opacity = '';
+            });
+            setTimeout(() => { window._pinpointJustDraggedCard = false; }, 160);
+        });
     },
 
     bindHomeAddClassButtons() {
@@ -862,9 +1116,9 @@ var TabDisguiser = window.TabDisguiser || {
 
         this.setTitle(this.getCanonicalPageTitle());
 
-        const bannerFile = (historyCfg.banner || 'WorldHistory.jpg').replace(/^(\.\.\/|\.\/)?images\//, '');
+        const bannerFile = historyCfg.banner || 'WorldHistory.jpg';
         const isPagesPath = path.includes('/pages/') || path.includes('\\pages\\') || path.startsWith('pages/');
-        const bannerUrl = (isPagesPath ? '../images/' : './images/') + bannerFile;
+        const bannerUrl = this.resolveBannerUrl(bannerFile, isPagesPath);
         document.querySelectorAll('.PFLqgc, li[data-course-id="854642477833"] .OjOEXb').forEach(b => {
             b.style.setProperty('background-image', 'url("' + bannerUrl + '")', 'important');
         });
@@ -2553,10 +2807,10 @@ var TabDisguiser = window.TabDisguiser || {
             .pinpoint-cm-grid {
                 display: grid !important;
                 grid-template-columns: 1.05fr 1fr !important;
-                gap: 32px !important;
+                gap: 28px !important;
                 width: 100% !important;
                 max-width: 1240px !important;
-                margin-top: 28px !important;
+                margin-top: 24px !important;
                 align-items: start !important;
             }
             @media (max-width: 960px) {
@@ -2568,31 +2822,56 @@ var TabDisguiser = window.TabDisguiser || {
                 background: #f8f9fa !important;
                 border: 1px solid #dadce0 !important;
                 border-radius: 24px !important;
-                padding: 24px !important;
+                padding: 22px 24px !important;
                 box-sizing: border-box !important;
                 display: flex !important;
                 flex-direction: column !important;
-                gap: 16px !important;
+                gap: 14px !important;
             }
             .pinpoint-cm-class-row {
                 display: flex !important;
                 align-items: center !important;
                 justify-content: space-between !important;
-                gap: 14px !important;
+                gap: 12px !important;
                 background: #ffffff !important;
                 border: 1px solid #dadce0 !important;
-                border-radius: 18px !important;
-                padding: 14px 16px !important;
-                transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
-                flex-wrap: wrap !important;
+                border-radius: 16px !important;
+                padding: 11px 14px !important;
+                transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease, opacity 0.15s ease !important;
+                cursor: grab !important;
+                user-select: none !important;
+            }
+            .pinpoint-cm-class-row:active {
+                cursor: grabbing !important;
             }
             .pinpoint-cm-class-row.is-games-class {
                 border: 2px solid #1a73e8 !important;
                 box-shadow: 0 2px 10px rgba(26,115,232,0.10) !important;
             }
+            .pinpoint-cm-class-row.is-dragging {
+                opacity: 0.45 !important;
+                border-style: dashed !important;
+            }
+            .pinpoint-cm-class-row.drag-over-top {
+                box-shadow: 0 -3px 0 0 #1a73e8 !important;
+            }
+            .pinpoint-cm-class-row.drag-over-bottom {
+                box-shadow: 0 3px 0 0 #1a73e8 !important;
+            }
+            .pinpoint-cm-drag-handle {
+                color: #9aa0a6 !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                cursor: grab !important;
+                flex-shrink: 0 !important;
+            }
+            .pinpoint-cm-class-row:hover .pinpoint-cm-drag-handle {
+                color: #5f6368 !important;
+            }
             .pinpoint-cm-input {
                 width: 100% !important;
-                padding: 11px 16px !important;
+                padding: 10px 14px !important;
                 border: 1px solid #dadce0 !important;
                 border-radius: 14px !important;
                 font-size: 14px !important;
@@ -2610,6 +2889,9 @@ var TabDisguiser = window.TabDisguiser || {
                 display: grid !important;
                 grid-template-columns: repeat(4, 1fr) !important;
                 gap: 8px !important;
+                max-height: 220px !important;
+                overflow-y: auto !important;
+                padding: 3px !important;
             }
             @media (max-width: 520px) {
                 .pinpoint-cm-banners {
@@ -2629,7 +2911,10 @@ var TabDisguiser = window.TabDisguiser || {
             const target = classes.find(c => c.id === editClassId);
             if (target) {
                 this._cmEditingClassId = target.id;
-                this._cmSelectedBanner = (target.banner || 'WorldHistory.jpg').replace(/^(\.\.\/|\.\/)?images\//, '');
+                const rawBanner = String(target.banner || 'WorldHistory.jpg');
+                this._cmSelectedBanner = (rawBanner.startsWith('custom_') || rawBanner.startsWith('data:'))
+                    ? rawBanner
+                    : rawBanner.replace(/^(\.\.\/|\.\/)?images\//, '');
                 this._cmMakeGamesClass = !!target.hasGames;
             } else {
                 this._cmEditingClassId = null;
@@ -2670,7 +2955,6 @@ var TabDisguiser = window.TabDisguiser || {
 
         const path = (window.__CURRENT_PAGE__ || window.location.pathname || '').toLowerCase();
         const isPages = path.includes('/pages/') || path.includes('\\pages\\') || path.startsWith('pages/');
-        const imgPrefix = isPages ? '../images/' : './images/';
 
         const cfg = this.getClassConfig();
         const classes = cfg.classes || [];
@@ -2696,35 +2980,41 @@ var TabDisguiser = window.TabDisguiser || {
             const teacher = (cls.teacher || cls.sec || '').trim();
             const safeTeacher = this.escapeHtml(teacher);
             const letter = this.escapeHtml((cName[0] || 'C').toUpperCase());
-            const bannerFile = (cls.banner || 'WorldHistory.jpg').replace(/^(\.\.\/|\.\/)?images\//, '');
+            const rawBanner = String(cls.banner || 'WorldHistory.jpg');
+            const bannerFile = (rawBanner.startsWith('custom_') || rawBanner.startsWith('data:'))
+                ? rawBanner
+                : rawBanner.replace(/^(\.\.\/|\.\/)?images\//, '');
             const theme = this.getClassThemeColor(cName, bannerFile);
             const safeId = this.escapeHtml(cls.id);
 
             const statusBadge = cls.hasGames
-                ? '<span style="display:inline-flex;align-items:center;gap:5px;background:#e8f0fe;color:#1a73e8;border:1px solid #d2e3fc;border-radius:99px;padding:3px 10px;font-size:11.5px;font-weight:600;"><span class="material-symbols-sharp notranslate" style="font-size:14px;color:#1a73e8;">sports_esports</span>Games Class (Redirects to Games)</span>'
-                : '<span style="display:inline-flex;align-items:center;gap:5px;background:#f1f3f4;color:#5f6368;border:1px solid #dadce0;border-radius:99px;padding:3px 10px;font-size:11.5px;font-weight:500;"><span class="material-symbols-sharp notranslate" style="font-size:14px;color:#5f6368;">block</span>Fake Placeholder (No Redirect)</span>';
+                ? '<span style="display:inline-flex;align-items:center;gap:4px;background:#e8f0fe;color:#1a73e8;border:1px solid #d2e3fc;border-radius:99px;padding:2px 8px;font-size:11px;font-weight:600;"><span class="material-symbols-sharp notranslate" style="font-size:13px;color:#1a73e8;">sports_esports</span>Games</span>'
+                : '<span style="display:inline-flex;align-items:center;gap:4px;background:#f1f3f4;color:#5f6368;border:1px solid #dadce0;border-radius:99px;padding:2px 8px;font-size:11px;font-weight:500;">Fake</span>';
 
             const setGamesBtn = cls.hasGames
-                ? '<button type="button" class="pinpoint-copy-circle-btn" style="background:#e6f4ea !important;border-color:#ceead6 !important;color:#137333 !important;cursor:default !important;" disabled><span class="material-symbols-sharp notranslate" style="font-size:16px;color:#137333;">check_circle</span><span>Has Games</span></button>'
-                : '<button type="button" class="pinpoint-copy-circle-btn" style="background:#e8f0fe !important;border-color:#d2e3fc !important;color:#1a73e8 !important;" onclick="TabDisguiser.setGamesClass(\'' + safeId + '\')"><span class="material-symbols-sharp notranslate" style="font-size:16px;color:#1a73e8;">sports_esports</span><span>Put Games Here</span></button>';
+                ? '<button type="button" class="pinpoint-copy-circle-btn" style="background:#e6f4ea !important;border-color:#ceead6 !important;color:#137333 !important;padding:6px 11px !important;font-size:12px !important;cursor:default !important;" disabled><span class="material-symbols-sharp notranslate" style="font-size:15px;color:#137333;">check_circle</span><span>Active</span></button>'
+                : '<button type="button" class="pinpoint-copy-circle-btn" style="background:#e8f0fe !important;border-color:#d2e3fc !important;color:#1a73e8 !important;padding:6px 11px !important;font-size:12px !important;" onclick="TabDisguiser.setGamesClass(\'' + safeId + '\')"><span class="material-symbols-sharp notranslate" style="font-size:15px;color:#1a73e8;">sports_esports</span><span>Use for Games</span></button>';
 
             const deleteBtn = classes.length > 1
-                ? '<button type="button" class="pinpoint-copy-circle-btn" style="background:#fce8e6 !important;border-color:#fad2cf !important;color:#c5221f !important;padding:7px 11px !important;" onclick="TabDisguiser.deleteClassInManager(\'' + safeId + '\')" title="Remove class"><span class="material-symbols-sharp notranslate" style="font-size:16px;color:#c5221f;">delete</span></button>'
+                ? '<button type="button" class="pinpoint-copy-circle-btn" style="background:#fce8e6 !important;border-color:#fad2cf !important;color:#c5221f !important;padding:6px 9px !important;" onclick="TabDisguiser.deleteClassInManager(\'' + safeId + '\')" title="Remove class"><span class="material-symbols-sharp notranslate" style="font-size:15px;color:#c5221f;">delete</span></button>'
                 : '';
 
-            return '<div class="pinpoint-cm-class-row ' + (cls.hasGames ? 'is-games-class' : '') + '">' +
-                '<div style="display:flex;align-items:center;gap:14px;min-width:0;flex:1;">' +
-                    '<div class="pinpoint-bullet-circle" style="background:' + theme.bg + ';border-color:' + theme.bg + ';color:' + theme.text + ';">' + letter + '</div>' +
-                    '<div style="display:flex;flex-direction:column;gap:4px;min-width:0;flex:1;">' +
-                        '<div style="font-size:16px;font-weight:500;color:#1f1f1f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + safeName + '</div>' +
-                        (safeTeacher ? '<div style="font-size:13px;color:#5f6368;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + safeTeacher + '</div>' : '') +
-                        '<div style="margin-top:2px;">' + statusBadge + '</div>' +
+            return '<div class="pinpoint-cm-class-row ' + (cls.hasGames ? 'is-games-class' : '') + '" draggable="true" data-class-id="' + safeId + '">' +
+                '<div style="display:flex;align-items:center;gap:10px;min-width:0;flex:1;">' +
+                    '<span class="pinpoint-cm-drag-handle" title="Drag to reorder"><span class="material-symbols-sharp notranslate" style="font-size:18px;">drag_indicator</span></span>' +
+                    '<div class="pinpoint-bullet-circle" style="width:36px !important;height:36px !important;font-size:14px !important;background:' + theme.bg + ';border-color:' + theme.bg + ';color:' + theme.text + ';">' + letter + '</div>' +
+                    '<div style="display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;">' +
+                        '<div style="display:flex;align-items:center;gap:7px;min-width:0;">' +
+                            '<span style="font-size:15px;font-weight:500;color:#1f1f1f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + safeName + '</span>' +
+                            statusBadge +
+                        '</div>' +
+                        (safeTeacher ? '<div style="font-size:12.5px;color:#5f6368;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + safeTeacher + '</div>' : '') +
                     '</div>' +
                 '</div>' +
-                '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+                '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">' +
                     setGamesBtn +
-                    '<button type="button" class="pinpoint-copy-circle-btn" onclick="TabDisguiser.editClassInManager(\'' + safeId + '\')">' +
-                        '<span class="material-symbols-sharp notranslate" style="font-size:16px;">edit</span>' +
+                    '<button type="button" class="pinpoint-copy-circle-btn" style="padding:6px 11px !important;font-size:12px !important;" onclick="TabDisguiser.editClassInManager(\'' + safeId + '\')">' +
+                        '<span class="material-symbols-sharp notranslate" style="font-size:15px;">edit</span>' +
                         '<span>Edit</span>' +
                     '</button>' +
                     deleteBtn +
@@ -2732,11 +3022,22 @@ var TabDisguiser = window.TabDisguiser || {
             '</div>';
         }).join('');
 
-        const bannersHtml = this.CLASSROOM_BANNERS.map((b) => {
+        const customBanners = this.getCustomBanners();
+        const allBanners = [
+            ...customBanners.map(cb => ({ id: cb.id, name: cb.name || 'Custom', isCustom: true })),
+            ...this.CLASSROOM_BANNERS.map(b => ({ id: b.id, name: b.name, isCustom: false }))
+        ];
+
+        const bannersHtml = allBanners.map((b) => {
             const isSelected = (b.id === this._cmSelectedBanner);
-            const bUrl = imgPrefix + b.id;
-            return '<div onclick="TabDisguiser.selectClassManagerBanner(\'' + b.id + '\')" style="height:56px;border-radius:12px;cursor:pointer;position:relative;background-image:url(\'' + bUrl + '\');background-size:cover;background-position:center;transition:all 0.15s ease;box-shadow:0 1px 3px rgba(0,0,0,0.12);' + (isSelected ? 'outline:3px solid #1a73e8;outline-offset:1px;' : 'outline:1px solid rgba(0,0,0,0.1);') + '">' +
+            const bUrl = this.resolveBannerUrl(b.id, isPages);
+            const safeBid = this.escapeHtml(b.id);
+            const delBtnHtml = b.isCustom
+                ? '<button type="button" onclick="TabDisguiser.deleteCustomBanner(\'' + safeBid + '\', event)" title="Delete custom image" style="position:absolute;top:4px;left:4px;width:18px;height:18px;border-radius:50%;border:none;background:rgba(0,0,0,0.65);color:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;z-index:2;"><span class="material-symbols-sharp notranslate" style="font-size:12px;color:#fff;">close</span></button>'
+                : '';
+            return '<div onclick="TabDisguiser.selectClassManagerBanner(\'' + safeBid + '\')" style="height:54px;border-radius:12px;cursor:pointer;position:relative;background-image:url(\'' + bUrl + '\');background-size:cover;background-position:center;transition:all 0.15s ease;box-shadow:0 1px 3px rgba(0,0,0,0.12);' + (isSelected ? 'outline:3px solid #1a73e8;outline-offset:1px;' : 'outline:1px solid rgba(0,0,0,0.1);') + '">' +
                 '<div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 65%);border-radius:12px;pointer-events:none;"></div>' +
+                delBtnHtml +
                 '<div style="position:absolute;bottom:4px;left:7px;right:7px;font-size:11px;font-weight:500;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px rgba(0,0,0,0.8);">' + this.escapeHtml(b.name) + '</div>' +
                 (isSelected ? '<span class="material-symbols-sharp notranslate" style="position:absolute;top:4px;right:4px;font-size:14px;background:#1a73e8;color:#fff;border-radius:50%;padding:2px;width:18px !important;height:18px !important;display:inline-flex !important;align-items:center !important;justify-content:center !important;">check</span>' : '') +
             '</div>';
@@ -2754,24 +3055,24 @@ var TabDisguiser = window.TabDisguiser || {
                 <div class="pinpoint-intro-header-left">
                     <h1 class="pinpoint-intro-title">Manage Classes</h1>
                     <p class="pinpoint-intro-subtitle">
-                        Create fake placeholder classes (which never redirect anywhere when clicked) and choose which class holds your games.
+                        Drag classes to reorder, add fake classes, or choose where games live.
                     </p>
                 </div>
 
                 <div class="pinpoint-cm-grid">
                     <!-- Left Column: Class List & Active Games Selector -->
                     <div class="pinpoint-cm-panel">
-                        <div style="display:flex;align-items:center;gap:14px;">
+                        <div style="display:flex;align-items:center;gap:12px;">
                             <div class="pinpoint-bullet-circle" style="background:#e8f0fe;border-color:#d2e3fc;color:#1a73e8;">
-                                <span class="material-symbols-sharp notranslate" style="color:#1a73e8;">sports_esports</span>
+                                <span class="material-symbols-sharp notranslate" style="color:#1a73e8;">reorder</span>
                             </div>
                             <div>
-                                <div style="font-size:18px;font-weight:500;color:#1f1f1f;">Your Classes &amp; Games Location</div>
-                                <div style="font-size:13.5px;color:#5f6368;">Click <b>Put Games Here</b> on any class to move your games into it. All other classes stay on Home without redirecting.</div>
+                                <div style="font-size:17px;font-weight:500;color:#1f1f1f;">Your Classes</div>
+                                <div style="font-size:13px;color:#5f6368;">Drag to rearrange order or pick your active games class.</div>
                             </div>
                         </div>
 
-                        <div style="display:flex;flex-direction:column;gap:10px;max-height:420px;overflow-y:auto;padding-right:2px;">
+                        <div id="cm-classes-list" style="display:flex;flex-direction:column;gap:8px;max-height:430px;overflow-y:auto;padding:2px;">
                             ${classesListHtml}
                         </div>
                     </div>
@@ -2779,55 +3080,64 @@ var TabDisguiser = window.TabDisguiser || {
                     <!-- Right Column: Add Fake Class / Edit Class Form -->
                     <div class="pinpoint-cm-panel">
                         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
-                            <div style="display:flex;align-items:center;gap:14px;">
+                            <div style="display:flex;align-items:center;gap:12px;">
                                 <div class="pinpoint-bullet-circle" style="background:${editingCls ? '#fef7e0' : '#e6f4ea'};border-color:${editingCls ? '#fce8b2' : '#ceead6'};color:${editingCls ? '#ea8600' : '#137333'};">
                                     <span class="material-symbols-sharp notranslate" style="color:${editingCls ? '#ea8600' : '#137333'};">${editingCls ? 'edit' : 'add'}</span>
                                 </div>
                                 <div>
-                                    <div style="font-size:18px;font-weight:500;color:#1f1f1f;">${editingCls ? 'Edit Class' : 'Add Fake Class'}</div>
-                                    <div style="font-size:13.5px;color:#5f6368;">${editingCls ? 'Update the name, teacher, banner, or game status for this class.' : 'Create a realistic placeholder class card and sidebar item.'}</div>
+                                    <div style="font-size:17px;font-weight:500;color:#1f1f1f;">${editingCls ? 'Edit Class' : 'New Class'}</div>
+                                    <div style="font-size:13px;color:#5f6368;">${editingCls ? 'Update class details and banner.' : 'Add a fake class card to Home and sidebar.'}</div>
                                 </div>
                             </div>
                             ${editingCls ? `
                                 <button type="button" class="pinpoint-copy-circle-btn" onclick="TabDisguiser.cancelEditClassInManager()">
-                                    <span class="material-symbols-sharp notranslate" style="font-size:16px;">close</span>
-                                    <span>Cancel Edit</span>
+                                    <span class="material-symbols-sharp notranslate" style="font-size:15px;">close</span>
+                                    <span>Cancel</span>
                                 </button>
                             ` : ''}
                         </div>
 
-                        <div style="display:flex;flex-direction:column;gap:12px;">
-                            <div>
-                                <label style="display:block;font-size:12.5px;font-weight:500;color:#5f6368;margin-bottom:6px;">Class Name</label>
-                                <input id="cm-class-name" class="pinpoint-cm-input" type="text" placeholder="e.g. AP Chemistry, Algebra II, English 10" value="${this.escapeHtml(currentNameVal)}" />
+                        <div style="display:flex;flex-direction:column;gap:11px;">
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                                <div>
+                                    <label style="display:block;font-size:12px;font-weight:500;color:#5f6368;margin-bottom:5px;">Class Name</label>
+                                    <input id="cm-class-name" class="pinpoint-cm-input" type="text" placeholder="e.g. AP Chemistry" value="${this.escapeHtml(currentNameVal)}" />
+                                </div>
+                                <div>
+                                    <label style="display:block;font-size:12px;font-weight:500;color:#5f6368;margin-bottom:5px;">Teacher / Section</label>
+                                    <input id="cm-class-teacher" class="pinpoint-cm-input" type="text" placeholder="e.g. Period 4" value="${this.escapeHtml(currentTeacherVal)}" />
+                                </div>
                             </div>
                             <div>
-                                <label style="display:block;font-size:12.5px;font-weight:500;color:#5f6368;margin-bottom:6px;">Teacher / Section <span style="font-weight:400;color:#80868b;">(optional)</span></label>
-                                <input id="cm-class-teacher" class="pinpoint-cm-input" type="text" placeholder="e.g. Period 4 • Mrs. Davis" value="${this.escapeHtml(currentTeacherVal)}" />
-                            </div>
-                            <div>
-                                <label style="display:block;font-size:12.5px;font-weight:500;color:#5f6368;margin-bottom:6px;">Class Behavior</label>
+                                <label style="display:block;font-size:12px;font-weight:500;color:#5f6368;margin-bottom:6px;">Role</label>
                                 <div style="display:flex;gap:8px;flex-wrap:wrap;">
                                     <button type="button" class="pinpoint-copy-circle-btn" style="${!this._cmMakeGamesClass ? 'background:#1f1f1f !important;border-color:#1f1f1f !important;color:#ffffff !important;' : ''}" onclick="TabDisguiser.setClassManagerRole(false)">
-                                        <span class="material-symbols-sharp notranslate" style="font-size:16px;color:${!this._cmMakeGamesClass ? '#ffffff' : '#5f6368'};">block</span>
-                                        <span>Fake Placeholder (No Redirect)</span>
+                                        <span class="material-symbols-sharp notranslate" style="font-size:15px;color:${!this._cmMakeGamesClass ? '#ffffff' : '#5f6368'};">block</span>
+                                        <span>Fake Class</span>
                                     </button>
                                     <button type="button" class="pinpoint-copy-circle-btn" style="${this._cmMakeGamesClass ? 'background:#1a73e8 !important;border-color:#1a73e8 !important;color:#ffffff !important;' : ''}" onclick="TabDisguiser.setClassManagerRole(true)">
-                                        <span class="material-symbols-sharp notranslate" style="font-size:16px;color:${this._cmMakeGamesClass ? '#ffffff' : '#1a73e8'};">sports_esports</span>
-                                        <span>Put Games in This Class</span>
+                                        <span class="material-symbols-sharp notranslate" style="font-size:15px;color:${this._cmMakeGamesClass ? '#ffffff' : '#1a73e8'};">sports_esports</span>
+                                        <span>Games Class</span>
                                     </button>
                                 </div>
                             </div>
                             <div>
-                                <label style="display:block;font-size:12.5px;font-weight:500;color:#5f6368;margin-bottom:8px;">Banner Theme</label>
+                                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px;">
+                                    <label style="font-size:12px;font-weight:500;color:#5f6368;">Banner Image</label>
+                                    <button type="button" class="pinpoint-copy-circle-btn" style="padding:5px 11px !important;font-size:12px !important;" onclick="TabDisguiser.triggerClassManagerBannerUpload()">
+                                        <span class="material-symbols-sharp notranslate" style="font-size:15px;color:#1a73e8;">upload</span>
+                                        <span>Upload Image</span>
+                                    </button>
+                                    <input id="cm-banner-upload-input" type="file" accept="image/*" style="display:none;" onchange="TabDisguiser.handleClassManagerBannerUpload(event)" />
+                                </div>
                                 <div id="cm-banners-grid" class="pinpoint-cm-banners">
                                     ${bannersHtml}
                                 </div>
                             </div>
-                            <div style="display:flex;justify-content:flex-end;margin-top:4px;">
-                                <button type="button" class="pinpoint-copy-circle-btn" style="background:#1a73e8 !important;border-color:#1a73e8 !important;color:#ffffff !important;padding:10px 22px !important;font-size:14px !important;" onclick="TabDisguiser.submitClassManagerForm()">
-                                    <span class="material-symbols-sharp notranslate" style="font-size:18px;color:#ffffff;">${editingCls ? 'save' : 'add_circle'}</span>
-                                    <span>${editingCls ? 'Save Class Changes' : 'Add Class'}</span>
+                            <div style="display:flex;justify-content:flex-end;margin-top:2px;">
+                                <button type="button" class="pinpoint-copy-circle-btn" style="background:#1a73e8 !important;border-color:#1a73e8 !important;color:#ffffff !important;padding:9px 20px !important;font-size:13.5px !important;" onclick="TabDisguiser.submitClassManagerForm()">
+                                    <span class="material-symbols-sharp notranslate" style="font-size:17px;color:#ffffff;">${editingCls ? 'save' : 'add_circle'}</span>
+                                    <span>${editingCls ? 'Save Changes' : 'Add Class'}</span>
                                 </button>
                             </div>
                         </div>
@@ -2838,7 +3148,7 @@ var TabDisguiser = window.TabDisguiser || {
             <div class="pinpoint-intro-bottom-row">
                 <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
                     <span style="background:#f1f3f4;border:1px solid #dadce0;border-radius:99px;padding:6px 14px;font-size:13px;color:#3c4043;font-weight:500;">
-                        Active games class: <b style="color:#1a73e8;">${this.escapeHtml(activeGamesCls ? activeGamesCls.name : 'World History')}</b> • ${fakeCount} fake placeholder ${fakeCount === 1 ? 'class' : 'classes'}
+                        Games in <b style="color:#1a73e8;">${this.escapeHtml(activeGamesCls ? activeGamesCls.name : 'World History')}</b> • ${fakeCount} fake ${fakeCount === 1 ? 'class' : 'classes'}
                     </span>
                 </div>
                 <div class="pinpoint-intro-nav-circles">
@@ -2848,6 +3158,107 @@ var TabDisguiser = window.TabDisguiser || {
                 </div>
             </div>
         `;
+
+        this.bindClassManagerListDragAndDrop();
+    },
+
+    bindClassManagerListDragAndDrop() {
+        const listEl = document.getElementById('cm-classes-list');
+        if (!listEl || listEl.dataset.cmDndBound === 'true') return;
+        listEl.dataset.cmDndBound = 'true';
+
+        let draggedId = null;
+
+        listEl.addEventListener('dragstart', (e) => {
+            if (e.target && e.target.closest && e.target.closest('button')) {
+                e.preventDefault();
+                return;
+            }
+            const row = e.target.closest ? e.target.closest('.pinpoint-cm-class-row[data-class-id]') : null;
+            if (!row) return;
+            draggedId = row.getAttribute('data-class-id');
+            row.classList.add('is-dragging');
+            if (e.dataTransfer) {
+                e.dataTransfer.effectAllowed = 'move';
+                try { e.dataTransfer.setData('text/plain', draggedId); } catch (err) {}
+            }
+        });
+
+        listEl.addEventListener('dragover', (e) => {
+            if (!draggedId) return;
+            const overRow = e.target.closest ? e.target.closest('.pinpoint-cm-class-row[data-class-id]') : null;
+            if (!overRow) return;
+            const overId = overRow.getAttribute('data-class-id');
+            if (!overId || overId === draggedId) return;
+            e.preventDefault();
+            if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+
+            listEl.querySelectorAll('.pinpoint-cm-class-row').forEach(r => {
+                r.classList.remove('drag-over-top', 'drag-over-bottom');
+            });
+            const rect = overRow.getBoundingClientRect();
+            const isAfter = (e.clientY - rect.top) > (rect.height / 2);
+            overRow.classList.add(isAfter ? 'drag-over-bottom' : 'drag-over-top');
+        });
+
+        listEl.addEventListener('dragleave', (e) => {
+            const overRow = e.target.closest ? e.target.closest('.pinpoint-cm-class-row[data-class-id]') : null;
+            if (overRow && !overRow.contains(e.relatedTarget)) {
+                overRow.classList.remove('drag-over-top', 'drag-over-bottom');
+            }
+        });
+
+        listEl.addEventListener('drop', (e) => {
+            if (!draggedId) return;
+            e.preventDefault();
+            const overRow = e.target.closest ? e.target.closest('.pinpoint-cm-class-row[data-class-id]') : null;
+            listEl.querySelectorAll('.pinpoint-cm-class-row').forEach(r => {
+                r.classList.remove('is-dragging', 'drag-over-top', 'drag-over-bottom');
+            });
+            if (!overRow) {
+                draggedId = null;
+                return;
+            }
+            const overId = overRow.getAttribute('data-class-id');
+            if (!overId || overId === draggedId) {
+                draggedId = null;
+                return;
+            }
+            const rect = overRow.getBoundingClientRect();
+            const insertAfter = (e.clientY - rect.top) > (rect.height / 2);
+            const fromId = draggedId;
+            draggedId = null;
+            this.reorderClasses(fromId, overId, insertAfter);
+        });
+
+        listEl.addEventListener('dragend', () => {
+            draggedId = null;
+            listEl.querySelectorAll('.pinpoint-cm-class-row').forEach(r => {
+                r.classList.remove('is-dragging', 'drag-over-top', 'drag-over-bottom');
+            });
+        });
+    },
+
+    triggerClassManagerBannerUpload() {
+        const input = document.getElementById('cm-banner-upload-input');
+        if (input) input.click();
+    },
+
+    async handleClassManagerBannerUpload(e) {
+        const file = e && e.target && e.target.files ? e.target.files[0] : null;
+        if (!file) return;
+        try {
+            const entry = await this.processUploadedBannerFile(file);
+            this._cmSelectedBanner = entry.id;
+            this.renderClassManagerContent();
+            if (typeof window.showPinpointToast === 'function') {
+                window.showPinpointToast('Uploaded banner "' + entry.name + '"', 'success');
+            }
+        } catch (err) {
+            if (typeof window.showPinpointToast === 'function') {
+                window.showPinpointToast('Could not upload image', 'error');
+            }
+        }
     },
 
     selectClassManagerBanner(bannerId) {
@@ -2865,7 +3276,10 @@ var TabDisguiser = window.TabDisguiser || {
         const target = (cfg.classes || []).find(c => c.id === classId);
         if (!target) return;
         this._cmEditingClassId = target.id;
-        this._cmSelectedBanner = (target.banner || 'WorldHistory.jpg').replace(/^(\.\.\/|\.\/)?images\//, '');
+        const rawBanner = String(target.banner || 'WorldHistory.jpg');
+        this._cmSelectedBanner = (rawBanner.startsWith('custom_') || rawBanner.startsWith('data:'))
+            ? rawBanner
+            : rawBanner.replace(/^(\.\.\/|\.\/)?images\//, '');
         this._cmMakeGamesClass = !!target.hasGames;
         const modal = document.getElementById('pinpoint-class-manager-modal');
         if (modal) modal.removeAttribute('data-editing-id');

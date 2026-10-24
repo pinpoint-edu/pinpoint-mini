@@ -596,31 +596,93 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-<div id="customize-modal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.55);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);z-index:9999999;align-items:center;justify-content:center;font-family:'Google Sans',Roboto,Arial,sans-serif;">
-  <div style="background:#fff;border-radius:12px;width:860px;max-width:95vw;max-height:92vh;display:flex;flex-direction:column;box-shadow:0 12px 36px rgba(0,0,0,0.28);overflow:hidden;">
-    <div style="padding:18px 24px 14px;border-bottom:1px solid #dadce0;display:flex;align-items:center;justify-content:space-between;">
-      <h2 style="margin:0;font-size:18px;font-weight:500;color:#202124;">Customize Class</h2>
-      <button onclick="closeCustomizeModal()" type="button" aria-label="Close" style="background:none;border:none;cursor:pointer;padding:6px;border-radius:50%;color:#5f6368;display:flex;align-items:center;justify-content:center;transition:background 0.15s;" onmouseover="this.style.background='#f1f3f4'" onmouseout="this.style.background='transparent'">
-        <span class="material-symbols-outlined notranslate" style="font-size:20px;line-height:1;">close</span>
+<div id="customize-modal" class="pinpoint-intro-fullscreen" style="display:none;">
+  <div class="pinpoint-intro-top-row">
+    <button class="pinpoint-close-circle-btn" type="button" onclick="closeCustomizeModal()" title="Close" aria-label="Close">
+      <span class="material-symbols-sharp notranslate" style="font-size:16px;line-height:1;pointer-events:none;">close</span>
+      <span>Close</span>
+    </button>
+  </div>
+
+  <div class="pinpoint-intro-body">
+    <div class="pinpoint-intro-header-left">
+      <h1 class="pinpoint-intro-title">Customize Class</h1>
+      <p class="pinpoint-intro-subtitle">
+        Update your class name, teacher, and header banner or upload a custom image.
+      </p>
+    </div>
+
+    <div class="pinpoint-cm-grid" style="grid-template-columns: 0.9fr 1.1fr !important;">
+      <!-- Left Panel: Class Details -->
+      <div class="pinpoint-cm-panel">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div class="pinpoint-bullet-circle" style="background:#e8f0fe;border-color:#d2e3fc;color:#1a73e8;">
+            <span class="material-symbols-sharp notranslate" style="color:#1a73e8;">edit_square</span>
+          </div>
+          <div>
+            <div style="font-size:17px;font-weight:500;color:#1f1f1f;">Class Info</div>
+            <div style="font-size:13px;color:#5f6368;">Set the title and teacher shown on the header and sidebar.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:14px;margin-top:4px;">
+          <div>
+            <label style="display:block;font-size:12px;font-weight:500;color:#5f6368;margin-bottom:6px;">Class Name</label>
+            <input id="cust-name" class="pinpoint-cm-input" type="text" placeholder="e.g. World History" />
+          </div>
+          <div>
+            <label style="display:block;font-size:12px;font-weight:500;color:#5f6368;margin-bottom:6px;">Teacher / Section <span style="font-weight:400;color:#80868b;">(optional)</span></label>
+            <input id="cust-teacher" class="pinpoint-cm-input" type="text" placeholder="e.g. Period 3 • Mr. Johnson" />
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:4px;flex-wrap:wrap;">
+            <button type="button" class="pinpoint-copy-circle-btn" onclick="if(typeof TabDisguiser!=='undefined'){closeCustomizeModal();TabDisguiser.openClassManagerModal();}">
+              <span class="material-symbols-sharp notranslate" style="font-size:15px;color:#1a73e8;">reorder</span>
+              <span>Manage All Classes</span>
+            </button>
+            <button type="button" class="pinpoint-copy-circle-btn" style="background:#1a73e8 !important;border-color:#1a73e8 !important;color:#ffffff !important;padding:9px 22px !important;font-size:13.5px !important;" onclick="saveCustomization()">
+              <span class="material-symbols-sharp notranslate" style="font-size:17px;color:#ffffff;">save</span>
+              <span>Save Changes</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Panel: Header Banner Theme & Custom Image Upload -->
+      <div class="pinpoint-cm-panel">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div class="pinpoint-bullet-circle" style="background:#e6f4ea;border-color:#ceead6;color:#137333;">
+              <span class="material-symbols-sharp notranslate" style="color:#137333;">image</span>
+            </div>
+            <div>
+              <div style="font-size:17px;font-weight:500;color:#1f1f1f;">Header Banner</div>
+              <div style="font-size:13px;color:#5f6368;">Pick a preset theme or upload your own banner image.</div>
+            </div>
+          </div>
+          <div>
+            <button type="button" class="pinpoint-copy-circle-btn" onclick="triggerCustomBannerUpload()">
+              <span class="material-symbols-sharp notranslate" style="font-size:16px;color:#1a73e8;">upload</span>
+              <span>Upload Image</span>
+            </button>
+            <input id="cust-banner-upload-input" type="file" accept="image/*" style="display:none;" onchange="handleCustomBannerUpload(event)" />
+          </div>
+        </div>
+
+        <div id="cust-banners-grid" class="pinpoint-cm-banners" style="max-height:270px !important;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pinpoint-intro-bottom-row">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <span style="background:#f1f3f4;border:1px solid #dadce0;border-radius:99px;padding:6px 14px;font-size:13px;color:#3c4043;font-weight:500;">
+        Changes sync across Home, Stream, and Classwork
+      </span>
+    </div>
+    <div class="pinpoint-intro-nav-circles">
+      <button class="pinpoint-nav-circle-btn" type="button" onclick="saveCustomization()" title="Save &amp; Close" aria-label="Save &amp; Close">
+        <span class="material-symbols-sharp notranslate" style="font-size:32px;line-height:1;pointer-events:none;">check</span>
       </button>
-    </div>
-    <div style="padding:20px 24px;overflow-y:auto;flex:1;">
-      <div style="margin-bottom:16px;">
-        <label style="display:block;font-size:12px;font-weight:500;color:#5f6368;margin-bottom:6px;">Class Name</label>
-        <input id="cust-name" type="text" placeholder="e.g. World History" style="width:100%;padding:10px 12px;box-sizing:border-box;border:1px solid #dadce0;border-radius:6px;font-family:inherit;font-size:14px;outline:none;" onfocus="this.style.borderColor='#1a73e8'" onblur="this.style.borderColor='#dadce0'"/>
-      </div>
-      <div style="margin-bottom:20px;">
-        <label style="display:block;font-size:12px;font-weight:500;color:#5f6368;margin-bottom:6px;">Teacher Name <span style="font-weight:400;color:#80868b;">(leave blank to remove)</span></label>
-        <input id="cust-teacher" type="text" placeholder="e.g. Mr. Johnson" style="width:100%;padding:10px 12px;box-sizing:border-box;border:1px solid #dadce0;border-radius:6px;font-family:inherit;font-size:14px;outline:none;" onfocus="this.style.borderColor='#1a73e8'" onblur="this.style.borderColor='#dadce0'"/>
-      </div>
-      <div>
-        <label style="display:block;font-size:12px;font-weight:500;color:#5f6368;margin-bottom:8px;">Header Theme Banner</label>
-        <div id="cust-banners-grid" style="display:grid;grid-template-columns:repeat(6, 1fr);gap:10px;padding:2px;overflow:visible;"></div>
-      </div>
-    </div>
-    <div style="padding:14px 24px;border-top:1px solid #dadce0;display:flex;justify-content:flex-end;gap:12px;background:#f8f9fa;">
-      <button onclick="closeCustomizeModal()" type="button" style="background:none;border:none;color:#5f6368;cursor:pointer;font-weight:500;padding:8px 16px;border-radius:4px;font-family:inherit;font-size:14px;">Cancel</button>
-      <button onclick="saveCustomization()" type="button" style="background:#1a73e8;border:none;color:#fff;border-radius:4px;cursor:pointer;font-weight:500;padding:8px 20px;font-family:inherit;font-size:14px;transition:background 0.15s;" onmouseover="this.style.background='#1557b0'" onmouseout="this.style.background='#1a73e8'">Save</button>
     </div>
   </div>
 </div>
@@ -647,23 +709,60 @@ const CLASSROOM_BANNERS = [
 
 let selectedBannerId = 'WorldHistory.jpg';
 
+function resolveHistoryBannerUrl(bannerId) {
+  if (typeof TabDisguiser !== 'undefined' && typeof TabDisguiser.resolveBannerUrl === 'function') {
+    return TabDisguiser.resolveBannerUrl(bannerId, true);
+  }
+  if (typeof window.resolveBannerUrl === 'function') {
+    return window.resolveBannerUrl(bannerId, true);
+  }
+  const clean = String(bannerId || 'WorldHistory.jpg').replace(/^(\.\.\/|\.\/)?images\//, '');
+  return '../images/' + clean;
+}
+
 function renderBannersGrid() {
   const container = document.getElementById('cust-banners-grid');
   if (!container) return;
   container.innerHTML = '';
-  CLASSROOM_BANNERS.forEach((b, index) => {
+
+  const customBanners = (typeof TabDisguiser !== 'undefined' && typeof TabDisguiser.getCustomBanners === 'function')
+    ? TabDisguiser.getCustomBanners()
+    : (typeof window.getCustomBanners === 'function' ? window.getCustomBanners() : []);
+
+  const allBanners = [
+    ...customBanners.map(cb => ({ id: cb.id, name: cb.name || 'Custom', isCustom: true })),
+    ...CLASSROOM_BANNERS.map(b => ({ id: b.id, name: b.name, isCustom: false }))
+  ];
+
+  allBanners.forEach((b) => {
     const isSelected = (b.id === selectedBannerId);
+    const bUrl = resolveHistoryBannerUrl(b.id);
     const card = document.createElement('div');
-    // In a 6x3 menu with 16 banners (Row 1: 0-5, Row 2: 6-11, Row 3: 12-15),
-    // start banner index 12 at column 2 so the bottom 4 banners are centered.
-    const extraGridStyle = (index === 12) ? 'grid-column-start:2;' : '';
-    card.style.cssText = 'height:68px;border-radius:8px;cursor:pointer;position:relative;background-image:url("../images/' + b.id + '");background-size:cover;background-position:center;transition:all 0.15s ease;box-shadow:0 1px 3px rgba(0,0,0,0.15);' + (isSelected ? 'outline:3px solid #1a73e8;outline-offset:1px;' : 'outline:2px solid transparent;') + extraGridStyle;
-    
+    card.style.cssText = 'height:58px;border-radius:12px;cursor:pointer;position:relative;background-image:url("' + bUrl + '");background-size:cover;background-position:center;transition:all 0.15s ease;box-shadow:0 1px 3px rgba(0,0,0,0.12);' + (isSelected ? 'outline:3px solid #1a73e8;outline-offset:1px;' : 'outline:1px solid rgba(0,0,0,0.1);');
+
+    const safeName = (b.name || 'Banner').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     card.innerHTML = `
-      <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 60%);border-radius:8px;pointer-events:none;"></div>
-      <div style="position:absolute;bottom:4px;left:6px;right:6px;font-size:11px;font-weight:500;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px rgba(0,0,0,0.8);">${b.name}</div>
-      ${isSelected ? '<span class="material-symbols-outlined notranslate" style="position:absolute;top:4px;right:4px;font-size:14px;background:#1a73e8;color:#fff;border-radius:50%;padding:2px;">check</span>' : ''}
+      <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 65%);border-radius:12px;pointer-events:none;"></div>
+      ${b.isCustom ? '<button type="button" class="cust-del-banner-btn" title="Delete custom image" style="position:absolute;top:4px;left:4px;width:18px;height:18px;border-radius:50%;border:none;background:rgba(0,0,0,0.65);color:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;z-index:2;"><span class="material-symbols-sharp notranslate" style="font-size:12px;color:#fff;">close</span></button>' : ''}
+      <div style="position:absolute;bottom:4px;left:7px;right:7px;font-size:11px;font-weight:500;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px rgba(0,0,0,0.8);">${safeName}</div>
+      ${isSelected ? '<span class="material-symbols-sharp notranslate" style="position:absolute;top:4px;right:4px;font-size:14px;background:#1a73e8;color:#fff;border-radius:50%;padding:2px;width:18px !important;height:18px !important;display:inline-flex !important;align-items:center !important;justify-content:center !important;">check</span>' : ''}
     `;
+
+    const delBtn = card.querySelector('.cust-del-banner-btn');
+    if (delBtn) {
+      delBtn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (typeof TabDisguiser !== 'undefined' && typeof TabDisguiser.deleteCustomBanner === 'function') {
+          TabDisguiser.deleteCustomBanner(b.id, e);
+        }
+        if (selectedBannerId === b.id) {
+          selectedBannerId = 'WorldHistory.jpg';
+        }
+        renderBannersGrid();
+      };
+    }
+
     card.onclick = () => {
       selectedBannerId = b.id;
       renderBannersGrid();
@@ -675,18 +774,53 @@ function renderBannersGrid() {
   });
 }
 
-function openCustomizeModal() {
+function triggerCustomBannerUpload() {
+  const input = document.getElementById('cust-banner-upload-input');
+  if (input) input.click();
+}
+
+async function handleCustomBannerUpload(e) {
+  const file = e && e.target && e.target.files ? e.target.files[0] : null;
+  if (!file) return;
+  if (typeof TabDisguiser !== 'undefined' && typeof TabDisguiser.processUploadedBannerFile === 'function') {
+    try {
+      const entry = await TabDisguiser.processUploadedBannerFile(file);
+      selectedBannerId = entry.id;
+      renderBannersGrid();
+      if (typeof updateStreamAnnouncementColor === 'function') {
+        updateStreamAnnouncementColor(entry.id);
+      }
+      if (typeof window.showPinpointToast === 'function') {
+        window.showPinpointToast('Uploaded banner "' + entry.name + '"', 'success');
+      }
+    } catch (err) {
+      if (typeof window.showPinpointToast === 'function') {
+        window.showPinpointToast('Could not upload image', 'error');
+      }
+    }
+  }
+}
+
+async function openCustomizeModal() {
+  if (typeof TabDisguiser !== 'undefined' && typeof TabDisguiser.ensureClassManagerStyles === 'function') {
+    await TabDisguiser.ensureClassManagerStyles();
+  }
   const cfg = getClassConfig();
   const c = cfg.history || cfg.english || {};
   document.getElementById('cust-name').value = c.name || 'World History';
   document.getElementById('cust-teacher').value = c.teacher || '';
-  selectedBannerId = (c.banner || 'WorldHistory.jpg').replace(/^(\.\.\/|\.\/)?images\//, '');
+  const rawBanner = String(c.banner || 'WorldHistory.jpg');
+  selectedBannerId = (rawBanner.startsWith('custom_') || rawBanner.startsWith('data:'))
+    ? rawBanner
+    : rawBanner.replace(/^(\.\.\/|\.\/)?images\//, '');
   renderBannersGrid();
-  document.getElementById('customize-modal').style.display = 'flex';
+  const modal = document.getElementById('customize-modal');
+  if (modal) modal.style.setProperty('display', 'flex', 'important');
 }
 
 function closeCustomizeModal() {
-  document.getElementById('customize-modal').style.display = 'none';
+  const modal = document.getElementById('customize-modal');
+  if (modal) modal.style.setProperty('display', 'none', 'important');
 }
 
 function saveCustomization() {
@@ -725,8 +859,10 @@ function saveCustomization() {
   }
 
   // Live in-place DOM updates immediately upon closing
-  const bannerFile = chosenBanner.replace(/^(\.\.\/|\.\/)?images\//, '');
-  const bannerUrl = '../images/' + bannerFile;
+  const bannerFile = (String(chosenBanner).startsWith('custom_') || String(chosenBanner).startsWith('data:'))
+    ? String(chosenBanner)
+    : String(chosenBanner).replace(/^(\.\.\/|\.\/)?images\//, '');
+  const bannerUrl = resolveHistoryBannerUrl(bannerFile);
 
   // 1. Update injected style element so background-image !important rules match immediately
   const fastStyle = document.getElementById('pinpoint-fast-cache-style');

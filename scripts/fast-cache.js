@@ -24,8 +24,48 @@
   };
   window.BANNER_COLOR_MAP = BANNER_COLOR_MAP;
 
+  function getCustomBanners() {
+    try {
+      var raw = localStorage.getItem('pinpoint_custom_banners');
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (e) {}
+    return [];
+  }
+  window.getCustomBanners = getCustomBanners;
+
+  function resolveBannerUrl(bannerFileName, isPages) {
+    var val = (bannerFileName || 'WorldHistory.jpg').trim();
+    if (val.indexOf('data:') === 0 || val.indexOf('blob:') === 0 || val.indexOf('http://') === 0 || val.indexOf('https://') === 0) {
+      return val;
+    }
+    if (val.indexOf('custom_') === 0) {
+      var customList = getCustomBanners();
+      for (var i = 0; i < customList.length; i++) {
+        if (customList[i] && customList[i].id === val && customList[i].dataUrl) {
+          return customList[i].dataUrl;
+        }
+      }
+      return (isPages ? '../images/' : './images/') + 'WorldHistory.jpg';
+    }
+    var cleanFile = val.replace(/^(\.\.\/|\.\/)?images\//, '');
+    return (isPages ? '../images/' : './images/') + cleanFile;
+  }
+  window.resolveBannerUrl = resolveBannerUrl;
+
   function getBannerColor(bannerFileName) {
-    var key = (bannerFileName || 'WorldHistory.jpg').replace(/^(\.\.\/|\.\/)?images\//, '');
+    var val = (bannerFileName || 'WorldHistory.jpg').trim();
+    if (val.indexOf('custom_') === 0 || val.indexOf('data:') === 0) {
+      var customList = getCustomBanners();
+      for (var i = 0; i < customList.length; i++) {
+        if (customList[i] && (customList[i].id === val || customList[i].dataUrl === val) && customList[i].colors) {
+          return customList[i].colors;
+        }
+      }
+    }
+    var key = val.replace(/^(\.\.\/|\.\/)?images\//, '');
     return BANNER_COLOR_MAP[key] || BANNER_COLOR_MAP['WorldHistory.jpg'];
   }
   window.getBannerColor = getBannerColor;
@@ -44,11 +84,11 @@
 
     var name = (c.name || 'World History').trim();
     var teacher = (c.teacher || '').trim();
-    var banner = (c.banner || 'WorldHistory.jpg').replace(/^(\.\.\/|\.\/)?images\//, '');
+    var banner = (c.banner || 'WorldHistory.jpg').trim();
 
     var isPages = window.location.pathname.includes('/pages/') || window.location.pathname.includes('\\pages\\');
     var isHome = !isPages && (window.location.pathname === '' || window.location.pathname === '/' || window.location.pathname.includes('home') || window.location.pathname.endsWith('home.html') || window.location.pathname.endsWith('index.html'));
-    var bannerUrl = (isPages ? '../images/' : './images/') + banner;
+    var bannerUrl = resolveBannerUrl(banner, isPages);
 
     var bannerColors = getBannerColor(banner);
     var letter = (name[0] || 'W').toUpperCase();
