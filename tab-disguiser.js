@@ -590,7 +590,7 @@ var TabDisguiser = window.TabDisguiser || {
             const raw = localStorage.getItem('pinpoint_custom_banners');
             if (raw) {
                 const parsed = JSON.parse(raw);
-                if (Array.isArray(parsed)) return parsed;
+                if (Array.isArray(parsed)) return parsed.slice(0, 4);
             }
         } catch (e) {}
         return [];
@@ -598,7 +598,8 @@ var TabDisguiser = window.TabDisguiser || {
 
     saveCustomBanners(list) {
         try {
-            localStorage.setItem('pinpoint_custom_banners', JSON.stringify(Array.isArray(list) ? list : []));
+            const capped = Array.isArray(list) ? list.slice(0, 4) : [];
+            localStorage.setItem('pinpoint_custom_banners', JSON.stringify(capped));
         } catch (e) {
             if (typeof window.showPinpointToast === 'function') {
                 window.showPinpointToast('Storage full: please remove an older custom banner first.', 'error');
@@ -930,6 +931,13 @@ var TabDisguiser = window.TabDisguiser || {
 
         const list = this.getCustomBanners();
         list.unshift(item);
+        const removedIds = [];
+        while (list.length > 4) {
+            const removed = list.pop();
+            if (removed && removed.id) {
+                removedIds.push(removed.id);
+            }
+        }
         try {
             localStorage.setItem('pinpoint_custom_banners', JSON.stringify(list));
         } catch (quotaErr) {
@@ -943,6 +951,22 @@ var TabDisguiser = window.TabDisguiser || {
             fbCtx.drawImage(st.img, st.srcX, st.srcY, st.srcW, st.srcH, 0, 0, 1616, 400);
             item.dataUrl = fbCanvas.toDataURL('image/jpeg', 0.90);
             this.saveCustomBanners(list);
+        }
+
+        if (removedIds.length > 0) {
+            const cfg = this.getClassConfig();
+            let changedCfg = false;
+            if (Array.isArray(cfg.classes)) {
+                cfg.classes.forEach(c => {
+                    if (removedIds.includes(c.banner)) {
+                        c.banner = item.id;
+                        changedCfg = true;
+                    }
+                });
+            }
+            if (changedCfg) {
+                this.saveClassConfig(cfg);
+            }
         }
 
         const cb = st.onComplete;
@@ -3167,7 +3191,7 @@ var TabDisguiser = window.TabDisguiser || {
             }
             #pinpoint-class-manager-modal,
             #customize-modal {
-                padding: clamp(16px, 2.2vh, 28px) clamp(24px, 4vw, 56px) !important;
+                padding: clamp(18px, 2.5vh, 32px) clamp(24px, 4vw, 56px) !important;
                 height: 100vh !important;
                 box-sizing: border-box !important;
                 overflow-y: auto !important;
@@ -3179,7 +3203,7 @@ var TabDisguiser = window.TabDisguiser || {
                 flex-direction: column !important;
                 width: 100% !important;
                 margin: auto 0 !important;
-                padding: 10px 0 !important;
+                padding: 12px 0 !important;
                 box-sizing: border-box !important;
             }
             #pinpoint-class-manager-modal .pinpoint-intro-header-left,
@@ -3189,42 +3213,42 @@ var TabDisguiser = window.TabDisguiser || {
                 align-items: flex-start !important;
                 text-align: left !important;
                 width: 100% !important;
-                max-width: 1240px !important;
+                max-width: 1380px !important;
                 box-sizing: border-box !important;
             }
             #pinpoint-class-manager-modal .pinpoint-intro-title,
             #customize-modal .pinpoint-intro-title {
-                font-size: clamp(26px, 3vw, 36px) !important;
+                font-size: clamp(28px, 3.2vw, 40px) !important;
                 line-height: 1.15 !important;
                 margin: 0 !important;
             }
             #pinpoint-class-manager-modal .pinpoint-intro-subtitle,
             #customize-modal .pinpoint-intro-subtitle {
-                font-size: clamp(13.5px, 1.2vw, 16px) !important;
+                font-size: clamp(14px, 1.3vw, 17px) !important;
                 margin: 6px 0 0 0 !important;
-                line-height: 1.4 !important;
+                line-height: 1.45 !important;
             }
             #pinpoint-class-manager-modal .pinpoint-intro-bottom-row,
             #customize-modal .pinpoint-intro-bottom-row {
-                padding-top: 10px !important;
+                padding-top: 12px !important;
                 margin-top: auto !important;
             }
             #pinpoint-class-manager-modal .pinpoint-nav-circle-btn,
             #customize-modal .pinpoint-nav-circle-btn {
-                width: 54px !important;
-                height: 54px !important;
-                min-width: 54px !important;
-                max-width: 54px !important;
+                width: 58px !important;
+                height: 58px !important;
+                min-width: 58px !important;
+                max-width: 58px !important;
                 border-radius: 9999px !important;
             }
             .pinpoint-cm-grid {
                 display: grid !important;
-                grid-template-columns: 1.05fr 1fr !important;
-                gap: 22px !important;
+                grid-template-columns: 1.02fr 1fr !important;
+                gap: 24px !important;
                 width: 100% !important;
-                max-width: 1240px !important;
-                margin-top: 16px !important;
-                align-items: start !important;
+                max-width: 1380px !important;
+                margin-top: 18px !important;
+                align-items: stretch !important;
             }
             @media (max-width: 960px) {
                 .pinpoint-cm-grid {
@@ -3234,22 +3258,22 @@ var TabDisguiser = window.TabDisguiser || {
             .pinpoint-cm-panel {
                 background: #f8f9fa !important;
                 border: 1px solid #dadce0 !important;
-                border-radius: 22px !important;
-                padding: 18px 20px !important;
+                border-radius: 24px !important;
+                padding: 20px 24px !important;
                 box-sizing: border-box !important;
                 display: flex !important;
                 flex-direction: column !important;
-                gap: 12px !important;
+                gap: 14px !important;
             }
             .pinpoint-cm-class-row {
                 display: flex !important;
                 align-items: center !important;
                 justify-content: space-between !important;
-                gap: 10px !important;
+                gap: 12px !important;
                 background: #ffffff !important;
                 border: 1px solid #dadce0 !important;
-                border-radius: 14px !important;
-                padding: 9px 12px !important;
+                border-radius: 16px !important;
+                padding: 10px 14px !important;
                 transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease, opacity 0.15s ease !important;
                 cursor: grab !important;
                 user-select: none !important;
@@ -3284,10 +3308,10 @@ var TabDisguiser = window.TabDisguiser || {
             }
             .pinpoint-cm-input {
                 width: 100% !important;
-                padding: 8px 12px !important;
+                padding: 9px 14px !important;
                 border: 1px solid #dadce0 !important;
-                border-radius: 12px !important;
-                font-size: 13.5px !important;
+                border-radius: 13px !important;
+                font-size: 14px !important;
                 font-family: inherit !important;
                 color: #1f1f1f !important;
                 background: #ffffff !important;
@@ -3298,13 +3322,46 @@ var TabDisguiser = window.TabDisguiser || {
             .pinpoint-cm-input:focus {
                 border-color: #1a73e8 !important;
             }
+            .pinpoint-scroll-fade-wrap {
+                position: relative !important;
+                display: flex !important;
+                flex-direction: column !important;
+                min-height: 0 !important;
+            }
+            .pinpoint-scroll-fade-wrap::before,
+            .pinpoint-scroll-fade-wrap::after {
+                content: '' !important;
+                position: absolute !important;
+                left: 0 !important;
+                right: 0 !important;
+                height: 32px !important;
+                pointer-events: none !important;
+                z-index: 6 !important;
+                opacity: 0 !important;
+                transition: opacity 0.18s ease !important;
+            }
+            .pinpoint-scroll-fade-wrap::before {
+                top: 0 !important;
+                background: linear-gradient(to bottom, #f8f9fa 12%, rgba(248, 249, 250, 0.82) 52%, rgba(248, 249, 250, 0) 100%) !important;
+            }
+            .pinpoint-scroll-fade-wrap::after {
+                bottom: 0 !important;
+                background: linear-gradient(to top, #f8f9fa 12%, rgba(248, 249, 250, 0.82) 52%, rgba(248, 249, 250, 0) 100%) !important;
+            }
+            .pinpoint-scroll-fade-wrap.fade-top::before {
+                opacity: 1 !important;
+            }
+            .pinpoint-scroll-fade-wrap.fade-bottom::after {
+                opacity: 1 !important;
+            }
             .pinpoint-cm-banners {
                 display: grid !important;
                 grid-template-columns: repeat(4, 1fr) !important;
-                gap: 7px !important;
-                max-height: 170px !important;
+                gap: 8px !important;
+                max-height: 248px !important;
                 overflow-y: auto !important;
                 padding: 3px !important;
+                scrollbar-width: thin !important;
             }
             @media (max-width: 520px) {
                 .pinpoint-cm-banners {
@@ -3449,11 +3506,11 @@ var TabDisguiser = window.TabDisguiser || {
             const delBtnHtml = b.isCustom
                 ? '<button type="button" onclick="TabDisguiser.deleteCustomBanner(\'' + safeBid + '\', event)" title="Delete custom image" style="position:absolute;top:4px;left:4px;width:18px;height:18px;border-radius:9999px;border:none;background:rgba(0,0,0,0.65);color:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;z-index:2;"><span class="material-symbols-sharp notranslate" style="font-size:12px;color:#fff;">close</span></button>'
                 : '';
-            return '<div onclick="TabDisguiser.selectClassManagerBanner(\'' + safeBid + '\')" style="height:46px;border-radius:10px;cursor:pointer;position:relative;background-image:url(\'' + bUrl + '\');background-size:cover;background-position:center;transition:all 0.15s ease;box-shadow:0 1px 2px rgba(0,0,0,0.12);' + (isSelected ? 'outline:2.5px solid #1a73e8;outline-offset:1px;' : 'outline:1px solid rgba(0,0,0,0.1);') + '">' +
-                '<div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 65%);border-radius:10px;pointer-events:none;"></div>' +
+            return '<div onclick="TabDisguiser.selectClassManagerBanner(\'' + safeBid + '\')" style="height:54px;border-radius:12px;cursor:pointer;position:relative;background-image:url(\'' + bUrl + '\');background-size:cover;background-position:center;transition:all 0.15s ease;box-shadow:0 1px 3px rgba(0,0,0,0.12);' + (isSelected ? 'outline:2.5px solid #1a73e8;outline-offset:1px;' : 'outline:1px solid rgba(0,0,0,0.1);') + '">' +
+                '<div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 65%);border-radius:12px;pointer-events:none;"></div>' +
                 delBtnHtml +
-                '<div style="position:absolute;bottom:3px;left:6px;right:6px;font-size:10.5px;font-weight:500;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px rgba(0,0,0,0.8);">' + this.escapeHtml(b.name) + '</div>' +
-                (isSelected ? '<span class="material-symbols-sharp notranslate" style="position:absolute;top:3px;right:3px;font-size:13px;background:#1a73e8;color:#fff;border-radius:9999px;padding:1px;width:16px !important;height:16px !important;display:inline-flex !important;align-items:center !important;justify-content:center !important;">check</span>' : '') +
+                '<div style="position:absolute;bottom:4px;left:7px;right:7px;font-size:11px;font-weight:500;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px rgba(0,0,0,0.8);">' + this.escapeHtml(b.name) + '</div>' +
+                (isSelected ? '<span class="material-symbols-sharp notranslate" style="position:absolute;top:4px;right:4px;font-size:14px;background:#1a73e8;color:#fff;border-radius:9999px;padding:1px;width:18px !important;height:18px !important;display:inline-flex !important;align-items:center !important;justify-content:center !important;">check</span>' : '') +
             '</div>';
         }).join('');
 
@@ -3477,17 +3534,19 @@ var TabDisguiser = window.TabDisguiser || {
                     <!-- Left Column: Class List & Active Games Selector -->
                     <div class="pinpoint-cm-panel">
                         <div style="display:flex;align-items:center;gap:12px;">
-                            <div class="pinpoint-bullet-circle" style="width:42px !important;height:42px !important;min-width:42px !important;max-width:42px !important;border-radius:9999px !important;background:#e8f0fe;border-color:#d2e3fc;color:#1a73e8;">
+                            <div class="pinpoint-bullet-circle" style="width:44px !important;height:44px !important;min-width:44px !important;max-width:44px !important;border-radius:9999px !important;background:#e8f0fe;border-color:#d2e3fc;color:#1a73e8;">
                                 <span class="material-symbols-sharp notranslate" style="color:#1a73e8;">reorder</span>
                             </div>
                             <div>
-                                <div style="font-size:16px;font-weight:500;color:#1f1f1f;">Your Classes</div>
-                                <div style="font-size:12.5px;color:#5f6368;">Drag to rearrange order or pick your active games class.</div>
+                                <div style="font-size:17px;font-weight:500;color:#1f1f1f;">Your Classes</div>
+                                <div style="font-size:13px;color:#5f6368;">Drag to rearrange order or pick your active games class.</div>
                             </div>
                         </div>
 
-                        <div id="cm-classes-list" style="display:flex;flex-direction:column;gap:7px;max-height:330px;overflow-y:auto;padding:2px;">
-                            ${classesListHtml}
+                        <div class="pinpoint-scroll-fade-wrap" style="flex:1;">
+                            <div id="cm-classes-list" data-scroll-fade="true" style="display:flex;flex-direction:column;gap:8px;max-height:390px;overflow-y:auto;padding:2px;scrollbar-width:thin;">
+                                ${classesListHtml}
+                            </div>
                         </div>
                     </div>
 
@@ -3495,12 +3554,12 @@ var TabDisguiser = window.TabDisguiser || {
                     <div class="pinpoint-cm-panel">
                         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
                             <div style="display:flex;align-items:center;gap:12px;">
-                                <div class="pinpoint-bullet-circle" style="width:42px !important;height:42px !important;min-width:42px !important;max-width:42px !important;border-radius:9999px !important;background:${editingCls ? '#fef7e0' : '#e6f4ea'};border-color:${editingCls ? '#fce8b2' : '#ceead6'};color:${editingCls ? '#ea8600' : '#137333'};">
+                                <div class="pinpoint-bullet-circle" style="width:44px !important;height:44px !important;min-width:44px !important;max-width:44px !important;border-radius:9999px !important;background:${editingCls ? '#fef7e0' : '#e6f4ea'};border-color:${editingCls ? '#fce8b2' : '#ceead6'};color:${editingCls ? '#ea8600' : '#137333'};">
                                     <span class="material-symbols-sharp notranslate" style="color:${editingCls ? '#ea8600' : '#137333'};">${editingCls ? 'edit' : 'add'}</span>
                                 </div>
                                 <div>
-                                    <div style="font-size:16px;font-weight:500;color:#1f1f1f;">${editingCls ? 'Edit Class' : 'New Class'}</div>
-                                    <div style="font-size:12.5px;color:#5f6368;">${editingCls ? 'Update class details and banner.' : 'Add a fake class card to Home and sidebar.'}</div>
+                                    <div style="font-size:17px;font-weight:500;color:#1f1f1f;">${editingCls ? 'Edit Class' : 'New Class'}</div>
+                                    <div style="font-size:13px;color:#5f6368;">${editingCls ? 'Update class details and banner.' : 'Add a fake class card to Home and sidebar.'}</div>
                                 </div>
                             </div>
                             ${editingCls ? `
@@ -3511,32 +3570,34 @@ var TabDisguiser = window.TabDisguiser || {
                             ` : ''}
                         </div>
 
-                        <div style="display:flex;flex-direction:column;gap:10px;">
-                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                        <div style="display:flex;flex-direction:column;gap:12px;">
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                                 <div>
-                                    <label style="display:block;font-size:12px;font-weight:500;color:#5f6368;margin-bottom:4px;">Class Name</label>
+                                    <label style="display:block;font-size:12px;font-weight:500;color:#5f6368;margin-bottom:5px;">Class Name</label>
                                     <input id="cm-class-name" class="pinpoint-cm-input" type="text" placeholder="e.g. AP Chemistry" value="${this.escapeHtml(currentNameVal)}" />
                                 </div>
                                 <div>
-                                    <label style="display:block;font-size:12px;font-weight:500;color:#5f6368;margin-bottom:4px;">Teacher / Section</label>
+                                    <label style="display:block;font-size:12px;font-weight:500;color:#5f6368;margin-bottom:5px;">Teacher / Section</label>
                                     <input id="cm-class-teacher" class="pinpoint-cm-input" type="text" placeholder="e.g. Period 4" value="${this.escapeHtml(currentTeacherVal)}" />
                                 </div>
                             </div>
                             <div>
-                                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;gap:8px;flex-wrap:wrap;">
-                                    <label style="font-size:12px;font-weight:500;color:#5f6368;">Banner Image</label>
-                                    <button type="button" class="pinpoint-copy-circle-btn" style="padding:4px 11px !important;font-size:12px !important;" onclick="TabDisguiser.triggerClassManagerBannerUpload()">
+                                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px;flex-wrap:wrap;">
+                                    <label style="font-size:12px;font-weight:500;color:#5f6368;">Banner Image ${customBanners.length > 0 ? `<span style="font-weight:400;color:#80868b;">(${customBanners.length}/4 custom)</span>` : ''}</label>
+                                    <button type="button" class="pinpoint-copy-circle-btn" style="padding:5px 12px !important;font-size:12px !important;" onclick="TabDisguiser.triggerClassManagerBannerUpload()">
                                         <span class="material-symbols-sharp notranslate" style="font-size:15px;color:#1a73e8;">upload</span>
                                         <span>Upload Image</span>
                                     </button>
                                     <input id="cm-banner-upload-input" type="file" accept="image/*" style="display:none;" onchange="TabDisguiser.handleClassManagerBannerUpload(event)" />
                                 </div>
-                                <div id="cm-banners-grid" class="pinpoint-cm-banners">
-                                    ${bannersHtml}
+                                <div class="pinpoint-scroll-fade-wrap">
+                                    <div id="cm-banners-grid" class="pinpoint-cm-banners" data-scroll-fade="true">
+                                        ${bannersHtml}
+                                    </div>
                                 </div>
                             </div>
                             <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:2px;flex-wrap:wrap;">
-                                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                                     <button type="button" class="pinpoint-copy-circle-btn" style="${!this._cmMakeGamesClass ? 'background:#1f1f1f !important;border-color:#1f1f1f !important;color:#ffffff !important;' : ''}" onclick="TabDisguiser.setClassManagerRole(false)">
                                         <span class="material-symbols-sharp notranslate" style="font-size:15px;color:${!this._cmMakeGamesClass ? '#ffffff' : '#5f6368'};">block</span>
                                         <span>Fake Class</span>
@@ -3546,8 +3607,8 @@ var TabDisguiser = window.TabDisguiser || {
                                         <span>Games Class</span>
                                     </button>
                                 </div>
-                                <button type="button" class="pinpoint-copy-circle-btn" style="background:#1a73e8 !important;border-color:#1a73e8 !important;color:#ffffff !important;padding:8px 18px !important;font-size:13px !important;" onclick="TabDisguiser.submitClassManagerForm()">
-                                    <span class="material-symbols-sharp notranslate" style="font-size:16px;color:#ffffff;">${editingCls ? 'save' : 'add_circle'}</span>
+                                <button type="button" class="pinpoint-copy-circle-btn" style="background:#1a73e8 !important;border-color:#1a73e8 !important;color:#ffffff !important;padding:9px 20px !important;font-size:13.5px !important;" onclick="TabDisguiser.submitClassManagerForm()">
+                                    <span class="material-symbols-sharp notranslate" style="font-size:17px;color:#ffffff;">${editingCls ? 'save' : 'add_circle'}</span>
                                     <span>${editingCls ? 'Save Changes' : 'Add Class'}</span>
                                 </button>
                             </div>
@@ -3564,13 +3625,57 @@ var TabDisguiser = window.TabDisguiser || {
                 </div>
                 <div class="pinpoint-intro-nav-circles">
                     <button class="pinpoint-nav-circle-btn" type="button" onclick="TabDisguiser.closeClassManagerModal(event)" title="Done" aria-label="Done">
-                        <span class="material-symbols-sharp notranslate" style="font-size:28px;line-height:1;pointer-events:none;">check</span>
+                        <span class="material-symbols-sharp notranslate" style="font-size:30px;line-height:1;pointer-events:none;">check</span>
                     </button>
                 </div>
             </div>
         `;
 
         this.bindClassManagerListDragAndDrop();
+        this.bindScrollFadeContainers(modal);
+    },
+
+    updateScrollFadeState(scrollEl) {
+        if (!scrollEl || !scrollEl.parentElement) return;
+        const wrap = scrollEl.parentElement;
+        if (!wrap.classList || !wrap.classList.contains('pinpoint-scroll-fade-wrap')) return;
+        const maxScroll = scrollEl.scrollHeight - scrollEl.clientHeight;
+        if (maxScroll <= 3) {
+            wrap.classList.remove('fade-top', 'fade-bottom');
+            return;
+        }
+        const top = scrollEl.scrollTop;
+        if (top <= 3) {
+            wrap.classList.remove('fade-top');
+            wrap.classList.add('fade-bottom');
+        } else if (top >= maxScroll - 3) {
+            wrap.classList.add('fade-top');
+            wrap.classList.remove('fade-bottom');
+        } else {
+            wrap.classList.add('fade-top', 'fade-bottom');
+        }
+    },
+
+    bindScrollFadeContainers(rootEl) {
+        const scope = rootEl || document;
+        const containers = scope.querySelectorAll('[data-scroll-fade="true"], .pinpoint-cm-banners');
+        containers.forEach((el) => {
+            if (!el.dataset.scrollFadeBound) {
+                el.dataset.scrollFadeBound = 'true';
+                el.addEventListener('scroll', () => this.updateScrollFadeState(el), { passive: true });
+            }
+            this.updateScrollFadeState(el);
+            requestAnimationFrame(() => this.updateScrollFadeState(el));
+            setTimeout(() => this.updateScrollFadeState(el), 60);
+        });
+        if (!this._scrollFadeResizeBound) {
+            this._scrollFadeResizeBound = true;
+            window.addEventListener('resize', () => {
+                document.querySelectorAll('[data-scroll-fade="true"], .pinpoint-cm-banners').forEach(el => {
+                    this.updateScrollFadeState(el);
+                });
+            });
+        }
     },
 
     bindClassManagerListDragAndDrop() {

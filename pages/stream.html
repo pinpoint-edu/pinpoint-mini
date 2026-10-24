@@ -668,7 +668,9 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </div>
 
-        <div id="cust-banners-grid" class="pinpoint-cm-banners" style="max-height:210px !important;"></div>
+        <div class="pinpoint-scroll-fade-wrap">
+          <div id="cust-banners-grid" class="pinpoint-cm-banners" data-scroll-fade="true"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -681,7 +683,7 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
     <div class="pinpoint-intro-nav-circles">
       <button class="pinpoint-nav-circle-btn" type="button" onclick="saveCustomization()" title="Save &amp; Close" aria-label="Save &amp; Close">
-        <span class="material-symbols-sharp notranslate" style="font-size:28px;line-height:1;pointer-events:none;">check</span>
+        <span class="material-symbols-sharp notranslate" style="font-size:30px;line-height:1;pointer-events:none;">check</span>
       </button>
     </div>
   </div>
@@ -738,14 +740,14 @@ function renderBannersGrid() {
     const isSelected = (b.id === selectedBannerId);
     const bUrl = resolveHistoryBannerUrl(b.id);
     const card = document.createElement('div');
-    card.style.cssText = 'height:46px;border-radius:10px;cursor:pointer;position:relative;background-image:url("' + bUrl + '");background-size:cover;background-position:center;transition:all 0.15s ease;box-shadow:0 1px 2px rgba(0,0,0,0.12);' + (isSelected ? 'outline:2.5px solid #1a73e8;outline-offset:1px;' : 'outline:1px solid rgba(0,0,0,0.1);');
+    card.style.cssText = 'height:54px;border-radius:12px;cursor:pointer;position:relative;background-image:url("' + bUrl + '");background-size:cover;background-position:center;transition:all 0.15s ease;box-shadow:0 1px 3px rgba(0,0,0,0.12);' + (isSelected ? 'outline:2.5px solid #1a73e8;outline-offset:1px;' : 'outline:1px solid rgba(0,0,0,0.1);');
 
     const safeName = (b.name || 'Banner').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     card.innerHTML = `
-      <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 65%);border-radius:10px;pointer-events:none;"></div>
+      <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 65%);border-radius:12px;pointer-events:none;"></div>
       ${b.isCustom ? '<button type="button" class="cust-del-banner-btn" title="Delete custom image" style="position:absolute;top:4px;left:4px;width:18px;height:18px;border-radius:9999px;border:none;background:rgba(0,0,0,0.65);color:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;z-index:2;"><span class="material-symbols-sharp notranslate" style="font-size:12px;color:#fff;">close</span></button>' : ''}
-      <div style="position:absolute;bottom:3px;left:6px;right:6px;font-size:10.5px;font-weight:500;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px rgba(0,0,0,0.8);">${safeName}</div>
-      ${isSelected ? '<span class="material-symbols-sharp notranslate" style="position:absolute;top:3px;right:3px;font-size:13px;background:#1a73e8;color:#fff;border-radius:9999px;padding:1px;width:16px !important;height:16px !important;display:inline-flex !important;align-items:center !important;justify-content:center !important;">check</span>' : ''}
+      <div style="position:absolute;bottom:4px;left:7px;right:7px;font-size:11px;font-weight:500;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px rgba(0,0,0,0.8);">${safeName}</div>
+      ${isSelected ? '<span class="material-symbols-sharp notranslate" style="position:absolute;top:4px;right:4px;font-size:14px;background:#1a73e8;color:#fff;border-radius:9999px;padding:1px;width:18px !important;height:18px !important;display:inline-flex !important;align-items:center !important;justify-content:center !important;">check</span>' : ''}
     `;
 
     const delBtn = card.querySelector('.cust-del-banner-btn');
@@ -772,6 +774,10 @@ function renderBannersGrid() {
     };
     container.appendChild(card);
   });
+
+  if (typeof TabDisguiser !== 'undefined' && typeof TabDisguiser.bindScrollFadeContainers === 'function') {
+    TabDisguiser.bindScrollFadeContainers(document.getElementById('customize-modal'));
+  }
 }
 
 function triggerCustomBannerUpload() {
