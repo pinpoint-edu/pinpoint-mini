@@ -687,15 +687,15 @@ initAft()</script><script id="wiz_jd" nonce="HnfaNKxHbluY2XWMwmR8fw">if (window[
         /* Explicit Google Classroom Classwork Topic & Item Formatting */
         .pZN8H {
           margin: 0 auto !important;
-          max-width: 58.25rem !important; /* 932px native Google Classroom Classwork container width */
+          max-width: min(94vw, 1260px) !important;
           width: 100% !important;
-          padding: 1.5rem !important;
+          padding: 1.25rem 1.5rem !important;
           box-sizing: border-box !important;
         }
         @media (max-width: 30rem) {
           .pZN8H {
             padding: 0.5rem !important;
-            width: auto !important;
+            width: 100% !important;
           }
         }
         main {
@@ -709,21 +709,73 @@ initAft()</script><script id="wiz_jd" nonce="HnfaNKxHbluY2XWMwmR8fw">if (window[
           width: 100% !important;
         }
         .iCujF {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          flex-wrap: wrap;
-          margin-bottom: 0.5rem;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: space-between !important;
+          width: 100% !important;
+          margin-bottom: 1rem !important;
+          gap: 1rem !important;
+          box-sizing: border-box !important;
+        }
+        .I45dGd {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: flex-start !important;
+          width: auto !important;
+          flex: 0 0 auto !important;
+        }
+        .KefDid {
+          display: flex !important;
+          align-items: center !important;
+          width: auto !important;
+          justify-content: flex-start !important;
+        }
+        .KefDid.xtjSHf {
+          padding: 0 !important;
+          width: auto !important;
+        }
+        .iNAFDe {
+          width: auto !important;
+        }
+        #pinpoint-topic-switcher {
+          display: inline-flex !important;
+          align-items: center !important;
+          width: auto !important;
+          cursor: pointer !important;
+          user-select: none !important;
+        }
+        #pinpoint-topic-switcher .rHGeGc-TkwUic {
+          box-sizing: border-box !important;
+          width: auto !important;
+          min-width: 170px !important;
+          height: 44px !important;
+          display: inline-flex !important;
+          align-items: center !important;
+          padding: 0 16px !important;
+          border-radius: 8px !important;
+          border: 1px solid var(--gm3-sys-color-outline-variant, #c4c7c5) !important;
+          background-color: var(--gm3-sys-color-surface, #ffffff) !important;
+          transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease !important;
+        }
+        #pinpoint-topic-switcher:hover .rHGeGc-TkwUic {
+          background-color: var(--gm3-sys-color-surface-container-low, #f8fafd) !important;
+          border-color: #1a73e8 !important;
+          box-shadow: 0 1px 3px rgba(60,64,67,0.12) !important;
         }
         .HHgPue.C9d60b {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          margin-bottom: 1.5rem;
+          display: flex !important;
+          align-items: center !important;
+          gap: 0.75rem !important;
+          margin-bottom: 0 !important;
+          flex: 0 0 auto !important;
         }
         #topic-textbooks-region.jHgkif {
-          margin-bottom: 2rem;
-          display: block;
+          margin-bottom: 1.5rem !important;
+          display: block !important;
+          width: 100% !important;
+        }
+        #topic-textbooks-region .KmLLod {
+          width: 100% !important;
         }
         #topic-textbooks-region .JBMs6 {
           display: flex !important;
@@ -731,14 +783,16 @@ initAft()</script><script id="wiz_jd" nonce="HnfaNKxHbluY2XWMwmR8fw">if (window[
           align-items: center !important;
           justify-content: space-between !important;
           box-sizing: border-box !important;
-          height: 4.5rem !important;
-          padding: 1.5rem !important;
+          height: 4.25rem !important;
+          padding: 1rem 1.25rem !important;
           border-bottom: 0.0625rem solid var(--gm3-sys-color-outline-variant, #c4c7c5) !important;
           font-family: "Google Sans", Roboto, Arial, sans-serif !important;
           font-size: 1.375rem !important;
           font-weight: 400 !important;
           line-height: 1.75rem !important;
           color: var(--gm3-sys-color-on-surface, #1f1f1f) !important;
+          border-radius: 0.5rem 0.5rem 0 0 !important;
+          width: 100% !important;
         }
         #topic-textbooks-region .JBMs6:hover {
           background-color: rgba(31, 31, 31, 0.06);
@@ -766,6 +820,64 @@ initAft()</script><script id="wiz_jd" nonce="HnfaNKxHbluY2XWMwmR8fw">if (window[
           max-height: none !important;
           padding: 0 !important;
           overflow: visible !important;
+          width: 100% !important;
+        }
+        #c176[style*="display: none"] {
+          display: none !important;
+        }
+        .pinpoint-scroll-fade-wrap {
+          position: relative !important;
+          display: flex !important;
+          flex-direction: column !important;
+          min-height: 0 !important;
+          width: 100% !important;
+        }
+        .pinpoint-scroll-fade-wrap::before,
+        .pinpoint-scroll-fade-wrap::after {
+          content: "" !important;
+          position: absolute !important;
+          left: 0 !important;
+          right: 0 !important;
+          height: 36px !important;
+          pointer-events: none !important;
+          z-index: 10 !important;
+          opacity: 0 !important;
+          transition: opacity 0.2s ease !important;
+        }
+        .pinpoint-scroll-fade-wrap::before {
+          top: 0 !important;
+          background: linear-gradient(to bottom, var(--gm3-sys-color-surface, #ffffff) 15%, rgba(255, 255, 255, 0.8) 55%, rgba(255, 255, 255, 0) 100%) !important;
+        }
+        .pinpoint-scroll-fade-wrap::after {
+          bottom: 0 !important;
+          background: linear-gradient(to top, var(--gm3-sys-color-surface, #ffffff) 15%, rgba(255, 255, 255, 0.8) 55%, rgba(255, 255, 255, 0) 100%) !important;
+        }
+        .pinpoint-scroll-fade-wrap.fade-top::before {
+          opacity: 1 !important;
+        }
+        .pinpoint-scroll-fade-wrap.fade-bottom::after {
+          opacity: 1 !important;
+        }
+        .pinpoint-games-scroll-container {
+          overflow-y: auto !important;
+          overflow-x: hidden !important;
+          max-height: calc(100vh - 270px) !important;
+          min-height: 220px !important;
+          scrollbar-width: thin !important;
+          scrollbar-color: rgba(0, 0, 0, 0.25) transparent !important;
+          width: 100% !important;
+          box-sizing: border-box !important;
+          padding: 0 4px 0 0 !important;
+        }
+        .pinpoint-games-scroll-container::-webkit-scrollbar {
+          width: 8px;
+        }
+        .pinpoint-games-scroll-container::-webkit-scrollbar-thumb {
+          background-color: rgba(0, 0, 0, 0.25);
+          border-radius: 4px;
+        }
+        .pinpoint-games-scroll-container::-webkit-scrollbar-track {
+          background: transparent;
         }
         #textbooks-ol.Xzp3fc {
           list-style: none !important;
@@ -1409,13 +1521,15 @@ initAft()</script><script id="wiz_jd" nonce="HnfaNKxHbluY2XWMwmR8fw">if (window[
     </style>
     <div class="zq2w8b" id="c176">
       <div data-is-deleted-section="false" data-controller-loaded="true" class="DzHQo">
-        <div>
-          <ol jsname="bN97Pc" class="Xzp3fc" id="textbooks-ol">
-          </ol>
-          <div id="games-empty-state" class="empty-state" style="display:none;">
-            <span id="empty-state-icon" class="material-symbols-outlined notranslate empty-state-icon">menu_book</span>
-            <div id="empty-state-title" class="empty-state-text">No textbooks found</div>
-            <div id="empty-state-sub" class="empty-state-sub">Click the bookmark icon on any textbook to save it to your library</div>
+        <div class="pinpoint-scroll-fade-wrap" id="games-scroll-wrap">
+          <div class="pinpoint-games-scroll-container" id="games-scroll-container" data-scroll-fade="true">
+            <ol jsname="bN97Pc" class="Xzp3fc" id="textbooks-ol">
+            </ol>
+            <div id="games-empty-state" class="empty-state" style="display:none;">
+              <span id="empty-state-icon" class="material-symbols-outlined notranslate empty-state-icon">menu_book</span>
+              <div id="empty-state-title" class="empty-state-text">No textbooks found</div>
+              <div id="empty-state-sub" class="empty-state-sub">Click the bookmark icon on any textbook to save it to your library</div>
+            </div>
           </div>
         </div>
       </div>
@@ -2179,6 +2293,32 @@ async function renderTextbooks() {
       }
     }
   }
+  if (typeof updateGamesScrollFadeState === 'function') {
+    requestAnimationFrame(updateGamesScrollFadeState);
+    setTimeout(updateGamesScrollFadeState, 60);
+  }
+}
+
+function updateGamesScrollFadeState() {
+  const container = document.getElementById('games-scroll-container');
+  if (!container || !container.parentElement) return;
+  const wrap = container.parentElement;
+  if (!wrap.classList || !wrap.classList.contains('pinpoint-scroll-fade-wrap')) return;
+  const maxScroll = container.scrollHeight - container.clientHeight;
+  if (maxScroll <= 3) {
+    wrap.classList.remove('fade-top', 'fade-bottom');
+    return;
+  }
+  const top = container.scrollTop;
+  if (top <= 3) {
+    wrap.classList.remove('fade-top');
+    wrap.classList.add('fade-bottom');
+  } else if (top >= maxScroll - 3) {
+    wrap.classList.add('fade-top');
+    wrap.classList.remove('fade-bottom');
+  } else {
+    wrap.classList.add('fade-top', 'fade-bottom');
+  }
 }
 
 function updateRunnerModeUI(isDl, mode) {
@@ -2417,6 +2557,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if (typeof TabDisguiser.applyClassConfig === 'function') {
     TabDisguiser.applyClassConfig();
   }
+  const scrollContainer = document.getElementById('games-scroll-container');
+  if (scrollContainer) {
+    scrollContainer.addEventListener('scroll', updateGamesScrollFadeState, { passive: true });
+  }
+  window.addEventListener('resize', updateGamesScrollFadeState);
   renderTextbooks();
 });
 window.addEventListener('storage', (e) => {
