@@ -875,19 +875,44 @@ initAft()</script><script id="wiz_jd" nonce="HnfaNKxHbluY2XWMwmR8fw">if (window[
         }
         .pinpoint-scroll-fade-wrap {
           position: relative !important;
-          display: block !important;
+          display: flex !important;
+          flex-direction: column !important;
           width: 100% !important;
           min-height: 0 !important;
         }
         .pinpoint-scroll-fade-wrap::before,
         .pinpoint-scroll-fade-wrap::after {
-          display: none !important;
+          content: '' !important;
+          position: absolute !important;
+          left: 0 !important;
+          right: 0 !important;
+          height: 32px !important;
+          pointer-events: none !important;
+          z-index: 6 !important;
+          opacity: 0 !important;
+          transition: opacity 0.18s ease !important;
+        }
+        .pinpoint-scroll-fade-wrap::before {
+          top: 0 !important;
+          background: linear-gradient(to bottom, #ffffff 12%, rgba(255, 255, 255, 0.82) 52%, rgba(255, 255, 255, 0) 100%) !important;
+        }
+        .pinpoint-scroll-fade-wrap::after {
+          bottom: 0 !important;
+          background: linear-gradient(to top, #ffffff 12%, rgba(255, 255, 255, 0.82) 52%, rgba(255, 255, 255, 0) 100%) !important;
+        }
+        .pinpoint-scroll-fade-wrap.fade-top::before {
+          opacity: 1 !important;
+        }
+        .pinpoint-scroll-fade-wrap.fade-bottom::after {
+          opacity: 1 !important;
         }
         .pinpoint-games-scroll-container {
-          overflow: visible !important;
-          max-height: none !important;
+          overflow-y: auto !important;
+          max-height: 480px !important;
           width: 100% !important;
           box-sizing: border-box !important;
+          scrollbar-width: thin !important;
+          scrollbar-color: rgba(0, 0, 0, 0.25) transparent !important;
         }
         .pinpoint-games-scroll-container::-webkit-scrollbar {
           width: 8px;
@@ -1972,6 +1997,9 @@ function toggleTopicCollapse() {
       ? '<path d="M12 5.83L15.17 9l1.41-1.41L12 3 7.41 7.59 8.83 9 12 5.83zm0 12.34L8.83 15l-1.41 1.41L12 21l4.59-4.59L15.17 15 12 18.17z" /><path d="M24 0v24H0V0h24z" fill="none" />'
       : '<path d="M7.41 2L6 3.41l6 6 6-6L16.59 2 12 6.58 7.41 2zM12 17.42L16.59 22 18 20.59l-6-6-6 6L7.41 22 12 17.42z" /><path d="M24 0v24H0V0h24z" fill="none" />';
   }
+  if (!isTopicCollapsed && typeof updateGamesScrollFadeState === 'function') {
+    setTimeout(updateGamesScrollFadeState, 50);
+  }
 }
 
 function clearSearch() {
@@ -2389,6 +2417,7 @@ async function renderTextbooks() {
   if (typeof updateGamesScrollFadeState === 'function') {
     requestAnimationFrame(updateGamesScrollFadeState);
     setTimeout(updateGamesScrollFadeState, 60);
+    setTimeout(updateGamesScrollFadeState, 200);
   }
 }
 
