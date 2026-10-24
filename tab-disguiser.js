@@ -1313,6 +1313,16 @@ var TabDisguiser = window.TabDisguiser || {
     _addClassPulseDone: false,
 
     startAddClassButtonsPulse(resetTimer = false) {
+        try {
+            if (localStorage.getItem('pinpoint_add_class_pulse_seen_v1') === 'true') {
+                this._addClassPulseDone = true;
+                return;
+            }
+            if (localStorage.getItem('pinpoint_intro_dismissed_v4') !== 'true' && !resetTimer) {
+                return;
+            }
+        } catch (e) {}
+
         if (this._addClassPulseDone && !resetTimer) return;
 
         if (!document.getElementById('pinpoint-add-class-pulse-style')) {
@@ -1369,6 +1379,10 @@ var TabDisguiser = window.TabDisguiser || {
         const btns = document.querySelectorAll('button[jsname="mSMdM"], button[data-open-class-manager="true"]');
         if (!btns.length) return;
 
+        try {
+            localStorage.setItem('pinpoint_add_class_pulse_seen_v1', 'true');
+        } catch (e) {}
+
         btns.forEach(btn => {
             btn.classList.remove('pinpoint-add-class-pulse-fading');
             btn.classList.add('pinpoint-add-class-pulse');
@@ -1384,6 +1398,9 @@ var TabDisguiser = window.TabDisguiser || {
 
     stopAddClassButtonsPulse(immediate = false) {
         this._addClassPulseDone = true;
+        try {
+            localStorage.setItem('pinpoint_add_class_pulse_seen_v1', 'true');
+        } catch (e) {}
         if (this._addClassPulseTimer) {
             clearTimeout(this._addClassPulseTimer);
             this._addClassPulseTimer = null;
@@ -3096,14 +3113,14 @@ var TabDisguiser = window.TabDisguiser || {
                 background: #f1f3f4 !important;
                 border: 1px solid #dadce0 !important;
                 border-radius: 9999px !important;
-                padding: 7px 16px !important;
-                font-size: 13px !important;
+                padding: 6px 14px !important;
+                font-size: 12.5px !important;
                 font-weight: 500 !important;
                 color: #3c4043 !important;
                 cursor: pointer !important;
                 display: inline-flex !important;
                 align-items: center !important;
-                gap: 6px !important;
+                gap: 5px !important;
                 font-family: inherit !important;
                 transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease, border-color 0.15s ease !important;
                 white-space: nowrap !important;
@@ -3148,16 +3165,75 @@ var TabDisguiser = window.TabDisguiser || {
                 border-color: #c4c7c5 !important;
                 transform: translateY(-1px) !important;
             }
+            #pinpoint-class-manager-modal,
+            #customize-modal {
+                padding: clamp(12px, 2vh, 20px) clamp(20px, 3vw, 40px) !important;
+                height: 100vh !important;
+                max-height: 100vh !important;
+                overflow: hidden !important;
+                justify-content: space-between !important;
+                gap: 8px !important;
+            }
+            #pinpoint-class-manager-modal .pinpoint-intro-body,
+            #customize-modal .pinpoint-intro-body {
+                flex: 1 !important;
+                min-height: 0 !important;
+                margin: 0 !important;
+                padding: 4px 0 !important;
+                display: flex !important;
+                flex-direction: column !important;
+                overflow: hidden !important;
+            }
+            #pinpoint-class-manager-modal .pinpoint-intro-header-left,
+            #customize-modal .pinpoint-intro-header-left {
+                flex-direction: row !important;
+                align-items: baseline !important;
+                justify-content: space-between !important;
+                gap: 14px !important;
+                max-width: 100% !important;
+                flex-wrap: wrap !important;
+                flex-shrink: 0 !important;
+            }
+            #pinpoint-class-manager-modal .pinpoint-intro-title,
+            #customize-modal .pinpoint-intro-title {
+                font-size: clamp(22px, 2.2vw, 28px) !important;
+                line-height: 1.15 !important;
+            }
+            #pinpoint-class-manager-modal .pinpoint-intro-subtitle,
+            #customize-modal .pinpoint-intro-subtitle {
+                font-size: clamp(12.5px, 1.1vw, 14px) !important;
+                margin: 2px 0 0 0 !important;
+                line-height: 1.35 !important;
+            }
+            #pinpoint-class-manager-modal .pinpoint-intro-bottom-row,
+            #customize-modal .pinpoint-intro-bottom-row {
+                padding-top: 6px !important;
+                margin-top: 0 !important;
+            }
+            #pinpoint-class-manager-modal .pinpoint-nav-circle-btn,
+            #customize-modal .pinpoint-nav-circle-btn {
+                width: 46px !important;
+                height: 46px !important;
+                min-width: 46px !important;
+                max-width: 46px !important;
+                border-radius: 9999px !important;
+            }
             .pinpoint-cm-grid {
                 display: grid !important;
-                grid-template-columns: 1.05fr 1fr !important;
-                gap: 28px !important;
+                grid-template-columns: 0.95fr 1.05fr !important;
+                gap: 16px !important;
                 width: 100% !important;
-                max-width: 1240px !important;
-                margin-top: 24px !important;
-                align-items: start !important;
+                max-width: 100% !important;
+                margin-top: 10px !important;
+                flex: 1 !important;
+                min-height: 0 !important;
+                align-items: stretch !important;
             }
-            @media (max-width: 960px) {
+            @media (max-width: 900px) {
+                #pinpoint-class-manager-modal,
+                #customize-modal {
+                    overflow-y: auto !important;
+                }
                 .pinpoint-cm-grid {
                     grid-template-columns: 1fr !important;
                 }
@@ -3165,32 +3241,36 @@ var TabDisguiser = window.TabDisguiser || {
             .pinpoint-cm-panel {
                 background: #f8f9fa !important;
                 border: 1px solid #dadce0 !important;
-                border-radius: 24px !important;
-                padding: 22px 24px !important;
+                border-radius: 18px !important;
+                padding: 14px 16px !important;
                 box-sizing: border-box !important;
                 display: flex !important;
                 flex-direction: column !important;
-                gap: 14px !important;
+                gap: 10px !important;
+                min-height: 0 !important;
+                height: 100% !important;
+                overflow: hidden !important;
             }
             .pinpoint-cm-class-row {
                 display: flex !important;
                 align-items: center !important;
                 justify-content: space-between !important;
-                gap: 12px !important;
+                gap: 10px !important;
                 background: #ffffff !important;
                 border: 1px solid #dadce0 !important;
-                border-radius: 16px !important;
-                padding: 11px 14px !important;
+                border-radius: 13px !important;
+                padding: 7px 11px !important;
                 transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease, opacity 0.15s ease !important;
                 cursor: grab !important;
                 user-select: none !important;
+                flex-shrink: 0 !important;
             }
             .pinpoint-cm-class-row:active {
                 cursor: grabbing !important;
             }
             .pinpoint-cm-class-row.is-games-class {
                 border: 2px solid #1a73e8 !important;
-                box-shadow: 0 2px 10px rgba(26,115,232,0.10) !important;
+                box-shadow: 0 2px 8px rgba(26,115,232,0.10) !important;
             }
             .pinpoint-cm-class-row.is-dragging {
                 opacity: 0.45 !important;
@@ -3215,16 +3295,17 @@ var TabDisguiser = window.TabDisguiser || {
             }
             .pinpoint-cm-input {
                 width: 100% !important;
-                padding: 10px 14px !important;
+                padding: 7px 11px !important;
                 border: 1px solid #dadce0 !important;
-                border-radius: 14px !important;
-                font-size: 14px !important;
+                border-radius: 11px !important;
+                font-size: 13px !important;
                 font-family: inherit !important;
                 color: #1f1f1f !important;
                 background: #ffffff !important;
                 box-sizing: border-box !important;
                 outline: none !important;
                 transition: border-color 0.15s ease !important;
+                height: 34px !important;
             }
             .pinpoint-cm-input:focus {
                 border-color: #1a73e8 !important;
@@ -3232,10 +3313,12 @@ var TabDisguiser = window.TabDisguiser || {
             .pinpoint-cm-banners {
                 display: grid !important;
                 grid-template-columns: repeat(4, 1fr) !important;
-                gap: 8px !important;
-                max-height: 220px !important;
+                gap: 7px !important;
+                flex: 1 !important;
+                min-height: 0 !important;
                 overflow-y: auto !important;
-                padding: 3px !important;
+                align-content: start !important;
+                padding: 2px !important;
             }
             @media (max-width: 520px) {
                 .pinpoint-cm-banners {
@@ -3333,33 +3416,33 @@ var TabDisguiser = window.TabDisguiser || {
             const safeId = this.escapeHtml(cls.id);
 
             const statusBadge = cls.hasGames
-                ? '<span style="display:inline-flex;align-items:center;gap:4px;background:#e8f0fe;color:#1a73e8;border:1px solid #d2e3fc;border-radius:99px;padding:2px 8px;font-size:11px;font-weight:600;"><span class="material-symbols-sharp notranslate" style="font-size:13px;color:#1a73e8;">sports_esports</span>Games</span>'
-                : '<span style="display:inline-flex;align-items:center;gap:4px;background:#f1f3f4;color:#5f6368;border:1px solid #dadce0;border-radius:99px;padding:2px 8px;font-size:11px;font-weight:500;">Fake</span>';
+                ? '<span style="display:inline-flex;align-items:center;gap:3px;background:#e8f0fe;color:#1a73e8;border:1px solid #d2e3fc;border-radius:99px;padding:1px 7px;font-size:10.5px;font-weight:600;"><span class="material-symbols-sharp notranslate" style="font-size:12px;color:#1a73e8;">sports_esports</span>Games</span>'
+                : '<span style="display:inline-flex;align-items:center;gap:3px;background:#f1f3f4;color:#5f6368;border:1px solid #dadce0;border-radius:99px;padding:1px 7px;font-size:10.5px;font-weight:500;">Fake</span>';
 
             const setGamesBtn = cls.hasGames
-                ? '<button type="button" class="pinpoint-copy-circle-btn" style="background:#e6f4ea !important;border-color:#ceead6 !important;color:#137333 !important;padding:6px 11px !important;font-size:12px !important;cursor:default !important;" disabled><span class="material-symbols-sharp notranslate" style="font-size:15px;color:#137333;">check_circle</span><span>Active</span></button>'
-                : '<button type="button" class="pinpoint-copy-circle-btn" style="background:#e8f0fe !important;border-color:#d2e3fc !important;color:#1a73e8 !important;padding:6px 11px !important;font-size:12px !important;" onclick="TabDisguiser.setGamesClass(\'' + safeId + '\')"><span class="material-symbols-sharp notranslate" style="font-size:15px;color:#1a73e8;">sports_esports</span><span>Use for Games</span></button>';
+                ? '<button type="button" class="pinpoint-copy-circle-btn" style="background:#e6f4ea !important;border-color:#ceead6 !important;color:#137333 !important;padding:5px 10px !important;font-size:11.5px !important;cursor:default !important;" disabled><span class="material-symbols-sharp notranslate" style="font-size:14px;color:#137333;">check_circle</span><span>Active</span></button>'
+                : '<button type="button" class="pinpoint-copy-circle-btn" style="background:#e8f0fe !important;border-color:#d2e3fc !important;color:#1a73e8 !important;padding:5px 10px !important;font-size:11.5px !important;" onclick="TabDisguiser.setGamesClass(\'' + safeId + '\')"><span class="material-symbols-sharp notranslate" style="font-size:14px;color:#1a73e8;">sports_esports</span><span>Use for Games</span></button>';
 
             const deleteBtn = classes.length > 1
-                ? '<button type="button" class="pinpoint-copy-circle-btn" style="background:#fce8e6 !important;border-color:#fad2cf !important;color:#c5221f !important;width:30px !important;height:30px !important;min-width:30px !important;padding:0 !important;border-radius:9999px !important;justify-content:center !important;" onclick="TabDisguiser.deleteClassInManager(\'' + safeId + '\')" title="Remove class"><span class="material-symbols-sharp notranslate" style="font-size:15px;color:#c5221f;">delete</span></button>'
+                ? '<button type="button" class="pinpoint-copy-circle-btn" style="background:#fce8e6 !important;border-color:#fad2cf !important;color:#c5221f !important;width:28px !important;height:28px !important;min-width:28px !important;max-width:28px !important;padding:0 !important;border-radius:9999px !important;justify-content:center !important;" onclick="TabDisguiser.deleteClassInManager(\'' + safeId + '\')" title="Remove class"><span class="material-symbols-sharp notranslate" style="font-size:14px;color:#c5221f;">delete</span></button>'
                 : '';
 
             return '<div class="pinpoint-cm-class-row ' + (cls.hasGames ? 'is-games-class' : '') + '" draggable="true" data-class-id="' + safeId + '">' +
-                '<div style="display:flex;align-items:center;gap:10px;min-width:0;flex:1;">' +
-                    '<span class="pinpoint-cm-drag-handle" title="Drag to reorder"><span class="material-symbols-sharp notranslate" style="font-size:18px;">drag_indicator</span></span>' +
-                    '<div class="pinpoint-bullet-circle" style="width:38px !important;height:38px !important;min-width:38px !important;max-width:38px !important;border-radius:9999px !important;flex-shrink:0 !important;font-size:14px !important;background:' + theme.bg + ';border-color:' + theme.bg + ';color:' + theme.text + ';">' + letter + '</div>' +
-                    '<div style="display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;">' +
-                        '<div style="display:flex;align-items:center;gap:7px;min-width:0;">' +
-                            '<span style="font-size:15px;font-weight:500;color:#1f1f1f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + safeName + '</span>' +
+                '<div style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">' +
+                    '<span class="pinpoint-cm-drag-handle" title="Drag to reorder"><span class="material-symbols-sharp notranslate" style="font-size:17px;">drag_indicator</span></span>' +
+                    '<div class="pinpoint-bullet-circle" style="width:34px !important;height:34px !important;min-width:34px !important;max-width:34px !important;border-radius:9999px !important;flex-shrink:0 !important;font-size:13px !important;background:' + theme.bg + ';border-color:' + theme.bg + ';color:' + theme.text + ';">' + letter + '</div>' +
+                    '<div style="display:flex;flex-direction:column;gap:1px;min-width:0;flex:1;">' +
+                        '<div style="display:flex;align-items:center;gap:6px;min-width:0;">' +
+                            '<span style="font-size:14px;font-weight:500;color:#1f1f1f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + safeName + '</span>' +
                             statusBadge +
                         '</div>' +
-                        (safeTeacher ? '<div style="font-size:12.5px;color:#5f6368;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + safeTeacher + '</div>' : '') +
+                        (safeTeacher ? '<div style="font-size:11.5px;color:#5f6368;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + safeTeacher + '</div>' : '') +
                     '</div>' +
                 '</div>' +
-                '<div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">' +
+                '<div style="display:flex;align-items:center;gap:5px;flex-shrink:0;">' +
                     setGamesBtn +
-                    '<button type="button" class="pinpoint-copy-circle-btn" style="padding:6px 11px !important;font-size:12px !important;" onclick="TabDisguiser.editClassInManager(\'' + safeId + '\')">' +
-                        '<span class="material-symbols-sharp notranslate" style="font-size:15px;">edit</span>' +
+                    '<button type="button" class="pinpoint-copy-circle-btn" style="padding:5px 10px !important;font-size:11.5px !important;" onclick="TabDisguiser.editClassInManager(\'' + safeId + '\')">' +
+                        '<span class="material-symbols-sharp notranslate" style="font-size:14px;">edit</span>' +
                         '<span>Edit</span>' +
                     '</button>' +
                     deleteBtn +
@@ -3378,127 +3461,125 @@ var TabDisguiser = window.TabDisguiser || {
             const bUrl = this.resolveBannerUrl(b.id, isPages);
             const safeBid = this.escapeHtml(b.id);
             const delBtnHtml = b.isCustom
-                ? '<button type="button" onclick="TabDisguiser.deleteCustomBanner(\'' + safeBid + '\', event)" title="Delete custom image" style="position:absolute;top:4px;left:4px;width:18px;height:18px;border-radius:50%;border:none;background:rgba(0,0,0,0.65);color:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;z-index:2;"><span class="material-symbols-sharp notranslate" style="font-size:12px;color:#fff;">close</span></button>'
+                ? '<button type="button" onclick="TabDisguiser.deleteCustomBanner(\'' + safeBid + '\', event)" title="Delete custom image" style="position:absolute;top:4px;left:4px;width:18px;height:18px;border-radius:9999px;border:none;background:rgba(0,0,0,0.65);color:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;z-index:2;"><span class="material-symbols-sharp notranslate" style="font-size:12px;color:#fff;">close</span></button>'
                 : '';
-            return '<div onclick="TabDisguiser.selectClassManagerBanner(\'' + safeBid + '\')" style="height:54px;border-radius:12px;cursor:pointer;position:relative;background-image:url(\'' + bUrl + '\');background-size:cover;background-position:center;transition:all 0.15s ease;box-shadow:0 1px 3px rgba(0,0,0,0.12);' + (isSelected ? 'outline:3px solid #1a73e8;outline-offset:1px;' : 'outline:1px solid rgba(0,0,0,0.1);') + '">' +
-                '<div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 65%);border-radius:12px;pointer-events:none;"></div>' +
+            return '<div onclick="TabDisguiser.selectClassManagerBanner(\'' + safeBid + '\')" style="height:46px;border-radius:10px;cursor:pointer;position:relative;background-image:url(\'' + bUrl + '\');background-size:cover;background-position:center;transition:all 0.15s ease;box-shadow:0 1px 2px rgba(0,0,0,0.12);' + (isSelected ? 'outline:2.5px solid #1a73e8;outline-offset:1px;' : 'outline:1px solid rgba(0,0,0,0.1);') + '">' +
+                '<div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 65%);border-radius:10px;pointer-events:none;"></div>' +
                 delBtnHtml +
-                '<div style="position:absolute;bottom:4px;left:7px;right:7px;font-size:11px;font-weight:500;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px rgba(0,0,0,0.8);">' + this.escapeHtml(b.name) + '</div>' +
-                (isSelected ? '<span class="material-symbols-sharp notranslate" style="position:absolute;top:4px;right:4px;font-size:14px;background:#1a73e8;color:#fff;border-radius:50%;padding:2px;width:18px !important;height:18px !important;display:inline-flex !important;align-items:center !important;justify-content:center !important;">check</span>' : '') +
+                '<div style="position:absolute;bottom:3px;left:6px;right:6px;font-size:10.5px;font-weight:500;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 2px rgba(0,0,0,0.8);">' + this.escapeHtml(b.name) + '</div>' +
+                (isSelected ? '<span class="material-symbols-sharp notranslate" style="position:absolute;top:3px;right:3px;font-size:13px;background:#1a73e8;color:#fff;border-radius:9999px;padding:1px;width:16px !important;height:16px !important;display:inline-flex !important;align-items:center !important;justify-content:center !important;">check</span>' : '') +
             '</div>';
         }).join('');
 
         modal.innerHTML = `
-            <div class="pinpoint-intro-top-row">
-                <button class="pinpoint-close-circle-btn" type="button" onclick="TabDisguiser.closeClassManagerModal(event)" title="Close" aria-label="Close">
-                    <span class="material-symbols-sharp notranslate" style="font-size:16px;line-height:1;pointer-events:none;">close</span>
-                    <span>Close</span>
-                </button>
+            <div class="pinpoint-intro-top-row" style="justify-content:space-between !important;gap:12px !important;">
+                <div style="display:flex;align-items:center;gap:14px;min-width:0;flex-wrap:wrap;">
+                    <button class="pinpoint-close-circle-btn" type="button" onclick="TabDisguiser.closeClassManagerModal(event)" title="Close" aria-label="Close">
+                        <span class="material-symbols-sharp notranslate" style="font-size:16px;line-height:1;pointer-events:none;">close</span>
+                        <span>Close</span>
+                    </button>
+                    <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;">
+                        <h1 class="pinpoint-intro-title">Manage Classes</h1>
+                        <p class="pinpoint-intro-subtitle" style="margin:0 !important;">
+                            Drag classes to reorder, add fake classes, or choose where games live.
+                        </p>
+                    </div>
+                </div>
+                <span style="background:#f1f3f4;border:1px solid #dadce0;border-radius:9999px;padding:5px 12px;font-size:12px;color:#3c4043;font-weight:500;white-space:nowrap;">
+                    Games in <b style="color:#1a73e8;">${this.escapeHtml(activeGamesCls ? activeGamesCls.name : 'World History')}</b> • ${fakeCount} fake ${fakeCount === 1 ? 'class' : 'classes'}
+                </span>
             </div>
 
             <div class="pinpoint-intro-body">
-                <div class="pinpoint-intro-header-left">
-                    <h1 class="pinpoint-intro-title">Manage Classes</h1>
-                    <p class="pinpoint-intro-subtitle">
-                        Drag classes to reorder, add fake classes, or choose where games live.
-                    </p>
-                </div>
-
-                <div class="pinpoint-cm-grid">
+                <div class="pinpoint-cm-grid" style="margin-top:4px !important;">
                     <!-- Left Column: Class List & Active Games Selector -->
                     <div class="pinpoint-cm-panel">
-                        <div style="display:flex;align-items:center;gap:12px;">
-                            <div class="pinpoint-bullet-circle" style="background:#e8f0fe;border-color:#d2e3fc;color:#1a73e8;">
-                                <span class="material-symbols-sharp notranslate" style="color:#1a73e8;">reorder</span>
+                        <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
+                            <div class="pinpoint-bullet-circle" style="width:36px !important;height:36px !important;min-width:36px !important;max-width:36px !important;border-radius:9999px !important;background:#e8f0fe;border-color:#d2e3fc;color:#1a73e8;">
+                                <span class="material-symbols-sharp notranslate" style="font-size:19px;color:#1a73e8;">reorder</span>
                             </div>
                             <div>
-                                <div style="font-size:17px;font-weight:500;color:#1f1f1f;">Your Classes</div>
-                                <div style="font-size:13px;color:#5f6368;">Drag to rearrange order or pick your active games class.</div>
+                                <div style="font-size:15.5px;font-weight:500;color:#1f1f1f;line-height:1.2;">Your Classes</div>
+                                <div style="font-size:12px;color:#5f6368;">Drag to rearrange order or pick your active games class.</div>
                             </div>
                         </div>
 
-                        <div id="cm-classes-list" style="display:flex;flex-direction:column;gap:8px;max-height:430px;overflow-y:auto;padding:2px;">
+                        <div id="cm-classes-list" style="display:flex;flex-direction:column;gap:6px;flex:1;min-height:0;overflow-y:auto;padding:2px;">
                             ${classesListHtml}
                         </div>
                     </div>
 
                     <!-- Right Column: Add Fake Class / Edit Class Form -->
                     <div class="pinpoint-cm-panel">
-                        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
-                            <div style="display:flex;align-items:center;gap:12px;">
-                                <div class="pinpoint-bullet-circle" style="background:${editingCls ? '#fef7e0' : '#e6f4ea'};border-color:${editingCls ? '#fce8b2' : '#ceead6'};color:${editingCls ? '#ea8600' : '#137333'};">
-                                    <span class="material-symbols-sharp notranslate" style="color:${editingCls ? '#ea8600' : '#137333'};">${editingCls ? 'edit' : 'add'}</span>
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0;flex-wrap:wrap;">
+                            <div style="display:flex;align-items:center;gap:10px;">
+                                <div class="pinpoint-bullet-circle" style="width:36px !important;height:36px !important;min-width:36px !important;max-width:36px !important;border-radius:9999px !important;background:${editingCls ? '#fef7e0' : '#e6f4ea'};border-color:${editingCls ? '#fce8b2' : '#ceead6'};color:${editingCls ? '#ea8600' : '#137333'};">
+                                    <span class="material-symbols-sharp notranslate" style="font-size:19px;color:${editingCls ? '#ea8600' : '#137333'};">${editingCls ? 'edit' : 'add'}</span>
                                 </div>
                                 <div>
-                                    <div style="font-size:17px;font-weight:500;color:#1f1f1f;">${editingCls ? 'Edit Class' : 'New Class'}</div>
-                                    <div style="font-size:13px;color:#5f6368;">${editingCls ? 'Update class details and banner.' : 'Add a fake class card to Home and sidebar.'}</div>
+                                    <div style="font-size:15.5px;font-weight:500;color:#1f1f1f;line-height:1.2;">${editingCls ? 'Edit Class' : 'New Class'}</div>
+                                    <div style="font-size:12px;color:#5f6368;">${editingCls ? 'Update class details and banner.' : 'Add a fake class card to Home and sidebar.'}</div>
                                 </div>
                             </div>
-                            ${editingCls ? `
-                                <button type="button" class="pinpoint-copy-circle-btn" onclick="TabDisguiser.cancelEditClassInManager()">
-                                    <span class="material-symbols-sharp notranslate" style="font-size:15px;">close</span>
-                                    <span>Cancel</span>
-                                </button>
-                            ` : ''}
-                        </div>
-
-                        <div style="display:flex;flex-direction:column;gap:11px;">
-                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                                <div>
-                                    <label style="display:block;font-size:12px;font-weight:500;color:#5f6368;margin-bottom:5px;">Class Name</label>
-                                    <input id="cm-class-name" class="pinpoint-cm-input" type="text" placeholder="e.g. AP Chemistry" value="${this.escapeHtml(currentNameVal)}" />
-                                </div>
-                                <div>
-                                    <label style="display:block;font-size:12px;font-weight:500;color:#5f6368;margin-bottom:5px;">Teacher / Section</label>
-                                    <input id="cm-class-teacher" class="pinpoint-cm-input" type="text" placeholder="e.g. Period 4" value="${this.escapeHtml(currentTeacherVal)}" />
-                                </div>
-                            </div>
-                            <div>
-                                <label style="display:block;font-size:12px;font-weight:500;color:#5f6368;margin-bottom:6px;">Role</label>
-                                <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                                    <button type="button" class="pinpoint-copy-circle-btn" style="${!this._cmMakeGamesClass ? 'background:#1f1f1f !important;border-color:#1f1f1f !important;color:#ffffff !important;' : ''}" onclick="TabDisguiser.setClassManagerRole(false)">
-                                        <span class="material-symbols-sharp notranslate" style="font-size:15px;color:${!this._cmMakeGamesClass ? '#ffffff' : '#5f6368'};">block</span>
-                                        <span>Fake Class</span>
+                            <div style="display:flex;align-items:center;gap:6px;">
+                                ${editingCls ? `
+                                    <button type="button" class="pinpoint-copy-circle-btn" style="padding:6px 11px !important;font-size:12px !important;" onclick="TabDisguiser.cancelEditClassInManager()">
+                                        <span class="material-symbols-sharp notranslate" style="font-size:14px;">close</span>
+                                        <span>Cancel</span>
                                     </button>
-                                    <button type="button" class="pinpoint-copy-circle-btn" style="${this._cmMakeGamesClass ? 'background:#1a73e8 !important;border-color:#1a73e8 !important;color:#ffffff !important;' : ''}" onclick="TabDisguiser.setClassManagerRole(true)">
-                                        <span class="material-symbols-sharp notranslate" style="font-size:15px;color:${this._cmMakeGamesClass ? '#ffffff' : '#1a73e8'};">sports_esports</span>
-                                        <span>Games Class</span>
-                                    </button>
-                                </div>
-                            </div>
-                            <div>
-                                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px;">
-                                    <label style="font-size:12px;font-weight:500;color:#5f6368;">Banner Image</label>
-                                    <button type="button" class="pinpoint-copy-circle-btn" style="padding:5px 11px !important;font-size:12px !important;" onclick="TabDisguiser.triggerClassManagerBannerUpload()">
-                                        <span class="material-symbols-sharp notranslate" style="font-size:15px;color:#1a73e8;">upload</span>
-                                        <span>Upload Image</span>
-                                    </button>
-                                    <input id="cm-banner-upload-input" type="file" accept="image/*" style="display:none;" onchange="TabDisguiser.handleClassManagerBannerUpload(event)" />
-                                </div>
-                                <div id="cm-banners-grid" class="pinpoint-cm-banners">
-                                    ${bannersHtml}
-                                </div>
-                            </div>
-                            <div style="display:flex;justify-content:flex-end;margin-top:2px;">
-                                <button type="button" class="pinpoint-copy-circle-btn" style="background:#1a73e8 !important;border-color:#1a73e8 !important;color:#ffffff !important;padding:9px 20px !important;font-size:13.5px !important;" onclick="TabDisguiser.submitClassManagerForm()">
-                                    <span class="material-symbols-sharp notranslate" style="font-size:17px;color:#ffffff;">${editingCls ? 'save' : 'add_circle'}</span>
+                                ` : ''}
+                                <button type="button" class="pinpoint-copy-circle-btn" style="background:#1a73e8 !important;border-color:#1a73e8 !important;color:#ffffff !important;padding:6px 14px !important;font-size:12.5px !important;" onclick="TabDisguiser.submitClassManagerForm()">
+                                    <span class="material-symbols-sharp notranslate" style="font-size:15px;color:#ffffff;">${editingCls ? 'save' : 'add_circle'}</span>
                                     <span>${editingCls ? 'Save Changes' : 'Add Class'}</span>
                                 </button>
+                            </div>
+                        </div>
+
+                        <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;flex-shrink:0;">
+                            <div>
+                                <label style="display:block;font-size:11.5px;font-weight:500;color:#5f6368;margin-bottom:4px;">Class Name</label>
+                                <input id="cm-class-name" class="pinpoint-cm-input" type="text" placeholder="e.g. AP Chemistry" value="${this.escapeHtml(currentNameVal)}" />
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:11.5px;font-weight:500;color:#5f6368;margin-bottom:4px;">Teacher / Section</label>
+                                <input id="cm-class-teacher" class="pinpoint-cm-input" type="text" placeholder="e.g. Period 4" value="${this.escapeHtml(currentTeacherVal)}" />
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:11.5px;font-weight:500;color:#5f6368;margin-bottom:4px;">Role</label>
+                                <div style="display:flex;gap:5px;height:34px;align-items:center;">
+                                    <button type="button" class="pinpoint-copy-circle-btn" style="height:34px !important;padding:0 11px !important;font-size:12px !important;${!this._cmMakeGamesClass ? 'background:#1f1f1f !important;border-color:#1f1f1f !important;color:#ffffff !important;' : ''}" onclick="TabDisguiser.setClassManagerRole(false)">
+                                        <span class="material-symbols-sharp notranslate" style="font-size:14px;color:${!this._cmMakeGamesClass ? '#ffffff' : '#5f6368'};">block</span>
+                                        <span>Fake</span>
+                                    </button>
+                                    <button type="button" class="pinpoint-copy-circle-btn" style="height:34px !important;padding:0 11px !important;font-size:12px !important;${this._cmMakeGamesClass ? 'background:#1a73e8 !important;border-color:#1a73e8 !important;color:#ffffff !important;' : ''}" onclick="TabDisguiser.setClassManagerRole(true)">
+                                        <span class="material-symbols-sharp notranslate" style="font-size:14px;color:${this._cmMakeGamesClass ? '#ffffff' : '#1a73e8'};">sports_esports</span>
+                                        <span>Games</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display:flex;flex-direction:column;flex:1;min-height:0;gap:5px;">
+                            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-shrink:0;">
+                                <label style="font-size:11.5px;font-weight:500;color:#5f6368;">Banner Image</label>
+                                <button type="button" class="pinpoint-copy-circle-btn" style="padding:4px 10px !important;font-size:11.5px !important;" onclick="TabDisguiser.triggerClassManagerBannerUpload()">
+                                    <span class="material-symbols-sharp notranslate" style="font-size:14px;color:#1a73e8;">upload</span>
+                                    <span>Upload Image</span>
+                                </button>
+                                <input id="cm-banner-upload-input" type="file" accept="image/*" style="display:none;" onchange="TabDisguiser.handleClassManagerBannerUpload(event)" />
+                            </div>
+                            <div id="cm-banners-grid" class="pinpoint-cm-banners">
+                                ${bannersHtml}
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="pinpoint-intro-bottom-row">
-                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-                    <span style="background:#f1f3f4;border:1px solid #dadce0;border-radius:99px;padding:6px 14px;font-size:13px;color:#3c4043;font-weight:500;">
-                        Games in <b style="color:#1a73e8;">${this.escapeHtml(activeGamesCls ? activeGamesCls.name : 'World History')}</b> • ${fakeCount} fake ${fakeCount === 1 ? 'class' : 'classes'}
-                    </span>
-                </div>
+            <div class="pinpoint-intro-bottom-row" style="justify-content:flex-end !important;padding-top:2px !important;">
                 <div class="pinpoint-intro-nav-circles">
                     <button class="pinpoint-nav-circle-btn" type="button" onclick="TabDisguiser.closeClassManagerModal(event)" title="Done" aria-label="Done">
-                        <span class="material-symbols-sharp notranslate" style="font-size:32px;line-height:1;pointer-events:none;">check</span>
+                        <span class="material-symbols-sharp notranslate" style="font-size:24px;line-height:1;pointer-events:none;">check</span>
                     </button>
                 </div>
             </div>
