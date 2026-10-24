@@ -77,6 +77,12 @@
             targetUrl = targetUrl.substring(1);
         }
 
+        if (targetUrl === 'pages/history.html' || targetUrl === 'history.html') {
+            targetUrl = 'pages/stream.html';
+        } else if (targetUrl === 'pages/classwork-history.html' || targetUrl === 'classwork-history.html') {
+            targetUrl = 'pages/classwork.html';
+        }
+
         try {
             const origin = localStorage.getItem('pinpoint_entry_origin') || window.location.origin;
             let fullUrl = targetUrl;
@@ -100,7 +106,7 @@
                     const cfgRaw = localStorage.getItem('pinpoint_classroom_config');
                     const cfgObj = cfgRaw ? JSON.parse(cfgRaw) : {};
                     const curName = (cfgObj.history || cfgObj.english || {}).name || 'World History';
-                    const isHistoryStream = targetUrl.includes('history.html') && !targetUrl.includes('classwork');
+                    const isHistoryStream = (targetUrl.includes('stream.html') || targetUrl.includes('history.html')) && !targetUrl.includes('classwork');
                     const disguiseTitle = isHistoryStream ? (curName + ' - Classroom') : ('Classwork for ' + curName + ' - Classroom');
                     if (html.includes('<title>')) {
                         html = html.replace(/<title>[\s\S]*?<\/title>/i, '<title>' + disguiseTitle + '</title>');

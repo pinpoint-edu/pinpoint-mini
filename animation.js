@@ -797,7 +797,7 @@
         attempts++;
         const el = document.querySelector('li[data-course-id="854642477833"]') ||
                    document.querySelector('li.gHz6xd') ||
-                   document.querySelector('a[href*="history.html"]');
+                   document.querySelector('a[href*="stream.html"]');
 
         if (el) {
           clearInterval(checkEl);
@@ -816,11 +816,11 @@
                   sessionStorage.setItem('pinpoint_walkthrough_active', 'true');
                   sessionStorage.setItem('pinpoint_walkthrough_step', '3');
                 } catch (e) {}
-                const link = el.querySelector('a[href*="history.html"]') || el.querySelector('a') || el;
+                const link = el.querySelector('a[href*="stream.html"]') || el.querySelector('a') || el;
                 if (link && link.href) {
                   safeNavigate(link.href);
                 } else {
-                  safeNavigate('./pages/history.html');
+                  safeNavigate('./pages/stream.html');
                 }
               }
             });
@@ -842,7 +842,7 @@
     let attempts = 0;
     const checkEl = setInterval(() => {
       attempts++;
-      const el = document.querySelector('a[href*="classwork-history.html"]') ||
+      const el = document.querySelector('a[href*="classwork.html"]') ||
                  document.querySelector('.P6qqFf a[href*="classwork"]') ||
                  document.querySelector('a.wz2Mic[href*="classwork"]');
 
@@ -866,7 +866,7 @@
               if (el.href) {
                 safeNavigate(el.href);
               } else {
-                safeNavigate('./classwork-history.html');
+                safeNavigate('./classwork.html');
               }
             }
           });
@@ -1035,7 +1035,7 @@
       const el = document.querySelector('button[onclick*="toggleFav"]') ||
                  document.getElementById('favorites-container') ||
                  document.querySelector('a[data-id="854642477833"]') ||
-                 document.querySelector('a[href*="history.html"]');
+                 document.querySelector('a[href*="stream.html"]');
 
       if (el) {
         clearInterval(checkSidebar);

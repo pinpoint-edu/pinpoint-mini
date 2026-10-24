@@ -25,8 +25,8 @@ var TabDisguiser = window.TabDisguiser || {
         const rawPath = window.__CURRENT_PAGE__ || window.location.pathname;
         const path = rawPath.toLowerCase();
         const isMusic = path.includes('music');
-        const isClassworkHistory = !isMusic && path.includes('classwork') && (path.includes('history') || path.includes('english'));
-        const isHistory = !isMusic && !path.includes('classwork') && (path.includes('history') || path.includes('english'));
+        const isClassworkHistory = !isMusic && path.includes('classwork');
+        const isHistory = !isMusic && !path.includes('classwork') && (path.includes('stream') || path.includes('history') || path.includes('english'));
         const isAI = !isMusic && path.includes('ai');
         const isSettings = !isMusic && path.includes('settings');
         const isMediaMarketing = path.includes('media-marketing');
@@ -251,7 +251,7 @@ var TabDisguiser = window.TabDisguiser || {
 
         const isMusic = path.includes('music');
         const isClasswork = path.includes('classwork');
-        const isHistoryOrEnglish = (path.includes('history') || path.includes('english'));
+        const isHistoryOrEnglish = (path.includes('stream') || path.includes('history') || path.includes('english'));
         const isAI = path.includes('ai');
         const isSettings = path.includes('settings');
         const isMediaMarketing = path.includes('media-marketing');
@@ -640,83 +640,316 @@ var TabDisguiser = window.TabDisguiser || {
         };
     },
 
-    processUploadedBannerFile(file) {
-        return new Promise((resolve, reject) => {
-            if (!file || !file.type || !file.type.startsWith('image/')) {
-                reject(new Error('Please select a valid image file.'));
-                return;
+    async openBannerCropModal(file, onComplete) {
+        if (!file || !file.type || !file.type.startsWith('image/')) {
+            if (typeof window.showPinpointToast === 'function') {
+                window.showPinpointToast('Please select a valid image file', 'error');
             }
-            const reader = new FileReader();
-            reader.onerror = () => reject(new Error('Failed to read image file.'));
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onerror = () => reject(new Error('Invalid image format.'));
-                img.onload = () => {
-                    try {
-                        const maxW = 1100;
-                        const maxH = 360;
-                        let w = img.width || 800;
-                        let h = img.height || 240;
-                        const scale = Math.min(1, maxW / w, maxH / Math.max(h, 1));
-                        w = Math.max(1, Math.round(w * scale));
-                        h = Math.max(1, Math.round(h * scale));
+            return;
+        }
+        await this.ensureClassManagerStyles();
 
-                        const canvas = document.createElement('canvas');
-                        canvas.width = w;
-                        canvas.height = h;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, w, h);
-
-                        // Extract average color to generate matching badge/sidebar palette
-                        let rSum = 0, gSum = 0, bSum = 0, count = 0;
-                        try {
-                            const data = ctx.getImageData(0, 0, w, h).data;
-                            const step = Math.max(4, Math.floor((data.length / 4) / 400) * 4);
-                            for (let i = 0; i < data.length; i += step) {
-                                if (data[i + 3] < 128) continue;
-                                rSum += data[i];
-                                gSum += data[i + 1];
-                                bSum += data[i + 2];
-                                count++;
-                            }
-                        } catch (err) {}
-
-                        let r = count ? Math.round(rSum / count) : 26;
-                        let g = count ? Math.round(gSum / count) : 115;
-                        let b = count ? Math.round(bSum / count) : 232;
-
-                        const toHex = (n) => Math.max(0, Math.min(255, Math.round(n))).toString(16).padStart(2, '0');
-                        const mixWhite = (c, ratio) => Math.round(c + (255 - c) * ratio);
-                        const darken = (c, ratio) => Math.round(c * ratio);
-
-                        const colors = {
-                            dominant: '#' + toHex(r) + toHex(g) + toHex(b),
-                            sidebarBg: '#' + toHex(mixWhite(r, 0.88)) + toHex(mixWhite(g, 0.88)) + toHex(mixWhite(b, 0.88)),
-                            sidebarHover: '#' + toHex(mixWhite(r, 0.78)) + toHex(mixWhite(g, 0.78)) + toHex(mixWhite(b, 0.78)),
-                            circleBg: '#' + toHex(mixWhite(r, 0.74)) + toHex(mixWhite(g, 0.74)) + toHex(mixWhite(b, 0.74)),
-                            circleText: '#' + toHex(darken(r, 0.42)) + toHex(darken(g, 0.42)) + toHex(darken(b, 0.42))
-                        };
-
-                        const dataUrl = canvas.toDataURL('image/jpeg', 0.84);
-                        const rawName = (file.name || 'Custom Banner').replace(/\.[^/.]+$/, '').trim() || 'Custom Banner';
-                        const item = {
-                            id: 'custom_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
-                            name: rawName.slice(0, 24),
-                            dataUrl,
-                            colors
-                        };
-                        const list = this.getCustomBanners();
-                        list.unshift(item);
-                        this.saveCustomBanners(list);
-                        resolve(item);
-                    } catch (err) {
-                        reject(err);
-                    }
-                };
-                img.src = e.target.result;
+        const reader = new FileReader();
+        reader.onerror = () => {
+            if (typeof window.showPinpointToast === 'function') {
+                window.showPinpointToast('Failed to read image file', 'error');
+            }
+        };
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onerror = () => {
+                if (typeof window.showPinpointToast === 'function') {
+                    window.showPinpointToast('Invalid image format', 'error');
+                }
             };
-            reader.readAsDataURL(file);
-        });
+            img.onload = () => {
+                const imgW = img.naturalWidth || img.width || 1010;
+                const imgH = img.naturalHeight || img.height || 250;
+                const cropAspect = 1010 / 250;
+
+                let baseSrcW, baseSrcH;
+                if (imgW / imgH >= cropAspect) {
+                    baseSrcH = imgH;
+                    baseSrcW = imgH * cropAspect;
+                } else {
+                    baseSrcW = imgW;
+                    baseSrcH = imgW / cropAspect;
+                }
+
+                this._cropState = {
+                    img,
+                    imgW,
+                    imgH,
+                    baseSrcW,
+                    baseSrcH,
+                    zoom: 1,
+                    centerX: imgW / 2,
+                    centerY: imgH / 2,
+                    fileName: (file.name || 'Custom Banner').replace(/\.[^/.]+$/, '').trim() || 'Custom Banner',
+                    onComplete: typeof onComplete === 'function' ? onComplete : null
+                };
+
+                let cropModal = document.getElementById('pinpoint-banner-crop-modal');
+                if (cropModal) cropModal.remove();
+
+                cropModal = document.createElement('div');
+                cropModal.id = 'pinpoint-banner-crop-modal';
+                cropModal.style.cssText = 'position:fixed !important;inset:0 !important;width:100vw !important;height:100vh !important;background:rgba(15,17,20,0.65) !important;backdrop-filter:blur(6px) !important;-webkit-backdrop-filter:blur(6px) !important;z-index:2147483647 !important;display:flex !important;align-items:center !important;justify-content:center !important;padding:24px !important;box-sizing:border-box !important;font-family:"Google Sans",Roboto,Arial,sans-serif !important;';
+
+                cropModal.innerHTML = `
+                    <div class="pinpoint-cm-panel" style="width:100% !important;max-width:860px !important;background:#ffffff !important;border-radius:28px !important;padding:28px !important;box-shadow:0 24px 64px rgba(0,0,0,0.32) !important;gap:18px !important;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+                            <div style="display:flex;align-items:center;gap:12px;">
+                                <div class="pinpoint-bullet-circle" style="background:#e8f0fe;border-color:#d2e3fc;color:#1a73e8;">
+                                    <span class="material-symbols-sharp notranslate" style="color:#1a73e8;">crop</span>
+                                </div>
+                                <div>
+                                    <div style="font-size:19px;font-weight:500;color:#1f1f1f;">Crop Banner Image</div>
+                                    <div style="font-size:13px;color:#5f6368;">Drag to reposition and zoom before uploading. Banner is saved permanently once cropped.</div>
+                                </div>
+                            </div>
+                            <button type="button" class="pinpoint-close-circle-btn" onclick="TabDisguiser.closeBannerCropModal()">
+                                <span class="material-symbols-sharp notranslate" style="font-size:16px;">close</span>
+                                <span>Cancel</span>
+                            </button>
+                        </div>
+
+                        <div style="position:relative;width:100%;border-radius:18px;overflow:hidden;background:#1f1f1f;border:2px solid #dadce0;box-shadow:inset 0 2px 8px rgba(0,0,0,0.2);">
+                            <canvas id="pinpoint-crop-canvas" width="1212" height="300" style="display:block;width:100%;aspect-ratio:1010/250;cursor:grab;touch-action:none;"></canvas>
+                            <div style="position:absolute;inset:0;pointer-events:none;border:1px solid rgba(255,255,255,0.35);border-radius:16px;box-shadow:inset 0 0 0 1px rgba(0,0,0,0.2);"></div>
+                            <div style="position:absolute;bottom:10px;left:12px;pointer-events:none;background:rgba(0,0,0,0.62);color:#fff;font-size:11.5px;font-weight:500;padding:4px 10px;border-radius:99px;display:inline-flex;align-items:center;gap:5px;backdrop-filter:blur(4px);">
+                                <span class="material-symbols-sharp notranslate" style="font-size:14px;color:#fff;">pan_tool</span>
+                                <span>Drag to pan • Scroll to zoom</span>
+                            </div>
+                        </div>
+
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:#f8f9fa;border:1px solid #dadce0;border-radius:16px;padding:12px 16px;">
+                            <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:220px;">
+                                <span class="material-symbols-sharp notranslate" style="font-size:18px;color:#5f6368;">zoom_out</span>
+                                <input id="pinpoint-crop-zoom" type="range" min="1" max="3.5" step="0.01" value="1" style="flex:1;accent-color:#1a73e8;cursor:pointer;" />
+                                <span class="material-symbols-sharp notranslate" style="font-size:18px;color:#5f6368;">zoom_in</span>
+                                <span id="pinpoint-crop-zoom-label" style="font-size:12.5px;font-weight:600;color:#3c4043;min-width:44px;text-align:right;">100%</span>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <button type="button" class="pinpoint-copy-circle-btn" onclick="TabDisguiser.resetBannerCropView()">
+                                    <span class="material-symbols-sharp notranslate" style="font-size:15px;">restart_alt</span>
+                                    <span>Reset</span>
+                                </button>
+                                <button type="button" class="pinpoint-copy-circle-btn" style="background:#1a73e8 !important;border-color:#1a73e8 !important;color:#ffffff !important;padding:9px 20px !important;font-size:13.5px !important;" onclick="TabDisguiser.confirmBannerCrop()">
+                                    <span class="material-symbols-sharp notranslate" style="font-size:17px;color:#ffffff;">check_circle</span>
+                                    <span>Crop &amp; Upload</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                document.body.appendChild(cropModal);
+                this.bindBannerCropInteractions();
+                this.drawBannerCropPreview();
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    },
+
+    clampBannerCropState() {
+        const st = this._cropState;
+        if (!st) return;
+        st.zoom = Math.max(1, Math.min(3.5, Number(st.zoom) || 1));
+        const srcW = st.baseSrcW / st.zoom;
+        const srcH = st.baseSrcH / st.zoom;
+        const halfW = srcW / 2;
+        const halfH = srcH / 2;
+        st.centerX = Math.max(halfW, Math.min(st.imgW - halfW, st.centerX));
+        st.centerY = Math.max(halfH, Math.min(st.imgH - halfH, st.centerY));
+        st.srcW = srcW;
+        st.srcH = srcH;
+        st.srcX = st.centerX - halfW;
+        st.srcY = st.centerY - halfH;
+    },
+
+    drawBannerCropPreview() {
+        const st = this._cropState;
+        const canvas = document.getElementById('pinpoint-crop-canvas');
+        if (!st || !canvas) return;
+        this.clampBannerCropState();
+
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(st.img, st.srcX, st.srcY, st.srcW, st.srcH, 0, 0, canvas.width, canvas.height);
+
+        const zoomSlider = document.getElementById('pinpoint-crop-zoom');
+        if (zoomSlider && Math.abs(Number(zoomSlider.value) - st.zoom) > 0.005) {
+            zoomSlider.value = String(st.zoom);
+        }
+        const zoomLabel = document.getElementById('pinpoint-crop-zoom-label');
+        if (zoomLabel) {
+            zoomLabel.textContent = Math.round(st.zoom * 100) + '%';
+        }
+    },
+
+    resetBannerCropView() {
+        const st = this._cropState;
+        if (!st) return;
+        st.zoom = 1;
+        st.centerX = st.imgW / 2;
+        st.centerY = st.imgH / 2;
+        this.drawBannerCropPreview();
+    },
+
+    bindBannerCropInteractions() {
+        const canvas = document.getElementById('pinpoint-crop-canvas');
+        const zoomSlider = document.getElementById('pinpoint-crop-zoom');
+        if (!canvas) return;
+
+        let isDragging = false;
+        let lastX = 0;
+        let lastY = 0;
+
+        const onPointerDown = (e) => {
+            if (!this._cropState) return;
+            isDragging = true;
+            lastX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+            lastY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+            canvas.style.cursor = 'grabbing';
+            if (e.setPointerCapture && e.pointerId !== undefined) {
+                try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+            }
+        };
+
+        const onPointerMove = (e) => {
+            if (!isDragging || !this._cropState) return;
+            const curX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : lastX);
+            const curY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : lastY);
+            const dx = curX - lastX;
+            const dy = curY - lastY;
+            lastX = curX;
+            lastY = curY;
+
+            const rect = canvas.getBoundingClientRect();
+            if (rect.width > 0 && rect.height > 0) {
+                const st = this._cropState;
+                const scaleX = st.srcW / rect.width;
+                const scaleY = st.srcH / rect.height;
+                st.centerX -= dx * scaleX;
+                st.centerY -= dy * scaleY;
+                this.drawBannerCropPreview();
+            }
+        };
+
+        const onPointerUp = () => {
+            if (!isDragging) return;
+            isDragging = false;
+            canvas.style.cursor = 'grab';
+        };
+
+        canvas.addEventListener('pointerdown', onPointerDown);
+        window.addEventListener('pointermove', onPointerMove);
+        window.addEventListener('pointerup', onPointerUp);
+
+        canvas.addEventListener('wheel', (e) => {
+            if (!this._cropState) return;
+            e.preventDefault();
+            const delta = -e.deltaY * 0.0018;
+            this._cropState.zoom = Math.max(1, Math.min(3.5, this._cropState.zoom + delta));
+            this.drawBannerCropPreview();
+        }, { passive: false });
+
+        if (zoomSlider) {
+            zoomSlider.addEventListener('input', (e) => {
+                if (!this._cropState) return;
+                this._cropState.zoom = Number(e.target.value) || 1;
+                this.drawBannerCropPreview();
+            });
+        }
+    },
+
+    closeBannerCropModal() {
+        this._cropState = null;
+        const modal = document.getElementById('pinpoint-banner-crop-modal');
+        if (modal) modal.remove();
+    },
+
+    confirmBannerCrop() {
+        const st = this._cropState;
+        if (!st || !st.img) return;
+        this.clampBannerCropState();
+
+        // Render high-resolution cropped banner (up to 2424x600 — 2.4x native Classroom banner resolution)
+        const targetW = Math.max(1010, Math.min(2424, Math.round(st.srcW)));
+        const targetH = Math.max(250, Math.round(targetW * (250 / 1010)));
+
+        const outCanvas = document.createElement('canvas');
+        outCanvas.width = targetW;
+        outCanvas.height = targetH;
+        const ctx = outCanvas.getContext('2d');
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(st.img, st.srcX, st.srcY, st.srcW, st.srcH, 0, 0, targetW, targetH);
+
+        // Extract dominant/accent colors from the cropped region
+        let rSum = 0, gSum = 0, bSum = 0, count = 0;
+        try {
+            const data = ctx.getImageData(0, 0, targetW, targetH).data;
+            const step = Math.max(4, Math.floor((data.length / 4) / 500) * 4);
+            for (let i = 0; i < data.length; i += step) {
+                if (data[i + 3] < 128) continue;
+                rSum += data[i];
+                gSum += data[i + 1];
+                bSum += data[i + 2];
+                count++;
+            }
+        } catch (err) {}
+
+        const r = count ? Math.round(rSum / count) : 26;
+        const g = count ? Math.round(gSum / count) : 115;
+        const b = count ? Math.round(bSum / count) : 232;
+
+        const toHex = (n) => Math.max(0, Math.min(255, Math.round(n))).toString(16).padStart(2, '0');
+        const mixWhite = (c, ratio) => Math.round(c + (255 - c) * ratio);
+        const darken = (c, ratio) => Math.round(c * ratio);
+
+        const colors = {
+            dominant: '#' + toHex(r) + toHex(g) + toHex(b),
+            sidebarBg: '#' + toHex(mixWhite(r, 0.88)) + toHex(mixWhite(g, 0.88)) + toHex(mixWhite(b, 0.88)),
+            sidebarHover: '#' + toHex(mixWhite(r, 0.78)) + toHex(mixWhite(g, 0.78)) + toHex(mixWhite(b, 0.78)),
+            circleBg: '#' + toHex(mixWhite(r, 0.74)) + toHex(mixWhite(g, 0.74)) + toHex(mixWhite(b, 0.74)),
+            circleText: '#' + toHex(darken(r, 0.42)) + toHex(darken(g, 0.42)) + toHex(darken(b, 0.42))
+        };
+
+        let dataUrl = outCanvas.toDataURL('image/jpeg', 0.94);
+        const item = {
+            id: 'custom_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+            name: (st.fileName || 'Custom Banner').slice(0, 24),
+            dataUrl,
+            colors
+        };
+
+        const list = this.getCustomBanners();
+        list.unshift(item);
+        try {
+            localStorage.setItem('pinpoint_custom_banners', JSON.stringify(list));
+        } catch (quotaErr) {
+            // Fallback to 1616x400 @ 0.90 if localStorage is near capacity
+            const fbCanvas = document.createElement('canvas');
+            fbCanvas.width = 1616;
+            fbCanvas.height = 400;
+            const fbCtx = fbCanvas.getContext('2d');
+            fbCtx.imageSmoothingEnabled = true;
+            fbCtx.imageSmoothingQuality = 'high';
+            fbCtx.drawImage(st.img, st.srcX, st.srcY, st.srcW, st.srcH, 0, 0, 1616, 400);
+            item.dataUrl = fbCanvas.toDataURL('image/jpeg', 0.90);
+            this.saveCustomBanners(list);
+        }
+
+        const cb = st.onComplete;
+        this.closeBannerCropModal();
+        if (typeof cb === 'function') {
+            cb(item);
+        }
     },
 
     deleteCustomBanner(bannerId, e) {
@@ -835,10 +1068,10 @@ var TabDisguiser = window.TabDisguiser || {
         const isFile = window.location.protocol === 'file:';
         const isAboutBlank = (window.location.protocol === 'about:' || window.location.href === 'about:blank' || window.location.href.startsWith('about:'));
         const pagesPrefix = isAboutBlank ? '#pages' : (isFile ? (isPages ? '.' : (isRoot ? './pages' : '../pages')) : '/pages');
-        const historyNavUrl = isAboutBlank ? '#pages/history.html' : (pagesPrefix + '/history.html');
+        const historyNavUrl = isAboutBlank ? '#pages/stream.html' : (pagesPrefix + '/stream.html');
 
         let activePage = 'home';
-        if (path.includes('classwork-history') || path.includes('classwork-english') || path.includes('classwork') || path.includes('history') || path.includes('english')) {
+        if (path.includes('classwork') || path.includes('stream') || path.includes('history') || path.includes('english')) {
             activePage = 'history';
         } else if (path.includes('ai')) {
             activePage = 'ai';
@@ -866,8 +1099,8 @@ var TabDisguiser = window.TabDisguiser || {
         const isFile = window.location.protocol === 'file:';
         const isAboutBlank = (window.location.protocol === 'about:' || window.location.href === 'about:blank' || window.location.href.startsWith('about:'));
 
-        const historyHref = isAboutBlank ? '#pages/history.html' : (isFile ? './pages/history.html' : '/pages/history.html');
-        const classworkHref = isAboutBlank ? '#pages/classwork-history.html' : (isFile ? './pages/classwork-history.html' : '/pages/classwork-history.html');
+        const historyHref = isAboutBlank ? '#pages/stream.html' : (isFile ? './pages/stream.html' : '/pages/stream.html');
+        const classworkHref = isAboutBlank ? '#pages/classwork.html' : (isFile ? './pages/classwork.html' : '/pages/classwork.html');
 
         const cfg = this.getClassConfig();
         const classes = cfg.classes || [];
@@ -903,7 +1136,7 @@ var TabDisguiser = window.TabDisguiser || {
                     '<div class="joT7of"><div class="TQYOZc"><div><div class="xo2x2e AX2up"><span class="Y5vSD">No work due soon</span><span class="nforOe">Woohoo, no work due soon!</span></div></div></div></div>' +
                     '<div class="SZ0kZe">' +
                         '<span data-is-tooltip-wrapper="true">' +
-                            '<div class="pYTkkf-Bz112c-LgbsSe pYTkkf-Bz112c-LgbsSe-OWXEXe-SfQLQb-suEOdc" style="cursor:pointer;position:relative;" onclick="if(window.navigateToAboutBlankPage){window.navigateToAboutBlankPage(\'pages/classwork-history.html\');return false;}">' +
+                            '<div class="pYTkkf-Bz112c-LgbsSe pYTkkf-Bz112c-LgbsSe-OWXEXe-SfQLQb-suEOdc" style="cursor:pointer;position:relative;" onclick="if(window.navigateToAboutBlankPage){window.navigateToAboutBlankPage(\'pages/classwork.html\');return false;}">' +
                                 '<span class="UTNHae"></span>' +
                                 '<span aria-hidden="true" class="pYTkkf-Bz112c-kBDsod-Rtc0Jf"><span class="notranslate VfPpkd-kBDsod" aria-hidden="true"><svg focusable="false" width="24" height="24" viewBox="0 0 24 24" class="NMm5M"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7.55 0c.14-.15.33-.25.55-.25s.41.1.55.25c.12.13.2.31.2.5 0 .41-.34.75-.75.75s-.75-.34-.75-.75c0-.19.08-.37.2-.5zM19 5v10.79C16.52 14.37 13.23 14 12 14s-4.52.37-7 1.79V5h14zM5 19v-.77C6.74 16.66 10.32 16 12 16s5.26.66 7 2.23V19H5z"/><path d="M12 13c1.94 0 3.5-1.56 3.5-3.5S13.94 6 12 6 8.5 7.56 8.5 9.5 10.06 13 12 13zm0-5c.83 0 1.5.67 1.5 1.5S12.83 11 12 11s-1.5-.67-1.5-1.5S11.17 8 12 8z"/></svg></span></span>' +
                                 '<a class="pYTkkf-Bz112c-mRLv6 pYTkkf-Bz112c-RLmnJb" draggable="false" href="' + classworkHref + '" aria-label="Open your work for &quot;' + safeName + '&quot;" style="position:absolute;inset:0;width:100%;height:100%;z-index:10;cursor:pointer;"></a>' +
@@ -1080,7 +1313,7 @@ var TabDisguiser = window.TabDisguiser || {
         const rawPath = window.__CURRENT_PAGE__ || window.location.pathname || '';
         const path = rawPath.toLowerCase();
         const isClasswork = path.includes('classwork');
-        const isHistory = !isClasswork && (path.includes('history') || path.includes('english'));
+        const isHistory = !isClasswork && (path.includes('stream') || path.includes('history') || path.includes('english'));
         const isEnglish = !isClasswork && path.includes('english');
         const isMusic = path.includes('music');
 
@@ -1197,11 +1430,11 @@ var TabDisguiser = window.TabDisguiser || {
         if (path.includes('classwork-history') || path.includes('classwork-english') || path.includes('classwork')) {
             activePage = 'history';
             subpageTitle = 'World History';
-            subpageUrl = isAboutBlank ? '#pages/classwork-history.html' : pagesPrefix + '/classwork-history.html';
-        } else if (path.includes('history') || path.includes('english')) {
+            subpageUrl = isAboutBlank ? '#pages/classwork.html' : pagesPrefix + '/classwork.html';
+        } else if (path.includes('stream') || path.includes('history') || path.includes('english')) {
             activePage = 'history';
             subpageTitle = 'World History';
-            subpageUrl = isAboutBlank ? '#pages/history.html' : pagesPrefix + '/history.html';
+            subpageUrl = isAboutBlank ? '#pages/stream.html' : pagesPrefix + '/stream.html';
         } else if (path.includes('music-test')) {
             activePage = 'music';
             subpageTitle = 'Music Production';
@@ -1255,7 +1488,7 @@ var TabDisguiser = window.TabDisguiser || {
         const sidebarNav = document.querySelector('nav.STek2d');
         if (sidebarNav) {
             const aiNavUrl = isAboutBlank ? '#pages/ai.html' : (pagesPrefix + '/ai.html');
-            const historyNavUrl = isAboutBlank ? '#pages/history.html' : (pagesPrefix + '/history.html');
+            const historyNavUrl = isAboutBlank ? '#pages/stream.html' : (pagesPrefix + '/stream.html');
             const settingsNavUrl = isAboutBlank ? '#pages/settings.html' : (pagesPrefix + '/settings.html');
 
             const classItemHtml = this.buildSidebarClassesHtml(cfg, activePage, historyNavUrl);
@@ -1498,7 +1731,7 @@ var TabDisguiser = window.TabDisguiser || {
         // Games (like Bit Planes) have light canvases/art styles and forcing dark color-scheme in Chrome/Chromebooks inverts text/input rendering causing text to fade invisible.
         const isGameIframe = iframe.id === 'runner-iframe' || 
                              iframe.id === 'game-frame' || 
-                             (iframe.src && (iframe.src.includes('/textbooks/') || iframe.src.includes('pages/classwork-history.html')));
+                             (iframe.src && (iframe.src.includes('/textbooks/') || iframe.src.includes('pages/classwork')));
 
         if (isGameIframe) {
             try {
@@ -3244,21 +3477,17 @@ var TabDisguiser = window.TabDisguiser || {
         if (input) input.click();
     },
 
-    async handleClassManagerBannerUpload(e) {
+    handleClassManagerBannerUpload(e) {
         const file = e && e.target && e.target.files ? e.target.files[0] : null;
+        if (e && e.target) e.target.value = '';
         if (!file) return;
-        try {
-            const entry = await this.processUploadedBannerFile(file);
+        this.openBannerCropModal(file, (entry) => {
             this._cmSelectedBanner = entry.id;
             this.renderClassManagerContent();
             if (typeof window.showPinpointToast === 'function') {
                 window.showPinpointToast('Uploaded banner "' + entry.name + '"', 'success');
             }
-        } catch (err) {
-            if (typeof window.showPinpointToast === 'function') {
-                window.showPinpointToast('Could not upload image', 'error');
-            }
-        }
+        });
     },
 
     selectClassManagerBanner(bannerId) {
@@ -3409,7 +3638,7 @@ var TabDisguiser = window.TabDisguiser || {
             ? window.location.origin 
             : (localStorage.getItem('pinpoint_entry_origin') || localStorage.getItem('pinpoint_return_origin') || '');
         const cleanOrigin = currentOrigin ? currentOrigin.replace(/\/$/, '') : '';
-        const currentUrl = (window.location.href && !window.location.href.startsWith('about:')) ? window.location.href : (cleanOrigin ? (cleanOrigin + '/pages/classwork-history.html') : 'pages/classwork-history.html');
+        const currentUrl = (window.location.href && !window.location.href.startsWith('about:')) ? window.location.href : (cleanOrigin ? (cleanOrigin + '/pages/classwork.html') : 'pages/classwork.html');
         const currentHost = window.location.host || window.location.hostname || 'pinpoint-edu';
 
         try {
@@ -3853,7 +4082,7 @@ var TabDisguiser = window.TabDisguiser || {
         window.close();
       } catch (e) {}
       setTimeout(() => {
-        navigateToAboutBlankPage('pages/classwork-history.html');
+        navigateToAboutBlankPage('pages/classwork.html');
       }, 90);
     }
 
