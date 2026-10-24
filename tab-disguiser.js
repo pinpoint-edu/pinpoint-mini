@@ -1336,7 +1336,7 @@ var TabDisguiser = window.TabDisguiser || {
                 button.pinpoint-add-class-pulse,
                 [data-open-class-manager="true"].pinpoint-add-class-pulse {
                     position: relative !important;
-                    border-radius: 50% !important;
+                    border-radius: 9999px !important;
                     color: #1a73e8 !important;
                     background-color: rgba(26, 115, 232, 0.12) !important;
                     transition: background-color 1s ease, color 1s ease !important;
@@ -1346,7 +1346,7 @@ var TabDisguiser = window.TabDisguiser || {
                     content: '' !important;
                     position: absolute !important;
                     inset: -3px !important;
-                    border-radius: 50% !important;
+                    border-radius: 9999px !important;
                     border: 2px solid #1a73e8 !important;
                     pointer-events: none !important;
                     opacity: 1 !important;
@@ -1579,7 +1579,7 @@ var TabDisguiser = window.TabDisguiser || {
         const headerNav = document.querySelector('nav.joJglb');
         if (headerNav) {
             const topAddClassBtnHtml = (activePage === 'home')
-                ? '<button type="button" data-open-class-manager="true" onclick="TabDisguiser.openClassManagerModal(); return false;" aria-label="Create or join a class" title="Add or manage classes" style="width:40px;height:40px;border-radius:50%;border:none;background:transparent;color:#5f6368;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background=\'rgba(60,64,67,0.08)\'" onmouseout="this.style.background=\'transparent\'"><svg focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></button>'
+                ? '<button type="button" data-open-class-manager="true" onclick="TabDisguiser.openClassManagerModal(); return false;" aria-label="Create or join a class" title="Add or manage classes" style="width:40px !important;height:40px !important;min-width:40px !important;max-width:40px !important;flex-shrink:0 !important;padding:0 !important;border-radius:9999px !important;border:none;background:transparent;color:#5f6368;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background=\'rgba(60,64,67,0.08)\'" onmouseout="this.style.background=\'transparent\'"><svg focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></button>'
                 : '';
             headerNav.innerHTML = '<div class="gmNu1d"><div class="FXKA9c"><div class="XIpEib gmNu1d"><div class="k43Owe mmOZjd" data-focus-id="JUeBdc"><div id="ow21"><span data-is-tooltip-wrapper="true"><button id="pinpoint-hamburger-btn" aria-controls="-uQIZnf" aria-expanded="true" aria-label="Main Menu" class="pYTkkf-Bz112c-LgbsSe pYTkkf-Bz112c-LgbsSe-OWXEXe-SfQLQb-suEOdc ykp8pd oxacD" style="cursor:pointer;" type="button"><span class="XjoK4b pYTkkf-Bz112c-UHGRz"></span><span class="UTNHae"></span><span aria-hidden="true" class="pYTkkf-Bz112c-kBDsod-Rtc0Jf"><span aria-hidden="true" class="notranslate VfPpkd-kBDsod"><svg class="NMm5M" focusable="false" height="24" viewBox="0 0 24 24" width="24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path></svg></span></span><div class="pYTkkf-Bz112c-RLmnJb"></div></button></span></div></div><h1 class="Hwv4mb rIyhE" data-impressions-entry-point="17"><a class="CbuVcc CYP1kd cGvavf gmNu1d y183Ub fcsk5" data-focus-id="titlebar-home" href="' + homeUrl + '" target="_self"><img alt="Google Classroom" class="UAJaRc" src="' + (isFile ? (rootPrefix + '/images/logo_square_rounded.svg') : '/images/logo_square_rounded.svg') + '"/><span class="dR850e FkiMUb">Classroom</span></a>' + breadcrumbHtml + '</h1></div></div><div class="R2tE8e VHRSDf gmNu1d"></div><div class="Mtd4hb gmNu1d" style="display:flex;align-items:center;gap:12px;padding-right:24px;"><div id="nav-clock-display" class="static-clock-display" style="font-size:14px;font-weight:500;color:#5f6368;font-variant-numeric:tabular-nums;font-family:\'Google Sans\',Roboto,sans-serif;display:inline-flex;align-items:center;cursor:pointer;user-select:none;" title="Fullscreen Clock"></div>' + topAddClassBtnHtml + '<svg class="NMm5M" focusable="false" height="24" viewBox="0 0 24 24" width="24" style="color:#5f6368;fill:#5f6368;cursor:pointer;"><path d="M6,8c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM12,20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM6,20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM6,14c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM12,14c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM16,6c0,1.1 0.9,2 2,2s2,-0.9 2,-2 -0.9,-2 -2,-2 -2,0.9 -2,2zM12,8c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM18,14c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2zM18,20c1.1,0 2,-0.9 2,-2s-0.9,-2 -2,-2 -2,0.9 -2,2 0.9,2 2,2z"></path></svg><img src="https://lh3.googleusercontent.com/a/default-user=s40-c" alt="Avatar" style="width:32px;height:32px;border-radius:50%;cursor:pointer;"></div></div>';
             const navClock = document.getElementById('nav-clock-display');
@@ -3077,7 +3077,9 @@ var TabDisguiser = window.TabDisguiser || {
                 width: 46px !important;
                 height: 46px !important;
                 min-width: 46px !important;
-                border-radius: 50% !important;
+                max-width: 46px !important;
+                aspect-ratio: 1 / 1 !important;
+                border-radius: 9999px !important;
                 background: #f1f3f4;
                 border: 1px solid #dadce0;
                 color: #444746;
@@ -3088,11 +3090,12 @@ var TabDisguiser = window.TabDisguiser || {
                 box-shadow: 0 1px 3px rgba(60,64,67,0.08) !important;
                 font-weight: 600 !important;
                 font-size: 18px !important;
+                box-sizing: border-box !important;
             }
             .pinpoint-copy-circle-btn {
                 background: #f1f3f4 !important;
                 border: 1px solid #dadce0 !important;
-                border-radius: 20px !important;
+                border-radius: 9999px !important;
                 padding: 7px 16px !important;
                 font-size: 13px !important;
                 font-weight: 500 !important;
@@ -3338,13 +3341,13 @@ var TabDisguiser = window.TabDisguiser || {
                 : '<button type="button" class="pinpoint-copy-circle-btn" style="background:#e8f0fe !important;border-color:#d2e3fc !important;color:#1a73e8 !important;padding:6px 11px !important;font-size:12px !important;" onclick="TabDisguiser.setGamesClass(\'' + safeId + '\')"><span class="material-symbols-sharp notranslate" style="font-size:15px;color:#1a73e8;">sports_esports</span><span>Use for Games</span></button>';
 
             const deleteBtn = classes.length > 1
-                ? '<button type="button" class="pinpoint-copy-circle-btn" style="background:#fce8e6 !important;border-color:#fad2cf !important;color:#c5221f !important;padding:6px 9px !important;" onclick="TabDisguiser.deleteClassInManager(\'' + safeId + '\')" title="Remove class"><span class="material-symbols-sharp notranslate" style="font-size:15px;color:#c5221f;">delete</span></button>'
+                ? '<button type="button" class="pinpoint-copy-circle-btn" style="background:#fce8e6 !important;border-color:#fad2cf !important;color:#c5221f !important;width:30px !important;height:30px !important;min-width:30px !important;padding:0 !important;border-radius:9999px !important;justify-content:center !important;" onclick="TabDisguiser.deleteClassInManager(\'' + safeId + '\')" title="Remove class"><span class="material-symbols-sharp notranslate" style="font-size:15px;color:#c5221f;">delete</span></button>'
                 : '';
 
             return '<div class="pinpoint-cm-class-row ' + (cls.hasGames ? 'is-games-class' : '') + '" draggable="true" data-class-id="' + safeId + '">' +
                 '<div style="display:flex;align-items:center;gap:10px;min-width:0;flex:1;">' +
                     '<span class="pinpoint-cm-drag-handle" title="Drag to reorder"><span class="material-symbols-sharp notranslate" style="font-size:18px;">drag_indicator</span></span>' +
-                    '<div class="pinpoint-bullet-circle" style="width:36px !important;height:36px !important;font-size:14px !important;background:' + theme.bg + ';border-color:' + theme.bg + ';color:' + theme.text + ';">' + letter + '</div>' +
+                    '<div class="pinpoint-bullet-circle" style="width:38px !important;height:38px !important;min-width:38px !important;max-width:38px !important;border-radius:9999px !important;flex-shrink:0 !important;font-size:14px !important;background:' + theme.bg + ';border-color:' + theme.bg + ';color:' + theme.text + ';">' + letter + '</div>' +
                     '<div style="display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;">' +
                         '<div style="display:flex;align-items:center;gap:7px;min-width:0;">' +
                             '<span style="font-size:15px;font-weight:500;color:#1f1f1f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + safeName + '</span>' +
