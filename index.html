@@ -793,6 +793,62 @@
       listContainer.innerHTML = html;
     }
 
+    function renderHtmlToIframe(iframe, html, fileUrl) {
+      let baseDir = fileUrl.substring(0, fileUrl.lastIndexOf('/') + 1);
+      if (!baseDir.endsWith('/')) baseDir += '/';
+
+      let fullBaseUrl = baseDir;
+      try {
+        fullBaseUrl = new URL(baseDir, window.location.href).href;
+      } catch(e) {}
+
+      const baseTag = '<base href="' + fullBaseUrl + '">';
+      let finalHtml = html;
+      if (finalHtml.includes('<head>')) {
+        finalHtml = finalHtml.replace('<head>', '<head>' + baseTag);
+      } else {
+        finalHtml = baseTag + finalHtml;
+      }
+
+      // Convert to Blob URL with explicit text/html MIME type
+      // This completely prevents the browser from showing raw HTML code as text!
+      const blob = new Blob([finalHtml], { type: 'text/html; charset=utf-8' });
+      iframe.src = URL.createObjectURL(blob);
+    }
+
+    async function fetchGameHtml(file) {
+      const cleanPath = file.replace(/^\/+/, '');
+      let fetchFile = cleanPath;
+      if (fetchFile.endsWith('/')) {
+        fetchFile += 'index.html';
+      }
+
+      // Priority list of mirrors and CDNs
+      const urlsToTry = [
+        fetchFile,
+        'https://cdn.jsdelivr.net/gh/pinpoint-edu/assets@main/' + fetchFile,
+        'https://fastly.jsdelivr.net/gh/pinpoint-edu/assets@main/' + fetchFile,
+        'https://gcore.jsdelivr.net/gh/pinpoint-edu/assets@main/' + fetchFile,
+        'https://cdn.jsdelivr.net/gh/pinpoint-edu/pinpoint-mini@v2.0/' + fetchFile,
+        'https://raw.githubusercontent.com/pinpoint-edu/assets/main/' + fetchFile
+      ];
+
+      for (const url of urlsToTry) {
+        try {
+          const res = await fetch(url);
+          if (!res.ok) continue;
+          const text = await res.text();
+          if (text.includes('Package size exceeded') || text.includes('404: Not Found') || text.trim().startsWith('{"status": 4')) {
+            continue;
+          }
+          return { html: text, resolvedUrl: url };
+        } catch(e) {
+          continue;
+        }
+      }
+      throw new Error('Could not fetch game from CDN mirrors.');
+    }
+
     // Play Game in the In-Page Player
     async function playGame(encodedFile, encodedTitle) {
       const file = decodeURIComponent(encodedFile);
@@ -805,23 +861,51 @@
 
       const iframe = document.getElementById('gameIframe');
 
-      // Check if game has offline content saved in IndexedDB
-      let offlineLoaded = false;
+      // 1. Check if game is saved offline in IndexedDB
       if (typeof PinpointGameStorage !== 'undefined') {
         try {
           const record = await PinpointGameStorage.getGame(id);
           if (record && record.content && record.content.length > 50) {
-            // Single-file offline game: load via Blob URL
-            const blob = new Blob([record.content], { type: 'text/html' });
-            iframe.src = URL.createObjectURL(blob);
-            offlineLoaded = true;
+            renderHtmlToIframe(iframe, record.content, file);
+            return;
           }
         } catch(e) {}
       }
 
-      if (!offlineLoaded) {
-        // Multi-file game or standard online play: load via relative URL (intercepted by sw.js if cached)
-        iframe.src = file;
+      // 2. Show loading spinner while fetching
+      iframe.srcdoc = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body { background: #000; color: #ff5722; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+            .spinner { width: 36px; height: 36px; border: 4px solid #333; border-top: 4px solid #ff4500; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 12px; }
+            @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+          </style>
+        </head>
+        <body>
+          <div class="spinner"></div>
+          <div>Loading ${title}...</div>
+        </body>
+        </html>
+      `;
+
+      // 3. Fetch game HTML with automated fallback and render as text/html Blob
+      try {
+        const { html, resolvedUrl } = await fetchGameHtml(file);
+        renderHtmlToIframe(iframe, html, resolvedUrl);
+      } catch (err) {
+        console.error('Play game error:', err);
+        iframe.srcdoc = `
+          <!DOCTYPE html>
+          <html>
+          <body style="background: #0d0f14; color: #f87171; font-family: sans-serif; padding: 30px; text-align: center;">
+            <h3>Unable to load ${title}</h3>
+            <p style="color: #9ca3af;">${err.message}</p>
+            <p style="color: #6b7280; font-size: 13px;">If you are offline, make sure you download the game first.</p>
+          </body>
+          </html>
+        `;
       }
     }
 

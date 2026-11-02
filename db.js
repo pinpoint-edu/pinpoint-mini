@@ -439,16 +439,29 @@ const PinpointGameStorage = {
                 try {
                     res = await fetch(assetUrl, { signal: controller.signal });
                     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                } catch(primaryErr) {
-                    // Fallback to raw GitHub assets repository if local fetch fails
-                    const clean = assetUrl.replace(/^\/+/, '');
-                    const rawFallback = 'https://raw.githubusercontent.com/pinpoint-edu/assets/main/' + clean;
-                    try {
-                        res = await fetch(rawFallback, { signal: controller.signal });
-                        if (!res.ok) throw primaryErr;
-                    } catch(fallbackErr) {
-                        throw primaryErr;
+                    const checkCl = res.headers.get('content-length');
+                    if (checkCl && parseInt(checkCl, 10) < 300 && assetUrl.endsWith('.html')) {
+                        const previewText = await res.clone().text();
+                        if (previewText.includes('Package size exceeded')) throw new Error('Package size exceeded');
                     }
+                } catch(primaryErr) {
+                    const clean = assetUrl.replace(/^\/+/, '');
+                    const fallbackUrls = [
+                        'https://cdn.jsdelivr.net/gh/pinpoint-edu/assets@main/' + clean,
+                        'https://fastly.jsdelivr.net/gh/pinpoint-edu/assets@main/' + clean,
+                        'https://raw.githubusercontent.com/pinpoint-edu/assets/main/' + clean
+                    ];
+                    let loaded = false;
+                    for (const fbUrl of fallbackUrls) {
+                        try {
+                            res = await fetch(fbUrl, { signal: controller.signal });
+                            if (res.ok) {
+                                loaded = true;
+                                break;
+                            }
+                        } catch(e) {}
+                    }
+                    if (!loaded) throw primaryErr;
                 }
 
                 const contentLength = parseInt(res.headers.get('content-length') || '0', 10);
