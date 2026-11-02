@@ -1056,6 +1056,12 @@ const PinpointGameStorage = {
                 }
 
                 const clean = assetUrl.replace(/^\/+/, '');
+                // Skip directories (cannot be fetched directly as files over HTTP)
+                if (!clean || clean.endsWith('/')) {
+                    completedAssets++;
+                    continue;
+                }
+
                 const mirrors = [activeMirror, ...CDN_MIRRORS.filter(m => m !== activeMirror)];
                 const candidateUrls = [
                     ...mirrors.map(m => m + '/gh/pinpoint-edu/assets@main/' + clean),
@@ -1230,19 +1236,18 @@ const PinpointGameStorage = {
                 req.onerror = () => reject(req.error);
             });
 
-            activeControllers.delete(id);
-            activeInFlightDownloads.delete(id);
             return record;
 
         } catch (downloadErr) {
-            activeControllers.delete(id);
-            activeInFlightDownloads.delete(id);
             try {
                 await this.deleteGame(id, fileUrl);
             } catch (cleanupErr) {
                 console.warn('Cleanup error after failed download:', cleanupErr);
             }
             throw downloadErr;
+        } finally {
+            activeControllers.delete(id);
+            activeInFlightDownloads.delete(id);
         }
     },
 
@@ -1519,34 +1524,51 @@ window.PinpointGameStorage = PinpointGameStorage;
       let base = fileUrl.replace(/[^/]*$/, '');
       if (!base.endsWith('/')) base += '/';
 
-      // 1. Inject <base href="..."> if not present
-      if (!/<base\b/i.test(html)) {
-        if (/<head([^>]*)>/i.test(html)) {
-          html = html.replace(/<head([^>]*)>/i, '<head$1><base href="' + base + '">');
-        } else {
-          html = '<base href="' + base + '">' + html;
-        }
+      let repoBase = base;
+      const mRepo = base.match(/^(https?:\/\/[^/]+\/(?:gh\/[^/]+\/[^/@]+@[^/]+\/|[^/]+\/[^/]+\/[^/]+\/))/i);
+      if (mRepo) {
+        repoBase = mRepo[1];
       }
 
-      // 2. Resolve root-relative paths (/...) to repo base
-      try {
-        const mRepo = base.match(/^(https?:\/\/[^/]+\/(?:gh\/[^/]+\/[^/@]+@[^/]+\/|[^/]+\/[^/]+\/[^/]+\/))/i);
-        if (mRepo) {
-          const repoBase = mRepo[1];
-          html = html.replace(/(\s(?:src|href))=(['"])\/(?!\/)/gi, '$1=$2' + repoBase);
+      const lower = html.toLowerCase();
+      const firstScript = lower.indexOf('<script');
+      const firstHead = lower.indexOf('<head');
+      const hasRealHead = firstHead !== -1 && (firstScript === -1 || firstHead < firstScript);
+
+      // 1. Inject or update <base href="...">
+      const mBase = html.match(/(<base\b[^>]*\bhref\s*=\s*)(['"])(.*?)\2/i);
+      if (mBase) {
+        const existingHref = mBase[3];
+        if (existingHref.startsWith('/') || existingHref.startsWith('./') || !existingHref.includes('://')) {
+          html = html.replace(/(<base\b[^>]*\bhref\s*=\s*)(['"])(.*?)\2/i, '$1$2' + base + '$2');
         }
-      } catch (e) {}
-
-      // 3. Normalize jsdelivr mirror domains to current active mirror
-      html = html.replace(/https?:\/\/[^/]*\.jsdelivr\.net\//g, activeMirror + '/');
-
-      // 4. Inject fullscreen viewport styles into frame
-      const frameStyle = '<style>html,body{height:100%;margin:0;padding:0;overflow:hidden;background:#000;}.webgl-content,#gameContainer,#canvas{width:100%;height:100%;}</style>';
-      if (/<head([^>]*)>/i.test(html)) {
-        html = html.replace(/<head([^>]*)>/i, '<head$1>' + frameStyle);
+      } else if (hasRealHead) {
+        html = html.replace(/<head([^>]*)>/i, '<head$1><base href="' + base + '">');
       } else {
-        html = frameStyle + html;
+        html = '<base href="' + base + '">' + html;
       }
+
+      // 2. Inject frame viewport style and runtime fetch/XHR interceptor
+      const frameStyle = '<style>html,body{height:100%;margin:0;padding:0;overflow:hidden;background:#000;}.webgl-content,#gameContainer,#canvas{width:100%;height:100%;}</style>';
+      const interceptScript = '<scr' + 'ipt>(function(){' +
+        'var b=' + JSON.stringify(base) + ';' +
+        'var rb=' + JSON.stringify(repoBase) + ';' +
+        'function fix(u){if(typeof u!=="string")return u;if(u.indexOf("/textbooks/")===0)return rb+u.slice(1);if(u.indexOf("/assets/")===0)return b+u.slice(1);return u;}' +
+        'if(typeof window.fetch!=="undefined"){var _f=window.fetch;window.fetch=function(inp,init){if(typeof inp==="string")inp=fix(inp);else if(inp&&inp.url)inp=new Request(fix(inp.url),inp);return _f.call(this,inp,init);};}' +
+        'if(typeof XMLHttpRequest!=="undefined"){var _o=XMLHttpRequest.prototype.open;XMLHttpRequest.prototype.open=function(m,u){arguments[1]=fix(u);return _o.apply(this,arguments);};}' +
+        '})();</scr' + 'ipt>';
+
+      if (hasRealHead) {
+        html = html.replace(/<head([^>]*)>/i, '<head$1>' + interceptScript + frameStyle);
+      } else {
+        html = interceptScript + frameStyle + html;
+      }
+
+      // 3. Resolve root-relative paths in HTML attributes
+      html = html.replace(/(\s(?:src|href))=(['"])\/(?!\/)/gi, '$1=$2' + repoBase);
+
+      // 4. Normalize jsdelivr mirror domains to current active mirror
+      html = html.replace(/https?:\/\/[^/]*\.jsdelivr\.net\//g, activeMirror + '/');
 
       return html;
     }
@@ -1695,6 +1717,10 @@ window.PinpointGameStorage = PinpointGameStorage;
 
       if (typeof PinpointGameStorage === 'undefined') {
         alert('Offline storage database is not available.');
+        return;
+      }
+
+      if (PinpointGameStorage.isDownloading(id)) {
         return;
       }
 
