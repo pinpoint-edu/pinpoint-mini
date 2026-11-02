@@ -62,7 +62,7 @@
   </div>
 
   <script>
-    const targetPath = "/gh/pinpoint-edu/pinpoint-mini@v2.0/index.html";
+    const targetPath = "/gh/pinpoint-edu/pinpoint-mini@v2.1/index.html";
     const mirrorSelect = document.getElementById("mirrorSelect");
 
     mirrorSelect.addEventListener("change", async (event) => {
@@ -73,7 +73,7 @@
       const newTab = window.open("about:blank", "_blank");
 
       try {
-        // 2. Fetch the game website HTML from the chosen CDN mirror
+        // 2. Fetch the clean Lavagames HTML directly from chosen CDN mirror
         const response = await fetch(selectedMirror + targetPath + "?t=" + Date.now());
         if (!response.ok) throw new Error(response.status);
 
@@ -86,7 +86,7 @@
           ? htmlContent.replace('<head>', '<head>' + baseTag)
           : baseTag + htmlContent;
 
-        // 4. Inject directly into about:blank (no classroom overlay)
+        // 4. Inject directly into about:blank
         newTab.document.open();
         newTab.document.write(htmlContent);
         newTab.document.close();
