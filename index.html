@@ -1057,6 +1057,7 @@ const PinpointGameStorage = {
                 const mirrors = [activeMirror, ...CDN_MIRRORS.filter(m => m !== activeMirror)];
                 const candidateUrls = [
                     ...mirrors.map(m => m + '/gh/pinpoint-edu/assets@main/' + clean),
+                    'https://cdn.statically.io/gh/pinpoint-edu/assets@main/' + clean,
                     'https://raw.githubusercontent.com/pinpoint-edu/assets/main/' + clean
                 ];
 
@@ -1068,7 +1069,7 @@ const PinpointGameStorage = {
                             const checkCl = r.headers.get('content-length');
                             if (checkCl && parseInt(checkCl, 10) < 300 && clean.endsWith('.html')) {
                                 const previewText = await r.clone().text();
-                                if (previewText.includes('Package size exceeded')) continue;
+                                if (previewText.includes('Package size exceeded') || previewText.includes('limit of 20 MB')) continue;
                             }
                             res = r;
                             for (const m of CDN_MIRRORS) {
@@ -1566,10 +1567,11 @@ window.PinpointGameStorage = PinpointGameStorage;
         fetchFile += 'index.html';
       }
 
-      // Priority list: active mirror first, then remaining CDN mirrors, then raw github
+      // Priority list: active mirror first, then remaining CDN mirrors, then statically.io, then raw github
       const mirrors = [activeMirror, ...CDN_MIRRORS.filter(m => m !== activeMirror)];
       const urlsToTry = [
         ...mirrors.map(m => m + '/gh/pinpoint-edu/assets@main/' + fetchFile),
+        'https://cdn.statically.io/gh/pinpoint-edu/assets@main/' + fetchFile,
         'https://raw.githubusercontent.com/pinpoint-edu/assets/main/' + fetchFile
       ];
 
@@ -1578,7 +1580,7 @@ window.PinpointGameStorage = PinpointGameStorage;
           const res = await fetch(url);
           if (!res.ok) continue;
           const text = await res.text();
-          if (text.includes('Package size exceeded') || text.includes('404: Not Found') || text.trim().startsWith('{"status": 4')) {
+          if (text.includes('Package size exceeded') || text.includes('limit of 20 MB') || text.includes('404: Not Found') || text.trim().startsWith('{"status": 4')) {
             continue;
           }
           for (const m of CDN_MIRRORS) {
