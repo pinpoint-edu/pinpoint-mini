@@ -683,13 +683,18 @@ const PinpointGameStorage = {
 
 window.PinpointGameStorage = PinpointGameStorage;
 
-// Automatically register Service Worker for offline game caching
-if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
-    if (document.readyState === 'complete') {
-        navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(e => console.warn('SW register:', e));
-    } else {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(e => console.warn('SW register:', e));
-        });
-    }
+// Safely register Service Worker only if on matching HTTP/HTTPS origin
+if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator && window.location.protocol.startsWith('http') && window.location.origin && window.location.origin !== 'null' && !window.location.origin.includes('googleusercontent')) {
+    try {
+        const swUrl = new URL('/sw.js', window.location.href);
+        if (swUrl.origin === window.location.origin) {
+            if (document.readyState === 'complete') {
+                navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {});
+            } else {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {});
+                });
+            }
+        }
+    } catch(e) {}
 }
