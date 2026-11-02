@@ -3,19 +3,10 @@ let textbookHTML = "";
 const LOCAL_PATHS = [
     "/",
     "/index.html",
-    "/home.html",
-    "/redirect.html",
-    "/redirect",
-    "/animation.html",
-    "/animation",
     "/db.js",
-    "/theme.js",
-    "/tab-disguiser.js",
-    "/effects.js",
     "/sw.js",
     "/favicon.ico",
-    "/bbb.ico",
-    "/manifest.json"
+    "/games.json"
 ];
 
 function isLocalResource(pathname) {
@@ -24,7 +15,6 @@ function isLocalResource(pathname) {
         pathname.startsWith("/images/") ||
         pathname.startsWith("/styles/") ||
         pathname.startsWith("/scripts/") ||
-        pathname.startsWith("/pages/") ||
         pathname.startsWith("/textbooks/")) {
         return true;
     }
@@ -92,9 +82,9 @@ self.addEventListener("fetch", (event) => {
 
     const url = new URL(rawUrl);
 
-    // 1. Virtual textbook / virtual game routes
-    if (url.pathname === "/virtual-textbook" || url.pathname.endsWith("/virtual-textbook") ||
-        url.pathname === "/virtual-game" || url.pathname.endsWith("/virtual-game")) {
+    // 1. Virtual game route
+    if (url.pathname === "/virtual-game" || url.pathname.endsWith("/virtual-game") ||
+        url.pathname === "/virtual-textbook" || url.pathname.endsWith("/virtual-textbook")) {
         event.respondWith(
             new Response(textbookHTML, {
                 headers: { "Content-Type": "text/html; charset=utf-8" }

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Home - Classroom</title>
+  <link rel="icon" type="image/png" href="https://ssl.gstatic.com/classroom/favicon.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: #0d0f14;
+      color: #e5e7eb;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .launcher-card {
+      background: #151821;
+      border: 1px solid #282d3c;
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(255, 69, 0, 0.12);
+      text-align: center;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 28px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 8px;
+    }
+    .brand .fire-icon {
+      color: #ff4500;
+      font-size: 34px;
+      filter: drop-shadow(0 0 12px rgba(255, 69, 0, 0.6));
+    }
+    .brand span.grad {
+      background: linear-gradient(135deg, #ff4500, #ff7a00);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subtitle {
+      font-size: 14px;
+      color: #9ca3af;
+      margin-bottom: 24px;
+    }
+    .form-group {
+      text-align: left;
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #ff7a00;
+      margin-bottom: 8px;
+    }
+    select, input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid #2e3447;
+      background: #0d0f14;
+      color: #f3f4f6;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    select:focus, input:focus {
+      border-color: #ff4500;
+      box-shadow: 0 0 0 3px rgba(255, 69, 0, 0.2);
+    }
+    .btn-launch {
+      width: 100%;
+      padding: 14px 20px;
+      border-radius: 10px;
+      border: none;
+      background: linear-gradient(135deg, #ff4500, #e63900);
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
+      box-shadow: 0 4px 20px rgba(255, 69, 0, 0.35);
+    }
+    .btn-launch:hover {
+      background: linear-gradient(135deg, #ff5722, #ff3d00);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(255, 69, 0, 0.5);
+    }
+    .btn-launch:active {
+      transform: translateY(1px);
+    }
+    .status-msg {
+      margin-top: 16px;
+      font-size: 13px;
+      min-height: 20px;
+      color: #9ca3af;
+    }
+    .status-msg.error {
+      color: #f87171;
+    }
+    .status-msg.success {
+      color: #4ade80;
+    }
+    .status-msg.loading {
+      color: #fbbf24;
+    }
+    .badge {
+      display: inline-block;
+      margin-top: 18px;
+      padding: 4px 10px;
+      background: #1c2130;
+      border: 1px solid #282f44;
+      border-radius: 20px;
+      font-size: 11px;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="launcher-card">
+    <div class="brand">
+      <span class="material-symbols-outlined fire-icon">local_fire_department</span>
+      <span>Lava<span class="grad">games</span></span>
+    </div>
+    <div class="subtitle">Google Apps Script about:blank Launcher</div>
+
+    <div class="form-group">
+      <label for="mirrorSelect">jsDelivr CDN Mirror</label>
+      <select id="mirrorSelect">
+        <option value="https://cdn.jsdelivr.net">cdn.jsdelivr.net (Official Global)</option>
+        <option value="https://fastly.jsdelivr.net">fastly.jsdelivr.net (Fastly CDN)</option>
+        <option value="https://gcore.jsdelivr.net">gcore.jsdelivr.net (Gcore CDN)</option>
+        <option value="https://testingcf.jsdelivr.net">testingcf.jsdelivr.net (Cloudflare CDN)</option>
+        <option value="https://jsd.onmicrosoft.cn">jsd.onmicrosoft.cn (China/Edge Mirror)</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="repoPath">GitHub Asset Path</label>
+      <input type="text" id="repoPath" value="/gh/pinpoint-edu/pinpoint-mini@main/index.html" />
+    </div>
+
+    <button id="launchBtn" class="btn-launch" type="button">
+      <span class="material-symbols-outlined">rocket_launch</span>
+      <span>Launch in about:blank</span>
+    </button>
+
+    <div id="statusMessage" class="status-msg">Click launch to open in a disguised blank tab.</div>
+    <div class="badge">Disguised via about:blank injection + jsDelivr mirrors</div>
+  </div>
+
+  <script>
+    const launchBtn = document.getElementById('launchBtn');
+    const mirrorSelect = document.getElementById('mirrorSelect');
+    const repoPathInput = document.getElementById('repoPath');
+    const statusMsg = document.getElementById('statusMessage');
+
+    async function launchLavagames() {
+      const selectedMirror = mirrorSelect.value.trim().replace(/\/+$/, '');
+      const targetPath = repoPathInput.value.trim();
+      const basePath = targetPath.substring(0, targetPath.lastIndexOf('/') + 1);
+
+      statusMsg.className = 'status-msg loading';
+      statusMsg.textContent = 'Opening clean about:blank tab...';
+
+      // 1. Open blank tab immediately on user click to avoid popup blockers
+      let newTab = null;
+      try {
+        newTab = window.open('about:blank', '_blank');
+      } catch (err) {
+        statusMsg.className = 'status-msg error';
+        statusMsg.textContent = 'Popup blocked! Please allow popups for script.google.com.';
+        return;
+      }
+
+      if (!newTab) {
+        statusMsg.className = 'status-msg error';
+        statusMsg.textContent = 'Unable to open blank tab. Check your browser popup settings.';
+        return;
+      }
+
+      // Initial loading state in the new tab
+      try {
+        newTab.document.open();
+        newTab.document.write(`
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>Home - Classroom</title>
+            <link rel="icon" type="image/png" href="https://ssl.gstatic.com/classroom/favicon.png"/>
+            <style>
+              body {
+                background: #0d0f14;
+                color: #e5e7eb;
+                font-family: system-ui, -apple-system, sans-serif;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                margin: 0;
+              }
+              .spinner {
+                width: 44px;
+                height: 44px;
+                border: 4px solid #282d3c;
+                border-top: 4px solid #ff4500;
+                border-radius: 50%;
+                animation: spin 0.8s linear infinite;
+                margin-bottom: 16px;
+              }
+              @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+              h2 { font-size: 20px; font-weight: 600; margin: 0 0 6px 0; color: #ff5722; }
+              p { font-size: 14px; color: #9ca3af; margin: 0; }
+            </style>
+          </head>
+          <body>
+            <div class="spinner"></div>
+            <h2>Igniting Lavagames...</h2>
+            <p>Fetching through ${selectedMirror}...</p>
+          </body>
+          </html>
+        `);
+        newTab.document.close();
+      } catch (e) {}
+
+      // 2. Fetch game website HTML from the chosen CDN mirror
+      const fullUrl = selectedMirror + targetPath + '?t=' + Date.now();
+      statusMsg.textContent = 'Fetching Lavagames payload...';
+
+      try {
+        const response = await fetch(fullUrl);
+        if (!response.ok) {
+          throw new Error('HTTP ' + response.status + ' ' + response.statusText);
+        }
+
+        let htmlContent = await response.text();
+
+        // 3. Inject <base href="..."> so all relative paths (scripts, games, assets) resolve through the CDN mirror
+        const baseHref = selectedMirror + basePath;
+        const baseTag = '<base href="' + baseHref + '">';
+
+        if (htmlContent.includes('<head>')) {
+          htmlContent = htmlContent.replace('<head>', '<head>' + baseTag);
+        } else {
+          htmlContent = baseTag + htmlContent;
+        }
+
+        // 4. Inject payload into the about:blank tab
+        newTab.document.open();
+        newTab.document.write(htmlContent);
+        newTab.document.close();
+
+        statusMsg.className = 'status-msg success';
+        statusMsg.textContent = 'Successfully launched Lavagames in about:blank!';
+      } catch (err) {
+        console.error('Launch failed:', err);
+        statusMsg.className = 'status-msg error';
+        statusMsg.textContent = 'Failed to load from ' + selectedMirror + '. Try another mirror!';
+
+        if (newTab) {
+          try {
+            newTab.document.open();
+            newTab.document.write(`
+              <!DOCTYPE html>
+              <html>
+              <head>
+                <title>Home - Classroom</title>
+                <style>
+                  body {
+                    background: #0d0f14;
+                    color: #e5e7eb;
+                    font-family: system-ui, -apple-system, sans-serif;
+                    padding: 30px;
+                    text-align: center;
+                  }
+                  .err-box {
+                    max-width: 500px;
+                    margin: 60px auto;
+                    background: #171a22;
+                    border: 1px solid #333a4d;
+                    border-radius: 12px;
+                    padding: 24px;
+                  }
+                  h3 { color: #f87171; margin-top: 0; }
+                  p { color: #94a3b8; font-size: 14px; line-height: 1.5; }
+                  button {
+                    margin-top: 15px;
+                    padding: 10px 18px;
+                    background: #ff4500;
+                    border: none;
+                    border-radius: 8px;
+                    color: #fff;
+                    cursor: pointer;
+                    font-weight: 600;
+                  }
+                </style>
+              </head>
+              <body>
+                <div class="err-box">
+                  <h3>Mirror Blocked or Offline</h3>
+                  <p>Failed to load assets from <b>${selectedMirror}</b>.<br/>Error: ${err.message}</p>
+                  <p>Close this tab and choose another jsDelivr mirror from the launcher dropdown.</p>
+                </div>
+              </body>
+              </html>
+            `);
+            newTab.document.close();
+          } catch(e) {}
+        }
+      }
+    }
+
+    launchBtn.addEventListener('click', launchLavagames);
+
+    // Auto-launch when mirror dropdown changes (matching the decompiled custom payload behavior)
+    mirrorSelect.addEventListener('change', () => {
+      launchLavagames();
+    });
+  </script>
+</body>
+</html>

@@ -5,117 +5,7 @@
       "main": true
     }
   },
-  "redirects": [
-    {
-      "source": "/pages/english.html",
-      "destination": "/pages/stream.html",
-      "permanent": true
-    },
-    {
-      "source": "/pages/classwork-english.html",
-      "destination": "/pages/classwork.html",
-      "permanent": true
-    },
-    {
-      "source": "/pages/english",
-      "destination": "/pages/stream.html",
-      "permanent": true
-    },
-    {
-      "source": "/pages/classwork-english",
-      "destination": "/pages/classwork.html",
-      "permanent": true
-    },
-    {
-      "source": "/pages/history.html",
-      "destination": "/pages/stream.html",
-      "permanent": true
-    },
-    {
-      "source": "/pages/classwork-history.html",
-      "destination": "/pages/classwork.html",
-      "permanent": true
-    },
-    {
-      "source": "/pages/history",
-      "destination": "/pages/stream.html",
-      "permanent": true
-    },
-    {
-      "source": "/pages/classwork-history",
-      "destination": "/pages/classwork.html",
-      "permanent": true
-    },
-    {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "header",
-          "key": "referer",
-          "value": ".*(securly|deviceconsole).*"
-        }
-      ],
-      "destination": "https://classroom.google.com",
-      "permanent": false
-    }
-  ],
   "rewrites": [
-    {
-      "source": "/classwork",
-      "destination": "/pages/classwork.html"
-    },
-    {
-      "source": "/classwork.html",
-      "destination": "/pages/classwork.html"
-    },
-    {
-      "source": "/pages/classwork",
-      "destination": "/pages/classwork.html"
-    },
-    {
-      "source": "/stream",
-      "destination": "/pages/stream.html"
-    },
-    {
-      "source": "/stream.html",
-      "destination": "/pages/stream.html"
-    },
-    {
-      "source": "/pages/stream",
-      "destination": "/pages/stream.html"
-    },
-    {
-      "source": "/classwork-history",
-      "destination": "/pages/classwork.html"
-    },
-    {
-      "source": "/classwork-history.html",
-      "destination": "/pages/classwork.html"
-    },
-    {
-      "source": "/history",
-      "destination": "/pages/stream.html"
-    },
-    {
-      "source": "/history.html",
-      "destination": "/pages/stream.html"
-    },
-    {
-      "source": "/settings",
-      "destination": "/pages/settings.html"
-    },
-    {
-      "source": "/settings.html",
-      "destination": "/pages/settings.html"
-    },
-    {
-      "source": "/pages/settings",
-      "destination": "/pages/settings.html"
-    },
-    {
-      "source": "/pages/ai",
-      "destination": "/pages/ai.html"
-    },
     {
       "source": "/textbooks/car-soccer.html",
       "destination": "/textbooks/car-soccer/index.html"
@@ -227,35 +117,23 @@
   ],
   "headers": [
     {
-      "source": "/api/(.*)",
+      "source": "/(.*)",
       "headers": [
         { "key": "Access-Control-Allow-Origin", "value": "*" },
-        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, PUT, DELETE, OPTIONS, HEAD" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS, HEAD" },
         { "key": "Access-Control-Allow-Headers", "value": "*" }
       ]
     },
     {
       "source": "/version.json",
       "headers": [
-        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate, max-age=0" },
-        { "key": "Pragma", "value": "no-cache" },
-        { "key": "Expires", "value": "0" }
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate, max-age=0" }
       ]
     },
     {
       "source": "/(.*)\\.(html|js|json)",
       "headers": [
-        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate, max-age=0" },
-        { "key": "Pragma", "value": "no-cache" },
-        { "key": "Expires", "value": "0" }
-      ]
-    },
-    {
-      "source": "/((?!api|favicons|images|styles|_vercel|.*\\.).*)",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate, max-age=0" },
-        { "key": "Pragma", "value": "no-cache" },
-        { "key": "Expires", "value": "0" }
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate, max-age=0" }
       ]
     }
   ]
