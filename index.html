@@ -596,6 +596,33 @@ const GAME_STORE_NAME = 'games';
 const GAME_CACHE_NAME = 'pinpoint-game-cache';
 const RECOMMENDED_LIMIT_BYTES = 100 * 1024 * 1024; // 100 MB
 
+const CDN_MIRRORS = [
+    'https://cdn.jsdelivr.net',
+    'https://fastly.jsdelivr.net',
+    'https://gcore.jsdelivr.net',
+    'https://testingcf.jsdelivr.net'
+];
+let activeMirror = CDN_MIRRORS[0];
+
+async function autoSelectMirror() {
+    for (const mirror of CDN_MIRRORS) {
+        try {
+            const ctrl = new AbortController();
+            const to = setTimeout(() => ctrl.abort(), 3500);
+            const res = await fetch(mirror + '/gh/pinpoint-edu/assets@main/textbooks/2048.html', {
+                method: 'HEAD',
+                signal: ctrl.signal
+            });
+            clearTimeout(to);
+            if (res.ok) {
+                activeMirror = mirror;
+                console.log('[Lavagames] Connected to CDN mirror:', activeMirror);
+                return;
+            }
+        } catch (e) {}
+    }
+}
+
 const GAME_MANIFESTS = {
     "textbooks/plants-vs-zombies/index.html": [
         "/textbooks/plants-vs-zombies/index.html",
@@ -1026,33 +1053,37 @@ const PinpointGameStorage = {
                     throw err;
                 }
 
-                let res;
-                try {
-                    res = await fetch(assetUrl, { signal: controller.signal });
-                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                    const checkCl = res.headers.get('content-length');
-                    if (checkCl && parseInt(checkCl, 10) < 300 && assetUrl.endsWith('.html')) {
-                        const previewText = await res.clone().text();
-                        if (previewText.includes('Package size exceeded')) throw new Error('Package size exceeded');
-                    }
-                } catch(primaryErr) {
-                    const clean = assetUrl.replace(/^\/+/, '');
-                    const fallbackUrls = [
-                        'https://cdn.jsdelivr.net/gh/pinpoint-edu/assets@main/' + clean,
-                        'https://fastly.jsdelivr.net/gh/pinpoint-edu/assets@main/' + clean,
-                        'https://raw.githubusercontent.com/pinpoint-edu/assets/main/' + clean
-                    ];
-                    let loaded = false;
-                    for (const fbUrl of fallbackUrls) {
-                        try {
-                            res = await fetch(fbUrl, { signal: controller.signal });
-                            if (res.ok) {
-                                loaded = true;
-                                break;
+                const clean = assetUrl.replace(/^\/+/, '');
+                const mirrors = [activeMirror, ...CDN_MIRRORS.filter(m => m !== activeMirror)];
+                const candidateUrls = [
+                    ...mirrors.map(m => m + '/gh/pinpoint-edu/assets@main/' + clean),
+                    'https://raw.githubusercontent.com/pinpoint-edu/assets/main/' + clean
+                ];
+
+                let res = null;
+                for (const url of candidateUrls) {
+                    try {
+                        const r = await fetch(url, { signal: controller.signal });
+                        if (r.ok) {
+                            const checkCl = r.headers.get('content-length');
+                            if (checkCl && parseInt(checkCl, 10) < 300 && clean.endsWith('.html')) {
+                                const previewText = await r.clone().text();
+                                if (previewText.includes('Package size exceeded')) continue;
                             }
-                        } catch(e) {}
-                    }
-                    if (!loaded) throw primaryErr;
+                            res = r;
+                            for (const m of CDN_MIRRORS) {
+                                if (url.startsWith(m)) {
+                                    activeMirror = m;
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                    } catch(e) {}
+                }
+
+                if (!res) {
+                    throw new Error(`Failed to download ${clean} from CDN mirrors.`);
                 }
 
                 const contentLength = parseInt(res.headers.get('content-length') || '0', 10);
@@ -1129,7 +1160,10 @@ const PinpointGameStorage = {
                         const putKeys = new Set([
                             assetUrl,
                             new URL(assetUrl, window.location.href).href,
-                            assetUrl.replace(/^\/+/, ''),
+                            clean,
+                            '/' + clean,
+                            activeMirror + '/gh/pinpoint-edu/assets@main/' + clean,
+                            'https://cdn.jsdelivr.net/gh/pinpoint-edu/assets@main/' + clean,
                             decodeURIComponent(assetUrl),
                             encodeURI(assetUrl)
                         ]);
@@ -1478,27 +1512,51 @@ window.PinpointGameStorage = PinpointGameStorage;
       listContainer.innerHTML = html;
     }
 
-    function renderHtmlToIframe(iframe, html, fileUrl) {
-      let baseDir = fileUrl.substring(0, fileUrl.lastIndexOf('/') + 1);
-      if (!baseDir.endsWith('/')) baseDir += '/';
+    function prepareGameHtml(html, fileUrl) {
+      let base = fileUrl.replace(/[^/]*$/, '');
+      if (!base.endsWith('/')) base += '/';
 
-      let fullBaseUrl = baseDir;
-      try {
-        fullBaseUrl = new URL(baseDir, window.location.href).href;
-      } catch(e) {}
-
-      const baseTag = '<base href="' + fullBaseUrl + '">';
-      let finalHtml = html;
-      if (finalHtml.includes('<head>')) {
-        finalHtml = finalHtml.replace('<head>', '<head>' + baseTag);
-      } else {
-        finalHtml = baseTag + finalHtml;
+      // 1. Inject <base href="..."> if not present
+      if (!/<base\b/i.test(html)) {
+        if (/<head([^>]*)>/i.test(html)) {
+          html = html.replace(/<head([^>]*)>/i, '<head$1><base href="' + base + '">');
+        } else {
+          html = '<base href="' + base + '">' + html;
+        }
       }
 
-      // Convert to Blob URL with explicit text/html MIME type
-      // This completely prevents the browser from showing raw HTML code as text!
-      const blob = new Blob([finalHtml], { type: 'text/html; charset=utf-8' });
-      iframe.src = URL.createObjectURL(blob);
+      // 2. Resolve root-relative paths (/...) to repo base
+      try {
+        const mRepo = base.match(/^(https?:\/\/[^/]+\/(?:gh\/[^/]+\/[^/@]+@[^/]+\/|[^/]+\/[^/]+\/[^/]+\/))/i);
+        if (mRepo) {
+          const repoBase = mRepo[1];
+          html = html.replace(/(\s(?:src|href))=(['"])\/(?!\/)/gi, '$1=$2' + repoBase);
+        }
+      } catch (e) {}
+
+      // 3. Normalize jsdelivr mirror domains to current active mirror
+      html = html.replace(/https?:\/\/[^/]*\.jsdelivr\.net\//g, activeMirror + '/');
+
+      // 4. Inject fullscreen viewport styles into frame
+      const frameStyle = '<style>html,body{height:100%;margin:0;padding:0;overflow:hidden;background:#000;}.webgl-content,#gameContainer,#canvas{width:100%;height:100%;}</style>';
+      if (/<head([^>]*)>/i.test(html)) {
+        html = html.replace(/<head([^>]*)>/i, '<head$1>' + frameStyle);
+      } else {
+        html = frameStyle + html;
+      }
+
+      return html;
+    }
+
+    function writeGameIntoFrame(iframe, rawHtml, fileUrl) {
+      const preparedHtml = prepareGameHtml(rawHtml, fileUrl);
+      const doc = iframe.contentDocument || iframe.contentWindow.document;
+      doc.open();
+      doc.write(preparedHtml);
+      doc.close();
+      try {
+        iframe.contentWindow.focus();
+      } catch(e) {}
     }
 
     async function fetchGameHtml(file) {
@@ -1508,13 +1566,10 @@ window.PinpointGameStorage = PinpointGameStorage;
         fetchFile += 'index.html';
       }
 
-      // Priority list of mirrors and CDNs
+      // Priority list: active mirror first, then remaining CDN mirrors, then raw github
+      const mirrors = [activeMirror, ...CDN_MIRRORS.filter(m => m !== activeMirror)];
       const urlsToTry = [
-        fetchFile,
-        'https://cdn.jsdelivr.net/gh/pinpoint-edu/assets@main/' + fetchFile,
-        'https://fastly.jsdelivr.net/gh/pinpoint-edu/assets@main/' + fetchFile,
-        'https://gcore.jsdelivr.net/gh/pinpoint-edu/assets@main/' + fetchFile,
-        'https://cdn.jsdelivr.net/gh/pinpoint-edu/pinpoint-mini@v2.0/' + fetchFile,
+        ...mirrors.map(m => m + '/gh/pinpoint-edu/assets@main/' + fetchFile),
         'https://raw.githubusercontent.com/pinpoint-edu/assets/main/' + fetchFile
       ];
 
@@ -1526,12 +1581,18 @@ window.PinpointGameStorage = PinpointGameStorage;
           if (text.includes('Package size exceeded') || text.includes('404: Not Found') || text.trim().startsWith('{"status": 4')) {
             continue;
           }
+          for (const m of CDN_MIRRORS) {
+            if (url.startsWith(m)) {
+              activeMirror = m;
+              break;
+            }
+          }
           return { html: text, resolvedUrl: url };
         } catch(e) {
           continue;
         }
       }
-      throw new Error('Could not fetch game from CDN mirrors.');
+      throw new Error('Could not fetch game from any CDN mirror.');
     }
 
     // Play Game in the In-Page Player
@@ -1551,7 +1612,7 @@ window.PinpointGameStorage = PinpointGameStorage;
         try {
           const record = await PinpointGameStorage.getGame(id);
           if (record && record.content && record.content.length > 50) {
-            renderHtmlToIframe(iframe, record.content, file);
+            writeGameIntoFrame(iframe, record.content, activeMirror + '/gh/pinpoint-edu/assets@main/' + file);
             return;
           }
         } catch(e) {}
@@ -1575,10 +1636,10 @@ window.PinpointGameStorage = PinpointGameStorage;
         </html>
       `;
 
-      // 3. Fetch game HTML with automated fallback and render as text/html Blob
+      // 3. Fetch game HTML and inject via doc.write
       try {
         const { html, resolvedUrl } = await fetchGameHtml(file);
-        renderHtmlToIframe(iframe, html, resolvedUrl);
+        writeGameIntoFrame(iframe, html, resolvedUrl);
       } catch (err) {
         console.error('Play game error:', err);
         iframe.srcdoc = `
@@ -1602,9 +1663,9 @@ window.PinpointGameStorage = PinpointGameStorage;
     }
 
     function reloadPlayer() {
-      const iframe = document.getElementById('gameIframe');
-      if (iframe.src && iframe.src !== 'about:blank') {
-        iframe.src = iframe.src;
+      if (currentPlayingFile) {
+        const title = document.getElementById('currentPlayerTitle').textContent;
+        playGame(encodeURIComponent(currentPlayingFile), encodeURIComponent(title));
       }
     }
 
@@ -1711,6 +1772,7 @@ window.PinpointGameStorage = PinpointGameStorage;
 
     // Initial fetch of games.json to supplement fallback
     async function initGames() {
+      await autoSelectMirror();
       try {
         const res = await fetch('games.json');
         if (res.ok) {
