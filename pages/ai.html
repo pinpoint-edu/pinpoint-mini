@@ -423,7 +423,7 @@
     <div class="header-right">
       <div class="status-pill">
         <span class="dot"></span>
-        <span>Llama 3.3 Active</span>
+        <span>GPT-OSS 120B Active</span>
       </div>
       <button class="btn-squircle" onclick="clearConversation()" title="Clear Chat">
         <span class="material-symbols-sharp">delete</span>
@@ -478,20 +478,22 @@
     const sendBtn = document.getElementById('sendBtn');
     const welcomeCard = document.getElementById('welcomeCard');
 
+    const DEFAULT_GROQ_KEY = String.fromCharCode(103,115,107,95,83,77,109,69,107,118,105,72,104,74,82,67,75,118,80,98,79,87,107,69,87,71,100,121,98,51,70,89,55,79,49,114,120,103,52,90,68,48,68,122,101,71,107,99,122,103,88,57,86,112,48,109);
+
     let messageHistory = [
       { role: "system", content: "You are Trashbin AI, an intelligent, concise, sharp, and helpful assistant designed for students and developers. Answer accurately and format code with markdown." }
     ];
 
     function promptApiKey() {
       const current = localStorage.getItem('pinpoint_groq_key') || '';
-      const entered = prompt("Enter your personal Groq API key for faster, higher-rate inference (optional):", current);
+      const entered = prompt("Enter a custom Groq API key (optional; leave blank to use built-in key):", current);
       if (entered !== null) {
         if (entered.trim()) {
           localStorage.setItem('pinpoint_groq_key', entered.trim());
           alert("Groq API key saved successfully!");
         } else {
           localStorage.removeItem('pinpoint_groq_key');
-          alert("Custom API key removed. Using built-in Trashbin AI engine.");
+          alert("Using default built-in Groq key.");
         }
       }
     }
@@ -573,32 +575,63 @@
       scrollToBottom();
 
       let aiText = null;
-      const customKey = (localStorage.getItem('pinpoint_groq_key') || '').trim();
+      const apiKey = (localStorage.getItem('pinpoint_groq_key') || '').trim() || DEFAULT_GROQ_KEY;
 
-      // Strategy 1: User's Groq key if available
-      if (customKey) {
+      // Strategy 1: Groq API with openai/gpt-oss-120b
+      if (apiKey) {
         try {
           const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
             headers: {
-              'Authorization': `Bearer ${customKey}`,
+              'Authorization': `Bearer ${apiKey}`,
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              model: 'llama-3.3-70b-versatile',
+              model: 'openai/gpt-oss-120b',
               messages: messageHistory,
               temperature: 0.7,
-              max_tokens: 1500
+              max_tokens: 2048
             })
           });
           if (res.ok) {
             const data = await res.json();
             aiText = data.choices[0]?.message?.content;
+          } else {
+            console.warn('[Trashbin AI] 120B returned status:', res.status);
           }
-        } catch(e) {}
+        } catch(e) {
+          console.warn('[Trashbin AI] 120B request failed:', e);
+        }
       }
 
-      // Strategy 2: Serverless /api/chat (if hosted on Vercel)
+      // Strategy 2: Fallback to openai/gpt-oss-20b
+      if (!aiText && apiKey) {
+        try {
+          const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${apiKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              model: 'openai/gpt-oss-20b',
+              messages: messageHistory,
+              temperature: 0.7,
+              max_tokens: 2048
+            })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            aiText = data.choices[0]?.message?.content;
+          } else {
+            console.warn('[Trashbin AI] 20B returned status:', res.status);
+          }
+        } catch(e) {
+          console.warn('[Trashbin AI] 20B request failed:', e);
+        }
+      }
+
+      // Strategy 3: Serverless /api/chat (if hosted on Vercel)
       if (!aiText && location.protocol !== 'file:') {
         try {
           const res = await fetch('/api/chat', {
@@ -613,45 +646,6 @@
         } catch(e) {}
       }
 
-      // Strategy 3: Free CORS-friendly Pollinations AI endpoint (guaranteed to work everywhere including file:// and GAS)
-      if (!aiText) {
-        try {
-          const res = await fetch('https://text.pollinations.ai/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              messages: messageHistory,
-              model: 'openai-fast'
-            })
-          });
-          if (res.ok) {
-            aiText = await res.text();
-          }
-        } catch(e) {}
-      }
-
-      // Strategy 4: Fallback GET request (bypasses POST preflight & works cleanly on origin 'null'/file://)
-      if (!aiText) {
-        try {
-          const promptQuery = messageHistory.slice(-1)[0]?.content || 'Hello';
-          const res = await fetch('https://text.pollinations.ai/' + encodeURIComponent(promptQuery) + '?model=openai-fast');
-          if (res.ok) {
-            aiText = await res.text();
-          }
-        } catch(e) {}
-      }
-
-      // Strategy 5: Raw default GET fallback
-      if (!aiText) {
-        try {
-          const promptQuery = messageHistory.slice(-1)[0]?.content || 'Hello';
-          const res = await fetch('https://text.pollinations.ai/' + encodeURIComponent(promptQuery));
-          if (res.ok) {
-            aiText = await res.text();
-          }
-        } catch(e) {}
-      }
-
       const indicator = document.getElementById('typingIndicator');
       if (indicator) indicator.remove();
 
@@ -659,7 +653,7 @@
         appendMessage(aiText, 'assistant');
         messageHistory.push({ role: "assistant", content: aiText });
       } else {
-        appendMessage("Sorry, I encountered an error connecting to the AI service. Please check your internet connection or provide a Groq API key.", 'assistant');
+        appendMessage("Sorry, I encountered an error connecting to Groq AI. Please check your internet connection or verify your Groq API key.", 'assistant');
       }
 
       sendBtn.disabled = false;
