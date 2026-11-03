@@ -1,0 +1,15 @@
+{
+  "id": "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_gd3d.html",
+  "title": "Geometry Dash 3D",
+  "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/gd3d.html",
+  "sizeBytes": 11455001,
+  "assets": [
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/gd3d.html",
+    "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/3d/v2.02c5b63d689c6bc2f83c.js",
+    "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/3d/style.css",
+    "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/3d/Build/GeometryDash.data.unityweb",
+    "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/3d/Build/GeometryDash.framework.js.unityweb",
+    "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/3d/Build/GeometryDash.wasm.unityweb"
+  ],
+  "updatedAt": "2026-11-03T03:51:10.626Z"
+}

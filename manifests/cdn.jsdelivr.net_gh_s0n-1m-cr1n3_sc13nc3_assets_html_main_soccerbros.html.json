@@ -1,0 +1,17 @@
+{
+  "id": "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_assets_html_main_soccerbros.html",
+  "title": "Soccer Bros",
+  "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/soccerbros.html",
+  "sizeBytes": 870702,
+  "assets": [
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/soccerbros.html",
+    "https://cdn.jsdelivr.net/gh/matheveryday25/math/soccerbros/SoccerBros.js?th=102",
+    "https://hb-bluewizard.s3.us-east-2.amazonaws.com/soccerbros.gg/asc_prebid.js",
+    "https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js",
+    "https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js",
+    "https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js",
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/favicon.png",
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/manifest.json"
+  ],
+  "updatedAt": "2026-11-03T03:51:51.817Z"
+}

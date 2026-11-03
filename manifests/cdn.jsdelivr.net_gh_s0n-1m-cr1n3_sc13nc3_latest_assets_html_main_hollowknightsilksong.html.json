@@ -1,0 +1,16 @@
+{
+  "id": "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_hollowknightsilksong.html",
+  "title": "Hollow Knight Silksong",
+  "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/hollowknightsilksong.html",
+  "sizeBytes": 95228,
+  "assets": [
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/hollowknightsilksong.html",
+    "https://cdn.jsdelivr.net/gh/web-ports/hollow-knight-silksong@master/jszip.js",
+    "https://cdn.jsdelivr.net/gh/web-ports/hollow-knight-silksong@master/TemplateData/favicon.ico",
+    "https://cdn.jsdelivr.net/gh/web-ports/hollow-knight-silksong@master/TemplateData/style.css",
+    "https://cdn.jsdelivr.net/w-pt.data.unityweb",
+    "https://cdn.jsdelivr.net/w-pt.framework.js.unityweb",
+    "https://cdn.jsdelivr.net/w-pt.wasm.unityweb"
+  ],
+  "updatedAt": "2026-11-03T03:51:22.781Z"
+}

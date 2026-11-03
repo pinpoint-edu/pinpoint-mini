@@ -1,0 +1,18 @@
+{
+  "id": "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_baseballbros.html",
+  "title": "Baseball Bros",
+  "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/baseballbros.html",
+  "sizeBytes": 1809479,
+  "assets": [
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/baseballbros.html",
+    "https://cdn.jsdelivr.net/gh/matheveryday25/math/baseballbros/BaseballBros.js?th=76",
+    "https://cdn.jsdelivr.net/gh/matheveryday25/math/baseballbros/tag.min.js",
+    "https://cdn.jsdelivr.net/gh/matheveryday25/math/baseballbros/firebase-app.js",
+    "https://cdn.jsdelivr.net/gh/matheveryday25/math/baseballbros/firebase-auth.js",
+    "https://cdn.jsdelivr.net/gh/matheveryday25/math/baseballbros/firebase-firestore.js",
+    "https://api.adinplay.com/v4/live/aip/ad-manager.js",
+    "https://cdn.jsdelivr.net/gh/matheveryday25/math/baseballbros/favicon.png",
+    "https://cdn.jsdelivr.net/gh/matheveryday25/math/baseballbros/manifest.json"
+  ],
+  "updatedAt": "2026-11-03T03:49:43.748Z"
+}

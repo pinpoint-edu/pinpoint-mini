@@ -1,0 +1,26 @@
+{
+  "id": "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_gdweb.html",
+  "title": "GDWEB+ (Stable)",
+  "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/gdweb.html",
+  "sizeBytes": 517669,
+  "assets": [
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/gdweb.html",
+    "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/libs/phaser.min.js",
+    "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/libs/pako.min.js",
+    "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/game/allObjects.js?latest",
+    "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/game/allLevels.js",
+    "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/utils/cache-manager.js",
+    "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/api/GDapiWrapper.js",
+    "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/utils/config.js",
+    "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/core/triggers.js",
+    "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/core/level.js?latest",
+    "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/core/player.js",
+    "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/core/audio.js",
+    "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/core/loading-screen.js",
+    "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/core/game-scene.js?latest",
+    "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/core/main.js",
+    "https://cdn.jsdelivr.net/assets/favicon.ico",
+    "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/style.css"
+  ],
+  "updatedAt": "2026-11-03T03:51:08.103Z"
+}

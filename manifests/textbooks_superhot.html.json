@@ -1,0 +1,15 @@
+{
+  "id": "textbooks_superhot.html",
+  "title": "Superhot",
+  "file": "textbooks/superhot.html",
+  "sizeBytes": 8890237,
+  "assets": [
+    "textbooks/superhot.html",
+    "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/swat/ts3.loader.js",
+    "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/swat/ts3.data",
+    "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/swat/ts3.framework.js",
+    "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/swat/ts3.wasm",
+    "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/swat/ts3.png"
+  ],
+  "updatedAt": "2026-11-03T03:49:33.095Z"
+}

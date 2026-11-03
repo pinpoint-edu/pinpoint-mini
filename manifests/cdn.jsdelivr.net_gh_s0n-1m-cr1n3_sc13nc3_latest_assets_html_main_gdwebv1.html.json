@@ -1,0 +1,16 @@
+{
+  "id": "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_gdwebv1.html",
+  "title": "GDWEB (V1)",
+  "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/gdwebv1.html",
+  "sizeBytes": 682,
+  "assets": [
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/gdwebv1.html",
+    "https://cdn.jsdelivr.net/gh/mrdavidzs/web-dashers.github.io@latest/assets/scripts/allObjects.js",
+    "https://cdn.jsdelivr.net/gh/mrdavidzs/web-dashers.github.io@latest/assets/scripts/allLevels.js",
+    "https://cdn.jsdelivr.net/gh/mrdavidzs/web-dashers.github.io@latest/assets/scripts/phaser.min.js",
+    "https://cdn.jsdelivr.net/gh/mrdavidzs/web-dashers.github.io@latest/assets/scripts/pako.min.js",
+    "https://cdn.jsdelivr.net/gh/mrdavidzs/web-dashers.github.io@latest/assets/scripts/index-game.js",
+    "https://cdn.jsdelivr.net/gh/mrdavidzs/web-dashers.github.io@latest/assets/style.css"
+  ],
+  "updatedAt": "2026-11-03T03:51:04.003Z"
+}

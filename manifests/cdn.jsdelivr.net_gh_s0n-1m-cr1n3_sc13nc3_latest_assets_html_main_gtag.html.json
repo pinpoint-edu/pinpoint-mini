@@ -1,0 +1,14 @@
+{
+  "id": "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_gtag.html",
+  "title": "Gorilla Tag",
+  "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/gtag.html",
+  "sizeBytes": 2524,
+  "assets": [
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/gtag.html",
+    "https://cdn.jsdelivr.net/gh/web-ports/gorilla-tag@latest/TemplateData/favicon.ico",
+    "https://cdn.jsdelivr.net/gh/web-ports/gorilla-tag@latest/TemplateData/style.css",
+    "https://cdn.jsdelivr.net/gtagwebR2.framework.js.unityweb",
+    "https://cdn.jsdelivr.net/gtagwebR2.wasm.unityweb"
+  ],
+  "updatedAt": "2026-11-03T03:51:13.552Z"
+}

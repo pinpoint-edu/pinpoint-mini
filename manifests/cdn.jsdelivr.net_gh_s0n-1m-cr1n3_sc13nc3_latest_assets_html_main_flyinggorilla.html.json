@@ -1,0 +1,15 @@
+{
+  "id": "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_flyinggorilla.html",
+  "title": "Flying Gorilla",
+  "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/flyinggorilla.html",
+  "sizeBytes": 98003,
+  "assets": [
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/flyinggorilla.html",
+    "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/gorilla/TemplateData/favicon.ico",
+    "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/gorilla/TemplateData/style.css",
+    "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/gorilla/Build/vb.framework.js",
+    "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/gorilla/Build/vb.data",
+    "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/gorilla/Build/vb.wasm"
+  ],
+  "updatedAt": "2026-11-03T03:50:48.871Z"
+}

@@ -1,0 +1,16 @@
+{
+  "id": "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_russia.html",
+  "title": "Drive in Russia",
+  "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/russia.html",
+  "sizeBytes": 8037558,
+  "assets": [
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/russia.html",
+    "https://cdn.jsdelivr.net/gh/karala-ar/vaydanam@main/build/RuDrift.loader.js",
+    "https://cdn.jsdelivr.net/gh/karala-ar/vaydanam@main/style.css",
+    "https://cdn.jsdelivr.net/RuDrift.framework.js.unityweb",
+    "https://cdn.jsdelivr.net/RuDrift.wasm.unityweb",
+    "https://cdn.jsdelivr.net/gh/karala-ar/vaydanam@main/build/RuDrift.framework.js.unityweb",
+    "https://cdn.jsdelivr.net/gh/karala-ar/vaydanam@main/build/RuDrift.wasm.unityweb"
+  ],
+  "updatedAt": "2026-11-03T03:50:26.939Z"
+}
