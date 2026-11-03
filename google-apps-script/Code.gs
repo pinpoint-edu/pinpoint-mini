@@ -1,5 +1,5 @@
 /**
- * Lavagames - Google Apps Script Web App Launcher
+ * Trashbin - Google Apps Script Web App Launcher
  * 
  * Instructions:
  * 1. Go to https://script.google.com

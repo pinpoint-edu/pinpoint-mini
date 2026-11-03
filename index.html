@@ -168,8 +168,12 @@
     }
 
     body.is-searching #search-block {
-      top: 24px;
+      top: 20px;
       transform: translate(-50%, 0);
+    }
+
+    body.is-searching .quick-pills {
+      margin-top: 10px;
     }
 
     /* Large Logo above Search Bar */
@@ -375,7 +379,7 @@
     /* Results Container: Pinned & Non-scrolling Page, with Internal Game List Scroll */
     #results-container {
       position: fixed;
-      top: 92px;
+      top: 136px;
       bottom: 16px;
       left: 50%;
       transform: translateX(-50%);
@@ -384,7 +388,7 @@
       padding: 0 20px;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.35s ease-out;
+      transition: opacity 0.35s ease-out, top 0.25s ease;
       display: flex;
       flex-direction: column;
       box-sizing: border-box;
@@ -1132,7 +1136,7 @@
         <img src="yolk/yolk-circle.png" alt="" style="width: 14px; height: 14px; border-radius: 50%; object-fit: contain;">
         <span>Yolk!</span>
       </button>
-      <button class="pill-chip" onclick="playGame('ai.html', 'Google Classroom AI Assistant')">
+      <button class="pill-chip" onclick="playGame('ai.html', 'Trashbin AI')">
         <span class="material-symbols-sharp" style="font-size: 15px; color: #60a5fa;">psychology</span>
         <span>AI</span>
       </button>
@@ -1905,7 +1909,7 @@ const DEFAULT_GAMES = [
             "isApp": true
       },
       {
-            "title": "Google Classroom AI Assistant",
+            "title": "Trashbin AI",
             "file": "ai.html",
             "img": "favicons/google-classroom.png",
             "sizeBytes": 125000,
@@ -2542,8 +2546,20 @@ function clearSearch() {
   resetToCenterHome();
 }
 
+function updateResultsPosition() {
+  const sb = document.getElementById('search-block');
+  const rc = document.getElementById('results-container');
+  if (sb && rc && document.body.classList.contains('is-searching')) {
+    const bottom = sb.getBoundingClientRect().bottom;
+    rc.style.top = Math.max(134, Math.round(bottom + 12)) + 'px';
+  }
+}
+
 function activateSearchState() {
   document.body.classList.add('is-searching');
+  setTimeout(updateResultsPosition, 40);
+  setTimeout(updateResultsPosition, 250);
+  setTimeout(updateResultsPosition, 650);
 }
 
 function resetToCenterHome() {
@@ -2551,6 +2567,8 @@ function resetToCenterHome() {
   document.getElementById('searchInput').value = '';
   document.getElementById('clearSearchBtn').style.display = 'none';
   document.body.classList.remove('is-searching');
+  const rc = document.getElementById('results-container');
+  if (rc) rc.style.top = '';
   currentTab = 'all';
   document.getElementById('chipAll').classList.add('active');
   document.getElementById('chipDownloaded').classList.remove('active');
@@ -2708,6 +2726,12 @@ function prepareGameHtml(html, fileUrl) {
   // Fix Ruffle publicPath in raw HTML so .wasm loads from valid mirror path
   html = html.replace(/publicPath:\s*[^,\n}]+/gi, 'publicPath: ' + JSON.stringify(repoBase + 'textbooks/ruffle/'));
 
+  // Strip broken wrapper scripts that fail with 404 / ERR_FILE_NOT_FOUND
+  html = html.replace(/<script[^>]*src=["'][^"']*(?:all\.js|settings\/js\/index\.js)[^"']*["'][^>]*>\s*<\/script>/gi, '');
+
+  // Protect car-soccer asset matcher from throwing if map is undefined
+  html = html.replace(/function matchAsset\s*\(([^)]*)\)\s*\{/g, 'function matchAsset($1){ if(!map)return null;');
+
   const lower = html.toLowerCase();
   const firstScript = lower.indexOf('<script');
   const firstHead = lower.indexOf('<head');
@@ -2729,6 +2753,26 @@ function prepareGameHtml(html, fileUrl) {
   // 2. Inject frame viewport style and runtime fetch/XHR interceptor
   const frameStyle = '<style>html,body{height:100%;margin:0;padding:0;overflow:hidden;background:#000;}.webgl-content,#gameContainer,#canvas{width:100%;height:100%;}</style>';
   const interceptScript = '<scr' + 'ipt>(function(){' +
+    'try {' +
+      'Object.defineProperty(window, "top", { get: function() { return window; } });' +
+    '}catch(e){}' +
+    'window._carSoccerImageBlobs = window._carSoccerImageBlobs || new Map();' +
+    'window.GZ_ASSETS_MAP = window.GZ_ASSETS_MAP || {};' +
+    'window.addEventListener("error", function(e) {' +
+      'if(e && e.message && (e.message.indexOf("getBoundingClientRect")!==-1 || e.message.indexOf("all.js")!==-1 || e.message.indexOf("matchAsset")!==-1)){' +
+        'e.preventDefault();' +
+        'e.stopPropagation();' +
+        'return true;' +
+      '}' +
+    '}, true);' +
+    'try {' +
+      'var origGetId = Document.prototype.getElementById;' +
+      'Document.prototype.getElementById = function(id) {' +
+        'var el = origGetId.call(this, id);' +
+        'if(!el && id === "canvas") { return document.querySelector("canvas"); }' +
+        'return el;' +
+      '};' +
+    '}catch(e){}' +
     'window.__allAudioContexts = window.__allAudioContexts || [];' +
     'try {' +
       'var OrigAC = window.AudioContext || window.webkitAudioContext;' +
@@ -2749,6 +2793,9 @@ function prepareGameHtml(html, fileUrl) {
     'function fix(u){' +
       'if(typeof u!=="string")return u;' +
       'if(u.indexOf("blob:")===0||u.indexOf("data:")===0)return u;' +
+      'if(/all\\.js|settings\\/js/i.test(u)){' +
+        'return "data:application/javascript,";' +
+      '}' +
       'if(/savedata.*\\.ini|optiondata\\.dat/i.test(u)){' +
         'return b + u.replace(/^\\/?(textbooks\\/)?/, "");' +
       '}' +
@@ -2757,15 +2804,37 @@ function prepareGameHtml(html, fileUrl) {
         'return rb+"textbooks/ruffle/"+fn;' +
       '}' +
       'if(u.indexOf("/textbooks/")===0)return rb+u.slice(1);' +
-      'if(u.indexOf("/assets/")===0)return b+u.slice(1);' +
-      'if(u.indexOf("://")===-1&&!u.startsWith("/")){' +
+      'if(u.indexOf("/assets/")===0)return rb+u.slice(1);' +
+      'if(u.startsWith("/")){' +
+        'return rb+u.slice(1);' +
+      '}' +
+      'if(u.indexOf("://")===-1){' +
         'return b+u;' +
       '}' +
       'return u;' +
     '}' +
+    'try {' +
+      'var origScriptSrc = Object.getOwnPropertyDescriptor(HTMLScriptElement.prototype, "src");' +
+      'if(origScriptSrc && origScriptSrc.set){' +
+        'Object.defineProperty(HTMLScriptElement.prototype, "src", {' +
+          'set: function(v){' +
+            'if(typeof v==="string"){' +
+              'if(/all\\.js|settings\\/js/i.test(v)) return origScriptSrc.set.call(this, "data:application/javascript,");' +
+              'v = fix(v);' +
+            '}' +
+            'return origScriptSrc.set.call(this, v);' +
+          '},' +
+          'get: function(){ return origScriptSrc.get.call(this); }' +
+        '});' +
+      '}' +
+    '}catch(e){}' +
     'if(typeof window.fetch!=="undefined"){' +
       'var _f=window.fetch;' +
       'window.fetch=function(inp,init){' +
+        'var u = typeof inp==="string" ? inp : (inp && inp.url ? inp.url : "");' +
+        'if(/all\\.js|settings\\/js/i.test(u)){' +
+          'return Promise.resolve(new Response("", {status: 200, headers: {"Content-Type": "application/javascript"}}));' +
+        '}' +
         'if(typeof inp==="string")inp=fix(inp);' +
         'else if(inp&&inp.url)inp=new Request(fix(inp.url),inp);' +
         'return _f.call(this,inp,init);' +
@@ -3696,6 +3765,8 @@ window.addEventListener('keydown', (e) => {
 updateClockDisplay();
 setInterval(updateClockDisplay, 1000);
 queryBattery();
+
+window.addEventListener('resize', updateResultsPosition);
 
 initGames();
   </script>
