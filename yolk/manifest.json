@@ -1,0 +1,88 @@
+{
+  "name": "Yolk! Music",
+  "short_name": "Yolk!",
+  "description": "Minimalist Music Streaming Platform with offline playback, lyrics, equalizer, and TV remote support.",
+  "version": "1.0.0",
+  "id": "/?source=pwa",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#FCFBF8",
+  "theme_color": "#FCFBF8",
+  "lang": "en-US",
+  "dir": "ltr",
+  "categories": [
+    "music",
+    "entertainment",
+    "audio"
+  ],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-256.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "/tv-banner.png",
+      "sizes": "320x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Search Music",
+      "short_name": "Search",
+      "description": "Search songs, albums, and artists on Yolk!",
+      "url": "/#search",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Favorites",
+      "short_name": "Favorites",
+      "description": "Open your Favorited songs",
+      "url": "/#favorites",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "My Library",
+      "short_name": "Library",
+      "description": "Browse your offline playlists and library",
+      "url": "/#library",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Equalizer & Settings",
+      "short_name": "Settings",
+      "description": "Adjust EQ, Crossfade, Visualizer, and Dark Mode",
+      "url": "/#settings",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ]
+}

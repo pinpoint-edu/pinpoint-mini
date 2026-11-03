@@ -3,314 +3,433 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lavagames</title>
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <title>Trashbin</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'><path d='M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z'/></svg>">
 
-  <!-- Google Fonts: Plus Jakarta Sans & Material Symbols Outlined -->
+  <!-- Google Fonts: Geist, Libre Baskerville, and Material Symbols Sharp -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --bg-base: #0d0f14;
-      --bg-card: #151821;
-      --bg-card-hover: #1c202d;
-      --border: #282d3d;
-      --border-focus: #ff4500;
-      --lava-1: #ff4500;
-      --lava-2: #ff7a00;
-      --lava-3: #ff2200;
-      --lava-glow: rgba(255, 69, 0, 0.35);
-      --lava-gradient: linear-gradient(135deg, #ff4500 0%, #ff7a00 100%);
-      --text-main: #f3f4f6;
-      --text-muted: #9ca3af;
-      --text-dim: #6b7280;
-      --success: #10b981;
+      --bg-base: #09090b;
+      --bg-surface: #121215;
+      --bg-card: #18181b;
+      --bg-card-hover: #222226;
+      --border: #27272a;
+      --border-hover: #3f3f46;
+      --border-focus: #ffffff;
+      --text-main: #fafafa;
+      --text-muted: #a1a1aa;
+      --text-dim: #71717a;
+      --accent: #ffffff;
+      --success: #22c55e;
       --danger: #ef4444;
+      --parabola-ease: cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    input, textarea {
+      -webkit-user-select: text;
+      user-select: text;
     }
 
     body {
       background-color: var(--bg-base);
       color: var(--text-main);
-      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      font-family: 'Geist', system-ui, -apple-system, sans-serif;
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
       overflow-x: hidden;
+      position: relative;
     }
 
-    /* Google Fonts Icon formatting */
-    .material-symbols-outlined {
-      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-      display: inline-block;
-      vertical-align: middle;
+    /* Headings and Big Text use Libre Baskerville */
+    h1, h2, h3, h4, .logo-title, .brand-name, .player-title, .results-title, #smallLogo span {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      letter-spacing: -0.02em;
+    }
+      position: relative;
+    }
+
+    /* Google Material Symbols Sharp */
+    .material-symbols-sharp {
+      font-family: 'Material Symbols Sharp' !important;
+      font-weight: normal;
+      font-style: normal;
+      font-size: 20px;
       line-height: 1;
-      user-select: none;
+      display: inline-block;
+      text-transform: none;
+      letter-spacing: normal;
+      word-wrap: normal;
+      white-space: nowrap;
+      direction: ltr;
+      -webkit-font-smoothing: antialiased;
+      vertical-align: middle;
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
     }
 
-    /* Top Navigation Header */
-    header {
-      background: rgba(13, 15, 20, 0.95);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      padding: 14px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-    }
-
-    .brand {
+    /* Top Left Small Logo (reveals when searching) */
+    #smallLogo {
+      position: fixed;
+      top: 24px;
+      left: 28px;
       display: flex;
       align-items: center;
       gap: 10px;
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 800;
-      color: #ffffff;
-      text-decoration: none;
       letter-spacing: -0.5px;
+      color: #ffffff;
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s var(--parabola-ease), transform 0.35s var(--parabola-ease);
+      transform: translateY(-4px);
+      z-index: 50;
+      text-decoration: none;
     }
 
-    .brand-flame {
-      color: var(--lava-1);
-      font-size: 28px;
-      filter: drop-shadow(0 0 10px var(--lava-glow));
+    body.is-searching #smallLogo {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
     }
 
-    .brand .accent {
-      background: var(--lava-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    #smallLogo .brand-icon {
+      font-size: 24px;
+      color: #ffffff;
     }
 
-    .header-stats {
+    /* Top Right Header Badges */
+    .top-header-right {
+      position: fixed;
+      top: 24px;
+      right: 28px;
       display: flex;
       align-items: center;
-      gap: 14px;
-      font-size: 13px;
-      color: var(--text-muted);
+      gap: 10px;
+      z-index: 50;
     }
 
-    .status-badge {
+    .status-pill {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 4px 10px;
-      background: var(--bg-card);
+      padding: 6px 12px;
+      background: var(--bg-surface);
       border: 1px solid var(--border);
-      border-radius: 20px;
+      border-radius: 9999px;
       font-size: 12px;
       font-weight: 600;
+      color: var(--text-muted);
+      transition: all 0.2s ease;
     }
 
-    .status-badge.online .dot {
-      width: 8px;
-      height: 8px;
+    .status-pill.online .dot {
+      width: 7px;
+      height: 7px;
       background: var(--success);
       border-radius: 50%;
-      box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+      box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
     }
 
-    .status-badge.offline .dot {
-      width: 8px;
-      height: 8px;
+    .status-pill.offline .dot {
+      width: 7px;
+      height: 7px;
       background: #f59e0b;
       border-radius: 50%;
     }
 
-    /* Main Container */
-    main {
-      flex: 1;
-      max-width: 900px;
+    /* Central Search Block */
+    #search-block {
+      position: fixed;
+      left: 50%;
+      top: 48%;
+      transform: translate(-50%, -50%);
       width: 100%;
-      margin: 0 auto;
-      padding: 24px 20px 60px 20px;
+      max-width: 620px;
+      padding: 0 20px;
+      z-index: 40;
+      box-sizing: border-box;
+      transition: top 0.6s var(--parabola-ease), 
+                  transform 0.6s var(--parabola-ease);
     }
 
-    /* Hero / Banner */
-    .hero {
-      margin-bottom: 24px;
+    body.is-searching #search-block {
+      top: 24px;
+      transform: translate(-50%, 0);
     }
 
-    .hero h1 {
-      font-size: 28px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .hero p {
-      color: var(--text-muted);
-      font-size: 14px;
-    }
-
-    /* Filter & Search Bar */
-    .controls {
+    /* Large Logo above Search Bar */
+    #large-logo-wrapper {
+      opacity: 1;
+      height: 120px;
+      transition: opacity 0.35s ease-out, height 0.35s ease-out, margin 0.35s ease-out;
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      margin-bottom: 20px;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      cursor: pointer;
     }
 
-    @media (min-width: 640px) {
-      .controls {
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-      }
-    }
-
-    .search-box {
-      position: relative;
-      flex: 1;
-      max-width: 440px;
-    }
-
-    .search-box .search-icon {
-      position: absolute;
-      left: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-dim);
-      font-size: 20px;
+    body.is-searching #large-logo-wrapper {
+      opacity: 0;
+      height: 0;
+      margin-bottom: 0 !important;
+      overflow: hidden;
       pointer-events: none;
     }
 
-    .search-box input {
-      width: 100%;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px 14px 12px 42px;
-      color: var(--text-main);
-      font-family: inherit;
-      font-size: 14px;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-
-    .search-box input:focus {
-      border-color: var(--border-focus);
-      box-shadow: 0 0 0 3px rgba(255, 69, 0, 0.2);
-    }
-
-    .tabs {
+    .logo-row {
       display: flex;
       align-items: center;
-      gap: 8px;
-      background: var(--bg-card);
-      padding: 4px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      align-self: flex-start;
+      gap: 12px;
     }
 
-    .tab-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
+    .brand-icon-large {
+      font-size: 44px;
+      color: #ffffff;
+      filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.25));
+    }
+
+    .logo-title {
+      font-size: 52px;
+      font-weight: 900;
+      letter-spacing: -1.5px;
+      color: #ffffff;
+    }
+
+    .logo-sub {
+      margin-top: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-dim);
+      letter-spacing: -0.2px;
+    }
+
+    /* Center Pill Search Bar */
+    .search-pill-wrapper {
+      position: relative;
+      width: 100%;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-pill-icon {
+      position: absolute;
+      left: 20px;
+      font-size: 22px;
+      color: var(--text-dim);
+      pointer-events: none;
+      transition: color 0.2s ease;
+    }
+
+    #searchInput {
+      width: 100%;
+      height: 56px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      padding: 0 52px 0 54px;
+      color: var(--text-main);
+      font-size: 16px;
+      font-weight: 500;
       font-family: inherit;
-      font-size: 13px;
-      font-weight: 600;
-      padding: 8px 16px;
-      border-radius: 8px;
+      outline: none;
+      transition: all 0.25s var(--parabola-ease);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    #searchInput:focus {
+      background: #18181b;
+      border-color: #ffffff;
+      box-shadow: 0 0 0 1px #ffffff, 0 8px 32px rgba(0, 0, 0, 0.7);
+    }
+
+    #searchInput::placeholder {
+      color: var(--text-dim);
+    }
+
+    .clear-search-btn {
+      position: absolute;
+      right: 16px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #27272a;
+      border: none;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .clear-search-btn:hover {
+      background: #3f3f46;
+      transform: scale(1.05);
+    }
+
+    /* Quick Filter Chips */
+    .quick-pills {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    .pill-chip {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      transition: background 0.2s, color 0.2s;
+      padding: 7px 14px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s ease;
     }
 
-    .tab-btn.active {
-      background: var(--lava-gradient);
+    .pill-chip:hover {
+      background: var(--bg-card);
+      border-color: #52525b;
       color: #ffffff;
-      box-shadow: 0 2px 12px var(--lava-glow);
     }
 
-    .tab-btn:hover:not(.active) {
-      color: var(--text-main);
-      background: rgba(255, 255, 255, 0.05);
+    .pill-chip.active {
+      background: #ffffff;
+      border-color: #ffffff;
+      color: #000000;
     }
 
-    .tab-count {
+    .pill-chip.active .pill-count {
+      background: #e4e4e7;
+      color: #000000;
+    }
+
+    .pill-count {
       font-size: 11px;
-      padding: 2px 6px;
-      border-radius: 10px;
-      background: rgba(0, 0, 0, 0.3);
+      padding: 2px 7px;
+      background: #27272a;
+      border-radius: 9999px;
+      color: var(--text-muted);
+      font-weight: 700;
     }
 
-    /* Single Scroll List */
-    .game-list {
+    /* Results Container (shows when searching) */
+    #results-container {
+      max-width: 900px;
+      margin: 120px auto 60px auto;
+      padding: 0 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease-out;
+    }
+
+    body.is-searching #results-container {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .results-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-dim);
+    }
+
+    /* Game Cards Grid */
+    .game-grid {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
 
     .game-card {
-      background: var(--bg-card);
+      background: var(--bg-surface);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px 18px;
+      border-radius: 4px;
+      padding: 12px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 16px;
-      transition: transform 0.15s, border-color 0.2s, background 0.2s, box-shadow 0.2s;
+      transition: all 0.15s ease;
     }
 
     .game-card:hover {
-      border-color: rgba(255, 69, 0, 0.4);
-      background: var(--bg-card-hover);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      background: var(--bg-card);
+      border-color: var(--border-hover);
+      transform: translateY(-1px);
     }
 
     .game-left {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
       min-width: 0;
+      flex: 1;
     }
 
     .game-icon-box {
       width: 44px;
       height: 44px;
-      min-width: 44px;
-      background: linear-gradient(135deg, #24191a 0%, #301718 100%);
-      border: 1px solid rgba(255, 69, 0, 0.25);
-      border-radius: 10px;
+      border-radius: 4px;
+      background: #18181b;
+      border: 1px solid #27272a;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--lava-1);
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .game-icon-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
     }
 
     .game-details {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
       min-width: 0;
+      flex: 1;
     }
 
     .game-title {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
-      color: var(--text-main);
+      color: #ffffff;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      display: block;
     }
 
     .game-meta {
@@ -319,30 +438,45 @@
       gap: 8px;
       font-size: 12px;
       color: var(--text-dim);
+      margin-top: 3px;
     }
 
     .badge-dl {
       display: inline-flex;
       align-items: center;
-      gap: 3px;
-      color: var(--success);
-      font-weight: 600;
+      gap: 4px;
       font-size: 11px;
-      background: rgba(16, 185, 129, 0.12);
-      border: 1px solid rgba(16, 185, 129, 0.25);
-      padding: 2px 6px;
-      border-radius: 4px;
+      font-weight: 600;
+      color: var(--success);
     }
 
     .badge-progress {
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      color: #f59e0b;
-      font-weight: 600;
       font-size: 11px;
+      font-weight: 600;
+      color: #ffffff;
     }
 
+    .progress-bar-wrap {
+      width: 100%;
+      max-width: 180px;
+      height: 3px;
+      background: #27272a;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 5px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: #ffffff;
+      width: 0%;
+      transition: width 0.2s ease;
+    }
+
+    /* Buttons */
     .game-actions {
       display: flex;
       align-items: center;
@@ -350,87 +484,80 @@
       flex-shrink: 0;
     }
 
-    /* Buttons */
-    .btn {
-      font-family: inherit;
-      font-size: 13px;
-      font-weight: 700;
-      padding: 8px 16px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
+    .btn-sharp {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      transition: background 0.15s, transform 0.1s, box-shadow 0.2s;
-    }
-
-    .btn:active {
-      transform: scale(0.97);
-    }
-
-    .btn-play {
-      background: var(--lava-gradient);
-      color: #ffffff;
-      box-shadow: 0 2px 10px var(--lava-glow);
-    }
-
-    .btn-play:hover {
-      box-shadow: 0 4px 16px rgba(255, 69, 0, 0.5);
-      background: linear-gradient(135deg, #ff5722 0%, #ff8a00 100%);
-    }
-
-    .btn-secondary {
-      background: #1e2230;
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-    }
-
-    .btn-secondary:hover {
-      background: #272d40;
-      color: var(--text-main);
-      border-color: #3b435e;
-    }
-
-    .btn-icon {
-      padding: 8px;
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text-muted);
+      padding: 7px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      border-radius: 4px;
       cursor: pointer;
-      display: inline-flex;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      border: 1px solid var(--border);
+      background: #18181b;
+      color: #fafafa;
+    }
+
+    .btn-sharp:hover {
+      background: #ffffff;
+      color: #000000;
+      border-color: #ffffff;
+    }
+
+    .btn-primary-sharp {
+      background: #ffffff;
+      color: #000000;
+      border: 1px solid #ffffff;
+    }
+
+    .btn-primary-sharp:hover {
+      background: #e4e4e7;
+      color: #000000;
+    }
+
+    .btn-icon-sharp {
+      width: 32px;
+      height: 32px;
+      border-radius: 4px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-dim);
+      display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.15s;
+      cursor: pointer;
+      transition: all 0.15s ease;
     }
 
-    .btn-icon:hover {
-      background: rgba(239, 68, 68, 0.15);
+    .btn-icon-sharp:hover {
+      background: #1f1f23;
+      border-color: var(--border);
       color: var(--danger);
-      border-color: rgba(239, 68, 68, 0.4);
     }
 
-    /* Empty state */
+    /* Empty State */
     .empty-state {
       text-align: center;
-      padding: 48px 20px;
-      color: var(--text-dim);
-    }
-
-    .empty-state .material-symbols-outlined {
-      font-size: 48px;
-      color: var(--text-dim);
-      margin-bottom: 12px;
+      padding: 60px 20px;
     }
 
     .empty-state h3 {
       font-size: 18px;
-      color: var(--text-main);
-      margin-bottom: 6px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-top: 12px;
     }
 
-    /* Game Player Overlay */
+    .empty-state p {
+      color: var(--text-dim);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    /* In-Page Player View */
     #player-view {
       display: none;
       position: fixed;
@@ -441,123 +568,118 @@
     }
 
     .player-header {
-      background: #10121a;
-      border-bottom: 1px solid var(--border);
-      padding: 10px 18px;
+      height: 48px;
+      background: #09090b;
+      border-bottom: 1px solid #27272a;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      padding: 0 16px;
+      flex-shrink: 0;
     }
 
-    .player-header-left {
+    .player-header-left, .player-header-right {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
 
     .player-title {
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 700;
       color: #ffffff;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .player-header-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
 
     .player-iframe {
-      width: 100%;
       flex: 1;
+      width: 100%;
+      height: calc(100% - 48px);
       border: none;
       background: #000000;
-    }
-
-    /* Download progress bar inside item */
-    .progress-bar-wrap {
-      width: 100%;
-      height: 4px;
-      background: #232736;
-      border-radius: 2px;
-      overflow: hidden;
-      margin-top: 4px;
-    }
-
-    .progress-bar-fill {
-      height: 100%;
-      background: var(--lava-gradient);
-      width: 0%;
-      transition: width 0.2s ease;
     }
   </style>
 </head>
 <body>
 
-  <!-- Header -->
-  <header>
-    <a href="#" class="brand" onclick="switchTab('all'); return false;">
-      <span class="material-symbols-outlined brand-flame">local_fire_department</span>
-      <span>Lava<span class="accent">games</span></span>
-    </a>
+  <!-- Small Top-Left Logo (reveals during search) -->
+  <a href="#" id="smallLogo" onclick="resetToCenterHome(); return false;">
+    <span class="material-symbols-sharp brand-icon">delete_sweep</span>
+    <span>Trashbin</span>
+  </a>
 
-    <div class="header-stats">
-      <div id="connectionStatus" class="status-badge online">
-        <span class="dot"></span>
-        <span id="connectionText">Online</span>
-      </div>
-      <div class="status-badge">
-        <span class="material-symbols-outlined" style="font-size: 16px; color: var(--lava-1);">download</span>
-        <span id="downloadCountLabel">0 Downloaded</span>
-      </div>
+  <!-- Top-Right Header Status -->
+  <div class="top-header-right">
+    <div id="connectionStatus" class="status-pill online">
+      <span class="dot"></span>
+      <span id="connectionText">Online</span>
     </div>
-  </header>
-
-  <!-- Main View -->
-  <main id="main-content">
-    <div class="hero">
-      <h1>
-        <span class="material-symbols-outlined" style="color: var(--lava-1); font-size: 32px;">sports_esports</span>
-        Games Collection
-      </h1>
-      <p>Play instantly or download to your browser for fast offline play.</p>
+    <div class="status-pill">
+      <span class="material-symbols-sharp" style="font-size: 15px;">download</span>
+      <span id="downloadCountLabel">0 Downloaded</span>
     </div>
+  </div>
 
-    <!-- Filter & Search Controls -->
-    <div class="controls">
-      <div class="tabs">
-        <button id="tabAll" class="tab-btn active" onclick="switchTab('all')">
-          <span class="material-symbols-outlined" style="font-size: 18px;">grid_view</span>
-          <span>All Games</span>
-          <span id="allCountBadge" class="tab-count">0</span>
-        </button>
-        <button id="tabDownloaded" class="tab-btn" onclick="switchTab('downloaded')">
-          <span class="material-symbols-outlined" style="font-size: 18px;">download_for_offline</span>
-          <span>Downloaded</span>
-          <span id="dlCountBadge" class="tab-count">0</span>
-        </button>
-      </div>
-
-      <div class="search-box">
-        <span class="material-symbols-outlined search-icon">search</span>
-        <input type="text" id="searchInput" placeholder="Search games..." oninput="handleSearch()" />
+  <!-- Center Search Block (Yolk-style with debounced push-up) -->
+  <div id="search-block">
+    <div id="large-logo-wrapper" onclick="focusSearch()">
+      <div class="logo-inner">
+        <div class="logo-row">
+          <span class="material-symbols-sharp brand-icon-large">delete_sweep</span>
+          <h1 class="logo-title">Trashbin</h1>
+        </div>
+        <p class="logo-sub">Fast games, music & study tools</p>
       </div>
     </div>
 
-    <!-- The Single Scroll List -->
-    <div id="gameList" class="game-list">
-      <!-- Generated dynamically -->
+    <div class="search-pill-wrapper">
+      <span class="material-symbols-sharp search-pill-icon">search</span>
+      <input 
+        type="text" 
+        id="searchInput" 
+        placeholder="Search games, music, AI..." 
+        autocomplete="off" 
+        spellcheck="false"
+      />
+      <button id="clearSearchBtn" class="clear-search-btn" onclick="clearSearch()" style="display: none;">
+        <span class="material-symbols-sharp" style="font-size: 16px;">close</span>
+      </button>
     </div>
 
-    <!-- Empty State -->
+    <div class="quick-pills">
+      <button class="pill-chip active" id="chipAll" onclick="selectChip('all')">
+        <span class="material-symbols-sharp" style="font-size: 15px;">grid_view</span>
+        <span>All Games</span>
+        <span class="pill-count" id="allCountBadge">0</span>
+      </button>
+      <button class="pill-chip" id="chipDownloaded" onclick="selectChip('downloaded')">
+        <span class="material-symbols-sharp" style="font-size: 15px;">download_for_offline</span>
+        <span>Downloaded</span>
+        <span class="pill-count" id="dlCountBadge">0</span>
+      </button>
+      <button class="pill-chip" onclick="playGame('yolk/index.html', 'Yolk! - Minimalist Music')">
+        <img src="yolk/yolk-circle.png" alt="" style="width: 14px; height: 14px; border-radius: 50%; object-fit: contain;">
+        <span>Yolk!</span>
+      </button>
+      <button class="pill-chip" onclick="playGame('ai.html', 'Google Classroom AI Assistant')">
+        <span class="material-symbols-sharp" style="font-size: 15px; color: #60a5fa;">psychology</span>
+        <span>AI</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Search Results Container -->
+  <main id="results-container">
+    <div class="results-header">
+      <span class="results-title" id="resultsCategoryLabel">All Games</span>
+      <span id="resultsSummaryLabel" style="font-size: 12px; color: var(--text-dim);"></span>
+    </div>
+
+    <div id="gameList" class="game-grid"></div>
+
     <div id="emptyState" class="empty-state" style="display: none;">
-      <span class="material-symbols-outlined">search_off</span>
+      <span class="material-symbols-sharp" style="font-size: 40px; color: #52525b;">search_off</span>
       <h3>No games found</h3>
-      <p id="emptyStateDesc">Try adjusting your search query.</p>
+      <p id="emptyStateDesc">Try searching for another keyword.</p>
     </div>
   </main>
 
@@ -565,22 +687,22 @@
   <div id="player-view">
     <div class="player-header">
       <div class="player-header-left">
-        <button class="btn btn-secondary" onclick="closePlayer()">
-          <span class="material-symbols-outlined">arrow_back</span>
+        <button class="btn-sharp" onclick="closePlayer()">
+          <span class="material-symbols-sharp">arrow_back</span>
           <span>Back</span>
         </button>
-        <span id="currentPlayerTitle" class="player-title">Playing Game</span>
+        <span id="currentPlayerTitle" class="player-title">Playing</span>
       </div>
 
       <div class="player-header-right">
-        <button class="btn btn-secondary" onclick="reloadPlayer()" title="Reload Game">
-          <span class="material-symbols-outlined">refresh</span>
+        <button class="btn-sharp" onclick="reloadPlayer()" title="Reload">
+          <span class="material-symbols-sharp">refresh</span>
         </button>
-        <button class="btn btn-secondary" onclick="toggleFullscreen()" title="Fullscreen">
-          <span class="material-symbols-outlined">fullscreen</span>
+        <button class="btn-sharp" onclick="toggleFullscreen()" title="Fullscreen">
+          <span class="material-symbols-sharp">fullscreen</span>
         </button>
-        <button class="btn btn-secondary" onclick="closePlayer()" title="Close">
-          <span class="material-symbols-outlined">close</span>
+        <button class="btn-sharp" onclick="closePlayer()" title="Close">
+          <span class="material-symbols-sharp">close</span>
         </button>
       </div>
     </div>
@@ -590,10 +712,10 @@
 
   <script>
 // IndexedDB + CacheStorage for Offline Games (Supports single-file & multi-part/asset games)
-const GAME_DB_NAME = 'PinpointGamesDB';
+const GAME_DB_NAME = 'TrashbinGamesDB';
 const GAME_DB_VERSION = 1;
 const GAME_STORE_NAME = 'games';
-const GAME_CACHE_NAME = 'pinpoint-game-cache';
+const GAME_CACHE_NAME = 'trashbin-game-cache';
 const RECOMMENDED_LIMIT_BYTES = 100 * 1024 * 1024; // 100 MB
 
 const CDN_MIRRORS = [
@@ -618,7 +740,7 @@ async function autoSelectMirror() {
             clearTimeout(to);
             if (res.ok) {
                 activeMirror = mirror;
-                console.log('[Lavagames] Connected to CDN mirror:', activeMirror);
+                console.log('[Trashbin] Connected to CDN mirror:', activeMirror);
                 return;
             }
         } catch (e) {}
@@ -904,60 +1026,46 @@ const GAME_MANIFESTS = {
     ]
 };
 
+// Open IndexedDB
 const gameDbPromise = new Promise((resolve, reject) => {
-    const request = indexedDB.open(GAME_DB_NAME, GAME_DB_VERSION);
-
-    request.onupgradeneeded = (event) => {
-        const db = event.target.result;
+    const req = indexedDB.open(GAME_DB_NAME, GAME_DB_VERSION);
+    req.onupgradeneeded = (e) => {
+        const db = e.target.result;
         if (!db.objectStoreNames.contains(GAME_STORE_NAME)) {
-            db.createObjectStore(GAME_STORE_NAME, { keyPath: 'id' });
+            const store = db.createObjectStore(GAME_STORE_NAME, { keyPath: 'id' });
+            store.createIndex('title', 'title', { unique: false });
+            store.createIndex('downloadedAt', 'downloadedAt', { unique: false });
         }
     };
-
-    request.onsuccess = (event) => resolve(event.target.result);
-    request.onerror = (event) => reject(event.target.error);
+    req.onsuccess = (e) => resolve(e.target.result);
+    req.onerror = () => reject(req.error);
 });
 
-// Active in-flight downloads for crash/interruption cleanup and cancellation
-const activeInFlightDownloads = new Map();
 const activeControllers = new Map();
+const activeInFlightDownloads = new Map();
 
-// Automatic cleanup if page refreshes or unloads during download
-if (typeof window !== 'undefined') {
-    const cleanInterrupted = () => {
-        for (const [id, fileUrl] of activeInFlightDownloads.entries()) {
-            try {
-                // Record in session to purge on next startup if interrupted
-                const current = JSON.parse(sessionStorage.getItem('pinpoint_pending_purges') || '[]');
-                if (!current.some(item => item.id === id)) {
-                    current.push({ id, fileUrl });
-                    sessionStorage.setItem('pinpoint_pending_purges', JSON.stringify(current));
-                }
-            } catch(e) {}
-        }
-    };
-    window.addEventListener('beforeunload', cleanInterrupted);
-    window.addEventListener('pagehide', cleanInterrupted);
-
-    // Run startup purge of any interrupted downloads
-    setTimeout(async () => {
+// Periodic storage quota check
+if (typeof navigator !== 'undefined' && navigator.storage && navigator.storage.estimate) {
+    setInterval(async () => {
         try {
-            const raw = sessionStorage.getItem('pinpoint_pending_purges');
-            if (raw) {
-                const purges = JSON.parse(raw);
-                sessionStorage.removeItem('pinpoint_pending_purges');
-                for (const item of purges) {
+            const est = await navigator.storage.estimate();
+            if (est.quota && est.usage && (est.quota - est.usage < 15 * 1024 * 1024)) {
+                const all = await PinpointGameStorage.getAllGames();
+                all.sort((a, b) => new Date(a.downloadedAt) - new Date(b.downloadedAt));
+                if (all.length > 0) {
+                    const item = all[0];
                     await PinpointGameStorage.deleteGame(item.id, item.fileUrl);
                 }
             }
         } catch(e) {}
-    }, 1000);
+    }, 20000);
 }
 
 const PinpointGameStorage = {
     RECOMMENDED_LIMIT_BYTES,
 
     getManifest(fileUrl) {
+        if (/^https?:\/\//i.test(fileUrl)) return [fileUrl];
         const norm = fileUrl.replace(/^\/+/, '');
         if (GAME_MANIFESTS[norm]) return GAME_MANIFESTS[norm];
         if (norm.endsWith('/index.html') && GAME_MANIFESTS[norm.replace('/index.html', '/')]) {
@@ -985,20 +1093,6 @@ const PinpointGameStorage = {
         } catch(e) { return false; }
     },
 
-    isDownloading(id) {
-        return activeControllers.has(id);
-    },
-
-    cancelDownload(id) {
-        if (activeControllers.has(id)) {
-            const ctrl = activeControllers.get(id);
-            ctrl.abort();
-            activeControllers.delete(id);
-            return true;
-        }
-        return false;
-    },
-
     async getGame(id) {
         const db = await gameDbPromise;
         return new Promise((resolve, reject) => {
@@ -1013,7 +1107,7 @@ const PinpointGameStorage = {
     async getAllGames() {
         try {
             const db = await gameDbPromise;
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
                 const tx = db.transaction([GAME_STORE_NAME], 'readonly');
                 const store = tx.objectStore(GAME_STORE_NAME);
                 const req = store.getAll();
@@ -1062,12 +1156,21 @@ const PinpointGameStorage = {
                     continue;
                 }
 
-                const mirrors = [activeMirror, ...CDN_MIRRORS.filter(m => m !== activeMirror)];
-                const candidateUrls = [
-                    ...mirrors.map(m => m + '/gh/pinpoint-edu/assets@main/' + clean),
-                    'https://cdn.statically.io/gh/pinpoint-edu/assets@main/' + clean,
-                    'https://raw.githubusercontent.com/pinpoint-edu/assets/main/' + clean
-                ];
+                let candidateUrls = [];
+                if (/^https?:\/\//i.test(assetUrl)) {
+                    let mirrorUrl = assetUrl;
+                    if (assetUrl.includes('jsdelivr.net')) {
+                        mirrorUrl = assetUrl.replace(/https?:\/\/[^/]*\.jsdelivr\.net\//i, activeMirror + '/');
+                    }
+                    candidateUrls = [mirrorUrl, assetUrl];
+                } else {
+                    const mirrors = [activeMirror, ...CDN_MIRRORS.filter(m => m !== activeMirror)];
+                    candidateUrls = [
+                        ...mirrors.map(m => m + '/gh/pinpoint-edu/assets@main/' + clean),
+                        'https://cdn.statically.io/gh/pinpoint-edu/assets@main/' + clean,
+                        'https://raw.githubusercontent.com/pinpoint-edu/assets/main/' + clean
+                    ];
+                }
 
                 let res = null;
                 for (const url of candidateUrls) {
@@ -1114,108 +1217,63 @@ const PinpointGameStorage = {
                         if (done) break;
                         chunks.push(value);
                         receivedBytes += value.length;
-
-                        const assetFraction = assets.length > 0 ? (i / assets.length) : 0;
-                        const thisAssetProgress = (receivedBytes / contentLength) * (1 / assets.length);
-                        const overallPercent = Math.min(99, Math.round((assetFraction + thisAssetProgress) * 100));
+                        totalBytes += value.length;
 
                         if (typeof onProgress === 'function') {
+                            const assetPart = (receivedBytes / contentLength) / assets.length;
+                            const overallPercent = Math.min(99, Math.round(((completedAssets / assets.length) + assetPart) * 100));
                             onProgress({
-                                completed: i,
-                                total: assets.length,
                                 percent: overallPercent,
-                                bytes: totalBytes + receivedBytes
+                                loaded: receivedBytes,
+                                total: contentLength,
+                                assetIndex: i + 1,
+                                assetTotal: assets.length
                             });
                         }
                     }
-                    assetBlob = new Blob(chunks);
+
+                    assetBlob = new Blob(chunks, { type: res.headers.get('content-type') || 'application/octet-stream' });
                 } else {
                     assetBlob = await res.blob();
+                    totalBytes += assetBlob.size;
                 }
 
-                totalBytes += assetBlob.size;
+                if (i === 0 && (clean.endsWith('.html') || clean.endsWith('/'))) {
+                    mainContent = await assetBlob.text();
+                }
 
                 if (cache) {
-                    try {
-                        const ext = assetUrl.split('.').pop().toLowerCase().split('?')[0];
-                        const mimeMap = {
-                            'wasm': 'application/wasm',
-                            'js': 'application/javascript; charset=utf-8',
-                            'json': 'application/json; charset=utf-8',
-                            'swf': 'application/x-shockwave-flash',
-                            'html': 'text/html; charset=utf-8',
-                            'htm': 'text/html; charset=utf-8',
-                            'css': 'text/css; charset=utf-8',
-                            'png': 'image/png',
-                            'jpg': 'image/jpeg',
-                            'jpeg': 'image/jpeg',
-                            'gif': 'image/gif',
-                            'svg': 'image/svg+xml',
-                            'ico': 'image/x-icon',
-                            'webm': 'video/webm'
-                        };
-
-                        const headers = new Headers(res.headers);
-                        if (mimeMap[ext]) {
-                            headers.set('content-type', mimeMap[ext]);
-                        }
-
-                        const cacheRes = new Response(assetBlob, {
-                            headers: headers,
-                            status: 200,
-                            statusText: 'OK'
-                        });
-
-                        const putKeys = new Set([
-                            assetUrl,
-                            new URL(assetUrl, window.location.href).href,
-                            clean,
-                            '/' + clean,
-                            activeMirror + '/gh/pinpoint-edu/assets@main/' + clean,
-                            'https://cdn.jsdelivr.net/gh/pinpoint-edu/assets@main/' + clean,
-                            decodeURIComponent(assetUrl),
-                            encodeURI(assetUrl)
-                        ]);
-
-                        if (assetUrl.endsWith('/index.html')) {
-                            const dirPath = assetUrl.replace(/index\.html$/, '');
-                            const dirNoSlash = dirPath.replace(/\/$/, '');
-                            putKeys.add(dirPath);
-                            putKeys.add(dirNoSlash);
-                            putKeys.add(new URL(dirPath, window.location.href).href);
-                            putKeys.add(new URL(dirNoSlash, window.location.href).href);
-                        } else if (assetUrl.endsWith('/')) {
-                            const indexPath = assetUrl + 'index.html';
-                            const noSlash = assetUrl.replace(/\/$/, '');
-                            putKeys.add(indexPath);
-                            putKeys.add(noSlash);
-                            putKeys.add(new URL(indexPath, window.location.href).href);
-                            putKeys.add(new URL(noSlash, window.location.href).href);
-                        }
-
-                        for (const k of putKeys) {
-                            try {
-                                await cache.put(k, cacheRes.clone());
-                            } catch(e) {}
-                        }
-                    } catch(err) {
-                        console.warn('Could not cache asset in CacheStorage:', assetUrl, err);
-                    }
-                }
-
-                if (assetUrl === fileUrl || assetUrl.endsWith('.html') || assetUrl.endsWith('/')) {
-                    if (!mainContent) {
+                    const cacheUrls = [
+                        assetUrl,
+                        new URL(assetUrl, window.location.href).href,
+                        clean,
+                        '/' + clean
+                    ];
+                    for (const cu of cacheUrls) {
                         try {
-                            mainContent = await assetBlob.text();
-                        } catch(e) {}
+                            await cache.put(cu, new Response(assetBlob.slice(), {
+                                headers: {
+                                    'Content-Type': res.headers.get('content-type') || 'application/octet-stream',
+                                    'Content-Length': assetBlob.size.toString()
+                                }
+                            }));
+                        } catch(ce) {}
                     }
                 }
 
                 completedAssets++;
-                const overallPercent = Math.round((completedAssets / assets.length) * 100);
                 if (typeof onProgress === 'function') {
-                    onProgress({ completed: completedAssets, total: assets.length, percent: overallPercent, bytes: totalBytes });
+                    const overallPercent = Math.min(99, Math.round((completedAssets / assets.length) * 100));
+                    onProgress({
+                        percent: overallPercent,
+                        assetIndex: completedAssets,
+                        assetTotal: assets.length
+                    });
                 }
+            }
+
+            if (typeof onProgress === 'function') {
+                onProgress({ percent: 100, assetIndex: assets.length, assetTotal: assets.length });
             }
 
             const db = await gameDbPromise;
@@ -1252,7 +1310,6 @@ const PinpointGameStorage = {
     },
 
     async deleteGame(id, fileUrl) {
-        // 1. Delete from CacheStorage
         if (typeof caches !== 'undefined') {
             try {
                 const cache = await caches.open(GAME_CACHE_NAME);
@@ -1267,566 +1324,661 @@ const PinpointGameStorage = {
                     ];
                     if (assetUrl.endsWith('/index.html')) {
                         const dirPath = assetUrl.replace(/index\.html$/, '');
-                        delKeys.push(dirPath, dirPath.replace(/\/$/, ''), new URL(dirPath, window.location.href).href);
-                    } else if (assetUrl.endsWith('/')) {
-                        const indexPath = assetUrl + 'index.html';
-                        delKeys.push(indexPath, assetUrl.replace(/\/$/, ''), new URL(indexPath, window.location.href).href);
+                        delKeys.push(dirPath, '/' + dirPath.replace(/^\/+/, ''));
                     }
                     for (const k of delKeys) {
-                        try { await cache.delete(k); } catch(e) {}
+                        await cache.delete(k);
                     }
                 }
-            } catch(e) {
-                console.warn('Error clearing CacheStorage:', e);
-            }
+            } catch(e) {}
         }
 
-        // 2. Delete from IndexedDB
         const db = await gameDbPromise;
         return new Promise((resolve, reject) => {
             const tx = db.transaction([GAME_STORE_NAME], 'readwrite');
             const store = tx.objectStore(GAME_STORE_NAME);
             const req = store.delete(id);
-            req.onsuccess = () => resolve();
+            req.onsuccess = () => resolve(true);
             req.onerror = () => reject(req.error);
         });
     },
 
-    async clearAllDownloads() {
-        // 1. Clear entire game cache in CacheStorage
-        if (typeof caches !== 'undefined') {
-            try {
-                await caches.delete(GAME_CACHE_NAME);
-            } catch(e) {
-                console.warn('Error deleting CacheStorage cache:', e);
-            }
+    cancelDownload(id) {
+        if (activeControllers.has(id)) {
+            activeControllers.get(id).abort();
+            activeControllers.delete(id);
+            activeInFlightDownloads.delete(id);
         }
+    },
 
-        // 2. Clear entire object store in IndexedDB
-        const db = await gameDbPromise;
-        return new Promise((resolve, reject) => {
-            const tx = db.transaction([GAME_STORE_NAME], 'readwrite');
-            const store = tx.objectStore(GAME_STORE_NAME);
-            const req = store.clear();
-            req.onsuccess = () => resolve();
-            req.onerror = () => reject(req.error);
-        });
+    isDownloading(id) {
+        return activeControllers.has(id);
     }
 };
 
 window.PinpointGameStorage = PinpointGameStorage;
 
-// Automatically register Service Worker for offline game caching
+// Service Worker for offline PWA
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.protocol === 'http:')) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+    });
+}
 
+// Fallback catalog including Yolk! Music and AI Assistant
+const DEFAULT_GAMES = [
+  { "title": "Yolk! - Minimalist Music", "file": "yolk/index.html", "img": "yolk/icon-256.png", "sizeBytes": 983040, "isApp": true },
+  { "title": "Google Classroom AI Assistant", "file": "ai.html", "img": "favicons/google-classroom.png", "sizeBytes": 125000, "isApp": true },
+  { "title": "2048", "file": "textbooks/2048.html", "sizeBytes": 46342 },
+  { "title": "Awesome Tanks", "file": "textbooks/awesome-tanks.html", "sizeBytes": 9825933 },
+  { "title": "Awesome Tanks 2", "file": "textbooks/awesometanks2.html", "sizeBytes": 13004415 },
+  { "title": "Basket Random", "file": "textbooks/basket-random/index.html", "sizeBytes": 2548324 },
+  { "title": "Basketball Stars", "file": "textbooks/basketball-stars.html", "sizeBytes": 11794098 },
+  { "title": "Bit Planes: Remastered", "file": "textbooks/bit-planes-remaster.html", "sizeBytes": 1173578 },
+  { "title": "Bloons TD", "file": "textbooks/Bloons-TD.html", "sizeBytes": 711100 },
+  { "title": "Bloons TD 2", "file": "textbooks/bloonsTD2.html", "sizeBytes": 7852517 },
+  { "title": "Bloons TD 3", "file": "textbooks/bloonsTD3.html", "sizeBytes": 8665053 },
+  { "title": "Bloons TD 4", "file": "textbooks/bloonsTD4.html", "sizeBytes": 11144029 },
+  { "title": "Bloons TD 5", "file": "textbooks/bloonsTD5.html", "sizeBytes": 21674453 },
+  { "title": "Bloxorz", "file": "textbooks/bloxorz.html", "sizeBytes": 9824296 },
+  { "title": "Car Soccer", "file": "textbooks/car-soccer/", "sizeBytes": 130837204 },
+  { "title": "Chess", "file": "textbooks/chess.html", "sizeBytes": 6914845 },
+  { "title": "Cluster Rush", "file": "textbooks/cluster-rush.html", "sizeBytes": 16052232 },
+  { "title": "Cookie Clicker", "file": "textbooks/cookie-clicker.html", "sizeBytes": 7649267 },
+  { "title": "Crazy Pixel Apocalypse 9", "file": "textbooks/crazy-pixel-apocalypse-9/index.html", "sizeBytes": 27833728 },
+  { "title": "Crossy Road", "file": "textbooks/crossy-road.html", "sizeBytes": 3250987 },
+  { "title": "Drift Boss", "file": "textbooks/drift-boss.html", "sizeBytes": 8990388 },
+  { "title": "Drivemad", "file": "textbooks/drivemad.html", "sizeBytes": 4999548 },
+  { "title": "Escape Road", "file": "textbooks/escape-road.html", "sizeBytes": 37333168 },
+  { "title": "Escape Road 2", "file": "textbooks/escape-road-2.html", "sizeBytes": 33570027 },
+  { "title": "Escape Road 3", "file": "textbooks/escape-road-3/index.html", "sizeBytes": 217224234 },
+  { "title": "Football Bros", "file": "textbooks/football-bros.html", "sizeBytes": 17512552 },
+  { "title": "Geometry Dash Lite", "file": "textbooks/geometry-dash-lite.html", "sizeBytes": 56611619 },
+  { "title": "Getaway Shootout", "file": "textbooks/getaway-shootout/index.html", "sizeBytes": 24514741 },
+  { "title": "Gladihoppers", "file": "textbooks/gladihoppers.html", "sizeBytes": 37178258 },
+  { "title": "Granny", "file": "textbooks/granny.html", "sizeBytes": 58316198 },
+  { "title": "Happy Wheels", "file": "textbooks/happy-wheels.html", "sizeBytes": 17835062 },
+  { "title": "Highway Traffic", "file": "textbooks/highway-traffic.html", "sizeBytes": 36836782 },
+  { "title": "Gumspin", "file": "textbooks/gumspin/index.html", "sizeBytes": 23136887 },
+  { "title": "Moto X3M 3", "file": "textbooks/moto-x3m-3.html", "sizeBytes": 10594220 },
+  { "title": "People Playground", "file": "textbooks/people-playground/index.html", "sizeBytes": 164247473 },
+  { "title": "Plants vs Zombies", "file": "textbooks/plants-vs-zombies/index.html", "sizeBytes": 10788264 },
+  { "title": "Polytrack", "file": "textbooks/polytrack.html", "sizeBytes": 7174550 },
+  { "title": "Retro Bowl", "file": "textbooks/retro-bowl.html", "sizeBytes": 7254005 },
+  { "title": "Retro Bowl College", "file": "textbooks/retro-bowl-college.html", "sizeBytes": 8216510 },
+  { "title": "Sandboxels", "file": "textbooks/sandboxels.html", "sizeBytes": 664962 },
+  { "title": "Slope", "file": "textbooks/slope.html", "sizeBytes": 25986251 },
+  { "title": "Slope 2 Player", "file": "textbooks/slope-2-player.html", "sizeBytes": 10275184 },
+  { "title": "Slow Roads", "file": "textbooks/slow-roads.html", "sizeBytes": 16960668 },
+  { "title": "Sprinter", "file": "textbooks/sprinter/index.html", "sizeBytes": 489000 },
+  { "title": "Vex5", "file": "textbooks/vex5.html", "sizeBytes": 15661734 },
+  { "title": "Wordle Unlimited", "file": "textbooks/wordle-unlimited.html", "sizeBytes": 184510 }
+];
 
-    // Complete 44-Game Fallback List
-    const DEFAULT_GAMES = [
-      { "title": "2048", "file": "textbooks/2048.html", "sizeBytes": 46342 },
-      { "title": "Awesome Tanks", "file": "textbooks/awesome-tanks.html", "sizeBytes": 9825933 },
-      { "title": "Awesome Tanks 2", "file": "textbooks/awesometanks2.html", "sizeBytes": 13004415 },
-      { "title": "Basket Random", "file": "textbooks/basket-random/index.html", "sizeBytes": 2548324 },
-      { "title": "Basketball Stars", "file": "textbooks/basketball-stars.html", "sizeBytes": 11794098 },
-      { "title": "Bit Planes: Remastered", "file": "textbooks/bit-planes-remaster.html", "sizeBytes": 1173578 },
-      { "title": "Bloons TD", "file": "textbooks/Bloons-TD.html", "sizeBytes": 711100 },
-      { "title": "Bloons TD 2", "file": "textbooks/bloonsTD2.html", "sizeBytes": 7852517 },
-      { "title": "Bloons TD 3", "file": "textbooks/bloonsTD3.html", "sizeBytes": 8665053 },
-      { "title": "Bloons TD 4", "file": "textbooks/bloonsTD4.html", "sizeBytes": 11144029 },
-      { "title": "Bloons TD 5", "file": "textbooks/bloonsTD5.html", "sizeBytes": 21674453 },
-      { "title": "Bloxorz", "file": "textbooks/bloxorz.html", "sizeBytes": 9824296 },
-      { "title": "Car Soccer", "file": "textbooks/car-soccer/", "sizeBytes": 130837204 },
-      { "title": "Chess", "file": "textbooks/chess.html", "sizeBytes": 6914845 },
-      { "title": "Cluster Rush", "file": "textbooks/cluster-rush.html", "sizeBytes": 16052232 },
-      { "title": "Cookie Clicker", "file": "textbooks/cookie-clicker.html", "sizeBytes": 7649267 },
-      { "title": "Crazy Pixel Apocalypse 9", "file": "textbooks/crazy-pixel-apocalypse-9/index.html", "sizeBytes": 27833728 },
-      { "title": "Crossy Road", "file": "textbooks/crossy-road.html", "sizeBytes": 3250987 },
-      { "title": "Drift Boss", "file": "textbooks/drift-boss.html", "sizeBytes": 8990388 },
-      { "title": "Drivemad", "file": "textbooks/drivemad.html", "sizeBytes": 4999548 },
-      { "title": "Escape Road", "file": "textbooks/escape-road.html", "sizeBytes": 37333168 },
-      { "title": "Escape Road 2", "file": "textbooks/escape-road-2.html", "sizeBytes": 33570027 },
-      { "title": "Escape Road 3", "file": "textbooks/escape-road-3/index.html", "sizeBytes": 217224234 },
-      { "title": "Football Bros", "file": "textbooks/football-bros.html", "sizeBytes": 17512552 },
-      { "title": "Geometry Dash Lite", "file": "textbooks/geometry-dash-lite.html", "sizeBytes": 56611619 },
-      { "title": "Getaway Shootout", "file": "textbooks/getaway-shootout/index.html", "sizeBytes": 24514741 },
-      { "title": "Gladihoppers", "file": "textbooks/gladihoppers.html", "sizeBytes": 37178258 },
-      { "title": "Granny", "file": "textbooks/granny.html", "sizeBytes": 58316198 },
-      { "title": "Happy Wheels", "file": "textbooks/happy-wheels.html", "sizeBytes": 17835062 },
-      { "title": "Highway Traffic", "file": "textbooks/highway-traffic.html", "sizeBytes": 36836782 },
-      { "title": "Gumspin", "file": "textbooks/gumspin/index.html", "sizeBytes": 23136887 },
-      { "title": "Moto X3M 3", "file": "textbooks/moto-x3m-3.html", "sizeBytes": 10594220 },
-      { "title": "People Playground", "file": "textbooks/people-playground/index.html", "sizeBytes": 164247473 },
-      { "title": "Plants vs Zombies", "file": "textbooks/plants-vs-zombies/index.html", "sizeBytes": 10788264 },
-      { "title": "Polytrack", "file": "textbooks/polytrack.html", "sizeBytes": 7174550 },
-      { "title": "Retro Bowl", "file": "textbooks/retro-bowl.html", "sizeBytes": 7254005 },
-      { "title": "Retro Bowl College", "file": "textbooks/retro-bowl-college.html", "sizeBytes": 8216510 },
-      { "title": "Sandboxels", "file": "textbooks/sandboxels.html", "sizeBytes": 664962 },
-      { "title": "Slope", "file": "textbooks/slope.html", "sizeBytes": 25986251 },
-      { "title": "Slope 2 Player", "file": "textbooks/slope-2-player.html", "sizeBytes": 10275184 },
-      { "title": "Slow Roads", "file": "textbooks/slow-roads.html", "sizeBytes": 16960668 },
-      { "title": "Sprinter", "file": "textbooks/sprinter/index.html", "sizeBytes": 489000 },
-      { "title": "Vex5", "file": "textbooks/vex5.html", "sizeBytes": 15661734 },
-      { "title": "Wordle Unlimited", "file": "textbooks/wordle-unlimited.html", "sizeBytes": 184510 }
-    ];
+let games = [...DEFAULT_GAMES];
+let downloadedGameIds = new Set();
+let currentTab = 'all'; // 'all' or 'downloaded'
+let currentPlayingFile = null;
+let activeProgressMap = new Map();
+let searchDebounceTimer = null;
 
-    let games = [...DEFAULT_GAMES];
-    let downloadedGameIds = new Set();
-    let currentTab = 'all'; // 'all' or 'downloaded'
-    let currentPlayingFile = null;
-    let activeProgressMap = new Map();
+function formatBytes(bytes) {
+  if (!bytes || bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
 
-    function formatBytes(bytes) {
-      if (!bytes || bytes === 0) return '0 B';
-      const k = 1024;
-      const sizes = ['B', 'KB', 'MB', 'GB'];
-      const i = Math.floor(Math.log(bytes) / Math.log(k));
-      return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+function getGameId(file) {
+  return file.replace(/[^a-zA-Z0-9_-]/g, '_');
+}
+
+async function syncDownloadedStatus() {
+  if (typeof PinpointGameStorage !== 'undefined') {
+    try {
+      const records = await PinpointGameStorage.getAllGames();
+      downloadedGameIds = new Set(records.map(r => r.id));
+    } catch(e) {
+      console.warn('Could not read offline games from storage:', e);
     }
+  }
+  updateCounts();
+  if (document.body.classList.contains('is-searching')) {
+    renderGames();
+  }
+}
 
-    function getGameId(file) {
-      return file.replace(/[^a-zA-Z0-9_-]/g, '_');
+function updateCounts() {
+  const allCount = games.length;
+  const dlCount = downloadedGameIds.size;
+
+  const bAll = document.getElementById('allCountBadge');
+  const bDl = document.getElementById('dlCountBadge');
+  const lDl = document.getElementById('downloadCountLabel');
+
+  if (bAll) bAll.textContent = allCount;
+  if (bDl) bDl.textContent = dlCount;
+  if (lDl) lDl.textContent = `${dlCount} Downloaded`;
+}
+
+function selectChip(tab) {
+  currentTab = tab;
+  document.getElementById('chipAll').classList.toggle('active', tab === 'all');
+  document.getElementById('chipDownloaded').classList.toggle('active', tab === 'downloaded');
+  document.getElementById('resultsCategoryLabel').textContent = tab === 'downloaded' ? 'Downloaded Games' : 'All Games';
+  activateSearchState();
+  renderGames();
+}
+
+function focusSearch() {
+  document.getElementById('searchInput').focus();
+}
+
+function clearSearch() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('clearSearchBtn').style.display = 'none';
+  resetToCenterHome();
+}
+
+function activateSearchState() {
+  document.body.classList.add('is-searching');
+}
+
+function resetToCenterHome() {
+  if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+  document.getElementById('searchInput').value = '';
+  document.getElementById('clearSearchBtn').style.display = 'none';
+  document.body.classList.remove('is-searching');
+  currentTab = 'all';
+  document.getElementById('chipAll').classList.add('active');
+  document.getElementById('chipDownloaded').classList.remove('active');
+  document.getElementById('resultsCategoryLabel').textContent = 'All Games';
+}
+
+// Debounced typing handler (1.2s delay pushes search bar up)
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('input', () => {
+  const val = searchInput.value;
+  document.getElementById('clearSearchBtn').style.display = val ? 'flex' : 'none';
+
+  if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+
+  if (!val.trim()) {
+    resetToCenterHome();
+    return;
+  }
+
+  searchDebounceTimer = setTimeout(() => {
+    activateSearchState();
+    renderGames();
+  }, 1200);
+});
+
+searchInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+    activateSearchState();
+    renderGames();
+  }
+});
+
+// Render results
+function renderGames() {
+  const listContainer = document.getElementById('gameList');
+  const emptyState = document.getElementById('emptyState');
+  const emptyDesc = document.getElementById('emptyStateDesc');
+  const summaryLabel = document.getElementById('resultsSummaryLabel');
+  const query = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+
+  let filtered = games.filter(g => {
+    const id = getGameId(g.file);
+    if (currentTab === 'downloaded' && !downloadedGameIds.has(id)) {
+      return false;
     }
-
-    // Initialize & Refresh Downloaded Status
-    async function syncDownloadedStatus() {
-      if (typeof PinpointGameStorage !== 'undefined') {
-        try {
-          const records = await PinpointGameStorage.getAllGames();
-          downloadedGameIds = new Set(records.map(r => r.id));
-        } catch(e) {
-          console.warn('Could not read offline games from storage:', e);
-        }
-      }
-      updateCounts();
-      renderGames();
+    if (query && !g.title.toLowerCase().includes(query)) {
+      return false;
     }
+    return true;
+  });
 
-    function updateCounts() {
-      const allCount = games.length;
-      const dlCount = downloadedGameIds.size;
+  if (summaryLabel) {
+    summaryLabel.textContent = `${filtered.length} results`;
+  }
 
-      document.getElementById('allCountBadge').textContent = allCount;
-      document.getElementById('dlCountBadge').textContent = dlCount;
-      document.getElementById('downloadCountLabel').textContent = `${dlCount} Downloaded`;
+  if (filtered.length === 0) {
+    listContainer.innerHTML = '';
+    emptyState.style.display = 'block';
+    if (currentTab === 'downloaded') {
+      emptyDesc.textContent = query
+        ? 'No downloaded games match your search.'
+        : 'No offline games yet. Click "Download" on any game to save it.';
+    } else {
+      emptyDesc.textContent = 'No games match your search query.';
     }
+    return;
+  }
 
-    // Switch between All Games and Downloaded tabs
-    function switchTab(tab) {
-      currentTab = tab;
-      document.getElementById('tabAll').classList.toggle('active', tab === 'all');
-      document.getElementById('tabDownloaded').classList.toggle('active', tab === 'downloaded');
-      renderGames();
-    }
+  emptyState.style.display = 'none';
 
-    function handleSearch() {
-      renderGames();
-    }
+  let html = '';
+  filtered.forEach(game => {
+    const id = getGameId(game.file);
+    const isDownloaded = downloadedGameIds.has(id);
+    const isDownloading = typeof PinpointGameStorage !== 'undefined' && PinpointGameStorage.isDownloading(id);
+    const progress = activeProgressMap.get(id);
 
-    // Render the Single Scroll List of Games
-    function renderGames() {
-      const listContainer = document.getElementById('gameList');
-      const emptyState = document.getElementById('emptyState');
-      const emptyDesc = document.getElementById('emptyStateDesc');
-      const query = (document.getElementById('searchInput').value || '').trim().toLowerCase();
-
-      let filtered = games.filter(g => {
-        const id = getGameId(g.file);
-        if (currentTab === 'downloaded' && !downloadedGameIds.has(id)) {
-          return false;
-        }
-        if (query && !g.title.toLowerCase().includes(query)) {
-          return false;
-        }
-        return true;
-      });
-
-      if (filtered.length === 0) {
-        listContainer.innerHTML = '';
-        emptyState.style.display = 'block';
-        if (currentTab === 'downloaded') {
-          emptyDesc.textContent = query
-            ? 'No downloaded games match your search.'
-            : 'You have not saved any games for offline play yet. Click "Download" on any game to save it!';
-        } else {
-          emptyDesc.textContent = 'No games match your search query.';
-        }
-        return;
-      }
-
-      emptyState.style.display = 'none';
-
-      let html = '';
-      filtered.forEach(game => {
-        const id = getGameId(game.file);
-        const isDownloaded = downloadedGameIds.has(id);
-        const isDownloading = typeof PinpointGameStorage !== 'undefined' && PinpointGameStorage.isDownloading(id);
-        const progress = activeProgressMap.get(id);
-
-        html += `
-          <div class="game-card" id="card-${id}">
-            <div class="game-left">
-              <div class="game-icon-box">
-                <span class="material-symbols-outlined">sports_esports</span>
-              </div>
-              <div class="game-details">
-                <span class="game-title">${game.title}</span>
-                <div class="game-meta">
-                  <span>${formatBytes(game.sizeBytes)}</span>
-                  ${isDownloaded ? `
-                    <span class="badge-dl">
-                      <span class="material-symbols-outlined" style="font-size: 14px;">check_circle</span>
-                      Downloaded
-                    </span>
-                  ` : ''}
-                  ${isDownloading ? `
-                    <span class="badge-progress">
-                      <span class="material-symbols-outlined" style="font-size: 14px; animation: spin 1s linear infinite;">sync</span>
-                      ${progress !== undefined ? progress + '%' : 'Downloading...'}
-                    </span>
-                  ` : ''}
-                </div>
-                ${isDownloading ? `
-                  <div class="progress-bar-wrap">
-                    <div class="progress-bar-fill" style="width: ${progress || 5}%;"></div>
-                  </div>
-                ` : ''}
-              </div>
-            </div>
-
-            <div class="game-actions">
-              <button class="btn btn-play" onclick="playGame('${encodeURIComponent(game.file)}', '${encodeURIComponent(game.title)}')">
-                <span class="material-symbols-outlined">play_arrow</span>
-                <span>Play</span>
-              </button>
-
-              ${isDownloaded ? `
-                <button class="btn-icon" onclick="deleteGame('${id}', '${encodeURIComponent(game.file)}', '${encodeURIComponent(game.title)}')" title="Remove from Downloaded">
-                  <span class="material-symbols-outlined">delete</span>
-                </button>
-              ` : isDownloading ? `
-                <button class="btn btn-secondary" onclick="cancelDownload('${id}')" title="Cancel Download">
-                  <span class="material-symbols-outlined">close</span>
-                  <span>Cancel</span>
-                </button>
-              ` : `
-                <button class="btn btn-secondary" onclick="startDownload('${id}', '${encodeURIComponent(game.title)}', '${encodeURIComponent(game.file)}')" title="Download for offline">
-                  <span class="material-symbols-outlined">download</span>
-                  <span>Download</span>
-                </button>
-              `}
-            </div>
+    html += `
+      <div class="game-card" id="card-${id}">
+        <div class="game-left">
+          <div class="game-icon-box">
+            ${game.img ? `
+              <img src="${game.img}" alt="" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='inline-block';">
+              <span class="material-symbols-sharp" style="display: none; font-size: 24px; color: #a1a1aa;">sports_esports</span>
+            ` : `
+              <span class="material-symbols-sharp" style="font-size: 24px; color: #a1a1aa;">${game.file.startsWith('yolk/') ? 'music_note' : (game.file === 'ai.html' ? 'psychology' : 'sports_esports')}</span>
+            `}
           </div>
-        `;
-      });
+          <div class="game-details">
+            <span class="game-title">${game.title}</span>
+            <div class="game-meta">
+              <span>${game.isApp ? 'Web App' : formatBytes(game.sizeBytes)}</span>
+              ${isDownloaded ? `
+                <span class="badge-dl">
+                  <span class="material-symbols-sharp" style="font-size: 14px;">check_circle</span>
+                  Downloaded
+                </span>
+              ` : ''}
+              ${isDownloading ? `
+                <span class="badge-progress">
+                  <span class="material-symbols-sharp" style="font-size: 14px; animation: spin 1s linear infinite;">sync</span>
+                  ${progress !== undefined ? progress + '%' : 'Downloading...'}
+                </span>
+              ` : ''}
+            </div>
+            ${isDownloading ? `
+              <div class="progress-bar-wrap">
+                <div class="progress-bar-fill" style="width: ${progress || 5}%;"></div>
+              </div>
+            ` : ''}
+          </div>
+        </div>
 
-      listContainer.innerHTML = html;
+        <div class="game-actions">
+          <button class="btn-sharp btn-primary-sharp" onclick="playGame('${encodeURIComponent(game.file)}', '${encodeURIComponent(game.title)}')">
+            <span class="material-symbols-sharp">${game.isApp ? 'open_in_new' : 'play_arrow'}</span>
+            <span>${game.isApp ? 'Open' : 'Play'}</span>
+          </button>
+
+          ${!game.isApp ? (isDownloaded ? `
+            <button class="btn-icon-sharp" onclick="deleteGame('${id}', '${encodeURIComponent(game.file)}', '${encodeURIComponent(game.title)}')" title="Remove">
+              <span class="material-symbols-sharp">delete</span>
+            </button>
+          ` : isDownloading ? `
+            <button class="btn-sharp" onclick="cancelDownload('${id}')" title="Cancel">
+              <span class="material-symbols-sharp">close</span>
+              <span>Cancel</span>
+            </button>
+          ` : `
+            <button class="btn-sharp" onclick="startDownload('${id}', '${encodeURIComponent(game.title)}', '${encodeURIComponent(game.file)}')" title="Download for offline">
+              <span class="material-symbols-sharp">download</span>
+              <span>Download</span>
+            </button>
+          `) : ''}
+        </div>
+      </div>
+    `;
+  });
+
+  listContainer.innerHTML = html;
+}
+
+function prepareGameHtml(html, fileUrl) {
+  let base = fileUrl.replace(/[^/]*$/, '');
+  if (!base.endsWith('/')) base += '/';
+
+  let repoBase = base;
+  const mRepo = base.match(/^(https?:\/\/[^/]+\/(?:gh\/[^/]+\/[^/@]+@[^/]+\/|[^/]+\/[^/]+\/[^/]+\/))/i);
+  if (mRepo) {
+    repoBase = mRepo[1];
+  }
+
+  const lower = html.toLowerCase();
+  const firstScript = lower.indexOf('<script');
+  const firstHead = lower.indexOf('<head');
+  const hasRealHead = firstHead !== -1 && (firstScript === -1 || firstHead < firstScript);
+
+  // 1. Inject or update <base href="...">
+  const mBase = html.match(/(<base\b[^>]*\bhref\s*=\s*)(['"])(.*?)\2/i);
+  if (mBase) {
+    const existingHref = mBase[3];
+    if (existingHref.startsWith('/') || existingHref.startsWith('./') || !existingHref.includes('://')) {
+      html = html.replace(/(<base\b[^>]*\bhref\s*=\s*)(['"])(.*?)\2/i, '$1$2' + base + '$2');
     }
+  } else if (hasRealHead) {
+    html = html.replace(/<head([^>]*)>/i, '<head$1><base href="' + base + '">');
+  } else {
+    html = '<base href="' + base + '">' + html;
+  }
 
-    function prepareGameHtml(html, fileUrl) {
-      let base = fileUrl.replace(/[^/]*$/, '');
-      if (!base.endsWith('/')) base += '/';
+  // 2. Inject frame viewport style and runtime fetch/XHR interceptor
+  const frameStyle = '<style>html,body{height:100%;margin:0;padding:0;overflow:hidden;background:#000;}.webgl-content,#gameContainer,#canvas{width:100%;height:100%;}</style>';
+  const interceptScript = '<scr' + 'ipt>(function(){' +
+    'var b=' + JSON.stringify(base) + ';' +
+    'var rb=' + JSON.stringify(repoBase) + ';' +
+    'function fix(u){if(typeof u!=="string")return u;if(u.indexOf("/textbooks/")===0)return rb+u.slice(1);if(u.indexOf("/assets/")===0)return b+u.slice(1);return u;}' +
+    'if(typeof window.fetch!=="undefined"){var _f=window.fetch;window.fetch=function(inp,init){if(typeof inp==="string")inp=fix(inp);else if(inp&&inp.url)inp=new Request(fix(inp.url),inp);return _f.call(this,inp,init);};}' +
+    'if(typeof XMLHttpRequest!=="undefined"){var _o=XMLHttpRequest.prototype.open;XMLHttpRequest.prototype.open=function(m,u){arguments[1]=fix(u);return _o.apply(this,arguments);};}' +
+    '})();</scr' + 'ipt>';
 
-      let repoBase = base;
-      const mRepo = base.match(/^(https?:\/\/[^/]+\/(?:gh\/[^/]+\/[^/@]+@[^/]+\/|[^/]+\/[^/]+\/[^/]+\/))/i);
-      if (mRepo) {
-        repoBase = mRepo[1];
-      }
+  if (hasRealHead) {
+    html = html.replace(/<head([^>]*)>/i, '<head$1>' + interceptScript + frameStyle);
+  } else {
+    html = interceptScript + frameStyle + html;
+  }
 
-      const lower = html.toLowerCase();
-      const firstScript = lower.indexOf('<script');
-      const firstHead = lower.indexOf('<head');
-      const hasRealHead = firstHead !== -1 && (firstScript === -1 || firstHead < firstScript);
+  // 3. Resolve root-relative paths in HTML attributes
+  html = html.replace(/(\s(?:src|href))=(['"])\/(?!\/)/gi, '$1=$2' + repoBase);
 
-      // 1. Inject or update <base href="...">
-      const mBase = html.match(/(<base\b[^>]*\bhref\s*=\s*)(['"])(.*?)\2/i);
-      if (mBase) {
-        const existingHref = mBase[3];
-        if (existingHref.startsWith('/') || existingHref.startsWith('./') || !existingHref.includes('://')) {
-          html = html.replace(/(<base\b[^>]*\bhref\s*=\s*)(['"])(.*?)\2/i, '$1$2' + base + '$2');
-        }
-      } else if (hasRealHead) {
-        html = html.replace(/<head([^>]*)>/i, '<head$1><base href="' + base + '">');
-      } else {
-        html = '<base href="' + base + '">' + html;
-      }
+  // 4. Normalize jsdelivr mirror domains to current active mirror
+  html = html.replace(/https?:\/\/[^/]*\.jsdelivr\.net\//g, activeMirror + '/');
 
-      // 2. Inject frame viewport style and runtime fetch/XHR interceptor
-      const frameStyle = '<style>html,body{height:100%;margin:0;padding:0;overflow:hidden;background:#000;}.webgl-content,#gameContainer,#canvas{width:100%;height:100%;}</style>';
-      const interceptScript = '<scr' + 'ipt>(function(){' +
-        'var b=' + JSON.stringify(base) + ';' +
-        'var rb=' + JSON.stringify(repoBase) + ';' +
-        'function fix(u){if(typeof u!=="string")return u;if(u.indexOf("/textbooks/")===0)return rb+u.slice(1);if(u.indexOf("/assets/")===0)return b+u.slice(1);return u;}' +
-        'if(typeof window.fetch!=="undefined"){var _f=window.fetch;window.fetch=function(inp,init){if(typeof inp==="string")inp=fix(inp);else if(inp&&inp.url)inp=new Request(fix(inp.url),inp);return _f.call(this,inp,init);};}' +
-        'if(typeof XMLHttpRequest!=="undefined"){var _o=XMLHttpRequest.prototype.open;XMLHttpRequest.prototype.open=function(m,u){arguments[1]=fix(u);return _o.apply(this,arguments);};}' +
-        '})();</scr' + 'ipt>';
+  return html;
+}
 
-      if (hasRealHead) {
-        html = html.replace(/<head([^>]*)>/i, '<head$1>' + interceptScript + frameStyle);
-      } else {
-        html = interceptScript + frameStyle + html;
-      }
+function writeGameIntoFrame(iframe, rawHtml, fileUrl) {
+  const preparedHtml = prepareGameHtml(rawHtml, fileUrl);
+  const doc = iframe.contentDocument || iframe.contentWindow.document;
+  doc.open();
+  doc.write(preparedHtml);
+  doc.close();
+  try {
+    iframe.contentWindow.focus();
+  } catch(e) {}
+}
 
-      // 3. Resolve root-relative paths in HTML attributes
-      html = html.replace(/(\s(?:src|href))=(['"])\/(?!\/)/gi, '$1=$2' + repoBase);
-
-      // 4. Normalize jsdelivr mirror domains to current active mirror
-      html = html.replace(/https?:\/\/[^/]*\.jsdelivr\.net\//g, activeMirror + '/');
-
-      return html;
+async function fetchGameHtml(file) {
+  if (/^https?:\/\//i.test(file)) {
+    let mirrorUrl = file;
+    if (file.includes('jsdelivr.net')) {
+      mirrorUrl = file.replace(/https?:\/\/[^/]*\.jsdelivr\.net\//i, activeMirror + '/');
     }
-
-    function writeGameIntoFrame(iframe, rawHtml, fileUrl) {
-      const preparedHtml = prepareGameHtml(rawHtml, fileUrl);
-      const doc = iframe.contentDocument || iframe.contentWindow.document;
-      doc.open();
-      doc.write(preparedHtml);
-      doc.close();
-      try {
-        iframe.contentWindow.focus();
-      } catch(e) {}
-    }
-
-    async function fetchGameHtml(file) {
-      const cleanPath = file.replace(/^\/+/, '');
-      let fetchFile = cleanPath;
-      if (fetchFile.endsWith('/')) {
-        fetchFile += 'index.html';
+    try {
+      const res = await fetch(mirrorUrl);
+      if (res.ok) {
+        const text = await res.text();
+        return { html: text, resolvedUrl: mirrorUrl };
       }
-
-      // Priority list: active mirror first, then remaining CDN mirrors, then statically.io, then raw github
-      const mirrors = [activeMirror, ...CDN_MIRRORS.filter(m => m !== activeMirror)];
-      const urlsToTry = [
-        ...mirrors.map(m => m + '/gh/pinpoint-edu/assets@main/' + fetchFile),
-        'https://cdn.statically.io/gh/pinpoint-edu/assets@main/' + fetchFile,
-        'https://raw.githubusercontent.com/pinpoint-edu/assets/main/' + fetchFile
-      ];
-
-      for (const url of urlsToTry) {
-        try {
-          const res = await fetch(url);
-          if (!res.ok) continue;
-          const text = await res.text();
-          if (text.includes('Package size exceeded') || text.includes('limit of 20 MB') || text.includes('404: Not Found') || text.trim().startsWith('{"status": 4')) {
-            continue;
-          }
-          for (const m of CDN_MIRRORS) {
-            if (url.startsWith(m)) {
-              activeMirror = m;
-              break;
-            }
-          }
-          return { html: text, resolvedUrl: url };
-        } catch(e) {
-          continue;
-        }
-      }
-      throw new Error('Could not fetch game from any CDN mirror.');
+    } catch(e) {}
+    const res2 = await fetch(file);
+    if (res2.ok) {
+      const text = await res2.text();
+      return { html: text, resolvedUrl: file };
     }
+    throw new Error('Could not fetch game from ' + file);
+  }
 
-    // Play Game in the In-Page Player
-    async function playGame(encodedFile, encodedTitle) {
-      const file = decodeURIComponent(encodedFile);
-      const title = decodeURIComponent(encodedTitle);
-      const id = getGameId(file);
+  const cleanPath = file.replace(/^\/+/, '');
+  let fetchFile = cleanPath;
+  if (fetchFile.endsWith('/')) {
+    fetchFile += 'index.html';
+  }
 
-      currentPlayingFile = file;
-      document.getElementById('currentPlayerTitle').textContent = title;
-      document.getElementById('player-view').style.display = 'flex';
+  const mirrors = [activeMirror, ...CDN_MIRRORS.filter(m => m !== activeMirror)];
+  const urlsToTry = [
+    ...mirrors.map(m => m + '/gh/pinpoint-edu/assets@main/' + fetchFile),
+    'https://cdn.statically.io/gh/pinpoint-edu/assets@main/' + fetchFile,
+    'https://raw.githubusercontent.com/pinpoint-edu/assets/main/' + fetchFile
+  ];
 
-      const iframe = document.getElementById('gameIframe');
-
-      // 1. Check if game is saved offline in IndexedDB
-      if (typeof PinpointGameStorage !== 'undefined') {
-        try {
-          const record = await PinpointGameStorage.getGame(id);
-          if (record && record.content && record.content.length > 50) {
-            writeGameIntoFrame(iframe, record.content, activeMirror + '/gh/pinpoint-edu/assets@main/' + file);
-            return;
-          }
-        } catch(e) {}
+  for (const url of urlsToTry) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) continue;
+      const text = await res.text();
+      if (text.includes('Package size exceeded') || text.includes('limit of 20 MB') || text.includes('404: Not Found') || text.trim().startsWith('{"status": 4')) {
+        continue;
       }
-
-      // 2. Show loading spinner while fetching
-      iframe.srcdoc = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <style>
-            body { background: #000; color: #ff5722; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-            .spinner { width: 36px; height: 36px; border: 4px solid #333; border-top: 4px solid #ff4500; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 12px; }
-            @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-          </style>
-        </head>
-        <body>
-          <div class="spinner"></div>
-          <div>Loading ${title}...</div>
-        </body>
-        </html>
-      `;
-
-      // 3. Fetch game HTML and inject via doc.write
-      try {
-        const { html, resolvedUrl } = await fetchGameHtml(file);
-        writeGameIntoFrame(iframe, html, resolvedUrl);
-      } catch (err) {
-        console.error('Play game error:', err);
-        iframe.srcdoc = `
-          <!DOCTYPE html>
-          <html>
-          <body style="background: #0d0f14; color: #f87171; font-family: sans-serif; padding: 30px; text-align: center;">
-            <h3>Unable to load ${title}</h3>
-            <p style="color: #9ca3af;">${err.message}</p>
-            <p style="color: #6b7280; font-size: 13px;">If you are offline, make sure you download the game first.</p>
-          </body>
-          </html>
-        `;
-      }
-    }
-
-    function closePlayer() {
-      const iframe = document.getElementById('gameIframe');
-      iframe.src = 'about:blank';
-      document.getElementById('player-view').style.display = 'none';
-      currentPlayingFile = null;
-    }
-
-    function reloadPlayer() {
-      if (currentPlayingFile) {
-        const title = document.getElementById('currentPlayerTitle').textContent;
-        playGame(encodeURIComponent(currentPlayingFile), encodeURIComponent(title));
-      }
-    }
-
-    function toggleFullscreen() {
-      const playerEl = document.getElementById('player-view');
-      if (!document.fullscreenElement) {
-        if (playerEl.requestFullscreen) {
-          playerEl.requestFullscreen();
-        } else if (playerEl.webkitRequestFullscreen) {
-          playerEl.webkitRequestFullscreen();
-        }
-      } else {
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
+      for (const m of CDN_MIRRORS) {
+        if (url.startsWith(m)) {
+          activeMirror = m;
+          break;
         }
       }
+      return { html: text, resolvedUrl: url };
+    } catch(e) {
+      continue;
     }
+  }
+  throw new Error('Could not fetch game from any CDN mirror.');
+}
 
-    // Download Game for Offline
-    async function startDownload(id, encodedTitle, encodedFile) {
-      const title = decodeURIComponent(encodedTitle);
-      const file = decodeURIComponent(encodedFile);
+// Play Game in the In-Page Player
+async function playGame(encodedFile, encodedTitle) {
+  const file = decodeURIComponent(encodedFile);
+  const title = decodeURIComponent(encodedTitle);
+  const id = getGameId(file);
 
-      if (typeof PinpointGameStorage === 'undefined') {
-        alert('Offline storage database is not available.');
+  currentPlayingFile = file;
+  document.getElementById('currentPlayerTitle').textContent = title;
+  document.getElementById('player-view').style.display = 'flex';
+
+  const iframe = document.getElementById('gameIframe');
+
+  // Direct iframe navigation for standalone apps or embedded external players
+  if (file.startsWith('yolk/') || file === 'ai.html' || file.startsWith('pages/') || file.includes('scratch.mit.edu')) {
+    iframe.removeAttribute('srcdoc');
+    iframe.src = file;
+    try { iframe.contentWindow.focus(); } catch(e) {}
+    return;
+  }
+
+  // 1. Check if game is saved offline in IndexedDB
+  if (typeof PinpointGameStorage !== 'undefined') {
+    try {
+      const record = await PinpointGameStorage.getGame(id);
+      if (record && record.content && record.content.length > 50) {
+        writeGameIntoFrame(iframe, record.content, activeMirror + '/gh/pinpoint-edu/assets@main/' + file);
         return;
       }
+    } catch(e) {}
+  }
 
-      if (PinpointGameStorage.isDownloading(id)) {
-        return;
-      }
+  // 2. Show loading spinner while fetching
+  iframe.removeAttribute('src');
+  iframe.srcdoc = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { background: #000; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .spinner { width: 36px; height: 36px; border: 3px solid #333; border-top: 3px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 14px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+      </style>
+    </head>
+    <body>
+      <div class="spinner"></div>
+      <div style="font-size: 14px; letter-spacing: 0.5px;">Loading ${title}...</div>
+    </body>
+    </html>
+  `;
 
-      activeProgressMap.set(id, 0);
-      renderGames();
+  // 3. Fetch game HTML and inject via doc.write
+  try {
+    const { html, resolvedUrl } = await fetchGameHtml(file);
+    writeGameIntoFrame(iframe, html, resolvedUrl);
+  } catch (err) {
+    console.error('Play game error:', err);
+    iframe.srcdoc = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          body { background: #000; color: #ef4444; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; padding: 20px; text-align: center; }
+        </style>
+      </head>
+      <body>
+        <h3 style="margin-bottom: 8px;">Failed to Load Game</h3>
+        <p style="color: #888; font-size: 14px;">${err.message}</p>
+      </body>
+      </html>
+    `;
+  }
+}
 
-      try {
-        await PinpointGameStorage.downloadGame(id, title, file, (progress) => {
-          activeProgressMap.set(id, progress.percent || 0);
-          const card = document.getElementById('card-' + id);
-          if (card) {
-            const fill = card.querySelector('.progress-bar-fill');
-            if (fill) fill.style.width = (progress.percent || 0) + '%';
-            const badge = card.querySelector('.badge-progress');
-            if (badge) badge.innerHTML = `<span class="material-symbols-outlined" style="font-size: 14px; animation: spin 1s linear infinite;">sync</span> ${progress.percent}%`;
-          }
-        });
+function closePlayer() {
+  const iframe = document.getElementById('gameIframe');
+  iframe.src = 'about:blank';
+  document.getElementById('player-view').style.display = 'none';
+  currentPlayingFile = null;
+}
 
-        activeProgressMap.delete(id);
-        downloadedGameIds.add(id);
-        updateCounts();
-        renderGames();
-      } catch (err) {
-        activeProgressMap.delete(id);
-        console.error('Download error:', err);
-        if (err.name !== 'AbortError') {
-          alert('Failed to download ' + title + ': ' + err.message);
-        }
-        renderGames();
-      }
+function reloadPlayer() {
+  if (currentPlayingFile) {
+    const title = document.getElementById('currentPlayerTitle').textContent;
+    playGame(encodeURIComponent(currentPlayingFile), encodeURIComponent(title));
+  }
+}
+
+function toggleFullscreen() {
+  const playerEl = document.getElementById('player-view');
+  if (!document.fullscreenElement) {
+    if (playerEl.requestFullscreen) {
+      playerEl.requestFullscreen();
+    } else if (playerEl.webkitRequestFullscreen) {
+      playerEl.webkitRequestFullscreen();
     }
-
-    function cancelDownload(id) {
-      if (typeof PinpointGameStorage !== 'undefined') {
-        PinpointGameStorage.cancelDownload(id);
-      }
-      activeProgressMap.delete(id);
-      renderGames();
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
     }
+  }
+}
 
-    async function deleteGame(id, encodedFile, encodedTitle) {
-      const file = decodeURIComponent(encodedFile);
-      const title = decodeURIComponent(encodedTitle);
+// Download Game for Offline
+async function startDownload(id, encodedTitle, encodedFile) {
+  const title = decodeURIComponent(encodedTitle);
+  const file = decodeURIComponent(encodedFile);
 
-      if (!confirm(`Remove "${title}" from Downloaded games?`)) {
-        return;
-      }
+  if (typeof PinpointGameStorage === 'undefined') {
+    alert('Offline storage database is not available.');
+    return;
+  }
 
-      if (typeof PinpointGameStorage !== 'undefined') {
-        try {
-          await PinpointGameStorage.deleteGame(id, file);
-        } catch(e) {
-          console.warn('Delete error:', e);
-        }
-      }
+  if (PinpointGameStorage.isDownloading(id)) {
+    return;
+  }
 
-      downloadedGameIds.delete(id);
-      updateCounts();
-      renderGames();
-    }
+  activeProgressMap.set(id, 0);
+  renderGames();
 
-    // Network Status Listeners
-    function updateOnlineStatus() {
-      const isOnline = navigator.onLine;
-      const statusEl = document.getElementById('connectionStatus');
-      const textEl = document.getElementById('connectionText');
-
-      if (isOnline) {
-        statusEl.className = 'status-badge online';
-        textEl.textContent = 'Online';
-      } else {
-        statusEl.className = 'status-badge offline';
-        textEl.textContent = 'Offline';
-      }
-    }
-
-    window.addEventListener('online', updateOnlineStatus);
-    window.addEventListener('offline', updateOnlineStatus);
-
-    // Initial fetch of games.json to supplement fallback
-    async function initGames() {
-      await autoSelectMirror();
-      try {
-        const res = await fetch('games.json');
-        if (res.ok) {
-          const data = await res.json();
-          if (Array.isArray(data) && data.length > 0) {
-            games = data;
-          }
-        }
-      } catch(e) {
-        console.log('Using default embedded games list');
-      }
-
-      updateOnlineStatus();
-      await syncDownloadedStatus();
-    }
-
-    // Escape key closes player view
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && document.getElementById('player-view').style.display === 'flex') {
-        closePlayer();
+  try {
+    await PinpointGameStorage.downloadGame(id, title, file, (progress) => {
+      activeProgressMap.set(id, progress.percent || 0);
+      const card = document.getElementById('card-' + id);
+      if (card) {
+        const fill = card.querySelector('.progress-bar-fill');
+        if (fill) fill.style.width = (progress.percent || 0) + '%';
+        const badge = card.querySelector('.badge-progress');
+        if (badge) badge.innerHTML = `<span class="material-symbols-sharp" style="font-size: 13px; animation: spin 1s linear infinite;">sync</span> ${progress.percent}%`;
       }
     });
 
-    initGames();
+    activeProgressMap.delete(id);
+    downloadedGameIds.add(id);
+    updateCounts();
+    renderGames();
+  } catch (err) {
+    activeProgressMap.delete(id);
+    console.error('Download error:', err);
+    if (err.name !== 'AbortError') {
+      alert('Failed to download ' + title + ': ' + err.message);
+    }
+    renderGames();
+  }
+}
+
+function cancelDownload(id) {
+  if (typeof PinpointGameStorage !== 'undefined') {
+    PinpointGameStorage.cancelDownload(id);
+  }
+  activeProgressMap.delete(id);
+  renderGames();
+}
+
+async function deleteGame(id, encodedFile, encodedTitle) {
+  const file = decodeURIComponent(encodedFile);
+  const title = decodeURIComponent(encodedTitle);
+
+  if (!confirm(`Remove "${title}" from Downloaded games?`)) {
+    return;
+  }
+
+  if (typeof PinpointGameStorage !== 'undefined') {
+    try {
+      await PinpointGameStorage.deleteGame(id, file);
+    } catch(e) {
+      console.warn('Delete error:', e);
+    }
+  }
+
+  downloadedGameIds.delete(id);
+  updateCounts();
+  renderGames();
+}
+
+function updateOnlineStatus() {
+  const isOnline = navigator.onLine;
+  const statusEl = document.getElementById('connectionStatus');
+  const textEl = document.getElementById('connectionText');
+
+  if (statusEl && textEl) {
+    if (isOnline) {
+      statusEl.className = 'status-pill online';
+      textEl.textContent = 'Online';
+    } else {
+      statusEl.className = 'status-pill offline';
+      textEl.textContent = 'Offline';
+    }
+  }
+}
+
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+
+async function initGames() {
+  await autoSelectMirror();
+  if (location.protocol !== 'file:') {
+    try {
+      const res = await fetch('games.json');
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          games = data;
+        }
+      }
+    } catch(e) {
+      console.log('[Trashbin] Using default embedded games list');
+    }
+  } else {
+    console.log('[Trashbin] Running locally, using default embedded games list');
+  }
+
+  updateOnlineStatus();
+  await syncDownloadedStatus();
+}
+
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (document.getElementById('player-view').style.display === 'flex') {
+      closePlayer();
+    } else if (document.body.classList.contains('is-searching')) {
+      resetToCenterHome();
+    }
+  }
+});
+
+initGames();
   </script>
 </body>
 </html>
