@@ -19,13 +19,18 @@
       --bg-card-hover: #222226;
       --border: #27272a;
       --border-hover: #3f3f46;
-      --border-focus: #ffffff;
+      --border-focus: #00ff88;
       --text-main: #fafafa;
       --text-muted: #a1a1aa;
       --text-dim: #71717a;
-      --accent: #ffffff;
-      --success: #22c55e;
-      --danger: #ef4444;
+      --accent: #00ff88;
+      --accent-light: #a7f3d0;
+      --accent-subtle: rgba(0, 255, 136, 0.12);
+      --accent-badge-bg: rgba(0, 255, 136, 0.22);
+      --accent-border: rgba(0, 255, 136, 0.35);
+      --accent-glow: rgba(0, 255, 136, 0.45);
+      --success: #00ff88;
+      --danger: #ff3b30;
       --parabola-ease: cubic-bezier(0.16, 1, 0.3, 1);
     }
 
@@ -109,7 +114,13 @@
 
     #smallLogo .brand-icon {
       font-size: 24px;
-      color: #ffffff;
+      color: var(--accent);
+      filter: drop-shadow(0 0 10px var(--accent-glow));
+      transition: all 0.2s ease;
+    }
+
+    #smallLogo:hover span {
+      color: var(--accent-light);
     }
 
     /* Top Right Header Badges (All matching 36px squircles) */
@@ -143,6 +154,11 @@
       outline: none;
     }
 
+    .header-status-squircle .material-symbols-sharp {
+      color: var(--accent);
+      transition: color 0.2s ease;
+    }
+
     #connectionStatus {
       padding: 0;
       width: 36px;
@@ -166,24 +182,26 @@
       color: #fafafa;
     }
 
+    .header-status-squircle:hover,
     .header-status-squircle.header-clickable:hover {
-      background: #27272a;
-      border-color: #3f3f46;
+      background: var(--accent-subtle);
+      border-color: var(--accent);
       color: #ffffff;
+      box-shadow: 0 0 14px var(--accent-glow);
       transform: translateY(-1px);
     }
 
     .header-status-squircle.header-clickable:active {
       transform: scale(0.95);
-      background: #3f3f46;
+      background: var(--accent-badge-bg);
     }
 
     .header-status-squircle.online .dot {
       width: 8px;
       height: 8px;
-      background: var(--success);
+      background: var(--accent);
       border-radius: 50%;
-      box-shadow: 0 0 8px rgba(34, 197, 94, 0.7);
+      box-shadow: 0 0 10px var(--accent);
     }
 
     .header-status-squircle.offline .dot {
@@ -267,8 +285,9 @@
 
     .brand-icon-large {
       font-size: 44px;
-      color: #ffffff;
-      filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.25));
+      color: var(--accent);
+      filter: drop-shadow(0 0 16px var(--accent-glow));
+      transition: all 0.3s ease;
     }
 
     .logo-title {
@@ -321,8 +340,12 @@
 
     #searchInput:focus {
       background: #18181b;
-      border-color: #ffffff;
-      box-shadow: 0 0 0 1px #ffffff, 0 8px 32px rgba(0, 0, 0, 0.7);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent-glow), 0 8px 32px rgba(0, 0, 0, 0.7);
+    }
+
+    #searchInput:focus ~ .search-pill-icon {
+      color: var(--accent-light);
     }
 
     #searchInput::placeholder {
@@ -352,7 +375,8 @@
     }
 
     .clear-search-btn:hover {
-      background: #3f3f46;
+      background: var(--accent-badge-bg);
+      color: var(--accent);
       transform: scale(1.05);
     }
 
@@ -362,10 +386,10 @@
       gap: 5px;
       padding: 0 12px;
       height: 32px;
-      background: #27272a;
-      border: 1px solid #3f3f46;
+      background: var(--accent-subtle);
+      border: 1px solid var(--accent-border);
       border-radius: 11px;
-      color: #ffffff;
+      color: var(--accent-light);
       font-size: 13px;
       font-weight: 600;
       font-family: inherit;
@@ -376,10 +400,11 @@
     }
 
     .search-browse-btn:hover {
-      background: #ffffff;
+      background: var(--accent);
       color: #000000;
-      border-color: #ffffff;
+      border-color: var(--accent);
       transform: translateY(-1px);
+      box-shadow: 0 4px 14px var(--accent-glow);
     }
 
     .search-browse-btn:active {
@@ -399,12 +424,12 @@
     .pill-chip {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 7px;
       padding: 7px 14px;
-      background: var(--bg-surface);
-      border: 1px solid var(--border);
+      background: var(--accent-subtle);
+      border: 1px solid var(--accent-border);
       border-radius: 12px;
-      color: var(--text-muted);
+      color: var(--accent-light);
       font-size: 13px;
       font-weight: 600;
       font-family: inherit;
@@ -414,12 +439,26 @@
       user-select: none;
     }
 
+    .pill-chip span {
+      color: var(--accent-light);
+      transition: color 0.2s ease;
+    }
+
+    .pill-chip .material-symbols-sharp {
+      color: var(--accent);
+      transition: color 0.2s ease;
+    }
+
     .pill-chip:hover {
-      background: #27272a;
-      border-color: #71717a;
+      background: var(--accent-badge-bg);
+      border-color: var(--accent);
       color: #ffffff;
       transform: translateY(-2px) scale(1.05);
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+      box-shadow: 0 6px 20px var(--accent-glow);
+    }
+
+    .pill-chip:hover span, .pill-chip:hover .material-symbols-sharp {
+      color: #ffffff;
     }
 
     .pill-chip:active {
@@ -427,23 +466,31 @@
     }
 
     .pill-chip.active {
-      background: #ffffff;
-      border-color: #ffffff;
-      color: #000000;
+      background: var(--accent) !important;
+      border-color: var(--accent) !important;
+      color: #000000 !important;
+      box-shadow: 0 0 20px var(--accent-glow) !important;
+    }
+
+    .pill-chip.active span, .pill-chip.active .material-symbols-sharp {
+      color: #000000 !important;
     }
 
     .pill-chip.active .pill-count {
-      background: #e4e4e7;
-      color: #000000;
+      background: rgba(0, 0, 0, 0.25) !important;
+      border-color: rgba(0, 0, 0, 0.3) !important;
+      color: #000000 !important;
     }
 
     .pill-count {
       font-size: 11px;
       padding: 2px 7px;
-      background: #27272a;
+      background: var(--accent-badge-bg);
+      border: 1px solid var(--accent-border);
       border-radius: 8px;
-      color: var(--text-muted);
+      color: var(--accent-light);
       font-weight: 700;
+      transition: all 0.2s ease;
     }
 
     /* Results Container: Grouped below Search Block, moves with it in unison */
@@ -481,7 +528,10 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.8px;
-      color: var(--text-dim);
+      color: var(--accent-light);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
     /* Game Cards Grid (scrolls internally) */
@@ -494,7 +544,7 @@
       flex-direction: column;
       gap: 8px;
       scrollbar-width: thin;
-      scrollbar-color: #27272a transparent;
+      scrollbar-color: var(--border-hover) transparent;
     }
 
     .game-grid::-webkit-scrollbar {
@@ -504,11 +554,11 @@
       background: transparent;
     }
     .game-grid::-webkit-scrollbar-thumb {
-      background: #27272a;
+      background: var(--border-hover);
       border-radius: 10px;
     }
     .game-grid::-webkit-scrollbar-thumb:hover {
-      background: #3f3f46;
+      background: var(--accent);
     }
     .game-card {
       background: var(--bg-surface);
@@ -519,14 +569,15 @@
       align-items: center;
       justify-content: space-between;
       gap: 16px;
-      transition: all 0.15s ease;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       cursor: pointer;
     }
 
     .game-card:hover {
       background: var(--bg-card);
-      border-color: var(--border-hover);
-      transform: translateY(-1px);
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5), 0 0 16px var(--accent-glow);
     }
 
     .game-left {
@@ -549,6 +600,11 @@
       overflow: hidden;
       text-overflow: ellipsis;
       display: block;
+      transition: color 0.15s ease;
+    }
+
+    .game-card:hover .game-title {
+      color: var(--accent-light);
     }
 
     .game-meta {
@@ -566,11 +622,11 @@
       gap: 4px;
       padding: 2px 7px;
       border-radius: 6px;
-      background: rgba(34, 197, 94, 0.1);
-      border: 1px solid rgba(34, 197, 94, 0.3);
+      background: var(--accent-subtle);
+      border: 1px solid var(--accent-border);
       font-size: 11px;
       font-weight: 600;
-      color: var(--success);
+      color: var(--accent-light);
     }
 
     .badge-progress {
@@ -579,11 +635,11 @@
       gap: 4px;
       padding: 2px 7px;
       border-radius: 6px;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: var(--accent-badge-bg);
+      border: 1px solid var(--accent-border);
       font-size: 11px;
       font-weight: 600;
-      color: #ffffff;
+      color: var(--accent-light);
     }
 
     .progress-bar-wrap {
@@ -598,9 +654,10 @@
 
     .progress-bar-fill {
       height: 100%;
-      background: #ffffff;
+      background: var(--accent);
       width: 0%;
       transition: width 0.2s ease;
+      box-shadow: 0 0 8px var(--accent);
     }
 
     /* Squircle Buttons */
@@ -629,20 +686,26 @@
     }
 
     .btn-sharp:hover {
-      background: #ffffff;
-      color: #000000;
-      border-color: #ffffff;
+      background: var(--accent-subtle);
+      color: #ffffff;
+      border-color: var(--accent);
+      box-shadow: 0 0 10px var(--accent-glow);
     }
 
     .btn-primary-sharp {
-      background: #ffffff;
+      background: var(--accent);
       color: #000000;
-      border: 1px solid #ffffff;
+      border: 1px solid var(--accent);
+      font-weight: 700;
+      box-shadow: 0 4px 12px var(--accent-glow);
     }
 
     .btn-primary-sharp:hover {
-      background: #e4e4e7;
+      background: var(--accent-light);
       color: #000000;
+      border-color: var(--accent-light);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px var(--accent-glow);
     }
 
     .btn-icon-sharp {
@@ -753,15 +816,16 @@
     }
 
     .player-btn-squircle:hover {
-      background: #27272a;
-      border-color: #3f3f46;
-      color: #ffffff;
+      background: var(--accent-subtle);
+      border-color: var(--accent);
+      color: var(--accent-light);
+      box-shadow: 0 0 12px var(--accent-glow);
       transform: translateY(-1px);
     }
 
     .player-btn-squircle:active {
       transform: scale(0.94);
-      background: #3f3f46;
+      background: var(--accent-badge-bg);
     }
 
     .player-btn-squircle .material-symbols-sharp {
@@ -785,6 +849,21 @@
       font-variant-numeric: tabular-nums;
       cursor: pointer;
       transition: all 0.15s ease;
+      outline: none;
+      user-select: none;
+    }
+
+    .player-time-squircle .material-symbols-sharp {
+      color: var(--accent);
+    }
+
+    .player-time-squircle:hover {
+      background: var(--accent-subtle);
+      border-color: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 0 12px var(--accent-glow);
+      transform: translateY(-1px);
+    }
       outline: none;
       user-select: none;
     }
@@ -3527,7 +3606,7 @@ function updateCounts() {
 
   if (bAll) bAll.textContent = allCount;
   if (bDl) bDl.textContent = dlCount;
-  if (lDl) lDl.textContent = `${dlCount} Downloaded`;
+  if (lDl) lDl.textContent = dlCount;
 }
 
 function selectChip(tab) {
@@ -3572,10 +3651,13 @@ function resetToCenterHome() {
   document.body.classList.remove('is-searching');
   const rc = document.getElementById('results-container');
   if (rc) rc.style.top = '';
-  currentTab = 'all';
-  document.getElementById('chipAll').classList.add('active');
-  document.getElementById('chipDownloaded').classList.remove('active');
-  document.getElementById('resultsCategoryLabel').textContent = 'All Games';
+  currentTab = null;
+  const chipAll = document.getElementById('chipAll');
+  const chipDl = document.getElementById('chipDownloaded');
+  if (chipAll) chipAll.classList.remove('active');
+  if (chipDl) chipDl.classList.remove('active');
+  const catLabel = document.getElementById('resultsCategoryLabel');
+  if (catLabel) catLabel.textContent = 'All Games';
 }
 
 function triggerBrowseAll() {
@@ -5009,27 +5091,104 @@ initGames();
 
 // ==== THEME TINT & SETTINGS SYSTEM ====
 const TRASHBIN_TINTS = [
-  { id: "white", label: "White", color: "#ffffff", glow: "rgba(255, 255, 255, 0.25)" },
-  { id: "green", label: "Emerald", color: "#22c55e", glow: "rgba(34, 197, 94, 0.3)" },
-  { id: "cyan", label: "Cyan", color: "#06b6d4", glow: "rgba(6, 182, 212, 0.3)" },
-  { id: "blue", label: "Blue", color: "#3b82f6", glow: "rgba(59, 130, 246, 0.3)" },
-  { id: "purple", label: "Purple", color: "#a855f7", glow: "rgba(168, 85, 247, 0.3)" },
-  { id: "pink", label: "Rose", color: "#f43f5e", glow: "rgba(244, 63, 94, 0.3)" },
-  { id: "amber", label: "Amber", color: "#f59e0b", glow: "rgba(245, 158, 11, 0.3)" },
-  { id: "red", label: "Red", color: "#ef4444", glow: "rgba(239, 68, 68, 0.3)" }
+  {
+    id: "green",
+    label: "Emerald",
+    color: "#00ff88",
+    light: "#a7f3d0",
+    subtle: "rgba(0, 255, 136, 0.12)",
+    badgeBg: "rgba(0, 255, 136, 0.22)",
+    border: "rgba(0, 255, 136, 0.35)",
+    glow: "rgba(0, 255, 136, 0.45)"
+  },
+  {
+    id: "cyan",
+    label: "Cyan",
+    color: "#00f0ff",
+    light: "#bae6fd",
+    subtle: "rgba(0, 240, 255, 0.12)",
+    badgeBg: "rgba(0, 240, 255, 0.22)",
+    border: "rgba(0, 240, 255, 0.35)",
+    glow: "rgba(0, 240, 255, 0.45)"
+  },
+  {
+    id: "blue",
+    label: "Sky Blue",
+    color: "#38bdf8",
+    light: "#bae6fd",
+    subtle: "rgba(56, 189, 248, 0.12)",
+    badgeBg: "rgba(56, 189, 248, 0.22)",
+    border: "rgba(56, 189, 248, 0.35)",
+    glow: "rgba(56, 189, 248, 0.45)"
+  },
+  {
+    id: "purple",
+    label: "Purple",
+    color: "#c084fc",
+    light: "#e9d5ff",
+    subtle: "rgba(192, 132, 252, 0.14)",
+    badgeBg: "rgba(192, 132, 252, 0.24)",
+    border: "rgba(192, 132, 252, 0.35)",
+    glow: "rgba(192, 132, 252, 0.45)"
+  },
+  {
+    id: "pink",
+    label: "Hot Pink",
+    color: "#ff2a85",
+    light: "#fbcfe8",
+    subtle: "rgba(255, 42, 133, 0.14)",
+    badgeBg: "rgba(255, 42, 133, 0.24)",
+    border: "rgba(255, 42, 133, 0.35)",
+    glow: "rgba(255, 42, 133, 0.45)"
+  },
+  {
+    id: "amber",
+    label: "Amber",
+    color: "#fbbf24",
+    light: "#fef08a",
+    subtle: "rgba(251, 191, 36, 0.14)",
+    badgeBg: "rgba(251, 191, 36, 0.24)",
+    border: "rgba(251, 191, 36, 0.35)",
+    glow: "rgba(251, 191, 36, 0.45)"
+  },
+  {
+    id: "red",
+    label: "Coral Red",
+    color: "#ff3b30",
+    light: "#fecaca",
+    subtle: "rgba(255, 59, 48, 0.14)",
+    badgeBg: "rgba(255, 59, 48, 0.24)",
+    border: "rgba(255, 59, 48, 0.35)",
+    glow: "rgba(255, 59, 48, 0.45)"
+  },
+  {
+    id: "white",
+    label: "White",
+    color: "#ffffff",
+    light: "#f4f4f5",
+    subtle: "rgba(255, 255, 255, 0.08)",
+    badgeBg: "rgba(255, 255, 255, 0.16)",
+    border: "rgba(255, 255, 255, 0.28)",
+    glow: "rgba(255, 255, 255, 0.35)"
+  }
 ];
 
-let currentTintId = "white";
+let currentTintId = "green";
 try {
-  currentTintId = localStorage.getItem("trashbin_theme_tint") || "white";
+  currentTintId = localStorage.getItem("trashbin_theme_tint") || "green";
 } catch(e) {}
 
 function applyTint(tintId) {
   const tint = TRASHBIN_TINTS.find(t => t.id === tintId) || TRASHBIN_TINTS[0];
   currentTintId = tint.id;
-  document.documentElement.style.setProperty("--accent", tint.color);
-  document.documentElement.style.setProperty("--border-focus", tint.color);
-  document.documentElement.style.setProperty("--accent-glow", tint.glow);
+  const root = document.documentElement.style;
+  root.setProperty("--accent", tint.color);
+  root.setProperty("--accent-light", tint.light);
+  root.setProperty("--accent-subtle", tint.subtle);
+  root.setProperty("--accent-badge-bg", tint.badgeBg);
+  root.setProperty("--accent-border", tint.border);
+  root.setProperty("--border-focus", tint.color);
+  root.setProperty("--accent-glow", tint.glow);
   try {
     localStorage.setItem("trashbin_theme_tint", tint.id);
   } catch(e) {}
