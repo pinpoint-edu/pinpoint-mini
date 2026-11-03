@@ -112,48 +112,90 @@
       color: #ffffff;
     }
 
-    /* Top Right Header Badges */
+    /* Top Right Header Badges (All matching 36px squircles) */
     .top-header-right {
       position: fixed;
       top: 24px;
       right: 28px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       z-index: 50;
     }
 
-    .status-pill {
+    .header-status-squircle {
+      height: 36px;
+      min-width: 36px;
+      padding: 0 10px;
+      border-radius: 11px;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 6px;
-      padding: 6px 12px;
       background: var(--bg-surface);
       border: 1px solid var(--border);
-      border-radius: 9999px;
-      font-size: 12px;
-      font-weight: 600;
       color: var(--text-muted);
-      transition: all 0.2s ease;
+      font-size: 13px;
+      font-weight: 600;
+      box-sizing: border-box;
+      transition: all 0.2s var(--parabola-ease);
+      user-select: none;
+      outline: none;
     }
 
-    .status-pill.online .dot {
-      width: 7px;
-      height: 7px;
+    #connectionStatus {
+      padding: 0;
+      width: 36px;
+    }
+
+    #settingsBtn {
+      padding: 0;
+      width: 36px;
+    }
+
+    #headerTimeBtn {
+      font-family: 'Geist', monospace, sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+      padding: 0 12px;
+    }
+
+    .header-status-squircle.header-clickable {
+      cursor: pointer;
+      color: #fafafa;
+    }
+
+    .header-status-squircle.header-clickable:hover {
+      background: #27272a;
+      border-color: #3f3f46;
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    .header-status-squircle.header-clickable:active {
+      transform: scale(0.95);
+      background: #3f3f46;
+    }
+
+    .header-status-squircle.online .dot {
+      width: 8px;
+      height: 8px;
       background: var(--success);
       border-radius: 50%;
-      box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+      box-shadow: 0 0 8px rgba(34, 197, 94, 0.7);
     }
 
-    .status-pill.offline .dot {
-      width: 7px;
-      height: 7px;
+    .header-status-squircle.offline .dot {
+      width: 8px;
+      height: 8px;
       background: #f59e0b;
       border-radius: 50%;
+      box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
     }
 
-    /* Central Search Block */
-    #search-block {
+    /* Central Search Block & Catalog Flow (Grouped together so they move upward in unison) */
+    #main-content-flow {
       position: fixed;
       left: 50%;
       top: 48%;
@@ -163,13 +205,33 @@
       padding: 0 20px;
       z-index: 40;
       box-sizing: border-box;
-      transition: top 0.6s var(--parabola-ease), 
-                  transform 0.6s var(--parabola-ease);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: top 0.45s cubic-bezier(0.16, 1, 0.3, 1), 
+                  transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                  max-width 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    body.is-searching #main-content-flow {
+      top: 20px;
+      transform: translate(-50%, 0);
+      max-width: 900px;
+      height: calc(100vh - 36px);
+      align-items: stretch;
+    }
+
+    #search-block {
+      width: 100%;
+      max-width: 620px;
+      margin: 0 auto;
+      flex-shrink: 0;
+      box-sizing: border-box;
+      transition: margin 0.35s ease;
     }
 
     body.is-searching #search-block {
-      top: 20px;
-      transform: translate(-50%, 0);
+      margin-bottom: 12px;
     }
 
     body.is-searching .quick-pills {
@@ -347,13 +409,21 @@
       font-weight: 600;
       font-family: inherit;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+      outline: none;
+      user-select: none;
     }
 
     .pill-chip:hover {
-      background: var(--bg-card);
-      border-color: #52525b;
+      background: #27272a;
+      border-color: #71717a;
       color: #ffffff;
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+    }
+
+    .pill-chip:active {
+      transform: translateY(0) scale(0.96);
     }
 
     .pill-chip.active {
@@ -376,27 +446,22 @@
       font-weight: 700;
     }
 
-    /* Results Container: Pinned & Non-scrolling Page, with Internal Game List Scroll */
+    /* Results Container: Grouped below Search Block, moves with it in unison */
     #results-container {
-      position: fixed;
-      top: 136px;
-      bottom: 16px;
-      left: 50%;
-      transform: translateX(-50%);
       width: 100%;
-      max-width: 900px;
-      padding: 0 20px;
+      flex: 1;
+      min-height: 0;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.35s ease-out, top 0.25s ease;
-      display: flex;
+      display: none;
       flex-direction: column;
       box-sizing: border-box;
       z-index: 30;
-      min-height: 0;
+      transition: opacity 0.25s ease-out;
     }
 
     body.is-searching #results-container {
+      display: flex;
       opacity: 1;
       pointer-events: auto;
     }
@@ -1210,21 +1275,26 @@
 
   <!-- Top-Right Header Status -->
   <div class="top-header-right">
-    <div id="connectionStatus" class="status-pill online">
+    <div id="connectionStatus" class="header-status-squircle online" title="Status: Online">
       <span class="dot"></span>
-      <span id="connectionText">Online</span>
     </div>
-    <div class="status-pill">
-      <span class="material-symbols-sharp" style="font-size: 15px;">download</span>
-      <span id="downloadCountLabel">0 Downloaded</span>
+    <div class="header-status-squircle" title="Downloaded Games">
+      <span class="material-symbols-sharp" style="font-size: 16px;">download</span>
+      <span id="downloadCountLabel">0</span>
     </div>
-    <button id="settingsBtn" class="status-pill" onclick="toggleSettingsModal()" title="Trashbin Settings" style="cursor: pointer; border: 1px solid var(--border); transition: all 0.2s var(--parabola-ease);">
-      <span class="material-symbols-sharp" style="font-size: 17px;">settings</span>
+    <button id="headerTimeBtn" class="header-status-squircle header-clickable" onclick="openGameStatusMenu()" title="View System Time & Battery">
+      <span class="material-symbols-sharp" style="font-size: 16px; color: var(--text-muted);">schedule</span>
+      <span id="headerLiveTime">--:--:--</span>
+    </button>
+    <button id="settingsBtn" class="header-status-squircle header-clickable" onclick="toggleSettingsModal()" title="Trashbin Settings">
+      <span class="material-symbols-sharp" style="font-size: 18px;">settings</span>
     </button>
   </div>
 
-  <!-- Center Search Block (Yolk-style with debounced push-up) -->
-  <div id="search-block">
+  <!-- Unified Main Content Flow (Search Block + Games Catalog grouped together) -->
+  <div id="main-content-flow">
+    <!-- Center Search Block (Yolk-style with instant push-up) -->
+    <div id="search-block">
     <div id="large-logo-wrapper" onclick="focusSearch()">
       <div class="logo-inner">
         <div class="logo-row">
@@ -1258,7 +1328,7 @@
     </div>
 
     <div class="quick-pills">
-      <button class="pill-chip active" id="chipAll" onclick="selectChip('all')">
+      <button class="pill-chip" id="chipAll" onclick="selectChip('all')">
         <span class="material-symbols-sharp" style="font-size: 15px;">grid_view</span>
         <span>All Games</span>
         <span class="pill-count" id="allCountBadge">0</span>
@@ -1294,6 +1364,7 @@
       <p id="emptyStateDesc">Try searching for another keyword.</p>
     </div>
   </main>
+  </div>
 
   <!-- In-Page Player View -->
   <div id="player-view">
@@ -3653,11 +3724,22 @@ function prepareGameHtml(html, fileUrl) {
     repoBase = mRepo[1];
   }
 
+  // Strip dead preceding HTML shell if concatenated (e.g., Minecraft PE duplicate shells)
+  if (html.includes('<!DOCTYPE html>') && html.indexOf('<!DOCTYPE html>') !== html.lastIndexOf('<!DOCTYPE html>')) {
+    html = html.substring(html.lastIndexOf('<!DOCTYPE html>'));
+  } else if (html.includes('<html') && html.indexOf('<html') !== html.lastIndexOf('<html')) {
+    html = html.substring(html.lastIndexOf('<html'));
+  }
+
   // Strip broken wrapper scripts that fail with 404 / ERR_FILE_NOT_FOUND
   html = html.replace(/<script[^>]*src=["'][^"']*(?:all\.js|settings\/js\/index\.js)[^"']*["'][^>]*>\s*<\/script>/gi, '');
 
   // Protect car-soccer asset matcher from throwing if map is undefined
   html = html.replace(/function matchAsset\s*\(([^)]*)\)\s*\{/g, 'function matchAsset($1){ if(!map)return null;');
+
+  // Neutralize baseOrigin script override in Flash HTML games so they never target googleusercontent.com
+  html = html.replace(/let\s+baseOrigin\s*=\s*[^;]+;/g, 'let baseOrigin = ' + JSON.stringify(repoBase.replace(/\/+$/, '')) + ';');
+  html = html.replace(/var\s+baseOrigin\s*=\s*[^;]+;/g, 'var baseOrigin = ' + JSON.stringify(repoBase.replace(/\/+$/, '')) + ';');
 
   // If the game already has an explicit absolute <base href="..."> (like Minecraft Pocket Edition, Gorilla Tag, Flying Gorilla)
   // use that base URL instead of the container page URL!
@@ -3714,8 +3796,16 @@ function prepareGameHtml(html, fileUrl) {
     '  game: { firstFrameReady: function(){}, gameReady: function(){}, pause: function(){}, resume: function(){} },',
     '  engagement: { sendScore: function(){} }',
     '};',
+    'var ruffleCdn = ' + JSON.stringify(repoBase + 'textbooks/ruffle/') + ';',
     'window.RufflePlayer = window.RufflePlayer || {};',
-    'window.RufflePlayer.config = Object.assign({ publicPath: ' + JSON.stringify(repoBase + 'textbooks/ruffle/') + ' }, window.RufflePlayer.config || {});',
+    'var _rConfig = { autoplay: "on", unmuteOverlay: "hidden", letterbox: "on", warnOnUnsupportedContent: false, publicPath: ruffleCdn };',
+    'try {',
+    '  Object.defineProperty(window.RufflePlayer, "config", {',
+    '    get: function() { return _rConfig; },',
+    '    set: function(val) { if(val && typeof val === "object"){ Object.assign(_rConfig, val); _rConfig.publicPath = ruffleCdn; } },',
+    '    configurable: true',
+    '  });',
+    '} catch(e){ window.RufflePlayer.config = _rConfig; }',
     'window._carSoccerImageBlobs = window._carSoccerImageBlobs || new Map();',
     'window.GZ_ASSETS_MAP = window.GZ_ASSETS_MAP || {};',
     'window.addEventListener("error", function(e) {',
@@ -3739,7 +3829,7 @@ function prepareGameHtml(html, fileUrl) {
     'try {',
     '  var _origWrite = document.write;',
     '  document.write = function(s){',
-    '    if(typeof s === "string"){ s = s.replace(/<script[^>]*src=["\x27][^"\x27]*(?:all\\.js|settings\\/js\\/index\\.js)[^"\x27]*["\x27][^>]*>\\s*<\\/script>/gi, ""); }',
+    '    if(typeof s === "string" && (s.indexOf("all.js")!==-1 || s.indexOf("settings/js")!==-1)){ return; }',
     '    return _origWrite.call(this, s);',
     '  };',
     '} catch(e){}',
@@ -3747,7 +3837,7 @@ function prepareGameHtml(html, fileUrl) {
     '  var _origSetAttr = Element.prototype.setAttribute;',
     '  Element.prototype.setAttribute = function(k, v){',
     '    if(this instanceof HTMLScriptElement && k && k.toLowerCase() === "src"){',
-    '      if(typeof v === "string" && /all\\.js|settings\\/js/i.test(v)){ v = "data:application/javascript,"; }',
+    '      if(typeof v === "string" && (v.indexOf("all.js")!==-1 || v.indexOf("settings/js")!==-1)){ v = "data:application/javascript,"; }',
     '    }',
     '    return _origSetAttr.call(this, k, v);',
     '  };',
@@ -3778,33 +3868,79 @@ function prepareGameHtml(html, fileUrl) {
     'var rb=' + JSON.stringify(repoBase) + ';',
     'var m=' + JSON.stringify(activeMirror) + ';',
     'function fix(u){',
-    '  if(typeof u!=="string") return u;',
-    '  if(u.indexOf("blob:")===0 || u.indexOf("data:")===0) return u;',
-    '  if(/all\\.js|settings\\/js/i.test(u)){ return "data:application/javascript,"; }',
-    '  if(u.indexOf("yolk/")!==-1){ return m + "/gh/pinpoint-edu/pinpoint-mini@main/" + u.substring(u.indexOf("yolk/")); }',
-    '  if(/ai\\.html/i.test(u)){ return m + "/gh/pinpoint-edu/pinpoint-mini@main/ai.html"; }',
-    '  if(/savedata.*\\.ini|optiondata\\.dat/i.test(u)){ return b + u.replace(/^\\/?(textbooks\\/)?/, ""); }',
-    '  if(u.indexOf("matheveryday25/math/truck")!==-1){ u = u.replace("/math/truck", "/math@main/truck"); }',
-    '  if(u.indexOf("matheveryday25/math@main/1v1lol/")!==-1 && u.includes(".unityweb")){',
-    '    return u.replace(/https?:\\/\\/[^/]*\\.jsdelivr\\.net\\/gh\\/matheveryday25\\/math@main\\//, "https://raw.githubusercontent.com/matheveryday25/math/main/");',
+    '  if(typeof u !== "string") return u;',
+    '  if(u.indexOf("blob:") === 0 || u.indexOf("data:") === 0) return u;',
+    '  if(u.indexOf("all.js") !== -1 || u.indexOf("settings/js") !== -1){ return "data:application/javascript,"; }',
+    '  if(u.indexOf("googleusercontent.com") !== -1 || u.indexOf("script.google.com") !== -1 || u.indexOf("localhost") !== -1 || u.indexOf("127.0.0.1") !== -1){',
+    '    var slashIdx = u.indexOf("/", 8);',
+    '    if(slashIdx !== -1) u = u.substring(slashIdx);',
     '  }',
-    '  if(/\\b(?:f9db7455c2c80fac021b|5db40605896b9147a8a1)\\.wasm\\b/i.test(u) || ((u.indexOf("ruffle/")!==-1 || /ruffle.*\\.wasm/i.test(u)) && !u.includes(".unityweb"))){',
-    '    var fn=u.substring(u.lastIndexOf("/")+1); return rb+"textbooks/ruffle/"+fn;',
+    '  if(u.indexOf("yolk/") !== -1){ return m + "/gh/pinpoint-edu/pinpoint-mini@main/" + u.substring(u.indexOf("yolk/")); }',
+    '  if(u.indexOf("ai.html") !== -1){ return m + "/gh/pinpoint-edu/pinpoint-mini@main/ai.html"; }',
+    '  if(u.indexOf("savedata") !== -1 || u.indexOf("optiondata.dat") !== -1){',
+    '    var cleanSave = u;',
+    '    if(cleanSave.indexOf("/textbooks/") !== -1) cleanSave = cleanSave.substring(cleanSave.indexOf("/textbooks/") + 11);',
+    '    else if(cleanSave.indexOf("textbooks/") === 0) cleanSave = cleanSave.substring(10);',
+    '    else if(cleanSave.indexOf("/") === 0) cleanSave = cleanSave.substring(1);',
+    '    return b + cleanSave;',
     '  }',
-    '  if(/\\.swf(?:[\\?#]|$)/i.test(u) && u.indexOf("://")===-1){',
-    '    var fn=u.substring(u.lastIndexOf("/")+1); return rb+"textbooks/"+fn;',
+    '  if(u.indexOf("matheveryday25/math/truck") !== -1){ u = u.replace("/math/truck", "/math@main/truck"); }',
+    '  if(u.indexOf("matheveryday25/math@main/1v1lol/") !== -1 && u.indexOf(".unityweb") !== -1){',
+    '    return u.replace("cdn.jsdelivr.net/gh/matheveryday25/math@main/", "raw.githubusercontent.com/matheveryday25/math/main/");',
     '  }',
-    '  if(u.indexOf("/textbooks/")===0) return rb+u.slice(1);',
-    '  if(u.indexOf("/assets/")===0) return rb+u.slice(1);',
-    '  if(u.startsWith("/")) return rb+u.slice(1);',
-    '  if(u.indexOf("://")===-1) return b+u;',
+    '  if(u.indexOf(".swf") !== -1){',
+    '    if(u.indexOf("cdn.jsdelivr.net") === -1 && u.indexOf("githubusercontent.com") === -1){',
+    '      var fn = u.substring(u.lastIndexOf("/") + 1).split("?")[0].split("#")[0];',
+    '      return rb + "textbooks/" + fn;',
+    '    }',
+    '  }',
+    '  if(u.indexOf("f9db7455c2c80fac021b") !== -1 || u.indexOf("5db40605896b9147a8a1") !== -1 || (u.indexOf("ruffle") !== -1 && u.indexOf(".unityweb") === -1)){',
+    '    if(u.indexOf(".wasm") !== -1){',
+    '      var fn = u.substring(u.lastIndexOf("/") + 1).split("?")[0].split("#")[0];',
+    '      return rb + "textbooks/ruffle/" + fn;',
+    '    }',
+    '  }',
+    '  if(u.indexOf("/textbooks/") !== -1 || u.indexOf("textbooks/") === 0){',
+    '    if(u.indexOf("cdn.jsdelivr.net") === -1 && u.indexOf("githubusercontent.com") === -1){',
+    '      var sub = u.substring(u.indexOf("textbooks/") + 10);',
+    '      if(!sub.trim() || sub === "/" || sub.slice(-1) === "/"){ return "data:text/plain,"; }',
+    '      return rb + "textbooks/" + sub;',
+    '    }',
+    '  }',
+    '  if(u.indexOf("/assets/") !== -1 || u.indexOf("assets/") === 0){',
+    '    if(u.indexOf("cdn.jsdelivr.net") === -1 && u.indexOf("githubusercontent.com") === -1){',
+    '      var sub = u.substring(u.indexOf("assets/") + 7);',
+    '      if(!sub.trim() || sub === "/" || sub.slice(-1) === "/"){ return "data:text/plain,"; }',
+    '      return rb + "assets/" + sub;',
+    '    }',
+    '  }',
+    '  if(u.indexOf("/") === 0) return rb + u.slice(1);',
+    '  if(u.indexOf("://") === -1) return b + u;',
     '  return u;',
     '}',
+    'try {',
+    '  var OrigWorker = window.Worker;',
+    '  if(OrigWorker){',
+    '    window.Worker = function(scriptURL, options){',
+    '      var resolved = fix(typeof scriptURL==="string" ? scriptURL : (scriptURL && scriptURL.href ? scriptURL.href : ""));',
+    '      if(resolved.indexOf("http://")===0 || resolved.indexOf("https://")===0){',
+    '        try {',
+    '          var blobCode = "importScripts(" + JSON.stringify(resolved) + ");";',
+    '          var blob = new Blob([blobCode], { type: "application/javascript" });',
+    '          var blobUrl = URL.createObjectURL(blob);',
+    '          return new OrigWorker(blobUrl, options);',
+    '        } catch(e){}',
+    '      }',
+    '      return new OrigWorker(resolved, options);',
+    '    };',
+    '    window.Worker.prototype = OrigWorker.prototype;',
+    '  }',
+    '} catch(e){}',
     'try {',
     '  var origScriptSrc = Object.getOwnPropertyDescriptor(HTMLScriptElement.prototype, "src");',
     '  if(origScriptSrc && origScriptSrc.set){',
     '    Object.defineProperty(HTMLScriptElement.prototype, "src", {',
-    '      set: function(v){ if(typeof v==="string"){ if(/all\\.js|settings\\/js/i.test(v)) return origScriptSrc.set.call(this, "data:application/javascript,"); v = fix(v); } return origScriptSrc.set.call(this, v); },',
+    '      set: function(v){ if(typeof v==="string"){ if(v.indexOf("all.js")!==-1 || v.indexOf("settings/js")!==-1) return origScriptSrc.set.call(this, "data:application/javascript,"); v = fix(v); } return origScriptSrc.set.call(this, v); },',
     '      get: function(){ return origScriptSrc.get.call(this); }',
     '    });',
     '  }',
@@ -3813,15 +3949,23 @@ function prepareGameHtml(html, fileUrl) {
     '  var _f=window.fetch;',
     '  window.fetch=function(inp,init){',
     '    var u = typeof inp==="string" ? inp : (inp && inp.url ? inp.url : "");',
-    '    if(/all\\.js|settings\\/js/i.test(u)){ return Promise.resolve(new Response("", {status: 200, headers: {"Content-Type": "application/javascript"}})); }',
+    '    if(u.indexOf("all.js")!==-1 || u.indexOf("settings/js")!==-1){ return Promise.resolve(new Response("", {status: 200, headers: {"Content-Type": "application/javascript"}})); }',
     '    var targetUrl=fix(u);',
     '    var req = (typeof inp==="string" || !inp) ? targetUrl : new Request(targetUrl, inp);',
     '    return _f.call(this,req,init).then(function(res){',
     '      if(!res.ok && (res.status===403 || res.status===404) && typeof targetUrl==="string" && targetUrl.indexOf("cdn.jsdelivr.net/gh/")!==-1){',
-    '        var rawUrl=targetUrl.replace(/https?:\\/\\/[^/]*\\.jsdelivr\\.net\\/gh\\/([^/@]+)\\/([^/@]+)(?:@[^/]+)?\\//, function(m, p1, p2){ return "https://raw.githubusercontent.com/" + p1 + "/" + p2 + "/main/"; });',
-    '        if(rawUrl!==targetUrl){',
-    '          var fbReq=(typeof inp==="string" || !inp) ? rawUrl : new Request(rawUrl, inp);',
-    '          return _f.call(window, fbReq, init);',
+    '        if(!targetUrl.endsWith("/")){',
+    '          try {',
+    '            var parts = targetUrl.split("cdn.jsdelivr.net/gh/")[1].split("/");',
+    '            var user = parts[0];',
+    '            var repo = parts[1].split("@")[0];',
+    '            var rest = parts.slice(2).join("/");',
+    '            var rawUrl = "https://raw.githubusercontent.com/" + user + "/" + repo + "/main/" + rest;',
+    '            if(rawUrl!==targetUrl){',
+    '              var fbReq=(typeof inp==="string" || !inp) ? rawUrl : new Request(rawUrl, inp);',
+    '              return _f.call(window, fbReq, init);',
+    '            }',
+    '          } catch(e){}',
     '        }',
     '      }',
     '      return res;',
@@ -3877,13 +4021,29 @@ async function fetchGameHtml(file) {
       const res = await fetch(mirrorUrl);
       if (res.ok) {
         const text = await res.text();
-        return { html: text, resolvedUrl: mirrorUrl };
+        if (!text.includes('Package size exceeded') && !text.includes('limit of 20 MB') && !text.includes('404: Not Found')) {
+          return { html: text, resolvedUrl: mirrorUrl };
+        }
       }
     } catch(e) {}
-    const res2 = await fetch(file);
-    if (res2.ok) {
-      const text = await res2.text();
-      return { html: text, resolvedUrl: file };
+    try {
+      const res2 = await fetch(file);
+      if (res2.ok) {
+        const text = await res2.text();
+        if (!text.includes('Package size exceeded') && !text.includes('limit of 20 MB') && !text.includes('404: Not Found')) {
+          return { html: text, resolvedUrl: file };
+        }
+      }
+    } catch(e) {}
+    if (file.includes('jsdelivr.net/gh/')) {
+      const rawUrl = file.replace(/https?:\/\/[^/]*\.jsdelivr\.net\/gh\/([^/@]+)\/([^/@]+)(?:@[^/]+)?\//i, 'https://raw.githubusercontent.com/$1/$2/main/');
+      try {
+        const res3 = await fetch(rawUrl);
+        if (res3.ok) {
+          const text = await res3.text();
+          return { html: text, resolvedUrl: rawUrl };
+        }
+      } catch(e) {}
     }
     throw new Error('Could not fetch game from ' + file);
   }
@@ -4003,31 +4163,7 @@ async function playGame(encodedFile, encodedTitle) {
     <body>
       <div class="spinner"></div>
       <div style="font-size: 14px; letter-spacing: 0.5px;">Loading ${title}...</div>
-    
-  <!-- Settings Modal (Squircle Theme Tint Picker) -->
-  <div id="settingsModalOverlay" class="settings-modal-overlay" style="display: none;" onclick="closeSettingsModal(event)">
-    <div class="settings-modal-card" onclick="event.stopPropagation()">
-      <div class="settings-modal-header">
-        <div class="settings-modal-title-col">
-          <h2 class="settings-modal-title">Settings</h2>
-          <p class="settings-modal-sub">Personalize Trashbin appearance</p>
-        </div>
-        <button class="player-btn-squircle" onclick="toggleSettingsModal()" title="Close Settings">
-          <span class="material-symbols-sharp" style="font-size: 18px;">close</span>
-        </button>
-      </div>
-
-      <div class="settings-modal-section">
-        <div class="settings-section-label">Accent Tint</div>
-        <div class="settings-section-desc">Choose a website accent color tint (default is white). Tint will not affect Yolk.</div>
-        <div class="tint-grid" id="tintGrid">
-          <!-- 8 squircle color buttons rendered dynamically -->
-        </div>
-      </div>
-    </div>
-  </div>
-
-</body>
+    </body>
     </html>
   `;
 
@@ -4547,6 +4683,9 @@ function updateClockDisplay() {
   const playerLiveTime = document.getElementById('playerLiveTime');
   if (playerLiveTime) playerLiveTime.textContent = timeStr;
 
+  const headerLiveTime = document.getElementById('headerLiveTime');
+  if (headerLiveTime) headerLiveTime.textContent = timeStr;
+
   const modalClockTime = document.getElementById('modalClockTime');
   if (modalClockTime) modalClockTime.textContent = timeStr;
 
@@ -4814,14 +4953,10 @@ function updateOnlineStatus() {
   const statusEl = document.getElementById('connectionStatus');
   const textEl = document.getElementById('connectionText');
 
-  if (statusEl && textEl) {
-    if (isOnline) {
-      statusEl.className = 'status-pill online';
-      textEl.textContent = 'Online';
-    } else {
-      statusEl.className = 'status-pill offline';
-      textEl.textContent = 'Offline';
-    }
+  if (statusEl) {
+    statusEl.className = 'header-status-squircle ' + (isOnline ? 'online' : 'offline');
+    statusEl.setAttribute('title', isOnline ? 'Status: Online' : 'Status: Offline');
+    if (textEl) textEl.textContent = isOnline ? 'Online' : 'Offline';
   }
 }
 
@@ -4868,7 +5003,7 @@ updateClockDisplay();
 setInterval(updateClockDisplay, 1000);
 queryBattery();
 
-window.addEventListener('resize', updateResultsPosition);
+// window.addEventListener('resize', updateResultsPosition); // Handled automatically by flex flow
 
 initGames();
 
@@ -4917,24 +5052,47 @@ function renderTintOptions() {
   }).join("");
 }
 
-function toggleSettingsModal() {
+window.toggleSettingsModal = function() {
   const modal = document.getElementById("settingsModalOverlay");
   if (!modal) return;
-  const isHidden = modal.style.display === "none";
+  const isHidden = modal.style.display === "none" || !modal.style.display;
   modal.style.display = isHidden ? "flex" : "none";
   if (isHidden) renderTintOptions();
-}
+};
 
-function closeSettingsModal(e) {
+window.closeSettingsModal = function(e) {
   if (e && e.target && e.target.id === "settingsModalOverlay") {
-    toggleSettingsModal();
+    window.toggleSettingsModal();
   }
-}
+};
 
 // Initialize tint on page load
 applyTint(currentTintId);
 
   </script>
+
+  <!-- Settings Modal (Squircle Theme Tint Picker) -->
+  <div id="settingsModalOverlay" class="settings-modal-overlay" style="display: none;" onclick="closeSettingsModal(event)">
+    <div class="settings-modal-card" onclick="event.stopPropagation()">
+      <div class="settings-modal-header">
+        <div class="settings-modal-title-col">
+          <h2 class="settings-modal-title">Settings</h2>
+          <p class="settings-modal-sub">Personalize Trashbin appearance</p>
+        </div>
+        <button class="player-btn-squircle" onclick="toggleSettingsModal()" title="Close Settings">
+          <span class="material-symbols-sharp" style="font-size: 18px;">close</span>
+        </button>
+      </div>
+
+      <div class="settings-modal-section">
+        <div class="settings-section-label">Accent Tint</div>
+        <div class="settings-section-desc">Choose a website accent color tint (default is white). Tint will not affect Yolk.</div>
+        <div class="tint-grid" id="tintGrid">
+          <!-- 8 squircle color buttons rendered dynamically -->
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Fake Resuming Screen Overlay -->
   <div id="fake-resuming-overlay" class="fake-resuming-overlay">

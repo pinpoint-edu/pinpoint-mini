@@ -19,6 +19,8 @@
       --text: #fafafa;
       --text-muted: #a1a1aa;
       --text-dim: #71717a;
+      --accent: #10b981;
+      --accent-glow: rgba(16, 185, 129, 0.35);
     }
 
     * {
@@ -76,7 +78,7 @@
     /* Center Hero Container */
     .hero-container {
       width: 100%;
-      max-width: 500px;
+      max-width: 520px;
       background: var(--card-bg);
       border: 1px solid var(--border);
       border-radius: 24px;
@@ -113,18 +115,87 @@
     .hero-subtitle {
       font-size: 14px;
       color: var(--text-muted);
-      margin-bottom: 28px;
+      margin-bottom: 24px;
       line-height: 1.5;
     }
 
-    /* Mirror Selector Card */
+    /* Update Notification Banner */
+    .update-banner {
+      width: 100%;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      text-align: left;
+      box-sizing: border-box;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .update-banner-icon {
+      font-size: 20px;
+      color: #10b981;
+      flex-shrink: 0;
+    }
+
+    .update-banner-text {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .update-banner-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fafafa;
+    }
+
+    .update-banner-sub {
+      font-size: 12px;
+      color: #a1a1aa;
+    }
+
+    .update-action-btn {
+      padding: 6px 12px;
+      background: #10b981;
+      color: #000000;
+      border: none;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+
+    .update-action-btn:hover {
+      background: #34d399;
+      transform: scale(1.03);
+    }
+
+    .version-badge-pill {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: rgba(16, 185, 129, 0.2);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      margin-left: auto;
+    }
+
+    /* Form Fields */
     .mirror-form-group {
       width: 100%;
       display: flex;
       flex-direction: column;
       gap: 8px;
       text-align: left;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
 
     .form-label {
@@ -143,7 +214,7 @@
       width: 100%;
     }
 
-    select#mirrorSelect {
+    select.launcher-select {
       width: 100%;
       height: 48px;
       padding: 0 42px 0 16px;
@@ -161,7 +232,7 @@
       transition: all 0.2s ease;
     }
 
-    select#mirrorSelect:hover, select#mirrorSelect:focus {
+    select.launcher-select:hover, select.launcher-select:focus {
       border-color: #ffffff;
       background: #202024;
     }
@@ -192,14 +263,17 @@
       justify-content: center;
       gap: 8px;
       cursor: pointer;
-      transition: all 0.2s ease;
+      margin-top: 6px;
+      margin-bottom: 22px;
+      transition: all 0.2s var(--parabola-ease);
+      box-shadow: 0 4px 20px rgba(255, 255, 255, 0.15);
       outline: none;
     }
 
     .launch-btn:hover {
-      background: #e4e4e7;
-      border-color: #e4e4e7;
       transform: translateY(-1px);
+      box-shadow: 0 8px 28px rgba(255, 255, 255, 0.25);
+      background: #f4f4f5;
     }
 
     .launch-btn:active {
@@ -209,18 +283,17 @@
     .launch-btn:disabled {
       opacity: 0.6;
       cursor: not-allowed;
-      transform: none;
+      transform: none !important;
     }
 
-    /* Footer Meta */
+    /* Meta Info */
     .meta-row {
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      justify-content: center;
       gap: 8px;
-      margin-top: 24px;
       font-size: 12px;
       color: var(--text-dim);
+      font-weight: 500;
     }
 
     .status-dot {
@@ -239,6 +312,11 @@
       display: inline-block;
       vertical-align: middle;
       font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
@@ -265,13 +343,39 @@
     <h1 class="hero-title">Trashbin</h1>
     <p class="hero-subtitle">Fast, unblocked browser games & minimalist music disguised cleanly inside Google Classroom.</p>
 
+    <!-- Dynamic Update Banner (shows when newer release is found) -->
+    <div id="updateBanner" class="update-banner" style="display: none;">
+      <span class="material-symbols-sharp update-banner-icon">auto_awesome</span>
+      <div class="update-banner-text">
+        <span class="update-banner-title">New Version Available!</span>
+        <span id="updateBannerDesc" class="update-banner-sub">A newer version is ready to launch.</span>
+      </div>
+      <button class="update-action-btn" onclick="applyLatestVersion()">Switch to Latest</button>
+    </div>
+
+    <!-- Release Version Selector -->
+    <div class="mirror-form-group">
+      <label class="form-label" for="versionSelect">
+        <span class="material-symbols-sharp" style="font-size: 15px;">sell</span>
+        <span>Version</span>
+        <span id="versionStatusBadge" class="version-badge-pill" style="display: none;">Update Available</span>
+      </label>
+      <div class="select-wrapper">
+        <select id="versionSelect" class="launcher-select" onchange="onVersionSelectChange()">
+          <option value="latest" selected>Latest (Auto-detecting...)</option>
+        </select>
+        <span class="material-symbols-sharp select-arrow-icon">expand_more</span>
+      </div>
+    </div>
+
+    <!-- CDN Mirror Selector -->
     <div class="mirror-form-group">
       <label class="form-label" for="mirrorSelect">
         <span class="material-symbols-sharp" style="font-size: 15px;">dns</span>
         <span>CDN Mirror Network</span>
       </label>
       <div class="select-wrapper">
-        <select id="mirrorSelect">
+        <select id="mirrorSelect" class="launcher-select">
           <option value="https://cdn.jsdelivr.net">cdn.jsdelivr.net (Default Anycast)</option>
           <option value="https://fastly.jsdelivr.net">fastly.jsdelivr.net (Fastly Edge)</option>
           <option value="https://testingcf.jsdelivr.net">testingcf.jsdelivr.net (Cloudflare Edge)</option>
@@ -290,17 +394,131 @@
 
     <div class="meta-row">
       <span class="status-dot"></span>
-      <span>Release v3.4 • Disguised in Classroom about:blank</span>
+      <span id="versionMetaLabel">Release v3.5 • Disguised in Classroom about:blank</span>
     </div>
   </div>
 
   <script>
-    const TARGET_PATH = "/gh/pinpoint-edu/pinpoint-mini@v3.4/index.html";
+    let baselineVersion = "v3.5";
+    let activeVersion = "v3.5";
+    let latestDetectedVersion = "v3.5";
+    let availableVersions = ["v3.5", "v3.4", "v3.3", "v3.2", "v3.1", "main"];
+
+    function updateVersionUI() {
+      const meta = document.getElementById("versionMetaLabel");
+      if (meta) {
+        meta.textContent = `Release ${activeVersion} • Disguised in Classroom about:blank`;
+      }
+    }
+
+    async function checkLatestVersion() {
+      try {
+        const res = await fetch("https://data.jsdelivr.com/v1/packages/gh/pinpoint-edu/pinpoint-mini?t=" + Date.now());
+        if (res.ok) {
+          const data = await res.json();
+          if (data && Array.isArray(data.versions) && data.versions.length > 0) {
+            const fetchedList = data.versions.map(v => "v" + v.version.replace(/^v/, ''));
+            
+            // Check version.json from raw github as well for newer commits
+            try {
+              const rawVerRes = await fetch("https://raw.githubusercontent.com/pinpoint-edu/pinpoint-mini/main/version.json?t=" + Date.now());
+              if (rawVerRes.ok) {
+                const verInfo = await rawVerRes.json();
+                if (verInfo && verInfo.version) {
+                  const tag = "v" + verInfo.version.replace(/^v/, '');
+                  if (!fetchedList.includes(tag)) fetchedList.unshift(tag);
+                }
+              }
+            } catch(e) {}
+
+            availableVersions = [...new Set([...fetchedList, "main"])];
+            latestDetectedVersion = fetchedList[0] || "v3.5";
+
+            const pinned = localStorage.getItem("trashbin_pinned_version");
+            const select = document.getElementById("versionSelect");
+
+            if (!pinned || pinned === "latest") {
+              activeVersion = latestDetectedVersion;
+            } else {
+              activeVersion = pinned;
+              if (pinned !== latestDetectedVersion) {
+                const banner = document.getElementById("updateBanner");
+                const desc = document.getElementById("updateBannerDesc");
+                if (banner && desc) {
+                  desc.textContent = `You are running ${pinned}. ${latestDetectedVersion} is now available!`;
+                  banner.style.display = "flex";
+                }
+                const badge = document.getElementById("versionStatusBadge");
+                if (badge) badge.style.display = "inline-block";
+              }
+            }
+
+            renderVersionOptions();
+          }
+        }
+      } catch (err) {
+        console.log("[Launcher] Version check error:", err);
+      }
+      updateVersionUI();
+    }
+
+    function renderVersionOptions() {
+      const select = document.getElementById("versionSelect");
+      if (!select) return;
+      const pinned = localStorage.getItem("trashbin_pinned_version") || "latest";
+
+      let optionsHtml = `<option value="latest">Latest (${latestDetectedVersion}) - Recommended</option>`;
+      for (const ver of availableVersions) {
+        optionsHtml += `<option value="${ver}">${ver}${ver === latestDetectedVersion ? " (Newest)" : ""}</option>`;
+      }
+      select.innerHTML = optionsHtml;
+      select.value = pinned;
+    }
+
+    function onVersionSelectChange() {
+      const select = document.getElementById("versionSelect");
+      const val = select.value;
+      if (val === "latest") {
+        activeVersion = latestDetectedVersion;
+        localStorage.removeItem("trashbin_pinned_version");
+        const banner = document.getElementById("updateBanner");
+        if (banner) banner.style.display = "none";
+        const badge = document.getElementById("versionStatusBadge");
+        if (badge) badge.style.display = "none";
+      } else {
+        activeVersion = val;
+        localStorage.setItem("trashbin_pinned_version", val);
+        if (val !== latestDetectedVersion) {
+          const banner = document.getElementById("updateBanner");
+          const desc = document.getElementById("updateBannerDesc");
+          if (banner && desc) {
+            desc.textContent = `Selected: ${val}. Newer version ${latestDetectedVersion} available.`;
+            banner.style.display = "flex";
+          }
+        } else {
+          const banner = document.getElementById("updateBanner");
+          if (banner) banner.style.display = "none";
+        }
+      }
+      updateVersionUI();
+    }
+
+    function applyLatestVersion() {
+      const select = document.getElementById("versionSelect");
+      if (select) select.value = "latest";
+      onVersionSelectChange();
+    }
+
+    function getTargetPath() {
+      const v = (activeVersion === "latest" ? latestDetectedVersion : activeVersion).replace(/^@+/, "");
+      return `/gh/pinpoint-edu/pinpoint-mini@${v}/index.html`;
+    }
 
     async function launchTrashbin() {
       const select = document.getElementById("mirrorSelect");
       const btn = document.getElementById("launchBtn");
       const selectedMirror = select.value || "https://cdn.jsdelivr.net";
+      const targetPath = getTargetPath();
 
       btn.disabled = true;
       btn.innerHTML = '<span class="material-symbols-sharp" style="font-size: 20px;">hourglass_top</span><span>Opening Cloaked Tab...</span>';
@@ -310,13 +528,13 @@
 
       try {
         // 2. Fetch the clean Trashbin HTML directly from chosen jsdelivr mirror
-        const response = await fetch(selectedMirror + TARGET_PATH + "?t=" + Date.now());
+        const response = await fetch(selectedMirror + targetPath + "?t=" + Date.now());
         if (!response.ok) throw new Error("HTTP " + response.status);
 
         let htmlContent = await response.text();
 
         // 3. Inject base href so all games, assets, and mirrors resolve correctly
-        const basePath = TARGET_PATH.substring(0, TARGET_PATH.lastIndexOf('/') + 1);
+        const basePath = targetPath.substring(0, targetPath.lastIndexOf('/') + 1);
         const baseTag = '<base href="' + selectedMirror + basePath + '">';
         htmlContent = htmlContent.includes('<head>')
           ? htmlContent.replace('<head>', '<head>' + baseTag)
@@ -352,6 +570,9 @@
         btn.innerHTML = '<span class="material-symbols-sharp" style="font-size: 20px;">open_in_new</span><span>Launch in Cloaked Tab</span>';
       }
     }
+
+    // Auto-detect version on page load
+    checkLatestVersion();
   </script>
 </body>
 </html>
