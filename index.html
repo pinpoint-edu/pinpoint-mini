@@ -4871,6 +4871,69 @@ queryBattery();
 window.addEventListener('resize', updateResultsPosition);
 
 initGames();
+
+// ==== THEME TINT & SETTINGS SYSTEM ====
+const TRASHBIN_TINTS = [
+  { id: "white", label: "White", color: "#ffffff", glow: "rgba(255, 255, 255, 0.25)" },
+  { id: "green", label: "Emerald", color: "#22c55e", glow: "rgba(34, 197, 94, 0.3)" },
+  { id: "cyan", label: "Cyan", color: "#06b6d4", glow: "rgba(6, 182, 212, 0.3)" },
+  { id: "blue", label: "Blue", color: "#3b82f6", glow: "rgba(59, 130, 246, 0.3)" },
+  { id: "purple", label: "Purple", color: "#a855f7", glow: "rgba(168, 85, 247, 0.3)" },
+  { id: "pink", label: "Rose", color: "#f43f5e", glow: "rgba(244, 63, 94, 0.3)" },
+  { id: "amber", label: "Amber", color: "#f59e0b", glow: "rgba(245, 158, 11, 0.3)" },
+  { id: "red", label: "Red", color: "#ef4444", glow: "rgba(239, 68, 68, 0.3)" }
+];
+
+let currentTintId = "white";
+try {
+  currentTintId = localStorage.getItem("trashbin_theme_tint") || "white";
+} catch(e) {}
+
+function applyTint(tintId) {
+  const tint = TRASHBIN_TINTS.find(t => t.id === tintId) || TRASHBIN_TINTS[0];
+  currentTintId = tint.id;
+  document.documentElement.style.setProperty("--accent", tint.color);
+  document.documentElement.style.setProperty("--border-focus", tint.color);
+  document.documentElement.style.setProperty("--accent-glow", tint.glow);
+  try {
+    localStorage.setItem("trashbin_theme_tint", tint.id);
+  } catch(e) {}
+  renderTintOptions();
+}
+
+function renderTintOptions() {
+  const grid = document.getElementById("tintGrid");
+  if (!grid) return;
+  grid.innerHTML = TRASHBIN_TINTS.map(t => {
+    const isActive = t.id === currentTintId;
+    return `
+      <button class="tint-squircle-btn ${isActive ? "active" : ""}" onclick="applyTint('${t.id}')" title="${t.label} Tint">
+        <div class="tint-squircle-color" style="background-color: ${t.color};">
+          ${isActive ? '<span class="material-symbols-sharp" style="font-size: 16px; color: ' + (t.id === "white" ? "#000" : "#fff") + ';">check</span>' : ""}
+        </div>
+        <span class="tint-squircle-label">${t.label}</span>
+      </button>
+    `;
+  }).join("");
+}
+
+function toggleSettingsModal() {
+  const modal = document.getElementById("settingsModalOverlay");
+  if (!modal) return;
+  const isHidden = modal.style.display === "none";
+  modal.style.display = isHidden ? "flex" : "none";
+  if (isHidden) renderTintOptions();
+}
+
+function closeSettingsModal(e) {
+  if (e && e.target && e.target.id === "settingsModalOverlay") {
+    toggleSettingsModal();
+  }
+}
+
+// Initialize tint on page load
+applyTint(currentTintId);
+
   </script>
 
   <!-- Fake Resuming Screen Overlay -->
