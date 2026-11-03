@@ -568,7 +568,7 @@
     }
 
     .player-header {
-      height: 48px;
+      height: 54px;
       background: #09090b;
       border-bottom: 1px solid #27272a;
       display: flex;
@@ -576,24 +576,303 @@
       justify-content: space-between;
       padding: 0 16px;
       flex-shrink: 0;
+      position: relative;
     }
 
     .player-header-left, .player-header-right {
       display: flex;
       align-items: center;
       gap: 10px;
+      z-index: 2;
+    }
+
+    .player-header-center {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
     }
 
     .player-title {
       font-size: 14px;
       font-weight: 700;
       color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 260px;
+    }
+
+    /* Small Squircle Buttons */
+    .player-btn-squircle {
+      width: 36px;
+      height: 36px;
+      border-radius: 11px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #18181b;
+      border: 1px solid #27272a;
+      color: #fafafa;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      padding: 0;
+      flex-shrink: 0;
+      outline: none;
+    }
+
+    .player-btn-squircle:hover {
+      background: #27272a;
+      border-color: #3f3f46;
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    .player-btn-squircle:active {
+      transform: scale(0.94);
+      background: #3f3f46;
+    }
+
+    .player-btn-squircle .material-symbols-sharp {
+      font-size: 20px;
+    }
+
+    /* Player Time Squircle */
+    .player-time-squircle {
+      height: 36px;
+      padding: 0 12px;
+      border-radius: 11px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: #18181b;
+      border: 1px solid #27272a;
+      color: #fafafa;
+      font-family: 'Geist', monospace, sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      outline: none;
+      user-select: none;
+    }
+
+    .player-time-squircle:hover {
+      background: #27272a;
+      border-color: #52525b;
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    .player-time-squircle:active {
+      transform: scale(0.96);
+    }
+
+    /* Status & Battery Modal Overlay */
+    .status-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeInStatus 0.15s ease-out;
+    }
+
+    @keyframes fadeInStatus {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .status-squircle-card {
+      background: #121215;
+      border: 1px solid #27272a;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 420px;
+      padding: 24px;
+      box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.04);
+      animation: zoomInStatus 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes zoomInStatus {
+      from { opacity: 0; transform: scale(0.94); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .status-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .status-card-title-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-card-title {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .status-time-block {
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 14px;
+      padding: 20px 16px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .modal-clock-time {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.5px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .modal-clock-date {
+      color: #a1a1aa;
+      font-size: 13px;
+      margin-top: 6px;
+      font-weight: 500;
+    }
+
+    .status-battery-block {
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 20px;
+    }
+
+    .battery-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .battery-info-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .battery-icon {
+      font-size: 28px;
+      color: #ffffff;
+      transition: color 0.3s ease;
+    }
+
+    .battery-text-col {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+    }
+
+    .battery-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    .battery-status-sub {
+      font-size: 12px;
+      color: #a1a1aa;
+      margin-top: 2px;
+      transition: color 0.3s ease;
+    }
+
+    .battery-percent-value {
+      font-family: 'Geist', monospace, sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: #ffffff;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .battery-bar-container {
+      width: 100%;
+      height: 8px;
+      background: #27272a;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .battery-bar-fill {
+      height: 100%;
+      background: #ffffff;
+      border-radius: 999px;
+      transition: width 0.3s ease, background 0.3s ease;
+    }
+
+    .battery-extra-details {
+      font-size: 11px;
+      color: #71717a;
+      margin-top: 8px;
+      text-align: left;
+    }
+
+    .status-card-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .status-action-btn {
+      width: 100%;
+      height: 42px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      border: 1px solid #27272a;
+      background: #18181b;
+      color: #ffffff;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .status-action-btn:hover {
+      background: #27272a;
+      border-color: #3f3f46;
+    }
+
+    .status-action-btn.primary {
+      background: #ffffff;
+      color: #000000;
+      border-color: #ffffff;
+    }
+
+    .status-action-btn.primary:hover {
+      background: #e4e4e7;
     }
 
     .player-iframe {
       flex: 1;
       width: 100%;
-      height: calc(100% - 48px);
+      height: calc(100% - 54px);
       border: none;
       background: #000000;
     }
@@ -687,27 +966,84 @@
   <div id="player-view">
     <div class="player-header">
       <div class="player-header-left">
-        <button class="btn-sharp" onclick="closePlayer()">
+        <button class="player-btn-squircle" onclick="closePlayer()" title="Back to Games">
           <span class="material-symbols-sharp">arrow_back</span>
-          <span>Back</span>
         </button>
         <span id="currentPlayerTitle" class="player-title">Playing</span>
       </div>
 
+      <div class="player-header-center">
+        <button id="playerTimeBtn" class="player-time-squircle" onclick="openGameStatusMenu()" title="View System Status & Battery (Closes Player)">
+          <span class="material-symbols-sharp" style="font-size: 16px; color: #a1a1aa;">schedule</span>
+          <span id="playerLiveTime">--:--:--</span>
+        </button>
+      </div>
+
       <div class="player-header-right">
-        <button class="btn-sharp" onclick="reloadPlayer()" title="Reload">
+        <button class="player-btn-squircle" onclick="reloadPlayer()" title="Reload Game">
           <span class="material-symbols-sharp">refresh</span>
         </button>
-        <button class="btn-sharp" onclick="toggleFullscreen()" title="Fullscreen">
-          <span class="material-symbols-sharp">fullscreen</span>
+        <button id="playerFullscreenBtn" class="player-btn-squircle" onclick="toggleFullscreen()" title="Toggle Fullscreen">
+          <span id="playerFullscreenIcon" class="material-symbols-sharp">fullscreen</span>
         </button>
-        <button class="btn-sharp" onclick="closePlayer()" title="Close">
+        <button class="player-btn-squircle" onclick="closePlayer()" title="Close Player">
           <span class="material-symbols-sharp">close</span>
         </button>
       </div>
     </div>
 
     <iframe id="gameIframe" class="player-iframe" allow="autoplay; fullscreen; camera; microphone; clipboard-read; clipboard-write; display-capture; geolocation"></iframe>
+  </div>
+
+  <!-- Device Status & Battery Modal Overlay (Closes player, shows live time in seconds and battery) -->
+  <div id="status-modal-overlay" class="status-overlay" style="display: none;" onclick="if (event.target === this) closeStatusModal();">
+    <div class="status-squircle-card">
+      <div class="status-card-header">
+        <div class="status-card-title-group">
+          <span class="material-symbols-sharp" style="font-size: 22px; color: #ffffff;">info</span>
+          <span class="status-card-title">System Status</span>
+        </div>
+        <button class="player-btn-squircle" onclick="closeStatusModal()" title="Close">
+          <span class="material-symbols-sharp">close</span>
+        </button>
+      </div>
+
+      <!-- Live Clock in Seconds -->
+      <div class="status-time-block">
+        <div id="modalClockTime" class="modal-clock-time">--:--:-- --</div>
+        <div id="modalClockDate" class="modal-clock-date">--------</div>
+      </div>
+
+      <!-- Device Battery Status -->
+      <div class="status-battery-block">
+        <div class="battery-top-row">
+          <div class="battery-info-left">
+            <span id="batteryIcon" class="material-symbols-sharp battery-icon">battery_std</span>
+            <div class="battery-text-col">
+              <span class="battery-label">Device Battery</span>
+              <span id="batteryStatusText" class="battery-status-sub">Checking...</span>
+            </div>
+          </div>
+          <div id="batteryPercentText" class="battery-percent-value">--%</div>
+        </div>
+        <div class="battery-bar-container">
+          <div id="batteryBarFill" class="battery-bar-fill" style="width: 0%;"></div>
+        </div>
+        <div id="batteryExtraDetails" class="battery-extra-details"></div>
+      </div>
+
+      <!-- Actions -->
+      <div class="status-card-actions">
+        <button id="resumeGameBtn" class="status-action-btn primary" style="display: none;" onclick="resumeGame()">
+          <span class="material-symbols-sharp">play_arrow</span>
+          <span>Resume Game</span>
+        </button>
+        <button class="status-action-btn" onclick="closeStatusModal()">
+          <span class="material-symbols-sharp">arrow_back</span>
+          <span>Return to Trashbin</span>
+        </button>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -1367,52 +1703,582 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
 
 // Fallback catalog including Yolk! Music and AI Assistant
 const DEFAULT_GAMES = [
-  { "title": "Yolk! - Minimalist Music", "file": "yolk/index.html", "img": "yolk/icon-256.png", "sizeBytes": 983040, "isApp": true },
-  { "title": "Google Classroom AI Assistant", "file": "ai.html", "img": "favicons/google-classroom.png", "sizeBytes": 125000, "isApp": true },
-  { "title": "2048", "file": "textbooks/2048.html", "sizeBytes": 46342 },
-  { "title": "Awesome Tanks", "file": "textbooks/awesome-tanks.html", "sizeBytes": 9825933 },
-  { "title": "Awesome Tanks 2", "file": "textbooks/awesometanks2.html", "sizeBytes": 13004415 },
-  { "title": "Basket Random", "file": "textbooks/basket-random/index.html", "sizeBytes": 2548324 },
-  { "title": "Basketball Stars", "file": "textbooks/basketball-stars.html", "sizeBytes": 11794098 },
-  { "title": "Bit Planes: Remastered", "file": "textbooks/bit-planes-remaster.html", "sizeBytes": 1173578 },
-  { "title": "Bloons TD", "file": "textbooks/Bloons-TD.html", "sizeBytes": 711100 },
-  { "title": "Bloons TD 2", "file": "textbooks/bloonsTD2.html", "sizeBytes": 7852517 },
-  { "title": "Bloons TD 3", "file": "textbooks/bloonsTD3.html", "sizeBytes": 8665053 },
-  { "title": "Bloons TD 4", "file": "textbooks/bloonsTD4.html", "sizeBytes": 11144029 },
-  { "title": "Bloons TD 5", "file": "textbooks/bloonsTD5.html", "sizeBytes": 21674453 },
-  { "title": "Bloxorz", "file": "textbooks/bloxorz.html", "sizeBytes": 9824296 },
-  { "title": "Car Soccer", "file": "textbooks/car-soccer/", "sizeBytes": 130837204 },
-  { "title": "Chess", "file": "textbooks/chess.html", "sizeBytes": 6914845 },
-  { "title": "Cluster Rush", "file": "textbooks/cluster-rush.html", "sizeBytes": 16052232 },
-  { "title": "Cookie Clicker", "file": "textbooks/cookie-clicker.html", "sizeBytes": 7649267 },
-  { "title": "Crazy Pixel Apocalypse 9", "file": "textbooks/crazy-pixel-apocalypse-9/index.html", "sizeBytes": 27833728 },
-  { "title": "Crossy Road", "file": "textbooks/crossy-road.html", "sizeBytes": 3250987 },
-  { "title": "Drift Boss", "file": "textbooks/drift-boss.html", "sizeBytes": 8990388 },
-  { "title": "Drivemad", "file": "textbooks/drivemad.html", "sizeBytes": 4999548 },
-  { "title": "Escape Road", "file": "textbooks/escape-road.html", "sizeBytes": 37333168 },
-  { "title": "Escape Road 2", "file": "textbooks/escape-road-2.html", "sizeBytes": 33570027 },
-  { "title": "Escape Road 3", "file": "textbooks/escape-road-3/index.html", "sizeBytes": 217224234 },
-  { "title": "Football Bros", "file": "textbooks/football-bros.html", "sizeBytes": 17512552 },
-  { "title": "Geometry Dash Lite", "file": "textbooks/geometry-dash-lite.html", "sizeBytes": 56611619 },
-  { "title": "Getaway Shootout", "file": "textbooks/getaway-shootout/index.html", "sizeBytes": 24514741 },
-  { "title": "Gladihoppers", "file": "textbooks/gladihoppers.html", "sizeBytes": 37178258 },
-  { "title": "Granny", "file": "textbooks/granny.html", "sizeBytes": 58316198 },
-  { "title": "Happy Wheels", "file": "textbooks/happy-wheels.html", "sizeBytes": 17835062 },
-  { "title": "Highway Traffic", "file": "textbooks/highway-traffic.html", "sizeBytes": 36836782 },
-  { "title": "Gumspin", "file": "textbooks/gumspin/index.html", "sizeBytes": 23136887 },
-  { "title": "Moto X3M 3", "file": "textbooks/moto-x3m-3.html", "sizeBytes": 10594220 },
-  { "title": "People Playground", "file": "textbooks/people-playground/index.html", "sizeBytes": 164247473 },
-  { "title": "Plants vs Zombies", "file": "textbooks/plants-vs-zombies/index.html", "sizeBytes": 10788264 },
-  { "title": "Polytrack", "file": "textbooks/polytrack.html", "sizeBytes": 7174550 },
-  { "title": "Retro Bowl", "file": "textbooks/retro-bowl.html", "sizeBytes": 7254005 },
-  { "title": "Retro Bowl College", "file": "textbooks/retro-bowl-college.html", "sizeBytes": 8216510 },
-  { "title": "Sandboxels", "file": "textbooks/sandboxels.html", "sizeBytes": 664962 },
-  { "title": "Slope", "file": "textbooks/slope.html", "sizeBytes": 25986251 },
-  { "title": "Slope 2 Player", "file": "textbooks/slope-2-player.html", "sizeBytes": 10275184 },
-  { "title": "Slow Roads", "file": "textbooks/slow-roads.html", "sizeBytes": 16960668 },
-  { "title": "Sprinter", "file": "textbooks/sprinter/index.html", "sizeBytes": 489000 },
-  { "title": "Vex5", "file": "textbooks/vex5.html", "sizeBytes": 15661734 },
-  { "title": "Wordle Unlimited", "file": "textbooks/wordle-unlimited.html", "sizeBytes": 184510 }
+      {
+            "title": "Yolk! - Minimalist Music",
+            "file": "yolk/index.html",
+            "img": "yolk/icon-256.png",
+            "sizeBytes": 983040,
+            "isApp": true
+      },
+      {
+            "title": "Google Classroom AI Assistant",
+            "file": "ai.html",
+            "img": "favicons/google-classroom.png",
+            "sizeBytes": 125000,
+            "isApp": true
+      },
+      {
+            "title": "2048",
+            "file": "textbooks/2048.html",
+            "sizeBytes": 46342
+      },
+      {
+            "title": "Awesome Tanks",
+            "file": "textbooks/awesome-tanks.html",
+            "sizeBytes": 9825933
+      },
+      {
+            "title": "Awesome Tanks 2",
+            "file": "textbooks/awesometanks2.html",
+            "sizeBytes": 13004415
+      },
+      {
+            "title": "Basket Random",
+            "file": "textbooks/basket-random/index.html",
+            "sizeBytes": 2548324
+      },
+      {
+            "title": "Basketball Stars",
+            "file": "textbooks/basketball-stars.html",
+            "sizeBytes": 11794098
+      },
+      {
+            "title": "Bit Planes: Remastered",
+            "file": "textbooks/bit-planes-remaster.html",
+            "sizeBytes": 1173578
+      },
+      {
+            "title": "Bloons TD",
+            "file": "textbooks/Bloons-TD.html",
+            "sizeBytes": 711100
+      },
+      {
+            "title": "Bloons TD 2",
+            "file": "textbooks/bloonsTD2.html",
+            "sizeBytes": 7852517
+      },
+      {
+            "title": "Bloons TD 3",
+            "file": "textbooks/bloonsTD3.html",
+            "sizeBytes": 8665053
+      },
+      {
+            "title": "Bloons TD 4",
+            "file": "textbooks/bloonsTD4.html",
+            "sizeBytes": 11144029
+      },
+      {
+            "title": "Bloons TD 5",
+            "file": "textbooks/bloonsTD5.html",
+            "sizeBytes": 21674453
+      },
+      {
+            "title": "Bloxorz",
+            "file": "textbooks/bloxorz.html",
+            "sizeBytes": 9824296
+      },
+      {
+            "title": "Car Soccer",
+            "file": "textbooks/car-soccer/",
+            "sizeBytes": 130837204
+      },
+      {
+            "title": "Chess",
+            "file": "textbooks/chess.html",
+            "sizeBytes": 6914845
+      },
+      {
+            "title": "Cluster Rush",
+            "file": "textbooks/cluster-rush.html",
+            "sizeBytes": 16052232
+      },
+      {
+            "title": "Cookie Clicker",
+            "file": "textbooks/cookie-clicker.html",
+            "sizeBytes": 7649267
+      },
+      {
+            "title": "Crazy Pixel Apocalypse 9",
+            "file": "textbooks/crazy-pixel-apocalypse-9/index.html",
+            "sizeBytes": 27833728
+      },
+      {
+            "title": "Crossy Road",
+            "file": "textbooks/crossy-road.html",
+            "sizeBytes": 3250987
+      },
+      {
+            "title": "Drift Boss",
+            "file": "textbooks/drift-boss.html",
+            "sizeBytes": 8990388
+      },
+      {
+            "title": "Drivemad",
+            "file": "textbooks/drivemad.html",
+            "sizeBytes": 4999548
+      },
+      {
+            "title": "Escape Road",
+            "file": "textbooks/escape-road.html",
+            "sizeBytes": 37333168
+      },
+      {
+            "title": "Escape Road 2",
+            "file": "textbooks/escape-road-2.html",
+            "sizeBytes": 33570027
+      },
+      {
+            "title": "Escape Road 3",
+            "file": "textbooks/escape-road-3/index.html",
+            "sizeBytes": 217224234
+      },
+      {
+            "title": "Football Bros",
+            "file": "textbooks/football-bros.html",
+            "sizeBytes": 17512552
+      },
+      {
+            "title": "Geometry Dash Lite",
+            "file": "textbooks/geometry-dash-lite.html",
+            "sizeBytes": 56611619
+      },
+      {
+            "title": "Getaway Shootout",
+            "file": "textbooks/getaway-shootout/index.html",
+            "sizeBytes": 24514741
+      },
+      {
+            "title": "Gladihoppers",
+            "file": "textbooks/gladihoppers.html",
+            "sizeBytes": 37178258
+      },
+      {
+            "title": "Granny",
+            "file": "textbooks/granny.html",
+            "sizeBytes": 58316198
+      },
+      {
+            "title": "Happy Wheels",
+            "file": "textbooks/happy-wheels.html",
+            "sizeBytes": 17835062
+      },
+      {
+            "title": "Highway Traffic",
+            "file": "textbooks/highway-traffic.html",
+            "sizeBytes": 36836782
+      },
+      {
+            "title": "Gumspin",
+            "file": "textbooks/gumspin/index.html",
+            "sizeBytes": 23136887
+      },
+      {
+            "title": "Moto X3M 3",
+            "file": "textbooks/moto-x3m-3.html",
+            "sizeBytes": 10594220
+      },
+      {
+            "title": "People Playground",
+            "file": "textbooks/people-playground/index.html",
+            "sizeBytes": 164247473
+      },
+      {
+            "title": "Plants vs Zombies",
+            "file": "textbooks/plants-vs-zombies/index.html",
+            "sizeBytes": 10788264
+      },
+      {
+            "title": "Polytrack",
+            "file": "textbooks/polytrack.html",
+            "sizeBytes": 7174550
+      },
+      {
+            "title": "Retro Bowl",
+            "file": "textbooks/retro-bowl.html",
+            "sizeBytes": 7254005
+      },
+      {
+            "title": "Retro Bowl College",
+            "file": "textbooks/retro-bowl-college.html",
+            "sizeBytes": 8216510
+      },
+      {
+            "title": "Sandboxels",
+            "file": "textbooks/sandboxels.html",
+            "sizeBytes": 664962
+      },
+      {
+            "title": "Slope",
+            "file": "textbooks/slope.html",
+            "sizeBytes": 25986251
+      },
+      {
+            "title": "Slope 2 Player",
+            "file": "textbooks/slope-2-player.html",
+            "sizeBytes": 10275184
+      },
+      {
+            "title": "Slow Roads",
+            "file": "textbooks/slow-roads.html",
+            "sizeBytes": 16960668
+      },
+      {
+            "title": "Sprinter",
+            "file": "textbooks/sprinter/index.html",
+            "sizeBytes": 489000
+      },
+      {
+            "title": "Vex5",
+            "file": "textbooks/vex5.html",
+            "sizeBytes": 15661734
+      },
+      {
+            "title": "Wordle Unlimited",
+            "file": "textbooks/wordle-unlimited.html",
+            "sizeBytes": 184510
+      },
+      {
+            "title": "1v1.LOL",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/1v1.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/1v1lol.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "8 Ball Pool (Scratch)",
+            "file": "https://scratch.mit.edu/projects/1291919322/embed",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/8ballpool.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Baldi's Basic's",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/baldisbasics.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/baldisbasics.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Bank Robbery 2",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/bank.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/bankrob2.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Baseball Bros",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/baseballbros.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/baseballbros.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Basketball Bros",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/basketbros.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/basketbros.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Block Blast",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/blockblast.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/blockblast.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Bow Masters",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/bowmasters.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/bowmasters.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Buckshot Roulette",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/buckshot.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/buckshotroullete.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "BuildNow.GG",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/buildnow.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/buildnowgg.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "C.S. 1.6",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/cs.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/cs16.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "CCM Client 1.5.2",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/ccm152.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/img/main/client152.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Chicken War",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/chicken.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/chickenwar.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Chrome Dino",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/chromedino.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/chromedino.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Clash Royale",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/clash.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/clashroyale.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Crazy Cattle",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/crazycattle.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/crazycattle3d.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Cuphead",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/cuphead.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/cuphead.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Drive in Russia",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/russia.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/driveinrussia.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "EaglerCraft 0.3.0 (WASM)",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/wasm030.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/img/main/030.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Eaglercraft 1.12 (WASM)",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/wasm112.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/img/main/112.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "EaglerCraft 1.8.8 (JS)",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/js18.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/img/main/188.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "EaglerCraft 1.8.8 (WASM)",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/wasm18.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/img/main/188.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "EaglerCraft Alpha 1.2.6",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/alpha126.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/img/main/126.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "EaglerCraft Beta 1.3_01 (JS)",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/js13.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/img/main/13.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "EaglerCraft Beta 1.7.3 (JS)",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/js173.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/img/main/173.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Flying Gorilla",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/flyinggorilla.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/flyinggorilla.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Fragzone",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/frag.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/frageb.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "GDWEB (V1)",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/gdwebv1.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/gdwebplusversion1.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "GDWEB+ (Stable)",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/gdweb.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/gdwebplus.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Geometry Dash (Scratch)",
+            "file": "https://scratch.mit.edu/projects/1282825077/embed",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/geometrydashscratch.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Geometry Dash (Web Port)",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/actualgd.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/actualgd.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Geometry Dash 3D",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/gd3d.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/3dgeometrydash.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Google Snake (Scratch)",
+            "file": "https://scratch.mit.edu/projects/1283303860/embed",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/googlesnake.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Gorilla Tag",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/gtag.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/gorillatag.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Granny 2",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/granny2.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/grannychapter2.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Hollow Knight",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/hollowknight.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/hollowknight.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Hollow Knight Silksong",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/hollowknightsilksong.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/hollowknightsilksong.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Impossible Quiz",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/impossiblequiz.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/impossiblequiz.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Indian Truck Driving",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/indiantruckdriving.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/indiantruckdriving.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Infinite Craft",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/infinite.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/infinitecraft.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Just Build LOL",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/justbuild.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/justbuildlol.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Kindergarten",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/kindergarten.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/kindergarten.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Kindergarten 2",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/kindergarten2.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/kindergarten2.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Kindergarten 3",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/kindergarten3.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/kindergarten3.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Minecraft P.E",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/pocketediton.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/minecraftpocketedition.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Plague Inc",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/plagueinc.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/plagueinc.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Ragdoll Archers",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/ragdoll.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/ragdollarchers.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Snow Rider 3D",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/snowrider.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/snowrider.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Soccer Random",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/soccerrandom.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/soccerrandom.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Soccer Bros",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/soccerbros.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/img/main/soccerbros.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Space Waves",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/spacewaves.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/spacewaves.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Stickman Duel",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/stickman.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/stickmanduel.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Subway Surfers",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/subway.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/subwaysurfers.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "The World's Hardest Game",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/hardestgame.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/theworldshardestgame.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Ultrakill",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/ultra.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/ultrakill.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Untitled Goose Game",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/goosegame.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/untitledgoosegame.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Who's Your Daddy",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/whosyourdaddy.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/whosyourdaddy.png",
+            "sizeBytes": 1500000
+      }
 ];
 
 let games = [...DEFAULT_GAMES];
@@ -1826,11 +2692,48 @@ async function playGame(encodedFile, encodedTitle) {
   }
 }
 
+let lastPlayingGame = null;
+
 function closePlayer() {
   const iframe = document.getElementById('gameIframe');
   iframe.src = 'about:blank';
   document.getElementById('player-view').style.display = 'none';
   currentPlayingFile = null;
+}
+
+function openGameStatusMenu() {
+  if (currentPlayingFile) {
+    const titleEl = document.getElementById('currentPlayerTitle');
+    lastPlayingGame = {
+      file: currentPlayingFile,
+      title: titleEl ? titleEl.textContent : 'Game'
+    };
+  }
+  // Close the game player and enter status menu
+  closePlayer();
+
+  const modal = document.getElementById('status-modal-overlay');
+  if (modal) modal.style.display = 'flex';
+
+  const resumeBtn = document.getElementById('resumeGameBtn');
+  if (resumeBtn) {
+    resumeBtn.style.display = (lastPlayingGame && lastPlayingGame.file) ? 'inline-flex' : 'none';
+  }
+
+  updateClockDisplay();
+  queryBattery();
+}
+
+function resumeGame() {
+  closeStatusModal();
+  if (lastPlayingGame && lastPlayingGame.file) {
+    playGame(encodeURIComponent(lastPlayingGame.file), encodeURIComponent(lastPlayingGame.title));
+  }
+}
+
+function closeStatusModal() {
+  const modal = document.getElementById('status-modal-overlay');
+  if (modal) modal.style.display = 'none';
 }
 
 function reloadPlayer() {
@@ -1842,7 +2745,7 @@ function reloadPlayer() {
 
 function toggleFullscreen() {
   const playerEl = document.getElementById('player-view');
-  if (!document.fullscreenElement) {
+  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
     if (playerEl.requestFullscreen) {
       playerEl.requestFullscreen();
     } else if (playerEl.webkitRequestFullscreen) {
@@ -1851,7 +2754,171 @@ function toggleFullscreen() {
   } else {
     if (document.exitFullscreen) {
       document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
     }
+  }
+}
+
+function updateFullscreenIcon() {
+  const icon = document.getElementById('playerFullscreenIcon');
+  if (!icon) return;
+  if (document.fullscreenElement || document.webkitFullscreenElement) {
+    icon.textContent = 'fullscreen_exit';
+  } else {
+    icon.textContent = 'fullscreen';
+  }
+}
+
+document.addEventListener('fullscreenchange', updateFullscreenIcon);
+document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
+
+// Live Clock with Seconds
+function updateClockDisplay() {
+  const now = new Date();
+  let hours = now.getHours();
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12;
+  const timeStr = `${hours}:${minutes}:${seconds} ${ampm}`;
+
+  const playerLiveTime = document.getElementById('playerLiveTime');
+  if (playerLiveTime) playerLiveTime.textContent = timeStr;
+
+  const modalClockTime = document.getElementById('modalClockTime');
+  if (modalClockTime) modalClockTime.textContent = timeStr;
+
+  const modalClockDate = document.getElementById('modalClockDate');
+  if (modalClockDate) {
+    modalClockDate.textContent = now.toLocaleDateString(undefined, {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  }
+}
+
+// Device Battery Monitor
+async function queryBattery() {
+  if ('getBattery' in navigator) {
+    try {
+      const battery = await navigator.getBattery();
+      renderBattery(battery);
+
+      battery.onlevelchange = () => renderBattery(battery);
+      battery.onchargingchange = () => renderBattery(battery);
+      battery.onchargingtimechange = () => renderBattery(battery);
+      battery.ondischargingtimechange = () => renderBattery(battery);
+    } catch (e) {
+      renderBatteryFallback();
+    }
+  } else {
+    renderBatteryFallback();
+  }
+}
+
+function renderBattery(battery) {
+  const pct = Math.round(battery.level * 100);
+  const isCharging = battery.charging;
+
+  const percentEl = document.getElementById('batteryPercentText');
+  const statusEl = document.getElementById('batteryStatusText');
+  const barFill = document.getElementById('batteryBarFill');
+  const iconEl = document.getElementById('batteryIcon');
+  const extraEl = document.getElementById('batteryExtraDetails');
+
+  if (percentEl) percentEl.textContent = pct + '%';
+  if (barFill) barFill.style.width = pct + '%';
+
+  if (isCharging) {
+    if (iconEl) {
+      iconEl.textContent = 'battery_charging_full';
+      iconEl.style.color = '#22c55e';
+    }
+    if (barFill) barFill.style.background = '#22c55e';
+    if (statusEl) {
+      statusEl.textContent = 'Charging (Plugged In)';
+      statusEl.style.color = '#22c55e';
+    }
+    if (extraEl) {
+      if (battery.chargingTime && isFinite(battery.chargingTime) && battery.chargingTime > 0) {
+        const mins = Math.ceil(battery.chargingTime / 60);
+        extraEl.textContent = `⚡ ~${mins} minutes until full charge`;
+      } else {
+        extraEl.textContent = '⚡ Connected to power supply';
+      }
+    }
+  } else {
+    let iconName = 'battery_full';
+    let iconColor = '#ffffff';
+    let barColor = '#ffffff';
+
+    if (pct <= 10) {
+      iconName = 'battery_alert';
+      iconColor = '#ef4444';
+      barColor = '#ef4444';
+    } else if (pct <= 20) {
+      iconName = 'battery_1_bar';
+      iconColor = '#f97316';
+      barColor = '#f97316';
+    } else if (pct <= 40) {
+      iconName = 'battery_3_bar';
+      iconColor = '#eab308';
+      barColor = '#eab308';
+    } else if (pct <= 60) {
+      iconName = 'battery_4_bar';
+    } else if (pct <= 80) {
+      iconName = 'battery_5_bar';
+    } else {
+      iconName = 'battery_full';
+    }
+
+    if (iconEl) {
+      iconEl.textContent = iconName;
+      iconEl.style.color = iconColor;
+    }
+    if (barFill) barFill.style.background = barColor;
+    if (statusEl) {
+      statusEl.textContent = pct <= 20 ? 'Low Battery — On Battery Power' : 'On Battery Power';
+      statusEl.style.color = pct <= 20 ? iconColor : '#a1a1aa';
+    }
+    if (extraEl) {
+      if (battery.dischargingTime && isFinite(battery.dischargingTime) && battery.dischargingTime > 0) {
+        const hours = Math.floor(battery.dischargingTime / 3600);
+        const mins = Math.ceil((battery.dischargingTime % 3600) / 60);
+        extraEl.textContent = `⏱ ~${hours > 0 ? hours + 'h ' : ''}${mins}m remaining`;
+      } else {
+        extraEl.textContent = '';
+      }
+    }
+  }
+}
+
+function renderBatteryFallback() {
+  const percentEl = document.getElementById('batteryPercentText');
+  const statusEl = document.getElementById('batteryStatusText');
+  const barFill = document.getElementById('batteryBarFill');
+  const iconEl = document.getElementById('batteryIcon');
+  const extraEl = document.getElementById('batteryExtraDetails');
+
+  if (percentEl) percentEl.textContent = '--';
+  if (statusEl) {
+    statusEl.textContent = 'Battery info unavailable';
+    statusEl.style.color = '#a1a1aa';
+  }
+  if (iconEl) {
+    iconEl.textContent = 'battery_unknown';
+    iconEl.style.color = '#71717a';
+  }
+  if (barFill) {
+    barFill.style.width = '100%';
+    barFill.style.background = '#27272a';
+  }
+  if (extraEl) {
+    extraEl.textContent = 'Battery Status API not permitted on this browser.';
   }
 }
 
@@ -1970,13 +3037,21 @@ async function initGames() {
 
 window.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
-    if (document.getElementById('player-view').style.display === 'flex') {
+    const statusModal = document.getElementById('status-modal-overlay');
+    if (statusModal && statusModal.style.display === 'flex') {
+      closeStatusModal();
+    } else if (document.getElementById('player-view').style.display === 'flex') {
       closePlayer();
     } else if (document.body.classList.contains('is-searching')) {
       resetToCenterHome();
     }
   }
 });
+
+// Start clock and battery monitor immediately
+updateClockDisplay();
+setInterval(updateClockDisplay, 1000);
+queryBattery();
 
 initGames();
   </script>

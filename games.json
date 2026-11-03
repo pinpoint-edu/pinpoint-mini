@@ -1,5 +1,19 @@
 [
   {
+    "title": "Yolk! - Minimalist Music",
+    "file": "yolk/index.html",
+    "img": "yolk/icon-256.png",
+    "sizeBytes": 983040,
+    "isApp": true
+  },
+  {
+    "title": "Google Classroom AI Assistant",
+    "file": "ai.html",
+    "img": "favicons/google-classroom.png",
+    "sizeBytes": 125000,
+    "isApp": true
+  },
+  {
     "title": "2048",
     "file": "textbooks/2048.html",
     "sizeBytes": 46342
@@ -218,5 +232,347 @@
     "title": "Wordle Unlimited",
     "file": "textbooks/wordle-unlimited.html",
     "sizeBytes": 184510
+  },
+  {
+    "title": "1v1.LOL",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/1v1.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/1v1lol.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "8 Ball Pool (Scratch)",
+    "file": "https://scratch.mit.edu/projects/1291919322/embed",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/8ballpool.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Baldi's Basic's",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/baldisbasics.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/baldisbasics.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Bank Robbery 2",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/bank.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/bankrob2.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Baseball Bros",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/baseballbros.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/baseballbros.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Basketball Bros",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/basketbros.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/basketbros.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Block Blast",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/blockblast.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/blockblast.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Bow Masters",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/bowmasters.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/bowmasters.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Buckshot Roulette",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/buckshot.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/buckshotroullete.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "BuildNow.GG",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/buildnow.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/buildnowgg.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "C.S. 1.6",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/cs.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/cs16.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "CCM Client 1.5.2",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/ccm152.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/img/main/client152.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Chicken War",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/chicken.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/chickenwar.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Chrome Dino",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/chromedino.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/chromedino.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Clash Royale",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/clash.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/clashroyale.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Crazy Cattle",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/crazycattle.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/crazycattle3d.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Cuphead",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/cuphead.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/cuphead.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Drive in Russia",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/russia.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/driveinrussia.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "EaglerCraft 0.3.0 (WASM)",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/wasm030.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/img/main/030.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Eaglercraft 1.12 (WASM)",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/wasm112.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/img/main/112.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "EaglerCraft 1.8.8 (JS)",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/js18.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/img/main/188.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "EaglerCraft 1.8.8 (WASM)",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/wasm18.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/img/main/188.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "EaglerCraft Alpha 1.2.6",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/alpha126.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/img/main/126.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "EaglerCraft Beta 1.3_01 (JS)",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/js13.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/img/main/13.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "EaglerCraft Beta 1.7.3 (JS)",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/js173.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/img/main/173.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Flying Gorilla",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/flyinggorilla.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/flyinggorilla.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Fragzone",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/frag.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/frageb.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "GDWEB (V1)",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/gdwebv1.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/gdwebplusversion1.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "GDWEB+ (Stable)",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/gdweb.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/gdwebplus.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Geometry Dash (Scratch)",
+    "file": "https://scratch.mit.edu/projects/1282825077/embed",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/geometrydashscratch.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Geometry Dash (Web Port)",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/actualgd.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/actualgd.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Geometry Dash 3D",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/gd3d.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/3dgeometrydash.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Google Snake (Scratch)",
+    "file": "https://scratch.mit.edu/projects/1283303860/embed",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/googlesnake.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Gorilla Tag",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/gtag.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/gorillatag.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Granny 2",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/granny2.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/grannychapter2.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Hollow Knight",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/hollowknight.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/hollowknight.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Hollow Knight Silksong",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/hollowknightsilksong.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/hollowknightsilksong.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Impossible Quiz",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/impossiblequiz.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/impossiblequiz.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Indian Truck Driving",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/indiantruckdriving.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/indiantruckdriving.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Infinite Craft",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/infinite.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/infinitecraft.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Just Build LOL",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/justbuild.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/justbuildlol.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Kindergarten",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/kindergarten.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/kindergarten.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Kindergarten 2",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/kindergarten2.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/kindergarten2.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Kindergarten 3",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/kindergarten3.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/kindergarten3.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Minecraft P.E",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/pocketediton.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/minecraftpocketedition.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Plague Inc",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/plagueinc.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/plagueinc.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Ragdoll Archers",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/ragdoll.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/ragdollarchers.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Snow Rider 3D",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/snowrider.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/snowrider.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Soccer Random",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/soccerrandom.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/soccerrandom.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Soccer Bros",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/soccerbros.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/img/main/soccerbros.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Space Waves",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/spacewaves.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/spacewaves.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Stickman Duel",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/stickman.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/stickmanduel.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Subway Surfers",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/subway.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/subwaysurfers.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "The World's Hardest Game",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/hardestgame.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/theworldshardestgame.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Ultrakill",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/ultra.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/ultrakill.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Untitled Goose Game",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/goosegame.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/untitledgoosegame.png",
+    "sizeBytes": 1500000
+  },
+  {
+    "title": "Who's Your Daddy",
+    "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/whosyourdaddy.html",
+    "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/whosyourdaddy.png",
+    "sizeBytes": 1500000
   }
 ]
