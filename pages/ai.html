@@ -414,10 +414,6 @@
   <!-- Header -->
   <header>
     <div class="header-left">
-      <a href="index.html" class="btn-squircle" title="Back to Trashbin Games">
-        <span class="material-symbols-sharp">arrow_back</span>
-        <span>Trashbin</span>
-      </a>
       <div class="brand-link">
         <span class="material-symbols-sharp" style="color: #60a5fa;">psychology</span>
         <span class="brand-name">Trashbin AI</span>
@@ -625,9 +621,31 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               messages: messageHistory,
-              model: 'openai'
+              model: 'openai-fast'
             })
           });
+          if (res.ok) {
+            aiText = await res.text();
+          }
+        } catch(e) {}
+      }
+
+      // Strategy 4: Fallback GET request (bypasses POST preflight & works cleanly on origin 'null'/file://)
+      if (!aiText) {
+        try {
+          const promptQuery = messageHistory.slice(-1)[0]?.content || 'Hello';
+          const res = await fetch('https://text.pollinations.ai/' + encodeURIComponent(promptQuery) + '?model=openai-fast');
+          if (res.ok) {
+            aiText = await res.text();
+          }
+        } catch(e) {}
+      }
+
+      // Strategy 5: Raw default GET fallback
+      if (!aiText) {
+        try {
+          const promptQuery = messageHistory.slice(-1)[0]?.content || 'Hello';
+          const res = await fetch('https://text.pollinations.ai/' + encodeURIComponent(promptQuery));
           if (res.ok) {
             aiText = await res.text();
           }

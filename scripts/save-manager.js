@@ -303,8 +303,12 @@
     return true;
   }
 
-  // Reload runner iframe
+  // Reload runner iframe or player
   function reloadRunnerIframe() {
+    if (typeof reloadPlayer === 'function') {
+      reloadPlayer();
+      return;
+    }
     const iframe = document.getElementById('gameIframe') || document.getElementById('runner-iframe');
     if (iframe) {
       try {
