@@ -50,7 +50,6 @@
     "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2.data.unityweb",
     "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2.framework.js.unityweb",
     "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2.wasm.unityweb",
-    "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/",
     "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2_part1.data.unityweb",
     "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2_part2.data.unityweb"
   ],
@@ -65,7 +64,6 @@
     "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2.data.unityweb",
     "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2.framework.js.unityweb",
     "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2.wasm.unityweb",
-    "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/",
     "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2_part1.data.unityweb",
     "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2_part2.data.unityweb"
   ],
@@ -226,12 +224,10 @@
     "https://cdn.jsdelivr.net/gh/matheveryday25/math/chicken/Build/Build.wasm.unityweb"
   ],
   "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/chromedino.html": [
-    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/chromedino.html",
-    "https://www.google.com/jsapi"
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/chromedino.html"
   ],
   "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_chromedino.html": [
-    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/chromedino.html",
-    "https://www.google.com/jsapi"
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/chromedino.html"
   ],
   "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/clash.html": [
     "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/clash.html",
@@ -552,12 +548,10 @@
     "https://cdn.jsdelivr.net/gh/matheveryday25/math/truck/Build/indian_truck_gd_2_0_1.wasm.framework.unityweb"
   ],
   "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/infinite.html": [
-    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/infinite.html",
-    "https://www.google.com/jsapi"
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/infinite.html"
   ],
   "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_infinite.html": [
-    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/infinite.html",
-    "https://www.google.com/jsapi"
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/infinite.html"
   ],
   "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/justbuild.html": [
     "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/justbuild.html",
@@ -653,7 +647,6 @@
   ],
   "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/snowrider.html": [
     "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/snowrider.html",
-    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/js/main.min.js?//html5.api.gamedistribution.com/main.min.js",
     "https://cdn.jsdelivr.net/gh/era6yera6y/00@main/TemplateData/UnityProgress.js",
     "https://cdn.jsdelivr.net/gh/era6yera6y/00@main/Build/UnityLoader.js",
     "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/UB.png",
@@ -661,7 +654,6 @@
   ],
   "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_snowrider.html": [
     "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/snowrider.html",
-    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/js/main.min.js?//html5.api.gamedistribution.com/main.min.js",
     "https://cdn.jsdelivr.net/gh/era6yera6y/00@main/TemplateData/UnityProgress.js",
     "https://cdn.jsdelivr.net/gh/era6yera6y/00@main/Build/UnityLoader.js",
     "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/UB.png",
@@ -707,7 +699,6 @@
   ],
   "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/stickman.html": [
     "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/stickman.html",
-    "https://www.google.com/jsapi",
     "https://cdn.jsdelivr.net/gh/Ieoldj-hs101082/Koans@03568ae5309942037071f3e50daf892ae3539c31/logic/data.js",
     "https://cdn.jsdelivr.net/gh/Ieoldj-hs101082/Koans@03568ae5309942037071f3e50daf892ae3539c31/logic/sd.loader.js",
     "https://cdn.jsdelivr.net/sd.data.js",
@@ -719,7 +710,6 @@
   ],
   "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_stickman.html": [
     "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/stickman.html",
-    "https://www.google.com/jsapi",
     "https://cdn.jsdelivr.net/gh/Ieoldj-hs101082/Koans@03568ae5309942037071f3e50daf892ae3539c31/logic/data.js",
     "https://cdn.jsdelivr.net/gh/Ieoldj-hs101082/Koans@03568ae5309942037071f3e50daf892ae3539c31/logic/sd.loader.js",
     "https://cdn.jsdelivr.net/sd.data.js",

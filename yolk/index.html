@@ -19,11 +19,9 @@
 
     <!-- Service Worker Registration for PWA Offline Playback -->
     <script>
-        if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.protocol === 'http:')) {
+        if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.protocol === 'http:') && window === window.top && !location.hostname.includes('googleusercontent') && !location.hostname.includes('jsdelivr')) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').catch((err) => {
-                    console.warn('PWA service worker registration notice:', err);
-                });
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
             });
         }
     </script>
@@ -3841,6 +3839,7 @@
                     const link = group[key];
                     if (!link) return;
                     link.addEventListener('click', (e) => {
+                        e.preventDefault();
                         if (typeof window.triggerHaptic === 'function') {
                             window.triggerHaptic('selection');
                         }
@@ -3848,28 +3847,26 @@
                         if (key === 'library') {
                             if (currentHash === 'now-playing') {
                                 if (lastLibrarySubPage === 'album' && document.getElementById('album-hero-name')?.textContent && document.getElementById('album-hero-name').textContent !== 'Loading Album...') {
-                                    e.preventDefault();
                                     window.location.hash = '#album';
                                     return;
                                 } else if (lastLibrarySubPage === 'artist' && document.getElementById('artist-hero-name')?.textContent && document.getElementById('artist-hero-name').textContent !== 'Artist Name') {
-                                    e.preventDefault();
                                     window.location.hash = '#artist';
                                     return;
                                 }
                             } else if (currentHash === 'album' || currentHash === 'artist') {
-                                e.preventDefault();
                                 lastLibrarySubPage = null;
                                 window.location.hash = '#library';
                                 return;
                             }
                         }
                         if (currentHash === key) {
-                            e.preventDefault();
                             if (key === 'search' && window.innerWidth < 640) {
                                 if (searchInputEl) searchInputEl.focus();
                             } else {
                                 scrollToTopOf(key);
                             }
+                        } else {
+                            window.location.hash = '#' + key;
                         }
                     });
                 });

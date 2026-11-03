@@ -1064,6 +1064,138 @@
       border: none;
       background: #000000;
     }
+
+    /* Settings Modal & Tint Squircle UI */
+    .settings-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      z-index: 1000000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .settings-modal-card {
+      background: #121215;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 24px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      animation: modalFadeIn 0.25s var(--parabola-ease);
+    }
+
+    .settings-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .settings-modal-title {
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin: 0 0 3px 0;
+    }
+
+    .settings-modal-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    .settings-section-label {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .settings-section-desc {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+
+    .tint-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .tint-squircle-btn {
+      aspect-ratio: 1;
+      border-radius: 18px;
+      border: 2px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s var(--parabola-ease);
+      background: #18181b;
+      padding: 8px;
+    }
+
+    .tint-squircle-btn:hover {
+      transform: translateY(-2px) scale(1.04);
+      border-color: var(--border-hover);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .tint-squircle-btn.active {
+      border-color: #ffffff;
+      box-shadow: 0 0 0 2px var(--accent-glow), 0 8px 24px var(--accent-glow);
+      background: #222226;
+    }
+
+    .tint-squircle-color {
+      width: 28px;
+      height: 28px;
+      border-radius: 10px;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 3px 10px rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tint-squircle-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .tint-squircle-btn.active .tint-squircle-label {
+      color: var(--text-main);
+    }
+
+    .pill-chip.active {
+      background: var(--accent) !important;
+      color: #000000 !important;
+      border-color: var(--accent) !important;
+    }
+
+    .game-card-squircle:hover {
+      border-color: var(--accent) !important;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), 0 0 16px var(--accent-glow) !important;
+    }
+
   </style>
 </head>
 <body>
@@ -1086,6 +1218,9 @@
       <span class="material-symbols-sharp" style="font-size: 15px;">download</span>
       <span id="downloadCountLabel">0 Downloaded</span>
     </div>
+    <button id="settingsBtn" class="status-pill" onclick="toggleSettingsModal()" title="Trashbin Settings" style="cursor: pointer; border: 1px solid var(--border); transition: all 0.2s var(--parabola-ease);">
+      <span class="material-symbols-sharp" style="font-size: 17px;">settings</span>
+    </button>
   </div>
 
   <!-- Center Search Block (Yolk-style with debounced push-up) -->
@@ -1180,15 +1315,15 @@
       <div class="player-header-right">
         <!-- Retro Bowl & Retro Bowl College Save Manager -->
         <button id="runner-save-export" class="player-btn-squircle" onclick="PinpointSaveManager.exportCurrentSave()" title="Export Save Data (.json)" style="display: none;">
-          <span class="material-symbols-sharp">download</span>
+          <span class="material-symbols-sharp">save</span>
         </button>
         <button id="runner-save-import" class="player-btn-squircle" onclick="PinpointSaveManager.triggerImportCurrentSave()" title="Import Save Data (.json)" style="display: none;">
-          <span class="material-symbols-sharp">upload</span>
+          <span class="material-symbols-sharp">upload_file</span>
         </button>
         <input type="file" id="runner-save-file-input" accept=".json,application/json" style="display: none;" onchange="PinpointSaveManager.handleImportFile(event)">
 
-        <button id="playerDownloadBtn" class="player-btn-squircle" onclick="downloadCurrentGame()" title="Download for Offline">
-          <span id="playerDownloadIcon" class="material-symbols-sharp">download</span>
+        <button id="playerDownloadBtn" class="player-btn-squircle" onclick="downloadCurrentGame()" title="Download Game for Offline">
+          <span id="playerDownloadIcon" class="material-symbols-sharp">download_for_offline</span>
         </button>
         <button class="player-btn-squircle" onclick="reloadPlayer()" title="Reload Game">
           <span class="material-symbols-sharp">refresh</span>
@@ -1288,7 +1423,6 @@ async function autoSelectMirror() {
 const GAME_MANIFESTS = {
     "textbooks/plants-vs-zombies/index.html": [
         "/textbooks/plants-vs-zombies/index.html",
-        "/textbooks/plants-vs-zombies/",
         "/textbooks/plants-vs-zombies/pvz_9_15.swf",
         "/textbooks/plants-vs-zombies/resources.swf",
         "/textbooks/plants-vs-zombies/data.xml",
@@ -1309,28 +1443,23 @@ const GAME_MANIFESTS = {
     ],
     "textbooks/getaway-shootout/index.html": [
         "/textbooks/getaway-shootout/index.html",
-        "/textbooks/getaway-shootout/",
         "/textbooks/getaway-shootout/Build/loader-v2.js",
         "/textbooks/getaway-shootout/Build/frame.js",
         "/textbooks/getaway-shootout/Build/864872d3e8c17c58e54028c101dae7a5.data.br",
         "/textbooks/getaway-shootout/Build/c0f8b2f06ae4c7c89b1e883b3d07ca8f.wasm.wasm",
-        "/textbooks/getaway-shootout/crazygames-sdk-v3-done.js",
         "/textbooks/getaway-shootout/StreamingAssets/Music.aac"
     ],
     "textbooks/getaway-shootout.html": [
         "/textbooks/getaway-shootout.html",
         "/textbooks/getaway-shootout/index.html",
-        "/textbooks/getaway-shootout/",
         "/textbooks/getaway-shootout/Build/loader-v2.js",
         "/textbooks/getaway-shootout/Build/frame.js",
         "/textbooks/getaway-shootout/Build/864872d3e8c17c58e54028c101dae7a5.data.br",
         "/textbooks/getaway-shootout/Build/c0f8b2f06ae4c7c89b1e883b3d07ca8f.wasm.wasm",
-        "/textbooks/getaway-shootout/crazygames-sdk-v3-done.js",
         "/textbooks/getaway-shootout/StreamingAssets/Music.aac"
     ],
     "textbooks/sprinter/index.html": [
         "/textbooks/sprinter/index.html",
-        "/textbooks/sprinter/",
         "/textbooks/sprinter/sprinter.swf",
         "/textbooks/ruffle/ruffle.js",
         "/textbooks/ruffle/core.ruffle.e1ab5671fe9d69a41e55.js",
@@ -1338,7 +1467,6 @@ const GAME_MANIFESTS = {
     ],
     "textbooks/basket-random/index.html": [
         "/textbooks/basket-random/index.html",
-        "/textbooks/basket-random/",
         "/textbooks/basket-random/appmanifest.json",
         "/textbooks/basket-random/box2d.wasm",
         "/textbooks/basket-random/box2d.wasm.js",
@@ -1404,7 +1532,6 @@ const GAME_MANIFESTS = {
         "/textbooks/basket-random/scripts/supportcheck.js"
     ],
     "textbooks/car-soccer/": [
-        "/textbooks/car-soccer/",
         "/textbooks/car-soccer/index.html",
         "/textbooks/car-soccer/game.js",
         "/textbooks/car-soccer/interceptor.js",
@@ -1417,7 +1544,6 @@ const GAME_MANIFESTS = {
     ],
     "textbooks/people-playground/index.html": [
         "/textbooks/people-playground/index.html",
-        "/textbooks/people-playground/",
         "/textbooks/people-playground/Build/PPG.loader.js",
         "/textbooks/people-playground/Build/PPG.framework.js",
         "/textbooks/people-playground/Build/PPG.data.part1",
@@ -1468,7 +1594,6 @@ const GAME_MANIFESTS = {
     ],
     "textbooks/escape-road-3/index.html": [
         "/textbooks/escape-road-3/index.html",
-        "/textbooks/escape-road-3/",
         "/textbooks/escape-road-3/game.html",
         "/textbooks/escape-road-3/game.css",
         "/textbooks/escape-road-3/gmsdkv1.js",
@@ -1501,7 +1626,6 @@ const GAME_MANIFESTS = {
     ],
     "textbooks/crazy-pixel-apocalypse-9/index.html": [
         "/textbooks/crazy-pixel-apocalypse-9/index.html",
-        "/textbooks/crazy-pixel-apocalypse-9/",
         "/textbooks/crazy-pixel-apocalypse-9/Build/puxx.data.unityweb",
         "/textbooks/crazy-pixel-apocalypse-9/Build/puxx.framework.js.unityweb",
         "/textbooks/crazy-pixel-apocalypse-9/Build/puxx.loader.js",
@@ -1514,7 +1638,6 @@ const GAME_MANIFESTS = {
     ],
     "textbooks/gumspin/index.html": [
         "/textbooks/gumspin/index.html",
-        "/textbooks/gumspin/",
         "/textbooks/gumspin/Build/UnityLoader.js",
         "/textbooks/gumspin/Build/GunSpin%20WebGL%20FinalVersion.json",
         "/textbooks/gumspin/Build/GunSpin WebGL FinalVersion.json",
@@ -1539,7 +1662,6 @@ const GAME_MANIFESTS = {
     ],
     "textbooks/monspin/index.html": [
         "/textbooks/gumspin/index.html",
-        "/textbooks/gumspin/",
         "/textbooks/gumspin/Build/UnityLoader.js",
         "/textbooks/gumspin/Build/GunSpin%20WebGL%20FinalVersion.json",
         "/textbooks/gumspin/Build/GunSpin WebGL FinalVersion.json",
@@ -1613,7 +1735,6 @@ const GAME_MANIFESTS = {
         "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2.data.unityweb",
         "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2.framework.js.unityweb",
         "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2.wasm.unityweb",
-        "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/",
         "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2_part1.data.unityweb",
         "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2_part2.data.unityweb"
     ],
@@ -1628,7 +1749,6 @@ const GAME_MANIFESTS = {
         "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2.data.unityweb",
         "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2.framework.js.unityweb",
         "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2.wasm.unityweb",
-        "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/",
         "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2_part1.data.unityweb",
         "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2_part2.data.unityweb"
     ],
@@ -1789,12 +1909,10 @@ const GAME_MANIFESTS = {
         "https://cdn.jsdelivr.net/gh/matheveryday25/math/chicken/Build/Build.wasm.unityweb"
     ],
     "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/chromedino.html": [
-        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/chromedino.html",
-        "https://www.google.com/jsapi"
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/chromedino.html"
     ],
     "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_chromedino.html": [
-        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/chromedino.html",
-        "https://www.google.com/jsapi"
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/chromedino.html"
     ],
     "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/clash.html": [
         "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/clash.html",
@@ -2115,12 +2233,10 @@ const GAME_MANIFESTS = {
         "https://cdn.jsdelivr.net/gh/matheveryday25/math/truck/Build/indian_truck_gd_2_0_1.wasm.framework.unityweb"
     ],
     "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/infinite.html": [
-        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/infinite.html",
-        "https://www.google.com/jsapi"
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/infinite.html"
     ],
     "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_infinite.html": [
-        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/infinite.html",
-        "https://www.google.com/jsapi"
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/infinite.html"
     ],
     "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/justbuild.html": [
         "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/justbuild.html",
@@ -2216,7 +2332,6 @@ const GAME_MANIFESTS = {
     ],
     "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/snowrider.html": [
         "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/snowrider.html",
-        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/js/main.min.js?//html5.api.gamedistribution.com/main.min.js",
         "https://cdn.jsdelivr.net/gh/era6yera6y/00@main/TemplateData/UnityProgress.js",
         "https://cdn.jsdelivr.net/gh/era6yera6y/00@main/Build/UnityLoader.js",
         "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/UB.png",
@@ -2224,7 +2339,6 @@ const GAME_MANIFESTS = {
     ],
     "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_snowrider.html": [
         "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/snowrider.html",
-        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/js/main.min.js?//html5.api.gamedistribution.com/main.min.js",
         "https://cdn.jsdelivr.net/gh/era6yera6y/00@main/TemplateData/UnityProgress.js",
         "https://cdn.jsdelivr.net/gh/era6yera6y/00@main/Build/UnityLoader.js",
         "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/UB.png",
@@ -2270,7 +2384,6 @@ const GAME_MANIFESTS = {
     ],
     "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/stickman.html": [
         "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/stickman.html",
-        "https://www.google.com/jsapi",
         "https://cdn.jsdelivr.net/gh/Ieoldj-hs101082/Koans@03568ae5309942037071f3e50daf892ae3539c31/logic/data.js",
         "https://cdn.jsdelivr.net/gh/Ieoldj-hs101082/Koans@03568ae5309942037071f3e50daf892ae3539c31/logic/sd.loader.js",
         "https://cdn.jsdelivr.net/sd.data.js",
@@ -2282,7 +2395,6 @@ const GAME_MANIFESTS = {
     ],
     "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_stickman.html": [
         "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/stickman.html",
-        "https://www.google.com/jsapi",
         "https://cdn.jsdelivr.net/gh/Ieoldj-hs101082/Koans@03568ae5309942037071f3e50daf892ae3539c31/logic/data.js",
         "https://cdn.jsdelivr.net/gh/Ieoldj-hs101082/Koans@03568ae5309942037071f3e50daf892ae3539c31/logic/sd.loader.js",
         "https://cdn.jsdelivr.net/sd.data.js",
@@ -2487,8 +2599,8 @@ const PinpointGameStorage = {
                 }
 
                 const clean = assetUrl.replace(/^\/+/, '');
-                // Skip directories (cannot be fetched directly as files over HTTP)
-                if (!clean || clean.endsWith('/')) {
+                // Skip directories and ad/tracker domains
+                if (!clean || clean.endsWith('/') || /google\.com|googletagmanager|google-analytics|gamedistribution|poki\.com|crazygames|gameanalytics/i.test(assetUrl)) {
                     completedAssets++;
                     continue;
                 }
@@ -2496,20 +2608,28 @@ const PinpointGameStorage = {
                 let candidateUrls = [];
                 if (/^https?:\/\//i.test(assetUrl)) {
                     let mirrorUrl = assetUrl;
-                    if (assetUrl.includes('jsdelivr.net')) {
-                        mirrorUrl = assetUrl.replace(/https?:\/\/[^/]*\.jsdelivr\.net\//i, activeMirror + '/');
+                    if (mirrorUrl.includes('matheveryday25/math/truck')) {
+                        mirrorUrl = mirrorUrl.replace('/math/truck', '/math@main/truck');
+                    }
+                    if (mirrorUrl.includes('jsdelivr.net')) {
+                        mirrorUrl = mirrorUrl.replace(/https?:\/\/[^/]*\.jsdelivr\.net\//i, activeMirror + '/');
                     }
                     candidateUrls = [mirrorUrl, assetUrl];
                     if (assetUrl.includes('jsdelivr.net/gh/')) {
-                        const rawGh = assetUrl.replace(/https?:\/\/[^/]*\.jsdelivr\.net\/gh\/([^/@]+)\/([^/@]+)(?:@[^/]+)?\//, 'https://raw.githubusercontent.com/$1/$2/main/');
+                        const rawGh = assetUrl.replace(/https?:\/\/[^/]*\.jsdelivr\.net\/gh\/([^/@]+)\/([^/@]+)(?:@[^/]+)?\//, 'https://raw.githubusercontent.com/$1/$2/main/').replace('/math/truck', '/math/main/truck');
                         candidateUrls.push(rawGh);
                     }
                 } else {
+                    const isMini = clean.startsWith('yolk/') || clean === 'ai.html' || clean.startsWith('pages/') || clean.includes('superhot');
+                    const primaryRepo = isMini ? 'pinpoint-edu/pinpoint-mini@main/' : 'pinpoint-edu/assets@main/';
+                    const fallbackRepo = isMini ? 'pinpoint-edu/assets@main/' : 'pinpoint-edu/pinpoint-mini@main/';
                     const mirrors = [activeMirror, ...CDN_MIRRORS.filter(m => m !== activeMirror)];
                     candidateUrls = [
-                        ...mirrors.map(m => m + '/gh/pinpoint-edu/assets@main/' + clean),
-                        'https://cdn.statically.io/gh/pinpoint-edu/assets@main/' + clean,
-                        'https://raw.githubusercontent.com/pinpoint-edu/assets/main/' + clean
+                        ...mirrors.map(m => m + '/gh/' + primaryRepo + clean),
+                        'https://cdn.statically.io/gh/' + primaryRepo + clean,
+                        'https://raw.githubusercontent.com/' + primaryRepo.replace('@main/', '/main/') + clean,
+                        ...mirrors.map(m => m + '/gh/' + fallbackRepo + clean),
+                        'https://raw.githubusercontent.com/' + fallbackRepo.replace('@main/', '/main/') + clean
                     ];
                 }
 
@@ -2536,7 +2656,12 @@ const PinpointGameStorage = {
                 }
 
                 if (!res) {
-                    throw new Error(`Failed to download ${clean} from CDN mirrors.`);
+                    if (i === 0) {
+                        throw new Error(`Failed to download ${clean} from CDN mirrors.`);
+                    }
+                    console.warn(`Optional asset ${clean} not found, continuing download...`);
+                    completedAssets++;
+                    continue;
                 }
 
                 const contentLength = parseInt(res.headers.get('content-length') || '0', 10);
@@ -3391,7 +3516,7 @@ function triggerBrowseAll() {
   renderGames();
 }
 
-// Debounced typing handler (1.2s delay pushes search bar up)
+// Instant typing handler (0ms delay for seamless instant search)
 const searchInput = document.getElementById('searchInput');
 searchInput.addEventListener('input', () => {
   const val = searchInput.value;
@@ -3404,10 +3529,8 @@ searchInput.addEventListener('input', () => {
     return;
   }
 
-  searchDebounceTimer = setTimeout(() => {
-    activateSearchState();
-    renderGames();
-  }, 1200);
+  activateSearchState();
+  renderGames();
 });
 
 searchInput.addEventListener('keydown', (e) => {
@@ -3536,17 +3659,17 @@ function prepareGameHtml(html, fileUrl) {
   // Protect car-soccer asset matcher from throwing if map is undefined
   html = html.replace(/function matchAsset\s*\(([^)]*)\)\s*\{/g, 'function matchAsset($1){ if(!map)return null;');
 
-  const lower = html.toLowerCase();
-  const firstScript = lower.indexOf('<script');
-  const firstHead = lower.indexOf('<head');
-  const hasRealHead = firstHead !== -1 && (firstScript === -1 || firstHead < firstScript);
-
-  // 1. Inject or update <base href="...">
+  // If the game already has an explicit absolute <base href="..."> (like Minecraft Pocket Edition, Gorilla Tag, Flying Gorilla)
+  // use that base URL instead of the container page URL!
   const mBase = html.match(/(<base\b[^>]*\bhref\s*=\s*)(['"])(.*?)\2/i);
   if (mBase) {
     const existingHref = mBase[3];
     if (/^https?:\/\//i.test(existingHref)) {
-      // It already has a valid absolute base URL (e.g. Superhot, Baseball Bros). Do not overwrite it!
+      base = existingHref;
+      if (!base.endsWith('/')) base += '/';
+      repoBase = base;
+      const mR = base.match(/^(https?:\/\/[^/]+\/(?:gh\/[^/]+\/[^/@]+@[^/]+\/|[^/]+\/[^/]+\/[^/]+\/))/i);
+      if (mR) repoBase = mR[1];
     } else {
       let resolvedBase = base;
       if (existingHref.startsWith('/')) {
@@ -3559,159 +3682,165 @@ function prepareGameHtml(html, fileUrl) {
         }
       }
       if (!resolvedBase.endsWith('/')) resolvedBase += '/';
+      base = resolvedBase;
       html = html.replace(/(<base\b[^>]*\bhref\s*=\s*)(['"])(.*?)\2/i, (m, p1, p2) => p1 + p2 + resolvedBase + p2);
     }
-  } else if (hasRealHead) {
-    html = html.replace(/<head([^>]*)>/i, (m, p1) => '<head' + p1 + '><base href="' + base + '">');
   } else {
-    html = '<base href="' + base + '">' + html;
+    const lower = html.toLowerCase();
+    const firstScript = lower.indexOf('<script');
+    const firstHead = lower.indexOf('<head');
+    const hasRealHead = firstHead !== -1 && (firstScript === -1 || firstHead < firstScript);
+    if (hasRealHead) {
+      html = html.replace(/<head([^>]*)>/i, (m, p1) => '<head' + p1 + '><base href="' + base + '">');
+    } else {
+      html = '<base href="' + base + '">' + html;
+    }
   }
 
   // 2. Inject frame viewport style and runtime fetch/XHR interceptor
   const isApp = fileUrl.includes('ai.html') || fileUrl.includes('yolk/');
   const frameStyle = isApp ? '' : '<style>html,body{height:100%;margin:0;padding:0;overflow:hidden;background:#000;}.webgl-content,#gameContainer,#canvas{width:100%;height:100%;}</style>';
-  const interceptScript = '<scr' + 'ipt>(function(){' +
-    'try {' +
-      'Object.defineProperty(window, "top", { get: function() { return window; } });' +
-    '}catch(e){}' +
-    'try {' +
-      'var _origPostMessage = window.postMessage;' +
-      'window.postMessage = function(msg, targetOrigin, transfer) {' +
-        'if (targetOrigin === "" || !targetOrigin) targetOrigin = "*";' +
-        'return _origPostMessage.call(this, msg, targetOrigin, transfer);' +
-      '};' +
-    '}catch(e){}' +
-    'window.ytgame = window.ytgame || {' +
-      'game: {' +
-        'firstFrameReady: function(){},' +
-        'gameReady: function(){},' +
-        'pause: function(){},' +
-        'resume: function(){}' +
-      '},' +
-      'engagement: {' +
-        'sendScore: function(){}' +
-      '}' +
-    '};' +
-    'window.RufflePlayer = window.RufflePlayer || {};' +
-    'window.RufflePlayer.config = Object.assign({' +
-      'publicPath: ' + JSON.stringify(repoBase + 'textbooks/ruffle/') +
-    '}, window.RufflePlayer.config || {});' +
-    'window._carSoccerImageBlobs = window._carSoccerImageBlobs || new Map();' +
-    'window.GZ_ASSETS_MAP = window.GZ_ASSETS_MAP || {};' +
-    'window.addEventListener("error", function(e) {' +
-      'if(e && e.message && (e.message.indexOf("getBoundingClientRect")!==-1 || e.message.indexOf("all.js")!==-1 || e.message.indexOf("matchAsset")!==-1)){' +
-        'e.preventDefault();' +
-        'e.stopPropagation();' +
-        'return true;' +
-      '}' +
-    '}, true);' +
-    'try {' +
-      'var origGetId = Document.prototype.getElementById;' +
-      'Document.prototype.getElementById = function(id) {' +
-        'var el = origGetId.call(this, id);' +
-        'if(!el && id === "canvas") { return document.querySelector("canvas"); }' +
-        'return el;' +
-      '};' +
-    '}catch(e){}' +
-    'window.__allAudioContexts = window.__allAudioContexts || [];' +
-    'try {' +
-      'var OrigAC = window.AudioContext || window.webkitAudioContext;' +
-      'if(OrigAC){' +
-        'var PatchedAC = function(){' +
-          'var ctx = new OrigAC();' +
-          'try{ window.__allAudioContexts.push(ctx); }catch(e){}' +
-          'return ctx;' +
-        '};' +
-        'PatchedAC.prototype = OrigAC.prototype;' +
-        'window.AudioContext = PatchedAC;' +
-        'if(window.webkitAudioContext) window.webkitAudioContext = PatchedAC;' +
-      '}' +
-    '}catch(e){}' +
-    'var b=' + JSON.stringify(base) + ';' +
-    'var rb=' + JSON.stringify(repoBase) + ';' +
-    'var m=' + JSON.stringify(activeMirror) + ';' +
-    'function fix(u){' +
-      'if(typeof u!=="string")return u;' +
-      'if(u.indexOf("blob:")===0||u.indexOf("data:")===0)return u;' +
-      'if(/all\\.js|settings\\/js/i.test(u)){' +
-        'return "data:application/javascript,";' +
-      '}' +
-      'if(u.indexOf("yolk/")!==-1){' +
-        'return m + "/gh/pinpoint-edu/pinpoint-mini@main/" + u.substring(u.indexOf("yolk/"));' +
-      '}' +
-      'if(/ai\\.html/i.test(u)){' +
-        'return m + "/gh/pinpoint-edu/pinpoint-mini@main/ai.html";' +
-      '}' +
-      'if(/savedata.*\\.ini|optiondata\\.dat/i.test(u)){' +
-        'return b + u.replace(/^\\/?(textbooks\\/)?/, "");' +
-      '}' +
-      'if(u.indexOf("matheveryday25/math@main/1v1lol/")!==-1 && u.includes(".unityweb")){' +
-        'return u.replace(/https?:\\/\\/[^/]*\\.jsdelivr\\.net\\/gh\\/matheveryday25\\/math@main\\//, "https://raw.githubusercontent.com/matheveryday25/math/main/");' +
-      '}' +
-      'if(/\\b(?:f9db7455c2c80fac021b|5db40605896b9147a8a1)\\.wasm\\b/i.test(u) || ((u.indexOf("ruffle/")!==-1 || /ruffle.*\\.wasm/i.test(u)) && !u.includes(".unityweb"))){' +
-        'var fn=u.substring(u.lastIndexOf("/")+1);' +
-        'return rb+"textbooks/ruffle/"+fn;' +
-      '}' +
-      'if(/\\.swf(?:[\\?#]|$)/i.test(u) && u.indexOf("://")===-1){' +
-        'var fn=u.substring(u.lastIndexOf("/")+1);' +
-        'return rb+"textbooks/"+fn;' +
-      '}' +
-      'if(u.indexOf("/textbooks/")===0)return rb+u.slice(1);' +
-      'if(u.indexOf("/assets/")===0)return rb+u.slice(1);' +
-      'if(u.startsWith("/")){' +
-        'return rb+u.slice(1);' +
-      '}' +
-      'if(u.indexOf("://")===-1){' +
-        'return b+u;' +
-      '}' +
-      'return u;' +
-    '}' +
-    'try {' +
-      'var origScriptSrc = Object.getOwnPropertyDescriptor(HTMLScriptElement.prototype, "src");' +
-      'if(origScriptSrc && origScriptSrc.set){' +
-        'Object.defineProperty(HTMLScriptElement.prototype, "src", {' +
-          'set: function(v){' +
-            'if(typeof v==="string"){' +
-              'if(/all\\.js|settings\\/js/i.test(v)) return origScriptSrc.set.call(this, "data:application/javascript,");' +
-              'v = fix(v);' +
-            '}' +
-            'return origScriptSrc.set.call(this, v);' +
-          '},' +
-          'get: function(){ return origScriptSrc.get.call(this); }' +
-        '});' +
-      '}' +
-    '}catch(e){}' +
-    'if(typeof window.fetch!=="undefined"){' +
-      'var _f=window.fetch;' +
-      'window.fetch=function(inp,init){' +
-        'var u = typeof inp==="string" ? inp : (inp && inp.url ? inp.url : "");' +
-        'if(/all\\.js|settings\\/js/i.test(u)){' +
-          'return Promise.resolve(new Response("", {status: 200, headers: {"Content-Type": "application/javascript"}}));' +
-        '}' +
-        'var targetUrl=fix(u);' +
-        'var req = (typeof inp==="string" || !inp) ? targetUrl : new Request(targetUrl, inp);' +
-        'return _f.call(this,req,init).then(function(res){' +
-          'if(!res.ok && (res.status===403 || res.status===404) && typeof targetUrl==="string" && targetUrl.indexOf("cdn.jsdelivr.net/gh/")!==-1){' +
-            'var rawUrl=targetUrl.replace(/https?:\\/\\/[^/]*\\.jsdelivr\\.net\\/gh\\/([^/@]+)\\/([^/@]+)(?:@[^/]+)?\\//, function(m, p1, p2){ return "https://raw.githubusercontent.com/" + p1 + "/" + p2 + "/main/"; });' +
-            'if(rawUrl!==targetUrl){' +
-              'var fbReq=(typeof inp==="string" || !inp) ? rawUrl : new Request(rawUrl, inp);' +
-              'return _f.call(window, fbReq, init);' +
-            '}' +
-          '}' +
-          'return res;' +
-        '});' +
-      '};' +
-    '}' +
-    'if(typeof XMLHttpRequest!=="undefined"){' +
-      'var _o=XMLHttpRequest.prototype.open;' +
-      'XMLHttpRequest.prototype.open=function(method,url,async,user,pass){' +
-        'var targetUrl=fix(url);' +
-        'return _o.call(this,method,targetUrl,async!==false,user,pass);' +
-      '};' +
-    '}' +
-  '})()</scr' + 'ipt>';
+  
+  const innerScriptBody = [
+    'try { Object.defineProperty(window, "top", { get: function() { return window; } }); } catch(e){}',
+    'try {',
+    '  var _origPostMessage = window.postMessage;',
+    '  window.postMessage = function(msg, targetOrigin, transfer) {',
+    '    if (targetOrigin === "" || !targetOrigin) targetOrigin = "*";',
+    '    return _origPostMessage.call(this, msg, targetOrigin, transfer);',
+    '  };',
+    '} catch(e){}',
+    'window.ytgame = window.ytgame || {',
+    '  game: { firstFrameReady: function(){}, gameReady: function(){}, pause: function(){}, resume: function(){} },',
+    '  engagement: { sendScore: function(){} }',
+    '};',
+    'window.RufflePlayer = window.RufflePlayer || {};',
+    'window.RufflePlayer.config = Object.assign({ publicPath: ' + JSON.stringify(repoBase + 'textbooks/ruffle/') + ' }, window.RufflePlayer.config || {});',
+    'window._carSoccerImageBlobs = window._carSoccerImageBlobs || new Map();',
+    'window.GZ_ASSETS_MAP = window.GZ_ASSETS_MAP || {};',
+    'window.addEventListener("error", function(e) {',
+    '  if(e && e.message && (e.message.indexOf("getBoundingClientRect")!==-1 || e.message.indexOf("all.js")!==-1 || e.message.indexOf("matchAsset")!==-1)){',
+    '    e.preventDefault(); e.stopPropagation(); return true;',
+    '  }',
+    '}, true);',
+    'try {',
+    '  var origGetId = Document.prototype.getElementById;',
+    '  Document.prototype.getElementById = function(id) {',
+    '    var el = origGetId.call(this, id);',
+    '    if(!el && id === "canvas") { return document.querySelector("canvas"); }',
+    '    return el;',
+    '  };',
+    '} catch(e){}',
+    'try {',
+    '  if(window.navigator && window.navigator.serviceWorker){',
+    '    window.navigator.serviceWorker.register = function(){ return new Promise(function(){}); };',
+    '  }',
+    '} catch(e){}',
+    'try {',
+    '  var _origWrite = document.write;',
+    '  document.write = function(s){',
+    '    if(typeof s === "string"){ s = s.replace(/<script[^>]*src=["\x27][^"\x27]*(?:all\\.js|settings\\/js\\/index\\.js)[^"\x27]*["\x27][^>]*>\\s*<\\/script>/gi, ""); }',
+    '    return _origWrite.call(this, s);',
+    '  };',
+    '} catch(e){}',
+    'try {',
+    '  var _origSetAttr = Element.prototype.setAttribute;',
+    '  Element.prototype.setAttribute = function(k, v){',
+    '    if(this instanceof HTMLScriptElement && k && k.toLowerCase() === "src"){',
+    '      if(typeof v === "string" && /all\\.js|settings\\/js/i.test(v)){ v = "data:application/javascript,"; }',
+    '    }',
+    '    return _origSetAttr.call(this, k, v);',
+    '  };',
+    '} catch(e){}',
+    'try {',
+    '  document.addEventListener("click", function(e){',
+    '    var a = e.target && e.target.closest && e.target.closest("a");',
+    '    if(a){',
+    '      var href = a.getAttribute("href");',
+    '      if(href && href.charAt(0) === "#"){',
+    '        e.preventDefault();',
+    '        if(window.location.hash !== href){ window.location.hash = href; } else { window.dispatchEvent(new Event("hashchange")); }',
+    '      }',
+    '    }',
+    '  }, true);',
+    '} catch(e){}',
+    'window.__allAudioContexts = window.__allAudioContexts || [];',
+    'try {',
+    '  var OrigAC = window.AudioContext || window.webkitAudioContext;',
+    '  if(OrigAC){',
+    '    var PatchedAC = function(){ var ctx = new OrigAC(); try{ window.__allAudioContexts.push(ctx); }catch(e){} return ctx; };',
+    '    PatchedAC.prototype = OrigAC.prototype;',
+    '    window.AudioContext = PatchedAC;',
+    '    if(window.webkitAudioContext) window.webkitAudioContext = PatchedAC;',
+    '  }',
+    '} catch(e){}',
+    'var b=' + JSON.stringify(base) + ';',
+    'var rb=' + JSON.stringify(repoBase) + ';',
+    'var m=' + JSON.stringify(activeMirror) + ';',
+    'function fix(u){',
+    '  if(typeof u!=="string") return u;',
+    '  if(u.indexOf("blob:")===0 || u.indexOf("data:")===0) return u;',
+    '  if(/all\\.js|settings\\/js/i.test(u)){ return "data:application/javascript,"; }',
+    '  if(u.indexOf("yolk/")!==-1){ return m + "/gh/pinpoint-edu/pinpoint-mini@main/" + u.substring(u.indexOf("yolk/")); }',
+    '  if(/ai\\.html/i.test(u)){ return m + "/gh/pinpoint-edu/pinpoint-mini@main/ai.html"; }',
+    '  if(/savedata.*\\.ini|optiondata\\.dat/i.test(u)){ return b + u.replace(/^\\/?(textbooks\\/)?/, ""); }',
+    '  if(u.indexOf("matheveryday25/math/truck")!==-1){ u = u.replace("/math/truck", "/math@main/truck"); }',
+    '  if(u.indexOf("matheveryday25/math@main/1v1lol/")!==-1 && u.includes(".unityweb")){',
+    '    return u.replace(/https?:\\/\\/[^/]*\\.jsdelivr\\.net\\/gh\\/matheveryday25\\/math@main\\//, "https://raw.githubusercontent.com/matheveryday25/math/main/");',
+    '  }',
+    '  if(/\\b(?:f9db7455c2c80fac021b|5db40605896b9147a8a1)\\.wasm\\b/i.test(u) || ((u.indexOf("ruffle/")!==-1 || /ruffle.*\\.wasm/i.test(u)) && !u.includes(".unityweb"))){',
+    '    var fn=u.substring(u.lastIndexOf("/")+1); return rb+"textbooks/ruffle/"+fn;',
+    '  }',
+    '  if(/\\.swf(?:[\\?#]|$)/i.test(u) && u.indexOf("://")===-1){',
+    '    var fn=u.substring(u.lastIndexOf("/")+1); return rb+"textbooks/"+fn;',
+    '  }',
+    '  if(u.indexOf("/textbooks/")===0) return rb+u.slice(1);',
+    '  if(u.indexOf("/assets/")===0) return rb+u.slice(1);',
+    '  if(u.startsWith("/")) return rb+u.slice(1);',
+    '  if(u.indexOf("://")===-1) return b+u;',
+    '  return u;',
+    '}',
+    'try {',
+    '  var origScriptSrc = Object.getOwnPropertyDescriptor(HTMLScriptElement.prototype, "src");',
+    '  if(origScriptSrc && origScriptSrc.set){',
+    '    Object.defineProperty(HTMLScriptElement.prototype, "src", {',
+    '      set: function(v){ if(typeof v==="string"){ if(/all\\.js|settings\\/js/i.test(v)) return origScriptSrc.set.call(this, "data:application/javascript,"); v = fix(v); } return origScriptSrc.set.call(this, v); },',
+    '      get: function(){ return origScriptSrc.get.call(this); }',
+    '    });',
+    '  }',
+    '} catch(e){}',
+    'if(typeof window.fetch!=="undefined"){',
+    '  var _f=window.fetch;',
+    '  window.fetch=function(inp,init){',
+    '    var u = typeof inp==="string" ? inp : (inp && inp.url ? inp.url : "");',
+    '    if(/all\\.js|settings\\/js/i.test(u)){ return Promise.resolve(new Response("", {status: 200, headers: {"Content-Type": "application/javascript"}})); }',
+    '    var targetUrl=fix(u);',
+    '    var req = (typeof inp==="string" || !inp) ? targetUrl : new Request(targetUrl, inp);',
+    '    return _f.call(this,req,init).then(function(res){',
+    '      if(!res.ok && (res.status===403 || res.status===404) && typeof targetUrl==="string" && targetUrl.indexOf("cdn.jsdelivr.net/gh/")!==-1){',
+    '        var rawUrl=targetUrl.replace(/https?:\\/\\/[^/]*\\.jsdelivr\\.net\\/gh\\/([^/@]+)\\/([^/@]+)(?:@[^/]+)?\\//, function(m, p1, p2){ return "https://raw.githubusercontent.com/" + p1 + "/" + p2 + "/main/"; });',
+    '        if(rawUrl!==targetUrl){',
+    '          var fbReq=(typeof inp==="string" || !inp) ? rawUrl : new Request(rawUrl, inp);',
+    '          return _f.call(window, fbReq, init);',
+    '        }',
+    '      }',
+    '      return res;',
+    '    });',
+    '  };',
+    '}',
+    'if(typeof XMLHttpRequest!=="undefined"){',
+    '  var _o=XMLHttpRequest.prototype.open;',
+    '  XMLHttpRequest.prototype.open=function(method,url,async,user,pass){',
+    '    var targetUrl=fix(url);',
+    '    return _o.call(this,method,targetUrl,async!==false,user,pass);',
+    '  };',
+    '}'
+  ].join('\n');
 
-  if (hasRealHead) {
+  const interceptScript = '<scr' + 'ipt>(function(){\n' + innerScriptBody + '\n})()</scr' + 'ipt>';
+
+  const firstHead = html.toLowerCase().indexOf('<head');
+  if (firstHead !== -1) {
     html = html.replace(/<head([^>]*)>/i, (m, p1) => '<head' + p1 + '>' + interceptScript + frameStyle);
   } else {
     html = interceptScript + frameStyle + html;
@@ -3725,6 +3854,7 @@ function prepareGameHtml(html, fileUrl) {
 
   return html;
 }
+
 
 function writeGameIntoFrame(iframe, rawHtml, fileUrl) {
   const preparedHtml = prepareGameHtml(rawHtml, fileUrl);
@@ -3785,7 +3915,7 @@ async function fetchGameHtml(file) {
   const mirrors = [activeMirror, ...CDN_MIRRORS.filter(m => m !== activeMirror)];
 
   // Apps live in pinpoint-mini, game textbooks live in assets
-  const isMiniRepo = fetchFile.startsWith('yolk/') || fetchFile === 'ai.html' || fetchFile.startsWith('pages/');
+  const isMiniRepo = fetchFile.startsWith('yolk/') || fetchFile === 'ai.html' || fetchFile.startsWith('pages/') || fetchFile.includes('superhot');
   const primaryRepo = isMiniRepo ? 'pinpoint-edu/pinpoint-mini@main/' : 'pinpoint-edu/assets@main/';
   const fallbackRepo = isMiniRepo ? 'pinpoint-edu/assets@main/' : 'pinpoint-edu/pinpoint-mini@main/';
 
@@ -3873,7 +4003,31 @@ async function playGame(encodedFile, encodedTitle) {
     <body>
       <div class="spinner"></div>
       <div style="font-size: 14px; letter-spacing: 0.5px;">Loading ${title}...</div>
-    </body>
+    
+  <!-- Settings Modal (Squircle Theme Tint Picker) -->
+  <div id="settingsModalOverlay" class="settings-modal-overlay" style="display: none;" onclick="closeSettingsModal(event)">
+    <div class="settings-modal-card" onclick="event.stopPropagation()">
+      <div class="settings-modal-header">
+        <div class="settings-modal-title-col">
+          <h2 class="settings-modal-title">Settings</h2>
+          <p class="settings-modal-sub">Personalize Trashbin appearance</p>
+        </div>
+        <button class="player-btn-squircle" onclick="toggleSettingsModal()" title="Close Settings">
+          <span class="material-symbols-sharp" style="font-size: 18px;">close</span>
+        </button>
+      </div>
+
+      <div class="settings-modal-section">
+        <div class="settings-section-label">Accent Tint</div>
+        <div class="settings-section-desc">Choose a website accent color tint (default is white). Tint will not affect Yolk.</div>
+        <div class="tint-grid" id="tintGrid">
+          <!-- 8 squircle color buttons rendered dynamically -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
     </html>
   `;
 
@@ -4561,7 +4715,7 @@ function updatePlayerDownloadBtn() {
     icon.style.animation = 'spin 1s linear infinite';
     btn.title = `Downloading... ${progress !== undefined ? progress + '%' : ''}`;
   } else {
-    icon.textContent = 'download';
+    icon.textContent = 'download_for_offline';
     icon.style.color = '';
     icon.style.animation = '';
     btn.title = 'Download for Offline';

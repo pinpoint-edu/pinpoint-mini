@@ -8,7 +8,6 @@ const RECOMMENDED_LIMIT_BYTES = 100 * 1024 * 1024; // 100 MB
 const GAME_MANIFESTS = {
     "textbooks/plants-vs-zombies/index.html": [
         "/textbooks/plants-vs-zombies/index.html",
-        "/textbooks/plants-vs-zombies/",
         "/textbooks/plants-vs-zombies/pvz_9_15.swf",
         "/textbooks/plants-vs-zombies/resources.swf",
         "/textbooks/plants-vs-zombies/data.xml",
@@ -29,28 +28,23 @@ const GAME_MANIFESTS = {
     ],
     "textbooks/getaway-shootout/index.html": [
         "/textbooks/getaway-shootout/index.html",
-        "/textbooks/getaway-shootout/",
         "/textbooks/getaway-shootout/Build/loader-v2.js",
         "/textbooks/getaway-shootout/Build/frame.js",
         "/textbooks/getaway-shootout/Build/864872d3e8c17c58e54028c101dae7a5.data.br",
         "/textbooks/getaway-shootout/Build/c0f8b2f06ae4c7c89b1e883b3d07ca8f.wasm.wasm",
-        "/textbooks/getaway-shootout/crazygames-sdk-v3-done.js",
         "/textbooks/getaway-shootout/StreamingAssets/Music.aac"
     ],
     "textbooks/getaway-shootout.html": [
         "/textbooks/getaway-shootout.html",
         "/textbooks/getaway-shootout/index.html",
-        "/textbooks/getaway-shootout/",
         "/textbooks/getaway-shootout/Build/loader-v2.js",
         "/textbooks/getaway-shootout/Build/frame.js",
         "/textbooks/getaway-shootout/Build/864872d3e8c17c58e54028c101dae7a5.data.br",
         "/textbooks/getaway-shootout/Build/c0f8b2f06ae4c7c89b1e883b3d07ca8f.wasm.wasm",
-        "/textbooks/getaway-shootout/crazygames-sdk-v3-done.js",
         "/textbooks/getaway-shootout/StreamingAssets/Music.aac"
     ],
     "textbooks/sprinter/index.html": [
         "/textbooks/sprinter/index.html",
-        "/textbooks/sprinter/",
         "/textbooks/sprinter/sprinter.swf",
         "/textbooks/ruffle/ruffle.js",
         "/textbooks/ruffle/core.ruffle.e1ab5671fe9d69a41e55.js",
@@ -58,7 +52,6 @@ const GAME_MANIFESTS = {
     ],
     "textbooks/basket-random/index.html": [
         "/textbooks/basket-random/index.html",
-        "/textbooks/basket-random/",
         "/textbooks/basket-random/appmanifest.json",
         "/textbooks/basket-random/box2d.wasm",
         "/textbooks/basket-random/box2d.wasm.js",
@@ -124,7 +117,6 @@ const GAME_MANIFESTS = {
         "/textbooks/basket-random/scripts/supportcheck.js"
     ],
     "textbooks/car-soccer/": [
-        "/textbooks/car-soccer/",
         "/textbooks/car-soccer/index.html",
         "/textbooks/car-soccer/game.js",
         "/textbooks/car-soccer/interceptor.js",
@@ -137,7 +129,6 @@ const GAME_MANIFESTS = {
     ],
     "textbooks/people-playground/index.html": [
         "/textbooks/people-playground/index.html",
-        "/textbooks/people-playground/",
         "/textbooks/people-playground/Build/PPG.loader.js",
         "/textbooks/people-playground/Build/PPG.framework.js",
         "/textbooks/people-playground/Build/PPG.data.part1",
@@ -188,7 +179,6 @@ const GAME_MANIFESTS = {
     ],
     "textbooks/escape-road-3/index.html": [
         "/textbooks/escape-road-3/index.html",
-        "/textbooks/escape-road-3/",
         "/textbooks/escape-road-3/game.html",
         "/textbooks/escape-road-3/game.css",
         "/textbooks/escape-road-3/gmsdkv1.js",
@@ -221,7 +211,6 @@ const GAME_MANIFESTS = {
     ],
     "textbooks/crazy-pixel-apocalypse-9/index.html": [
         "/textbooks/crazy-pixel-apocalypse-9/index.html",
-        "/textbooks/crazy-pixel-apocalypse-9/",
         "/textbooks/crazy-pixel-apocalypse-9/Build/puxx.data.unityweb",
         "/textbooks/crazy-pixel-apocalypse-9/Build/puxx.framework.js.unityweb",
         "/textbooks/crazy-pixel-apocalypse-9/Build/puxx.loader.js",
@@ -234,7 +223,6 @@ const GAME_MANIFESTS = {
     ],
     "textbooks/gumspin/index.html": [
         "/textbooks/gumspin/index.html",
-        "/textbooks/gumspin/",
         "/textbooks/gumspin/Build/UnityLoader.js",
         "/textbooks/gumspin/Build/GunSpin%20WebGL%20FinalVersion.json",
         "/textbooks/gumspin/Build/GunSpin WebGL FinalVersion.json",
@@ -259,7 +247,6 @@ const GAME_MANIFESTS = {
     ],
     "textbooks/monspin/index.html": [
         "/textbooks/gumspin/index.html",
-        "/textbooks/gumspin/",
         "/textbooks/gumspin/Build/UnityLoader.js",
         "/textbooks/gumspin/Build/GunSpin%20WebGL%20FinalVersion.json",
         "/textbooks/gumspin/Build/GunSpin WebGL FinalVersion.json",
@@ -333,7 +320,6 @@ const GAME_MANIFESTS = {
         "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2.data.unityweb",
         "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2.framework.js.unityweb",
         "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2.wasm.unityweb",
-        "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/",
         "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2_part1.data.unityweb",
         "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2_part2.data.unityweb"
     ],
@@ -348,7 +334,6 @@ const GAME_MANIFESTS = {
         "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2.data.unityweb",
         "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2.framework.js.unityweb",
         "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2.wasm.unityweb",
-        "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/",
         "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2_part1.data.unityweb",
         "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2_part2.data.unityweb"
     ],
@@ -509,12 +494,10 @@ const GAME_MANIFESTS = {
         "https://cdn.jsdelivr.net/gh/matheveryday25/math/chicken/Build/Build.wasm.unityweb"
     ],
     "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/chromedino.html": [
-        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/chromedino.html",
-        "https://www.google.com/jsapi"
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/chromedino.html"
     ],
     "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_chromedino.html": [
-        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/chromedino.html",
-        "https://www.google.com/jsapi"
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/chromedino.html"
     ],
     "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/clash.html": [
         "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/clash.html",
@@ -835,12 +818,10 @@ const GAME_MANIFESTS = {
         "https://cdn.jsdelivr.net/gh/matheveryday25/math/truck/Build/indian_truck_gd_2_0_1.wasm.framework.unityweb"
     ],
     "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/infinite.html": [
-        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/infinite.html",
-        "https://www.google.com/jsapi"
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/infinite.html"
     ],
     "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_infinite.html": [
-        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/infinite.html",
-        "https://www.google.com/jsapi"
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/infinite.html"
     ],
     "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/justbuild.html": [
         "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/justbuild.html",
@@ -936,7 +917,6 @@ const GAME_MANIFESTS = {
     ],
     "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/snowrider.html": [
         "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/snowrider.html",
-        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/js/main.min.js?//html5.api.gamedistribution.com/main.min.js",
         "https://cdn.jsdelivr.net/gh/era6yera6y/00@main/TemplateData/UnityProgress.js",
         "https://cdn.jsdelivr.net/gh/era6yera6y/00@main/Build/UnityLoader.js",
         "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/UB.png",
@@ -944,7 +924,6 @@ const GAME_MANIFESTS = {
     ],
     "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_snowrider.html": [
         "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/snowrider.html",
-        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/js/main.min.js?//html5.api.gamedistribution.com/main.min.js",
         "https://cdn.jsdelivr.net/gh/era6yera6y/00@main/TemplateData/UnityProgress.js",
         "https://cdn.jsdelivr.net/gh/era6yera6y/00@main/Build/UnityLoader.js",
         "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/UB.png",
@@ -990,7 +969,6 @@ const GAME_MANIFESTS = {
     ],
     "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/stickman.html": [
         "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/stickman.html",
-        "https://www.google.com/jsapi",
         "https://cdn.jsdelivr.net/gh/Ieoldj-hs101082/Koans@03568ae5309942037071f3e50daf892ae3539c31/logic/data.js",
         "https://cdn.jsdelivr.net/gh/Ieoldj-hs101082/Koans@03568ae5309942037071f3e50daf892ae3539c31/logic/sd.loader.js",
         "https://cdn.jsdelivr.net/sd.data.js",
@@ -1002,7 +980,6 @@ const GAME_MANIFESTS = {
     ],
     "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_stickman.html": [
         "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/stickman.html",
-        "https://www.google.com/jsapi",
         "https://cdn.jsdelivr.net/gh/Ieoldj-hs101082/Koans@03568ae5309942037071f3e50daf892ae3539c31/logic/data.js",
         "https://cdn.jsdelivr.net/gh/Ieoldj-hs101082/Koans@03568ae5309942037071f3e50daf892ae3539c31/logic/sd.loader.js",
         "https://cdn.jsdelivr.net/sd.data.js",
@@ -1235,6 +1212,12 @@ const PinpointGameStorage = {
                     throw err;
                 }
 
+                const clean = assetUrl.replace(/^\/+/, '');
+                if (!clean || clean.endsWith('/') || /google\.com|googletagmanager|google-analytics|gamedistribution|poki\.com|crazygames|gameanalytics/i.test(assetUrl)) {
+                    completedAssets++;
+                    continue;
+                }
+
                 let res;
                 try {
                     res = await fetch(assetUrl, { signal: controller.signal });
@@ -1268,7 +1251,12 @@ const PinpointGameStorage = {
                             }
                         } catch(e) {}
                     }
-                    if (!loaded) throw primaryErr;
+                    if (!loaded) {
+                        if (i === 0) throw primaryErr;
+                        console.warn('Optional asset could not be downloaded:', assetUrl);
+                        completedAssets++;
+                        continue;
+                    }
                 }
 
                 const contentLength = parseInt(res.headers.get('content-length') || '0', 10);
