@@ -455,6 +455,7 @@
       justify-content: space-between;
       gap: 16px;
       transition: all 0.15s ease;
+      cursor: pointer;
     }
 
     .game-card:hover {
@@ -1186,6 +1187,9 @@
         </button>
         <input type="file" id="runner-save-file-input" accept=".json,application/json" style="display: none;" onchange="PinpointSaveManager.handleImportFile(event)">
 
+        <button id="playerDownloadBtn" class="player-btn-squircle" onclick="downloadCurrentGame()" title="Download for Offline">
+          <span id="playerDownloadIcon" class="material-symbols-sharp">download</span>
+        </button>
         <button class="player-btn-squircle" onclick="reloadPlayer()" title="Reload Game">
           <span class="material-symbols-sharp">refresh</span>
         </button>
@@ -2657,7 +2661,7 @@ function renderGames() {
     const progress = activeProgressMap.get(id);
 
     html += `
-      <div class="game-card" id="card-${id}">
+      <div class="game-card" id="card-${id}" onclick="playGame('${encodeURIComponent(game.file)}', '${encodeURIComponent(game.title)}')">
         <div class="game-left">
           <div class="game-details">
             <span class="game-title">${game.title}</span>
@@ -2685,22 +2689,22 @@ function renderGames() {
         </div>
 
         <div class="game-actions">
-          <button class="btn-sharp btn-primary-sharp" onclick="playGame('${encodeURIComponent(game.file)}', '${encodeURIComponent(game.title)}')">
+          <button class="btn-sharp btn-primary-sharp" onclick="event.stopPropagation(); playGame('${encodeURIComponent(game.file)}', '${encodeURIComponent(game.title)}')">
             <span class="material-symbols-sharp">${game.isApp ? 'open_in_new' : 'play_arrow'}</span>
             <span>${game.isApp ? 'Open' : 'Play'}</span>
           </button>
 
           ${!game.isApp ? (isDownloaded ? `
-            <button class="btn-icon-sharp" onclick="deleteGame('${id}', '${encodeURIComponent(game.file)}', '${encodeURIComponent(game.title)}')" title="Remove">
+            <button class="btn-icon-sharp" onclick="event.stopPropagation(); deleteGame('${id}', '${encodeURIComponent(game.file)}', '${encodeURIComponent(game.title)}')" title="Remove">
               <span class="material-symbols-sharp">delete</span>
             </button>
           ` : isDownloading ? `
-            <button class="btn-sharp" onclick="cancelDownload('${id}')" title="Cancel">
+            <button class="btn-sharp" onclick="event.stopPropagation(); cancelDownload('${id}')" title="Cancel">
               <span class="material-symbols-sharp">close</span>
               <span>Cancel</span>
             </button>
           ` : `
-            <button class="btn-sharp" onclick="startDownload('${id}', '${encodeURIComponent(game.title)}', '${encodeURIComponent(game.file)}')" title="Download for offline">
+            <button class="btn-sharp" onclick="event.stopPropagation(); startDownload('${id}', '${encodeURIComponent(game.title)}', '${encodeURIComponent(game.file)}')" title="Download for offline">
               <span class="material-symbols-sharp">download</span>
               <span>Download</span>
             </button>
@@ -2741,17 +2745,31 @@ function prepareGameHtml(html, fileUrl) {
   const mBase = html.match(/(<base\b[^>]*\bhref\s*=\s*)(['"])(.*?)\2/i);
   if (mBase) {
     const existingHref = mBase[3];
-    if (existingHref.startsWith('/') || existingHref.startsWith('./') || !existingHref.includes('://')) {
-      html = html.replace(/(<base\b[^>]*\bhref\s*=\s*)(['"])(.*?)\2/i, '$1$2' + base + '$2');
+    if (/^https?:\/\//i.test(existingHref)) {
+      // It already has a valid absolute base URL (e.g. Baldi's Basics, Baseball Bros). Do not overwrite it!
+    } else {
+      let resolvedBase = base;
+      if (existingHref.startsWith('/')) {
+        resolvedBase = repoBase + existingHref.replace(/^\/+/, '');
+      } else {
+        try {
+          resolvedBase = new URL(existingHref, base).href;
+        } catch(e) {
+          resolvedBase = base + existingHref;
+        }
+      }
+      if (!resolvedBase.endsWith('/')) resolvedBase += '/';
+      html = html.replace(/(<base\b[^>]*\bhref\s*=\s*)(['"])(.*?)\2/i, (m, p1, p2) => p1 + p2 + resolvedBase + p2);
     }
   } else if (hasRealHead) {
-    html = html.replace(/<head([^>]*)>/i, '<head$1><base href="' + base + '">');
+    html = html.replace(/<head([^>]*)>/i, (m, p1) => '<head' + p1 + '><base href="' + base + '">');
   } else {
     html = '<base href="' + base + '">' + html;
   }
 
   // 2. Inject frame viewport style and runtime fetch/XHR interceptor
-  const frameStyle = '<style>html,body{height:100%;margin:0;padding:0;overflow:hidden;background:#000;}.webgl-content,#gameContainer,#canvas{width:100%;height:100%;}</style>';
+  const isApp = fileUrl.includes('ai.html') || fileUrl.includes('yolk/');
+  const frameStyle = isApp ? '' : '<style>html,body{height:100%;margin:0;padding:0;overflow:hidden;background:#000;}.webgl-content,#gameContainer,#canvas{width:100%;height:100%;}</style>';
   const interceptScript = '<scr' + 'ipt>(function(){' +
     'try {' +
       'Object.defineProperty(window, "top", { get: function() { return window; } });' +
@@ -2799,7 +2817,10 @@ function prepareGameHtml(html, fileUrl) {
       'if(/savedata.*\\.ini|optiondata\\.dat/i.test(u)){' +
         'return b + u.replace(/^\\/?(textbooks\\/)?/, "");' +
       '}' +
-      'if(u.indexOf("ruffle/")!==-1||u.indexOf(".wasm")!==-1){' +
+      'if(u.indexOf("matheveryday25/math@main/1v1lol/2.7.wasm.code.unityweb")!==-1){' +
+        'return "https://raw.githubusercontent.com/matheveryday25/math/main/1v1lol/2.7.wasm.code.unityweb";' +
+      '}' +
+      'if((u.indexOf("ruffle/")!==-1 || /ruffle.*\\.wasm/i.test(u)) && !u.includes(".unityweb")){' +
         'var fn=u.substring(u.lastIndexOf("/")+1);' +
         'return rb+"textbooks/ruffle/"+fn;' +
       '}' +
@@ -2835,9 +2856,18 @@ function prepareGameHtml(html, fileUrl) {
         'if(/all\\.js|settings\\/js/i.test(u)){' +
           'return Promise.resolve(new Response("", {status: 200, headers: {"Content-Type": "application/javascript"}}));' +
         '}' +
-        'if(typeof inp==="string")inp=fix(inp);' +
-        'else if(inp&&inp.url)inp=new Request(fix(inp.url),inp);' +
-        'return _f.call(this,inp,init);' +
+        'var targetUrl=fix(u);' +
+        'var req = (typeof inp==="string" || !inp) ? targetUrl : new Request(targetUrl, inp);' +
+        'return _f.call(this,req,init).then(function(res){' +
+          'if(!res.ok && (res.status===403 || res.status===404) && typeof targetUrl==="string" && targetUrl.indexOf("cdn.jsdelivr.net/gh/")!==-1){' +
+            'var rawUrl=targetUrl.replace(/https?:\\/\\/[^/]*\\.jsdelivr\\.net\\/gh\\/([^/@]+)\\/([^/@]+)(?:@[^/]+)?\\//, function(m, p1, p2){ return "https://raw.githubusercontent.com/" + p1 + "/" + p2 + "/main/"; });' +
+            'if(rawUrl!==targetUrl){' +
+              'var fbReq=(typeof inp==="string" || !inp) ? rawUrl : new Request(rawUrl, inp);' +
+              'return _f.call(window, fbReq, init);' +
+            '}' +
+          '}' +
+          'return res;' +
+        '});' +
       '};' +
     '}' +
     'if(typeof XMLHttpRequest!=="undefined"){' +
@@ -2850,13 +2880,13 @@ function prepareGameHtml(html, fileUrl) {
   '})();</scr' + 'ipt>';
 
   if (hasRealHead) {
-    html = html.replace(/<head([^>]*)>/i, '<head$1>' + interceptScript + frameStyle);
+    html = html.replace(/<head([^>]*)>/i, (m, p1) => '<head' + p1 + '>' + interceptScript + frameStyle);
   } else {
     html = interceptScript + frameStyle + html;
   }
 
   // 3. Resolve root-relative paths in HTML attributes
-  html = html.replace(/(\s(?:src|href))=(['"])\/(?!\/)/gi, '$1=$2' + repoBase);
+  html = html.replace(/(\s(?:src|href))=(['"])\/(?!\/)/gi, (m, p1, p2) => p1 + '=' + p2 + repoBase);
 
   // 4. Normalize jsdelivr mirror domains to current active mirror
   html = html.replace(/https?:\/\/[^/]*\.jsdelivr\.net\//g, activeMirror + '/');
@@ -2902,11 +2932,35 @@ async function fetchGameHtml(file) {
     fetchFile += 'index.html';
   }
 
+  // First try direct local / relative fetch (e.g. running on file://, localhost, or Vercel)
+  try {
+    const localRes = await fetch(fetchFile);
+    if (localRes.ok) {
+      const text = await localRes.text();
+      if (!text.includes('Package size exceeded') && !text.includes('limit of 20 MB') && !text.includes('404: Not Found') && !text.trim().startsWith('{"status": 4')) {
+        let localResolved = fetchFile;
+        try {
+          localResolved = new URL(fetchFile, window.location.href).href;
+        } catch(e) {}
+        return { html: text, resolvedUrl: localResolved };
+      }
+    }
+  } catch(e) {}
+
   const mirrors = [activeMirror, ...CDN_MIRRORS.filter(m => m !== activeMirror)];
+
+  // Apps live in pinpoint-mini, game textbooks live in assets
+  const isMiniRepo = fetchFile.startsWith('yolk/') || fetchFile === 'ai.html' || fetchFile.startsWith('pages/');
+  const primaryRepo = isMiniRepo ? 'pinpoint-edu/pinpoint-mini@main/' : 'pinpoint-edu/assets@main/';
+  const fallbackRepo = isMiniRepo ? 'pinpoint-edu/assets@main/' : 'pinpoint-edu/pinpoint-mini@main/';
+
   const urlsToTry = [
-    ...mirrors.map(m => m + '/gh/pinpoint-edu/assets@main/' + fetchFile),
-    'https://cdn.statically.io/gh/pinpoint-edu/assets@main/' + fetchFile,
-    'https://raw.githubusercontent.com/pinpoint-edu/assets/main/' + fetchFile
+    ...mirrors.map(m => m + '/gh/' + primaryRepo + fetchFile),
+    'https://cdn.statically.io/gh/' + primaryRepo + fetchFile,
+    'https://raw.githubusercontent.com/' + primaryRepo.replace('@main/', '/main/') + fetchFile,
+    ...mirrors.map(m => m + '/gh/' + fallbackRepo + fetchFile),
+    'https://cdn.statically.io/gh/' + fallbackRepo + fetchFile,
+    'https://raw.githubusercontent.com/' + fallbackRepo.replace('@main/', '/main/') + fetchFile
   ];
 
   for (const url of urlsToTry) {
@@ -2945,11 +2999,12 @@ async function playGame(encodedFile, encodedTitle) {
   if (window.PinpointSaveManager) {
     PinpointSaveManager.updateUI(file, title);
   }
+  updatePlayerDownloadBtn();
 
   const iframe = document.getElementById('gameIframe');
 
-  // Direct iframe navigation for standalone apps or embedded external players
-  if (file.startsWith('yolk/') || file === 'ai.html' || file.startsWith('pages/') || file.includes('scratch.mit.edu')) {
+  // Direct iframe navigation for external embeds
+  if (file.startsWith('http') && file.includes('scratch.mit.edu')) {
     iframe.removeAttribute('srcdoc');
     iframe.src = file;
     try { iframe.contentWindow.focus(); } catch(e) {}
@@ -2961,7 +3016,8 @@ async function playGame(encodedFile, encodedTitle) {
     try {
       const record = await PinpointGameStorage.getGame(id);
       if (record && record.content && record.content.length > 50) {
-        writeGameIntoFrame(iframe, record.content, activeMirror + '/gh/pinpoint-edu/assets@main/' + file);
+        const offlineBase = (/^https?:\/\//i.test(file)) ? file : (activeMirror + '/gh/pinpoint-edu/assets@main/' + file);
+        writeGameIntoFrame(iframe, record.content, offlineBase);
         return;
       }
     } catch(e) {}
@@ -3375,6 +3431,7 @@ function unmuteGameFrame() {
 function closePlayer() {
   isGamePausedInViewer = false;
   const iframe = document.getElementById('gameIframe');
+  iframe.removeAttribute('srcdoc');
   iframe.src = 'about:blank';
   document.getElementById('player-view').style.display = 'none';
   currentPlayingFile = null;
@@ -3382,6 +3439,7 @@ function closePlayer() {
   if (window.PinpointSaveManager) {
     PinpointSaveManager.updateUI(null);
   }
+  updatePlayerDownloadBtn();
 }
 
 function openGameStatusMenu() {
@@ -3635,6 +3693,55 @@ function renderBatteryFallback() {
   }
 }
 
+// Player Download Button State Manager
+function updatePlayerDownloadBtn() {
+  const btn = document.getElementById('playerDownloadBtn');
+  const icon = document.getElementById('playerDownloadIcon');
+  if (!btn || !icon) return;
+
+  if (!currentPlayingFile) {
+    btn.style.display = 'none';
+    return;
+  }
+
+  const id = getGameId(currentPlayingFile);
+  const isDownloaded = downloadedGameIds.has(id);
+  const isDownloading = typeof PinpointGameStorage !== 'undefined' && PinpointGameStorage.isDownloading(id);
+  const progress = activeProgressMap.get(id);
+
+  if (currentPlayingFile.startsWith('yolk/') || currentPlayingFile === 'ai.html' || currentPlayingFile.startsWith('pages/') || currentPlayingFile.includes('scratch.mit.edu')) {
+    btn.style.display = 'none';
+    return;
+  }
+  btn.style.display = 'inline-flex';
+
+  if (isDownloaded) {
+    icon.textContent = 'check_circle';
+    icon.style.color = '#34d399';
+    icon.style.animation = '';
+    btn.title = 'Downloaded for Offline';
+  } else if (isDownloading) {
+    icon.textContent = 'sync';
+    icon.style.color = '#60a5fa';
+    icon.style.animation = 'spin 1s linear infinite';
+    btn.title = `Downloading... ${progress !== undefined ? progress + '%' : ''}`;
+  } else {
+    icon.textContent = 'download';
+    icon.style.color = '';
+    icon.style.animation = '';
+    btn.title = 'Download for Offline';
+  }
+}
+
+async function downloadCurrentGame() {
+  if (!currentPlayingFile || !currentPlayingTitle) return;
+  const id = getGameId(currentPlayingFile);
+  if (downloadedGameIds.has(id)) {
+    return;
+  }
+  await startDownload(id, encodeURIComponent(currentPlayingTitle), encodeURIComponent(currentPlayingFile));
+}
+
 // Download Game for Offline
 async function startDownload(id, encodedTitle, encodedFile) {
   const title = decodeURIComponent(encodedTitle);
@@ -3651,6 +3758,7 @@ async function startDownload(id, encodedTitle, encodedFile) {
 
   activeProgressMap.set(id, 0);
   renderGames();
+  updatePlayerDownloadBtn();
 
   try {
     await PinpointGameStorage.downloadGame(id, title, file, (progress) => {
@@ -3662,12 +3770,14 @@ async function startDownload(id, encodedTitle, encodedFile) {
         const badge = card.querySelector('.badge-progress');
         if (badge) badge.innerHTML = `<span class="material-symbols-sharp" style="font-size: 13px; animation: spin 1s linear infinite;">sync</span> ${progress.percent}%`;
       }
+      updatePlayerDownloadBtn();
     });
 
     activeProgressMap.delete(id);
     downloadedGameIds.add(id);
     updateCounts();
     renderGames();
+    updatePlayerDownloadBtn();
   } catch (err) {
     activeProgressMap.delete(id);
     console.error('Download error:', err);
@@ -3675,6 +3785,7 @@ async function startDownload(id, encodedTitle, encodedFile) {
       alert('Failed to download ' + title + ': ' + err.message);
     }
     renderGames();
+    updatePlayerDownloadBtn();
   }
 }
 
@@ -3684,6 +3795,7 @@ function cancelDownload(id) {
   }
   activeProgressMap.delete(id);
   renderGames();
+  updatePlayerDownloadBtn();
 }
 
 async function deleteGame(id, encodedFile, encodedTitle) {
@@ -3705,6 +3817,7 @@ async function deleteGame(id, encodedFile, encodedTitle) {
   downloadedGameIds.delete(id);
   updateCounts();
   renderGames();
+  updatePlayerDownloadBtn();
 }
 
 function updateOnlineStatus() {
