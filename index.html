@@ -199,9 +199,9 @@
     .header-status-squircle.online .dot {
       width: 8px;
       height: 8px;
-      background: var(--accent);
+      background: #22c55e;
       border-radius: 50%;
-      box-shadow: 0 0 10px var(--accent);
+      box-shadow: 0 0 8px rgba(34, 197, 94, 0.8);
     }
 
     .header-status-squircle.offline .dot {
@@ -534,15 +534,17 @@
       gap: 6px;
     }
 
-    /* Game Cards Grid (scrolls internally) */
+    /* Game Cards Grid (scrolls internally, generous padding so underglow never clips) */
     .game-grid {
       flex: 1;
       min-height: 0;
       overflow-y: auto;
-      padding-right: 6px;
+      overflow-x: hidden;
+      padding: 10px 16px 20px 16px;
+      margin: -10px -16px 0 -16px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
       scrollbar-width: thin;
       scrollbar-color: var(--border-hover) transparent;
     }
@@ -571,13 +573,15 @@
       gap: 16px;
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       cursor: pointer;
+      position: relative;
     }
 
     .game-card:hover {
       background: var(--bg-card);
       border-color: var(--accent);
       transform: translateY(-2px);
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5), 0 0 16px var(--accent-glow);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5), 0 0 18px var(--accent-glow);
+      z-index: 2;
     }
 
     .game-left {
@@ -3946,6 +3950,37 @@ function prepareGameHtml(html, fileUrl) {
     '    if(window.webkitAudioContext) window.webkitAudioContext = PatchedAC;',
     '  }',
     '} catch(e){}',
+    'try {',
+    '  var _origGetImageData = CanvasRenderingContext2D.prototype.getImageData;',
+    '  CanvasRenderingContext2D.prototype.getImageData = function(sx, sy, sw, sh, settings) {',
+    '    try {',
+    '      if(!sw || sw <= 0) sw = 1;',
+    '      if(!sh || sh <= 0) sh = 1;',
+    '      var res = _origGetImageData.call(this, sx, sy, sw, sh, settings);',
+    '      if(!res || !res.data){',
+    '        return this.createImageData(Math.max(1, Math.round(sw)), Math.max(1, Math.round(sh)));',
+    '      }',
+    '      return res;',
+    '    } catch(e){',
+    '      try {',
+    '        return this.createImageData(Math.max(1, Math.round(sw || 1)), Math.max(1, Math.round(sh || 1)));',
+    '      } catch(err){',
+    '        var w = Math.max(1, Math.round(sw || 1)), h = Math.max(1, Math.round(sh || 1));',
+    '        return { width: w, height: h, data: new Uint8ClampedArray(w * h * 4) };',
+    '      }',
+    '    }',
+    '  };',
+    '} catch(e){}',
+    'try {',
+    '  var _origGetContext = HTMLCanvasElement.prototype.getContext;',
+    '  HTMLCanvasElement.prototype.getContext = function(type, attribs) {',
+    '    if(type === "2d"){',
+    '      attribs = attribs || {};',
+    '      attribs.willReadFrequently = true;',
+    '    }',
+    '    return _origGetContext.call(this, type, attribs);',
+    '  };',
+    '} catch(e){}',
     'var b=' + JSON.stringify(base) + ';',
     'var rb=' + JSON.stringify(repoBase) + ';',
     'var m=' + JSON.stringify(activeMirror) + ';',
@@ -3969,6 +4004,15 @@ function prepareGameHtml(html, fileUrl) {
     '  if(u.indexOf("matheveryday25/math/truck") !== -1){ u = u.replace("/math/truck", "/math@main/truck"); }',
     '  if(u.indexOf("matheveryday25/math@main/1v1lol/") !== -1 && u.indexOf(".unityweb") !== -1){',
     '    return u.replace("cdn.jsdelivr.net/gh/matheveryday25/math@main/", "raw.githubusercontent.com/matheveryday25/math/main/");',
+    '  }',
+    '  if(u.indexOf("dispatchworker.js") !== -1 && u.indexOf("scripts/") === -1){',
+    '    u = u.replace("dispatchworker.js", "scripts/dispatchworker.js");',
+    '  }',
+    '  if(u.indexOf("jobworker.js") !== -1 && u.indexOf("scripts/") === -1){',
+    '    u = u.replace("jobworker.js", "scripts/jobworker.js");',
+    '  }',
+    '  if(u.indexOf("c3runtime.js") !== -1 && u.indexOf("scripts/") === -1){',
+    '    u = u.replace("c3runtime.js", "scripts/c3runtime.js");',
     '  }',
     '  if(u.indexOf(".swf") !== -1){',
     '    if(u.indexOf("cdn.jsdelivr.net") === -1 && u.indexOf("githubusercontent.com") === -1){',
@@ -4004,7 +4048,14 @@ function prepareGameHtml(html, fileUrl) {
     '  var OrigWorker = window.Worker;',
     '  if(OrigWorker){',
     '    window.Worker = function(scriptURL, options){',
-    '      var resolved = fix(typeof scriptURL==="string" ? scriptURL : (scriptURL && scriptURL.href ? scriptURL.href : ""));',
+    '      var raw = typeof scriptURL==="string" ? scriptURL : (scriptURL && scriptURL.href ? scriptURL.href : "");',
+    '      var resolved = fix(raw);',
+    '      if(resolved.indexOf("dispatchworker.js") !== -1 && resolved.indexOf("scripts/") === -1){',
+    '        resolved = resolved.replace("dispatchworker.js", "scripts/dispatchworker.js");',
+    '      }',
+    '      if(resolved.indexOf("jobworker.js") !== -1 && resolved.indexOf("scripts/") === -1){',
+    '        resolved = resolved.replace("jobworker.js", "scripts/jobworker.js");',
+    '      }',
     '      if(resolved.indexOf("http://")===0 || resolved.indexOf("https://")===0){',
     '        try {',
     '          var blobCode = "importScripts(" + JSON.stringify(resolved) + ");";',
@@ -4033,6 +4084,9 @@ function prepareGameHtml(html, fileUrl) {
     '    var u = typeof inp==="string" ? inp : (inp && inp.url ? inp.url : "");',
     '    if(u.indexOf("all.js")!==-1 || u.indexOf("settings/js")!==-1){ return Promise.resolve(new Response("", {status: 200, headers: {"Content-Type": "application/javascript"}})); }',
     '    var targetUrl=fix(u);',
+    '    if(targetUrl.endsWith("/textbooks/basket-random/") || targetUrl.endsWith("/textbooks/basket-random")){',
+    '      return Promise.resolve(new Response("<!DOCTYPE html><html></html>", {status: 200, headers: {"Content-Type": "text/html"}}));',
+    '    }',
     '    var req = (typeof inp==="string" || !inp) ? targetUrl : new Request(targetUrl, inp);',
     '    return _f.call(this,req,init).then(function(res){',
     '      if(!res.ok && (res.status===403 || res.status===404) && typeof targetUrl==="string" && targetUrl.indexOf("cdn.jsdelivr.net/gh/")!==-1){',
