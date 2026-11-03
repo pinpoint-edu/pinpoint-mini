@@ -109,7 +109,7 @@
 
     try {
       if (typeof document !== 'undefined') {
-        const iframe = document.getElementById('runner-iframe');
+        const iframe = document.getElementById('gameIframe') || document.getElementById('runner-iframe');
         if (iframe && iframe.contentWindow && iframe.contentWindow.localStorage) {
           if (!storages.includes(iframe.contentWindow.localStorage)) {
             storages.push(iframe.contentWindow.localStorage);
@@ -305,7 +305,7 @@
 
   // Reload runner iframe
   function reloadRunnerIframe() {
-    const iframe = document.getElementById('runner-iframe');
+    const iframe = document.getElementById('gameIframe') || document.getElementById('runner-iframe');
     if (iframe) {
       try {
         if (iframe.contentWindow && iframe.contentWindow.location) {

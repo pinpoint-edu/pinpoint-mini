@@ -869,6 +869,50 @@
       background: #e4e4e7;
     }
 
+    /* Toast Notifications */
+    .trashbin-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(40px);
+      background: #18181b;
+      border: 1px solid #27272a;
+      border-radius: 12px;
+      padding: 10px 18px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #ffffff;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .trashbin-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+
+    .trashbin-toast.success {
+      border-color: #22c55e;
+      color: #22c55e;
+    }
+
+    .trashbin-toast.warning {
+      border-color: #f59e0b;
+      color: #f59e0b;
+    }
+
+    .trashbin-toast.error {
+      border-color: #ef4444;
+      color: #ef4444;
+    }
+
     .player-iframe {
       flex: 1;
       width: 100%;
@@ -980,6 +1024,15 @@
       </div>
 
       <div class="player-header-right">
+        <!-- Retro Bowl & Retro Bowl College Save Manager -->
+        <button id="runner-save-export" class="player-btn-squircle" onclick="PinpointSaveManager.exportCurrentSave()" title="Export Save Data (.json)" style="display: none;">
+          <span class="material-symbols-sharp">download</span>
+        </button>
+        <button id="runner-save-import" class="player-btn-squircle" onclick="PinpointSaveManager.triggerImportCurrentSave()" title="Import Save Data (.json)" style="display: none;">
+          <span class="material-symbols-sharp">upload</span>
+        </button>
+        <input type="file" id="runner-save-file-input" accept=".json,application/json" style="display: none;" onchange="PinpointSaveManager.handleImportFile(event)">
+
         <button class="player-btn-squircle" onclick="reloadPlayer()" title="Reload Game">
           <span class="material-symbols-sharp">refresh</span>
         </button>
@@ -2285,6 +2338,7 @@ let games = [...DEFAULT_GAMES];
 let downloadedGameIds = new Set();
 let currentTab = 'all'; // 'all' or 'downloaded'
 let currentPlayingFile = null;
+let currentPlayingTitle = null;
 let activeProgressMap = new Map();
 let searchDebounceTimer = null;
 
@@ -2626,8 +2680,13 @@ async function playGame(encodedFile, encodedTitle) {
   const id = getGameId(file);
 
   currentPlayingFile = file;
+  currentPlayingTitle = title;
   document.getElementById('currentPlayerTitle').textContent = title;
   document.getElementById('player-view').style.display = 'flex';
+
+  if (window.PinpointSaveManager) {
+    PinpointSaveManager.updateUI(file, title);
+  }
 
   const iframe = document.getElementById('gameIframe');
 
@@ -2692,6 +2751,320 @@ async function playGame(encodedFile, encodedTitle) {
   }
 }
 
+// Pinpoint Game Save Manager (Retro Bowl & Retro Bowl College)
+const SAVE_SALT = 'PinpointMini_SecureSave_v1';
+
+const GAME_SAVE_CONFIGS = {
+  'retro-bowl': {
+    id: 'retro-bowl',
+    title: 'Retro Bowl',
+    matchers: [
+      /textbooks\/retro-bowl\.html/i,
+      /retro-bowl(?!\-college)/i,
+      /retro\s*bowl(?!\s*college)/i,
+      /^retro-bowl$/i
+    ],
+    isKeyMatch: (key) => {
+      if (!key || typeof key !== 'string') return false;
+      return (key.startsWith('RetroBowl.') || key.startsWith('RetroBowl_')) &&
+             !key.startsWith('RetroBowlCollege.') &&
+             !key.startsWith('RetroBowlCollege_') &&
+             !key.startsWith('RetroBowl_College');
+    },
+    validateData: (data) => {
+      const keys = Object.keys(data || {});
+      if (keys.length === 0) return { valid: false, error: 'No save data entries found.' };
+      for (const k of keys) {
+        if (k.toLowerCase().includes('college')) {
+          return { valid: false, error: 'Save data contains Retro Bowl College keys and cannot be imported into Retro Bowl.' };
+        }
+        if (!k.startsWith('RetroBowl.') && !k.startsWith('RetroBowl_')) {
+          return { valid: false, error: `Unrecognized save key '${k}' for Retro Bowl.` };
+        }
+      }
+      return { valid: true };
+    }
+  },
+  'retro-bowl-college': {
+    id: 'retro-bowl-college',
+    title: 'Retro Bowl College',
+    matchers: [
+      /textbooks\/retro-bowl-college\.html/i,
+      /retro-bowl-college/i,
+      /retro\s*bowl\s*college/i,
+      /^retro-bowl-college$/i
+    ],
+    isKeyMatch: (key) => {
+      if (!key || typeof key !== 'string') return false;
+      return key.startsWith('RetroBowlCollege.') ||
+             key.startsWith('RetroBowlCollege_') ||
+             key.startsWith('RetroBowl_College.') ||
+             key.startsWith('RetroBowl_College_');
+    },
+    validateData: (data) => {
+      const keys = Object.keys(data || {});
+      if (keys.length === 0) return { valid: false, error: 'No save data entries found.' };
+      for (const k of keys) {
+        if (!k.startsWith('RetroBowlCollege.') && !k.startsWith('RetroBowlCollege_') && !k.startsWith('RetroBowl_College')) {
+          return { valid: false, error: `Save data contains non-College Retro Bowl keys ('${k}') and cannot be imported into Retro Bowl College.` };
+        }
+      }
+      return { valid: true };
+    }
+  }
+};
+
+function computeSaveChecksum(gameId, dataObj) {
+  const keys = Object.keys(dataObj).sort();
+  let str = gameId + ':' + SAVE_SALT + ':';
+  for (const k of keys) {
+    str += k + '=' + String(dataObj[k]).length + ':' + String(dataObj[k]).slice(0, 50) + ';';
+  }
+  let h1 = 0x811c9dc5;
+  for (let i = 0; i < str.length; i++) {
+    h1 ^= str.charCodeAt(i);
+    h1 = Math.imul(h1, 0x01000193);
+  }
+  return (h1 >>> 0).toString(16).padStart(8, '0');
+}
+
+function getSaveGameConfig(fileOrTitle) {
+  if (!fileOrTitle || typeof fileOrTitle !== 'string') return null;
+  const cleanStr = fileOrTitle.trim();
+  for (const id in GAME_SAVE_CONFIGS) {
+    const cfg = GAME_SAVE_CONFIGS[id];
+    if (cfg.id === cleanStr) return cfg;
+    if (cfg.title.toLowerCase() === cleanStr.toLowerCase()) return cfg;
+    for (const m of cfg.matchers) {
+      if (m.test(cleanStr)) return cfg;
+    }
+  }
+  return null;
+}
+
+function getSaveStorageList() {
+  const storages = [];
+  try {
+    if (typeof localStorage !== 'undefined') storages.push(localStorage);
+  } catch(e) {}
+
+  try {
+    const iframe = document.getElementById('gameIframe') || document.getElementById('runner-iframe');
+    if (iframe && iframe.contentWindow) {
+      try {
+        const ifStorage = iframe.contentWindow.localStorage;
+        if (ifStorage && !storages.includes(ifStorage)) {
+          storages.push(ifStorage);
+        }
+      } catch(secErr) {}
+    }
+  } catch(e) {}
+
+  return storages;
+}
+
+function showTrashbinToast(msg, type = 'info', duration = 3500) {
+  let toast = document.getElementById('trashbin-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'trashbin-toast';
+    document.body.appendChild(toast);
+  }
+  toast.className = `trashbin-toast ${type} show`;
+  toast.innerHTML = `<span class="material-symbols-sharp" style="font-size: 18px;">${type === 'success' ? 'check_circle' : type === 'error' ? 'error' : type === 'warning' ? 'warning' : 'info'}</span><span>${msg}</span>`;
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => {
+    toast.className = 'trashbin-toast';
+  }, duration);
+}
+
+const PinpointSaveManager = {
+  isSupported: (fileOrTitle) => !!getSaveGameConfig(fileOrTitle),
+
+  updateUI: (file, title) => {
+    const isSupported = !!getSaveGameConfig(file || title);
+    const exportBtn = document.getElementById('runner-save-export');
+    const importBtn = document.getElementById('runner-save-import');
+    if (exportBtn) exportBtn.style.display = isSupported ? 'inline-flex' : 'none';
+    if (importBtn) importBtn.style.display = isSupported ? 'inline-flex' : 'none';
+  },
+
+  exportCurrentSave: () => {
+    const target = currentPlayingFile || currentPlayingTitle || '';
+    const cfg = getSaveGameConfig(target);
+    if (!cfg) {
+      showTrashbinToast('Save export is not supported for this game.', 'warning');
+      return false;
+    }
+
+    const storages = getSaveStorageList();
+    const data = {};
+    for (const storage of storages) {
+      try {
+        for (let i = 0; i < storage.length; i++) {
+          const key = storage.key(i);
+          if (key && cfg.isKeyMatch(key)) {
+            const val = storage.getItem(key);
+            if (val !== null && val !== undefined) {
+              data[key] = val;
+            }
+          }
+        }
+      } catch(e) {}
+    }
+
+    const keyCount = Object.keys(data).length;
+    if (keyCount === 0) {
+      showTrashbinToast(`No save data found yet for ${cfg.title}. Play a match or start a season first!`, 'warning', 4500);
+      return false;
+    }
+
+    const now = new Date();
+    const savePayload = {
+      pinpointSave: true,
+      formatVersion: 1,
+      app: 'pinpoint-mini',
+      gameId: cfg.id,
+      gameTitle: cfg.title,
+      exportedAt: now.toISOString(),
+      timestamp: now.getTime(),
+      metadata: {
+        keyCount: keyCount,
+        keys: Object.keys(data),
+        totalBytes: JSON.stringify(data).length
+      },
+      checksum: computeSaveChecksum(cfg.id, data),
+      data: data
+    };
+
+    const jsonString = JSON.stringify(savePayload, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const dateStamp = now.toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `${cfg.id}_save_${dateStamp}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    showTrashbinToast(`Exported save file for ${cfg.title} (${keyCount} entries)!`, 'success');
+    return true;
+  },
+
+  triggerImportCurrentSave: () => {
+    const fileInput = document.getElementById('runner-save-file-input');
+    if (fileInput) {
+      fileInput.value = '';
+      fileInput.click();
+    }
+  },
+
+  handleImportFile: (event) => {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    const target = currentPlayingFile || currentPlayingTitle || '';
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const content = e.target.result;
+      PinpointSaveManager.importSave(target, content);
+    };
+    reader.onerror = function() {
+      showTrashbinToast('Failed to read save file from disk.', 'error');
+    };
+    reader.readAsText(file);
+  },
+
+  importSave: async (fileOrTitle, jsonContent) => {
+    const cfg = getSaveGameConfig(fileOrTitle);
+    if (!cfg) {
+      showTrashbinToast('Save import is not supported for this game.', 'error');
+      return false;
+    }
+
+    let parsed;
+    try {
+      parsed = typeof jsonContent === 'string' ? JSON.parse(jsonContent) : jsonContent;
+    } catch(e) {
+      showTrashbinToast('Invalid file: The file does not contain valid JSON.', 'error');
+      return false;
+    }
+
+    if (!parsed || typeof parsed !== 'object') {
+      showTrashbinToast('Invalid save file format.', 'error');
+      return false;
+    }
+
+    if (!parsed.pinpointSave && !parsed.data) {
+      showTrashbinToast('Invalid save file: Missing save data structure.', 'error');
+      return false;
+    }
+
+    if (parsed.gameId && parsed.gameId !== cfg.id) {
+      const originTitle = parsed.gameTitle || parsed.gameId;
+      showTrashbinToast(`Incompatible Save: File belongs to "${originTitle}", cannot import into "${cfg.title}".`, 'error', 5000);
+      return false;
+    }
+
+    const payloadData = parsed.data || parsed;
+    const valResult = cfg.validateData(payloadData);
+    if (!valResult.valid) {
+      showTrashbinToast(`Save Validation Failed: ${valResult.error}`, 'error', 5000);
+      return false;
+    }
+
+    const saveCount = Object.keys(payloadData).length;
+    const confirmed = confirm(`Import save for ${cfg.title}?\n\nThis will overwrite your existing save progress on this device with ${saveCount} save entries from ${parsed.exportedAt ? new Date(parsed.exportedAt).toLocaleDateString() : 'the uploaded file'}.`);
+
+    if (!confirmed) {
+      showTrashbinToast('Save import cancelled.', 'info');
+      return false;
+    }
+
+    const storages = getSaveStorageList();
+    for (const storage of storages) {
+      try {
+        const keysToRemove = [];
+        for (let i = 0; i < storage.length; i++) {
+          const k = storage.key(i);
+          if (k && cfg.isKeyMatch(k)) {
+            keysToRemove.push(k);
+          }
+        }
+        for (const k of keysToRemove) {
+          storage.removeItem(k);
+        }
+
+        for (const [k, v] of Object.entries(payloadData)) {
+          storage.setItem(k, v);
+        }
+      } catch(e) {
+        console.error('[PinpointSaveManager] Error writing storage:', e);
+      }
+    }
+
+    // Reload iframe
+    const iframe = document.getElementById('gameIframe') || document.getElementById('runner-iframe');
+    if (iframe) {
+      try {
+        if (iframe.contentWindow && iframe.contentWindow.location) {
+          iframe.contentWindow.location.reload();
+        } else {
+          reloadPlayer();
+        }
+      } catch(e) {
+        reloadPlayer();
+      }
+    }
+
+    showTrashbinToast(`Successfully imported save for ${cfg.title}! Reloading game...`, 'success', 4000);
+    return true;
+  }
+};
+window.PinpointSaveManager = PinpointSaveManager;
+
 let lastPlayingGame = null;
 
 function closePlayer() {
@@ -2699,6 +3072,10 @@ function closePlayer() {
   iframe.src = 'about:blank';
   document.getElementById('player-view').style.display = 'none';
   currentPlayingFile = null;
+  currentPlayingTitle = null;
+  if (window.PinpointSaveManager) {
+    PinpointSaveManager.updateUI(null);
+  }
 }
 
 function openGameStatusMenu() {
