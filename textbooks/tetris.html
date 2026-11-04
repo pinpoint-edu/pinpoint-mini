@@ -163,22 +163,23 @@
       border: 3px solid #000000;
       overflow: hidden;
       flex-shrink: 0;
+      position: relative;
     }
 
+    /* NEVER stretch canvas pixels with CSS percentage widths */
     #next-canvas {
       display: block;
       background: #d4d4d8;
-      width: 100%;
-      height: 100%;
+      margin: auto;
     }
 
-    /* Keyboard Inverted-T Arrow Cluster Setup (No Container) */
+    /* Keyboard Inverted-T Arrow Cluster Setup (No Controls Box) */
     .keyboard-arrow-cluster {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 12px;
       flex: 1;
       margin-top: auto;
       margin-bottom: auto;
@@ -191,13 +192,14 @@
 
     .arrow-row-bottom {
       display: flex;
-      gap: 10px;
+      gap: 12px;
       justify-content: center;
     }
 
+    /* Universal Buttons */
     .btn-key {
-      width: 72px;
-      height: 72px;
+      width: 74px;
+      height: 74px;
       background: #1d4ed8;
       color: #ffffff;
       border: 3px solid #000000;
@@ -207,6 +209,7 @@
       cursor: pointer;
       outline: none;
       transition: background 0.1s, transform 0.05s;
+      position: relative;
     }
 
     .btn-key:hover {
@@ -225,7 +228,7 @@
     /* Bottom Actions Row: Big Square Pause & Music Buttons */
     .bottom-actions-row {
       display: flex;
-      gap: 12px;
+      gap: 14px;
       justify-content: center;
       align-items: center;
       margin-top: auto;
@@ -233,8 +236,8 @@
     }
 
     .btn-action-square {
-      width: 64px;
-      height: 64px;
+      width: 68px;
+      height: 68px;
       background: #123060;
       color: #ffffff;
       border: 3px solid #000000;
@@ -244,6 +247,7 @@
       cursor: pointer;
       outline: none;
       transition: background 0.1s, transform 0.05s;
+      position: relative;
     }
 
     .btn-action-square:hover {
@@ -255,7 +259,71 @@
     }
 
     .btn-action-square .material-symbols-sharp {
-      font-size: 34px;
+      font-size: 36px;
+    }
+
+    /* Sharp Custom Tooltip System */
+    [data-tooltip] {
+      position: relative;
+    }
+
+    [data-tooltip]::before {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: calc(100% + 10px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #040915;
+      color: #ffffff;
+      border: 2px solid #000000;
+      padding: 6px 10px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.15s ease, visibility 0.15s ease;
+      z-index: 100;
+      text-transform: uppercase;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+    }
+
+    /* Notch arrow pointing down from top tooltip */
+    [data-tooltip]::after {
+      content: '';
+      position: absolute;
+      bottom: calc(100% + 4px);
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 6px 6px 0 6px;
+      border-style: solid;
+      border-color: #000000 transparent transparent transparent;
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.15s ease, visibility 0.15s ease;
+      z-index: 101;
+    }
+
+    /* Tooltip positioned below the button */
+    [data-tooltip-bottom]::before {
+      bottom: auto;
+      top: calc(100% + 10px);
+    }
+
+    [data-tooltip-bottom]::after {
+      bottom: auto;
+      top: calc(100% + 4px);
+      border-width: 0 6px 6px 6px;
+      border-color: transparent transparent #000000 transparent;
+    }
+
+    [data-tooltip]:hover::before,
+    [data-tooltip]:hover::after {
+      opacity: 1;
+      visibility: visible;
     }
 
     /* Overlays */
@@ -349,7 +417,7 @@
         <div id="pause-overlay" class="overlay">
           <h2 class="overlay-title">PAUSED</h2>
           <p class="overlay-subtitle">Press <kbd style="padding: 2px 6px; background: #1a3f7a; border: 1px solid #000;">Space</kbd> or click to resume</p>
-          <button id="resume-btn" class="btn-overlay">
+          <button id="resume-btn" class="btn-overlay" data-tooltip="Resume (Space)" title="Resume (Space)">
             <span class="material-symbols-sharp">play_arrow</span>
             <span>Resume</span>
           </button>
@@ -368,7 +436,7 @@
               <div id="final-lines" class="overlay-stat-num">0</div>
             </div>
           </div>
-          <button id="restart-btn" class="btn-overlay">
+          <button id="restart-btn" class="btn-overlay" data-tooltip="Restart Game" title="Restart Game">
             <span class="material-symbols-sharp">replay</span>
             <span>Play Again</span>
           </button>
@@ -401,38 +469,38 @@
           NEXT PIECE
         </div>
         <div class="next-preview-box">
-          <canvas id="next-canvas" width="300" height="150"></canvas>
+          <canvas id="next-canvas" width="280" height="160"></canvas>
         </div>
       </div>
 
-      <!-- Inverted-T Keyboard Arrow Keys Setup (No Controls Box) -->
+      <!-- Inverted-T Keyboard Arrow Keys Setup with Tooltips -->
       <div class="keyboard-arrow-cluster">
         <!-- Up Row -->
         <div class="arrow-row-top">
-          <button class="btn-key" id="btn-up" title="Rotate (Up Arrow / X)">
+          <button class="btn-key" id="btn-up" data-tooltip="Rotate (Up / X)" title="Rotate (Up Arrow / X)">
             <span class="material-symbols-sharp">arrow_upward</span>
           </button>
         </div>
         <!-- Bottom Row: Left, Down, Right -->
         <div class="arrow-row-bottom">
-          <button class="btn-key" id="btn-left" title="Move Left (Left Arrow)">
+          <button class="btn-key" id="btn-left" data-tooltip="Move Left (←)" data-tooltip-bottom="true" title="Move Left (Left Arrow)">
             <span class="material-symbols-sharp">arrow_back</span>
           </button>
-          <button class="btn-key" id="btn-down" title="Fast Drop (Down Arrow)">
+          <button class="btn-key" id="btn-down" data-tooltip="Fast Drop (↓)" data-tooltip-bottom="true" title="Fast Drop (Down Arrow)">
             <span class="material-symbols-sharp">arrow_downward</span>
           </button>
-          <button class="btn-key" id="btn-right" title="Move Right (Right Arrow)">
+          <button class="btn-key" id="btn-right" data-tooltip="Move Right (→)" data-tooltip-bottom="true" title="Move Right (Right Arrow)">
             <span class="material-symbols-sharp">arrow_forward</span>
           </button>
         </div>
       </div>
 
-      <!-- Bottom Actions: Big Square Pause Button & Calming Music Toggle -->
+      <!-- Bottom Actions: Big Square Pause Button & Calming Music Toggle with Tooltips -->
       <div class="bottom-actions-row">
-        <button class="btn-action-square" id="pause-btn" title="Pause / Resume (Space)">
+        <button class="btn-action-square" id="pause-btn" data-tooltip="Pause / Resume (Space)" title="Pause / Resume (Space)">
           <span class="material-symbols-sharp" id="pause-icon">pause</span>
         </button>
-        <button class="btn-action-square" id="music-btn" title="Toggle Calming Theme Music">
+        <button class="btn-action-square" id="music-btn" data-tooltip="Mute Music" title="Mute Music">
           <span class="material-symbols-sharp" id="music-icon">music_note</span>
         </button>
       </div>
@@ -443,28 +511,44 @@
     // --- Calming Background Music System ---
     const bgMusic = new Audio('theme.mp3');
     bgMusic.loop = true;
-    bgMusic.volume = 0.45;
+    bgMusic.volume = 0.5;
     let musicStarted = false;
     let musicEnabled = true;
 
-    function startMusic() {
-      if (!musicStarted && musicEnabled) {
-        musicStarted = true;
-        bgMusic.play().catch(() => {
-          musicStarted = false;
-        });
+    function playMusic() {
+      if (musicEnabled) {
+        const p = bgMusic.play();
+        if (p !== undefined) {
+          p.then(() => {
+            musicStarted = true;
+          }).catch(err => {
+            console.log('Audio playback pending user gesture:', err);
+          });
+        }
       }
     }
+
+    // Start calming music on any user gesture
+    ['click', 'keydown', 'touchstart', 'mousedown'].forEach(eventType => {
+      window.addEventListener(eventType, () => {
+        if (!musicStarted && musicEnabled) {
+          playMusic();
+        }
+      }, { once: false });
+    });
 
     function toggleMusic() {
       musicEnabled = !musicEnabled;
       const musicIcon = document.getElementById('music-icon');
       if (musicEnabled) {
         musicIcon.textContent = 'music_note';
-        bgMusic.play().catch(() => {});
-        musicStarted = true;
+        musicBtn.setAttribute('data-tooltip', 'Mute Music');
+        musicBtn.setAttribute('title', 'Mute Music');
+        playMusic();
       } else {
         musicIcon.textContent = 'music_off';
+        musicBtn.setAttribute('data-tooltip', 'Play Music');
+        musicBtn.setAttribute('title', 'Play Music');
         bgMusic.pause();
       }
     }
@@ -665,7 +749,7 @@
 
     function playerMove(dir) {
       if (isPaused || isGameOver) return;
-      startMusic();
+      playMusic();
       currentPiece.x += dir;
       if (collide(board, currentPiece)) {
         currentPiece.x -= dir;
@@ -675,7 +759,7 @@
     // Only clockwise rotation
     function playerRotate(dir = 1) {
       if (isPaused || isGameOver) return;
-      startMusic();
+      playMusic();
       const origX = currentPiece.x;
       const origMatrix = currentPiece.matrix;
       currentPiece.matrix = rotateMatrix(currentPiece.matrix, 1);
@@ -694,7 +778,7 @@
 
     function playerDrop() {
       if (isPaused || isGameOver) return;
-      startMusic();
+      playMusic();
       currentPiece.y++;
       if (collide(board, currentPiece)) {
         currentPiece.y--;
@@ -747,7 +831,7 @@
     function triggerGameOver() {
       isGameOver = true;
       isFastDropping = false;
-      if (musicEnabled) bgMusic.pause();
+      bgMusic.pause();
       finalScore.textContent = score.toLocaleString();
       finalLines.textContent = lines;
       gameoverOverlay.classList.add('active');
@@ -767,11 +851,15 @@
       if (isPaused) {
         pauseOverlay.classList.add('active');
         pauseIcon.textContent = "play_arrow";
-        if (musicEnabled) bgMusic.pause();
+        pauseBtn.setAttribute('data-tooltip', 'Resume (Space)');
+        pauseBtn.setAttribute('title', 'Resume (Space)');
+        bgMusic.pause();
       } else {
         pauseOverlay.classList.remove('active');
         pauseIcon.textContent = "pause";
-        if (musicEnabled) bgMusic.play().catch(() => {});
+        pauseBtn.setAttribute('data-tooltip', 'Pause (Space)');
+        pauseBtn.setAttribute('title', 'Pause (Space)');
+        if (musicEnabled) playMusic();
         lastTime = performance.now();
       }
     }
@@ -790,7 +878,9 @@
       pauseOverlay.classList.remove('active');
       gameoverOverlay.classList.remove('active');
       pauseIcon.textContent = "pause";
-      if (musicEnabled) bgMusic.play().catch(() => {});
+      pauseBtn.setAttribute('data-tooltip', 'Pause (Space)');
+      pauseBtn.setAttribute('title', 'Pause (Space)');
+      if (musicEnabled) playMusic();
       updateScoreDisplays();
       nextPiece = getNextPieceFromBag();
       spawnNextPiece();
@@ -819,8 +909,17 @@
       ctxTarget.restore();
     }
 
-    // Extends to max size before touching container edges, with scaling outline thickness
+    // NEVER stretch next piece: syncs canvas resolution 1:1 with container pixels
     function drawNextPreview() {
+      const parent = nextCanvas.parentElement;
+      const boxW = (parent && parent.clientWidth) ? parent.clientWidth : 280;
+      const boxH = (parent && parent.clientHeight) ? parent.clientHeight : 160;
+
+      if (nextCanvas.width !== boxW || nextCanvas.height !== boxH) {
+        nextCanvas.width = boxW;
+        nextCanvas.height = boxH;
+      }
+
       nextCtx.fillStyle = '#d4d4d8';
       nextCtx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
       if (!nextPiece) return;
@@ -844,14 +943,14 @@
       const cols = maxX - minX + 1;
       const rows = maxY - minY + 1;
 
-      // Extend to max size before height or width touch edge (16px padding)
-      const paddingX = 16;
-      const paddingY = 16;
+      // Extend to max size before height or width touch edge (24px padding)
+      const paddingX = 24;
+      const paddingY = 24;
       const maxCellW = (nextCanvas.width - paddingX * 2) / cols;
       const maxCellH = (nextCanvas.height - paddingY * 2) / rows;
       const size = Math.floor(Math.min(maxCellW, maxCellH));
 
-      // Outline thickness also scales with block size!
+      // Outline thickness scales proportionally with block size
       const outlineWidth = Math.max(3, Math.round(size * 0.09));
 
       const activeW = cols * size;
@@ -948,7 +1047,7 @@
 
     // --- Input Handling ---
     window.addEventListener('keydown', (e) => {
-      startMusic();
+      playMusic();
 
       if (e.code === 'Space' || e.keyCode === 32) {
         e.preventDefault();
@@ -997,7 +1096,7 @@
 
     btnDown.addEventListener('mousedown', (e) => {
       e.preventDefault();
-      startMusic();
+      playMusic();
       isFastDropping = true;
       playerDrop();
       dropCounter = 0;
@@ -1006,7 +1105,7 @@
     btnDown.addEventListener('mouseleave', () => { isFastDropping = false; });
     btnDown.addEventListener('touchstart', (e) => {
       e.preventDefault();
-      startMusic();
+      playMusic();
       isFastDropping = true;
       playerDrop();
       dropCounter = 0;
@@ -1020,6 +1119,10 @@
     musicBtn.addEventListener('click', toggleMusic);
     resumeBtn.addEventListener('click', togglePause);
     restartBtn.addEventListener('click', resetGame);
+
+    window.addEventListener('resize', () => {
+      drawNextPreview();
+    });
 
     // Initial start
     resetGame();
