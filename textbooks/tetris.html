@@ -4,19 +4,37 @@
   <meta charset="UTF-8">
   <title>Tetris</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      border-radius: 0 !important;
       user-select: none;
       -webkit-user-select: none;
     }
 
+    .material-symbols-sharp {
+      font-family: 'Material Symbols Sharp';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 22px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-feature-settings: 'liga';
+      -webkit-font-smoothing: antialiased;
+    }
+
     body {
-      background: radial-gradient(circle at 50% 20%, #0d1b2a, #050811);
-      color: #e0e6ed;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: #071326;
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -26,14 +44,10 @@
 
     .tetris-app {
       display: flex;
-      gap: 28px;
-      padding: 24px;
-      background: rgba(15, 23, 42, 0.75);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 20px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 40px rgba(0, 240, 255, 0.08);
+      gap: 20px;
+      padding: 20px;
+      background: #0d2347;
+      border: 3px solid #000000;
       max-width: 95vw;
       max-height: 95vh;
       position: relative;
@@ -44,83 +58,72 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
     }
 
     .board-container {
       position: relative;
-      border: 2px solid rgba(0, 240, 255, 0.25);
-      border-radius: 12px;
+      border: 3px solid #000000;
+      background: #d4d4d8;
       overflow: hidden;
-      box-shadow: 0 0 25px rgba(0, 240, 255, 0.15), inset 0 0 20px rgba(0, 0, 0, 0.6);
-      background: #060913;
     }
 
     #tetris-canvas {
       display: block;
-      background: transparent;
+      background: #d4d4d8;
     }
 
     .stats-bar {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
+      gap: 8px;
       width: 100%;
     }
 
     .stat-card {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 10px;
-      padding: 8px 12px;
+      background: #123060;
+      border: 2px solid #000000;
+      padding: 8px;
       text-align: center;
-      transition: border-color 0.2s, background 0.2s;
-    }
-
-    .stat-card:hover {
-      background: rgba(255, 255, 255, 0.07);
-      border-color: rgba(0, 240, 255, 0.3);
     }
 
     .stat-label {
       font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      color: #94a3b8;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #93c5fd;
       text-transform: uppercase;
       margin-bottom: 2px;
     }
 
     .stat-value {
-      font-size: 20px;
-      font-weight: 800;
+      font-size: 18px;
+      font-weight: 900;
       font-variant-numeric: tabular-nums;
-      color: #38bdf8;
-      text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+      color: #ffffff;
     }
 
     /* Right Side: Sidebar */
     .sidebar-side {
       display: flex;
       flex-direction: column;
-      width: 250px;
-      gap: 14px;
+      width: 220px;
+      gap: 12px;
     }
 
     .panel {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 14px;
-      padding: 14px;
+      background: #123060;
+      border: 2px solid #000000;
+      padding: 12px;
       display: flex;
       flex-direction: column;
     }
 
     .panel-title {
       font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 1.2px;
-      color: #94a3b8;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      color: #bfdbfe;
       text-transform: uppercase;
       margin-bottom: 10px;
       display: flex;
@@ -128,19 +131,23 @@
       gap: 6px;
     }
 
+    .panel-title .material-symbols-sharp {
+      font-size: 18px;
+    }
+
     /* Top Right: Next piece preview */
     .next-preview-box {
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 100px;
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      height: 90px;
+      background: #d4d4d8;
+      border: 2px solid #000000;
     }
 
     #next-canvas {
       display: block;
+      background: #d4d4d8;
     }
 
     /* Middle Right: Instructions */
@@ -154,21 +161,19 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 13px;
+      font-size: 12px;
     }
 
     .key-badge {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 3px 8px;
+      padding: 3px 6px;
       font-size: 11px;
-      font-weight: 700;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 6px;
-      color: #f1f5f9;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      font-weight: 800;
+      background: #1a3f7a;
+      border: 1px solid #000000;
+      color: #ffffff;
     }
 
     .key-combo {
@@ -177,12 +182,12 @@
     }
 
     .action-name {
-      color: #cbd5e1;
+      color: #e0e7ff;
       font-size: 12px;
-      font-weight: 500;
+      font-weight: 600;
     }
 
-    /* Bottom Right: Controls & Pause Button */
+    /* Bottom Right: Pause button under instructions (no text) */
     .actions-group {
       display: flex;
       flex-direction: column;
@@ -195,52 +200,31 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      padding: 11px 16px;
-      border: none;
-      border-radius: 10px;
+      padding: 10px 14px;
+      border: 2px solid #000000;
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       outline: none;
+      transition: background 0.1s, transform 0.05s;
     }
 
     .btn-pause {
-      background: linear-gradient(135deg, #0ea5e9, #0284c7);
+      background: #1d4ed8;
       color: #ffffff;
-      box-shadow: 0 4px 14px rgba(14, 165, 233, 0.35);
     }
 
     .btn-pause:hover {
-      background: linear-gradient(135deg, #38bdf8, #0ea5e9);
-      box-shadow: 0 6px 20px rgba(14, 165, 233, 0.5);
-      transform: translateY(-1px);
+      background: #2563eb;
     }
 
     .btn-pause:active {
       transform: translateY(1px);
     }
 
-    .btn-quit {
-      background: rgba(239, 68, 68, 0.12);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      color: #fca5a5;
-    }
-
-    .btn-quit:hover {
-      background: rgba(239, 68, 68, 0.22);
-      border-color: rgba(239, 68, 68, 0.6);
-      color: #ffffff;
-      transform: translateY(-1px);
-    }
-
-    .btn-quit:active {
-      transform: translateY(1px);
-    }
-
-    .btn svg {
-      width: 16px;
-      height: 16px;
+    .btn-icon-only {
+      padding: 12px;
+      width: 100%;
     }
 
     /* Overlays */
@@ -250,18 +234,16 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(5, 8, 17, 0.88);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      background: rgba(7, 19, 38, 0.94);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 16px;
+      gap: 14px;
       z-index: 10;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.25s ease;
+      transition: opacity 0.15s ease;
     }
 
     .overlay.active {
@@ -270,25 +252,23 @@
     }
 
     .overlay-title {
-      font-size: 28px;
+      font-size: 26px;
       font-weight: 900;
-      letter-spacing: 2px;
+      letter-spacing: 1.5px;
       color: #ffffff;
-      text-shadow: 0 0 20px rgba(56, 189, 248, 0.8);
     }
 
     .overlay-subtitle {
       font-size: 13px;
-      color: #94a3b8;
+      color: #93c5fd;
     }
 
     .overlay-stats {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 10px;
-      padding: 12px 24px;
+      background: #123060;
+      border: 2px solid #000000;
+      padding: 10px 20px;
       display: flex;
-      gap: 24px;
-      margin: 4px 0;
+      gap: 20px;
     }
 
     .overlay-stat-item {
@@ -296,32 +276,9 @@
     }
 
     .overlay-stat-num {
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 800;
-      color: #38bdf8;
-    }
-
-    @media (max-height: 700px) {
-      .tetris-app {
-        padding: 14px;
-        gap: 16px;
-      }
-      .sidebar-side {
-        width: 210px;
-        gap: 10px;
-      }
-      .panel {
-        padding: 10px;
-      }
-      .next-preview-box {
-        height: 80px;
-      }
-      .stat-card {
-        padding: 4px 8px;
-      }
-      .stat-value {
-        font-size: 16px;
-      }
+      color: #ffffff;
     }
   </style>
 </head>
@@ -337,15 +294,15 @@
         <div id="pause-overlay" class="overlay">
           <h2 class="overlay-title">PAUSED</h2>
           <p class="overlay-subtitle">Press <kbd class="key-badge">Space</kbd> or click to resume</p>
-          <button id="resume-btn" class="btn btn-pause">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-            Resume
+          <button id="resume-btn" class="btn btn-pause" style="width: auto; padding: 10px 24px;">
+            <span class="material-symbols-sharp">play_arrow</span>
+            <span>Resume</span>
           </button>
         </div>
 
         <!-- Game Over Overlay -->
         <div id="gameover-overlay" class="overlay">
-          <h2 class="overlay-title" style="color: #ef4444; text-shadow: 0 0 20px rgba(239, 68, 68, 0.8);">GAME OVER</h2>
+          <h2 class="overlay-title" style="color: #ff1744;">GAME OVER</h2>
           <div class="overlay-stats">
             <div class="overlay-stat-item">
               <div class="stat-label">SCORE</div>
@@ -356,9 +313,9 @@
               <div id="final-lines" class="overlay-stat-num">0</div>
             </div>
           </div>
-          <button id="restart-btn" class="btn btn-pause">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
-            Play Again
+          <button id="restart-btn" class="btn btn-pause" style="width: auto; padding: 10px 24px;">
+            <span class="material-symbols-sharp">replay</span>
+            <span>Play Again</span>
           </button>
         </div>
       </div>
@@ -385,7 +342,7 @@
       <!-- Top Right: Next piece above instructions -->
       <div class="panel">
         <div class="panel-title">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/></svg>
+          <span class="material-symbols-sharp">extension</span>
           NEXT PIECE
         </div>
         <div class="next-preview-box">
@@ -396,7 +353,7 @@
       <!-- Middle Right: Instructions -->
       <div class="panel">
         <div class="panel-title">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+          <span class="material-symbols-sharp">sports_esports</span>
           CONTROLS
         </div>
         <div class="instructions-list">
@@ -420,27 +377,13 @@
             <span class="action-name">Pause</span>
             <span class="key-badge">Space</span>
           </div>
-          <div class="instruction-row">
-            <span class="action-name">Quit Game</span>
-            <span class="key-badge">Esc</span>
-          </div>
         </div>
       </div>
 
-      <!-- Bottom Right: Pause button under instructions -->
+      <!-- Bottom Right: Pause button under instructions (no text) -->
       <div class="actions-group">
-        <button id="pause-btn" class="btn btn-pause">
-          <svg id="pause-icon" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
-          </svg>
-          <span id="pause-btn-text">Pause (Space)</span>
-        </button>
-
-        <button id="quit-btn" class="btn btn-quit">
-          <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/>
-          </svg>
-          Quit (Esc)
+        <button id="pause-btn" class="btn btn-pause btn-icon-only" title="Pause / Resume (Space)">
+          <span class="material-symbols-sharp" id="pause-icon">pause</span>
         </button>
       </div>
     </div>
@@ -475,16 +418,16 @@
           osc.stop(this.ctx.currentTime + duration);
         } catch(e) {}
       },
-      move() { this.play(260, 'sine', 0.04, 0.04); },
-      rotate() { this.play(440, 'triangle', 0.06, 0.08); },
-      drop() { this.play(180, 'sine', 0.07, 0.08); },
+      move() { this.play(260, 'square', 0.04, 0.04); },
+      rotate() { this.play(440, 'square', 0.06, 0.08); },
+      drop() { this.play(180, 'square', 0.07, 0.08); },
       clear(lines) {
         if (!this.ctx) this.init();
         const base = lines === 4 ? 523.25 : 392;
-        this.play(base, 'triangle', 0.12, 0.12);
-        setTimeout(() => this.play(base * 1.25, 'triangle', 0.15, 0.12), 60);
+        this.play(base, 'square', 0.12, 0.12);
+        setTimeout(() => this.play(base * 1.25, 'square', 0.15, 0.12), 60);
         if (lines === 4) {
-          setTimeout(() => this.play(base * 1.5, 'triangle', 0.2, 0.15), 130);
+          setTimeout(() => this.play(base * 1.5, 'square', 0.2, 0.15), 130);
         }
       },
       gameover() {
@@ -494,7 +437,7 @@
       }
     };
 
-    // --- Tetris Constants & Pieces ---
+    // --- Tetris Constants & Flat Saturated Colors ---
     const COLS = 10;
     const ROWS = 20;
     const BLOCK_SIZE = 28;
@@ -507,9 +450,7 @@
           [0, 0, 0, 0],
           [0, 0, 0, 0]
         ],
-        color: '#06b6d4',
-        light: '#67e8f9',
-        dark: '#0891b2'
+        color: '#00e5ff' // saturated cyan
       },
       J: {
         shape: [
@@ -517,9 +458,7 @@
           [1, 1, 1],
           [0, 0, 0]
         ],
-        color: '#3b82f6',
-        light: '#93c5fd',
-        dark: '#1d4ed8'
+        color: '#2979ff' // saturated blue
       },
       L: {
         shape: [
@@ -527,18 +466,14 @@
           [1, 1, 1],
           [0, 0, 0]
         ],
-        color: '#f97316',
-        light: '#fdba74',
-        dark: '#c2410c'
+        color: '#ff9100' // saturated orange
       },
       O: {
         shape: [
           [1, 1],
           [1, 1]
         ],
-        color: '#eab308',
-        light: '#fde047',
-        dark: '#a16207'
+        color: '#ffd600' // saturated yellow
       },
       S: {
         shape: [
@@ -546,9 +481,7 @@
           [1, 1, 0],
           [0, 0, 0]
         ],
-        color: '#22c55e',
-        light: '#86efac',
-        dark: '#15803d'
+        color: '#00e676' // saturated green
       },
       T: {
         shape: [
@@ -556,9 +489,7 @@
           [1, 1, 1],
           [0, 0, 0]
         ],
-        color: '#a855f7',
-        light: '#d8b4fe',
-        dark: '#7e22ce'
+        color: '#d500f9' // saturated purple
       },
       Z: {
         shape: [
@@ -566,9 +497,7 @@
           [0, 1, 1],
           [0, 0, 0]
         ],
-        color: '#ef4444',
-        light: '#fca5a5',
-        dark: '#b91c1c'
+        color: '#ff1744' // saturated red
       }
     };
 
@@ -587,8 +516,6 @@
     let lastTime = 0;
     let isPaused = false;
     let isGameOver = false;
-    let clearingRows = [];
-    let clearAnimProgress = 0;
 
     // DOM Elements
     const canvas = document.getElementById('tetris-canvas');
@@ -606,11 +533,9 @@
     const finalLines = document.getElementById('final-lines');
 
     const pauseBtn = document.getElementById('pause-btn');
-    const pauseBtnText = document.getElementById('pause-btn-text');
     const pauseIcon = document.getElementById('pause-icon');
     const resumeBtn = document.getElementById('resume-btn');
     const restartBtn = document.getElementById('restart-btn');
-    const quitBtn = document.getElementById('quit-btn');
 
     function createMatrix(rows, cols) {
       const matrix = [];
@@ -624,7 +549,6 @@
     function getNextPieceFromBag() {
       if (bag.length === 0) {
         bag = [...PIECE_KEYS];
-        // Fisher-Yates shuffle
         for (let i = bag.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
           [bag[i], bag[j]] = [bag[j], bag[i]];
@@ -636,8 +560,6 @@
         type: type,
         matrix: proto.shape.map(row => [...row]),
         color: proto.color,
-        light: proto.light,
-        dark: proto.dark,
         x: Math.floor(COLS / 2) - Math.ceil(proto.shape[0].length / 2),
         y: 0
       };
@@ -680,11 +602,7 @@
             const by = piece.y + r;
             const bx = piece.x + c;
             if (by >= 0 && by < ROWS && bx >= 0 && bx < COLS) {
-              b[by][bx] = {
-                color: piece.color,
-                light: piece.light,
-                dark: piece.dark
-              };
+              b[by][bx] = piece.color;
             }
           }
         });
@@ -722,13 +640,11 @@
       const origMatrix = currentPiece.matrix;
       currentPiece.matrix = rotateMatrix(currentPiece.matrix, dir);
 
-      // Simple wall-kick offsets
       let offset = 1;
       while (collide(board, currentPiece)) {
         currentPiece.x += offset;
         offset = -(offset + (offset > 0 ? 1 : -1));
         if (Math.abs(offset) > currentPiece.matrix[0].length) {
-          // Restore
           currentPiece.matrix = origMatrix;
           currentPiece.x = origX;
           return;
@@ -758,30 +674,24 @@
     }
 
     function checkLines() {
-      clearingRows = [];
+      let linesCleared = 0;
       for (let r = ROWS - 1; r >= 0; r--) {
         if (board[r].every(cell => cell !== 0)) {
-          clearingRows.push(r);
+          board.splice(r, 1);
+          board.unshift(new Array(COLS).fill(0));
+          linesCleared++;
+          r++;
         }
       }
 
-      if (clearingRows.length > 0) {
-        clearAnimProgress = 1.0;
-        const count = clearingRows.length;
-        AudioEngine.clear(count);
+      if (linesCleared > 0) {
+        AudioEngine.clear(linesCleared);
 
-        // Scoring: 100, 300, 500, 800 * level
         const basePoints = [0, 100, 300, 500, 800];
-        score += (basePoints[count] || count * 200) * level;
-        lines += count;
+        score += (basePoints[linesCleared] || linesCleared * 200) * level;
+        lines += linesCleared;
         level = Math.floor(lines / 10) + 1;
         dropInterval = Math.max(100, 800 - (level - 1) * 65);
-
-        // Remove rows
-        clearingRows.forEach(rowIdx => {
-          board.splice(rowIdx, 1);
-          board.unshift(new Array(COLS).fill(0));
-        });
 
         updateScoreDisplays();
       }
@@ -818,30 +728,12 @@
 
       if (isPaused) {
         pauseOverlay.classList.add('active');
-        pauseBtnText.textContent = "Resume (Space)";
-        pauseIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+        pauseIcon.textContent = "play_arrow";
       } else {
         pauseOverlay.classList.remove('active');
-        pauseBtnText.textContent = "Pause (Space)";
-        pauseIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+        pauseIcon.textContent = "pause";
         lastTime = performance.now();
       }
-    }
-
-    function quitGame() {
-      try {
-        if (window.parent && typeof window.parent.closePlayer === 'function') {
-          window.parent.closePlayer();
-          return;
-        }
-      } catch (err) {}
-      try {
-        if (window.parent && window.parent !== window) {
-          window.parent.postMessage({ type: 'closePlayer' }, '*');
-          return;
-        }
-      } catch (err) {}
-      window.location.href = '../../index.html';
     }
 
     function resetGame() {
@@ -854,59 +746,36 @@
       dropCounter = 0;
       isPaused = false;
       isGameOver = false;
-      clearingRows = [];
       pauseOverlay.classList.remove('active');
       gameoverOverlay.classList.remove('active');
-      pauseBtnText.textContent = "Pause (Space)";
-      pauseIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+      pauseIcon.textContent = "pause";
       updateScoreDisplays();
       nextPiece = getNextPieceFromBag();
       spawnNextPiece();
       lastTime = performance.now();
     }
 
-    // --- Rendering ---
-    function drawBlock(ctxTarget, x, y, size, color, light, dark, alpha = 1) {
+    // --- Rendering: Bland saturated colors with thick black sharp outlines ---
+    function drawBlock(ctxTarget, x, y, size, color, alpha = 1) {
       ctxTarget.save();
       ctxTarget.globalAlpha = alpha;
 
-      // Base fill
+      // Solid flat saturated fill
       ctxTarget.fillStyle = color;
       ctxTarget.fillRect(x, y, size, size);
 
-      // Light bevel (top and left)
-      ctxTarget.fillStyle = light || '#ffffff';
-      ctxTarget.beginPath();
-      ctxTarget.moveTo(x, y);
-      ctxTarget.lineTo(x + size, y);
-      ctxTarget.lineTo(x + size - 3, y + 3);
-      ctxTarget.lineTo(x + 3, y + 3);
-      ctxTarget.lineTo(x + 3, y + size - 3);
-      ctxTarget.lineTo(x, y + size);
-      ctxTarget.closePath();
-      ctxTarget.fill();
-
-      // Dark bevel (bottom and right)
-      ctxTarget.fillStyle = dark || 'rgba(0,0,0,0.4)';
-      ctxTarget.beginPath();
-      ctxTarget.moveTo(x + size, y);
-      ctxTarget.lineTo(x + size, y + size);
-      ctxTarget.lineTo(x, y + size);
-      ctxTarget.lineTo(x + 3, y + size - 3);
-      ctxTarget.lineTo(x + size - 3, y + size - 3);
-      ctxTarget.lineTo(x + size - 3, y + 3);
-      ctxTarget.closePath();
-      ctxTarget.fill();
-
-      // Inner cell accent
-      ctxTarget.fillStyle = 'rgba(255, 255, 255, 0.1)';
-      ctxTarget.fillRect(x + 4, y + 4, size - 8, size - 8);
+      // Thick black sharp outline
+      ctxTarget.lineWidth = 3;
+      ctxTarget.strokeStyle = '#000000';
+      ctxTarget.strokeRect(x + 1.5, y + 1.5, size - 3, size - 3);
 
       ctxTarget.restore();
     }
 
     function drawNextPreview() {
-      nextCtx.clearRect(0, 0, nextCanvas.width, nextCanvas.height);
+      // Light grey preview background
+      nextCtx.fillStyle = '#d4d4d8';
+      nextCtx.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
       if (!nextPiece) return;
 
       const m = nextPiece.matrix;
@@ -914,7 +783,6 @@
       const pieceH = m.length;
       const size = 18;
 
-      // Calculate bounds of non-empty cells
       let minX = pieceW, maxX = 0, minY = pieceH, maxY = 0;
       for (let r = 0; r < pieceH; r++) {
         for (let c = 0; c < pieceW; c++) {
@@ -935,18 +803,19 @@
       for (let r = 0; r < pieceH; r++) {
         for (let c = 0; c < pieceW; c++) {
           if (m[r][c]) {
-            drawBlock(nextCtx, startX + c * size, startY + r * size, size, nextPiece.color, nextPiece.light, nextPiece.dark);
+            drawBlock(nextCtx, startX + c * size, startY + r * size, size, nextPiece.color);
           }
         }
       }
     }
 
     function draw() {
-      // Clear canvas
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Light grey board background
+      ctx.fillStyle = '#d4d4d8';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Draw grid lines
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.035)';
+      // Clean grid lines on light grey
+      ctx.strokeStyle = '#b8b8be';
       ctx.lineWidth = 1;
       for (let c = 1; c < COLS; c++) {
         ctx.beginPath();
@@ -964,9 +833,9 @@
       // Draw locked board blocks
       for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS; c++) {
-          const cell = board[r][c];
-          if (cell) {
-            drawBlock(ctx, c * BLOCK_SIZE, r * BLOCK_SIZE, BLOCK_SIZE, cell.color, cell.light, cell.dark);
+          const color = board[r][c];
+          if (color) {
+            drawBlock(ctx, c * BLOCK_SIZE, r * BLOCK_SIZE, BLOCK_SIZE, color);
           }
         }
       }
@@ -979,14 +848,7 @@
             if (value) {
               const gx = (ghost.x + c) * BLOCK_SIZE;
               const gy = (ghost.y + r) * BLOCK_SIZE;
-              ctx.save();
-              ctx.strokeStyle = currentPiece.color;
-              ctx.lineWidth = 2;
-              ctx.strokeRect(gx + 1, gy + 1, BLOCK_SIZE - 2, BLOCK_SIZE - 2);
-              ctx.fillStyle = currentPiece.color;
-              ctx.globalAlpha = 0.15;
-              ctx.fillRect(gx + 1, gy + 1, BLOCK_SIZE - 2, BLOCK_SIZE - 2);
-              ctx.restore();
+              drawBlock(ctx, gx, gy, BLOCK_SIZE, currentPiece.color, 0.35);
             }
           });
         });
@@ -1000,7 +862,7 @@
               const px = (currentPiece.x + c) * BLOCK_SIZE;
               const py = (currentPiece.y + r) * BLOCK_SIZE;
               if (py >= 0) {
-                drawBlock(ctx, px, py, BLOCK_SIZE, currentPiece.color, currentPiece.light, currentPiece.dark);
+                drawBlock(ctx, px, py, BLOCK_SIZE, currentPiece.color);
               }
             }
           });
@@ -1026,18 +888,11 @@
 
     // --- Input Handling ---
     window.addEventListener('keydown', (e) => {
-      // Audio init on user gesture
       AudioEngine.init();
 
       if (e.code === 'Space' || e.keyCode === 32) {
         e.preventDefault();
         togglePause();
-        return;
-      }
-
-      if (e.code === 'Escape' || e.keyCode === 27) {
-        e.preventDefault();
-        quitGame();
         return;
       }
 
@@ -1061,11 +916,10 @@
       }
     });
 
-    // Buttons
+    // Button Listeners
     pauseBtn.addEventListener('click', togglePause);
     resumeBtn.addEventListener('click', togglePause);
     restartBtn.addEventListener('click', resetGame);
-    quitBtn.addEventListener('click', quitGame);
 
     // Initial start
     resetGame();
