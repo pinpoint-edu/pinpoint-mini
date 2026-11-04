@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Trashbin</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'><path d='M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z'/></svg>">
+  <link id="dynamicFavicon" rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'><path d='M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z'/></svg>">
 
   <!-- Google Fonts: Geist, Libre Baskerville, and Material Symbols Sharp -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1213,48 +1213,55 @@
       background: #000000;
     }
 
-    /* Settings Modal & Tint Squircle UI */
+    /* ==========================================================================
+       SETTINGS MODAL & MULTI-TAB CONTROLS
+       ========================================================================== */
     .settings-modal-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
       z-index: 1000000;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 18px;
     }
 
     .settings-modal-card {
-      background: #121215;
+      background: #121216;
       border: 1px solid var(--border);
       border-radius: 24px;
-      padding: 24px;
+      padding: 22px 24px;
       width: 100%;
-      max-width: 440px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      max-width: 660px;
+      max-height: 86vh;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.06);
       animation: modalFadeIn 0.25s var(--parabola-ease);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
 
     .settings-modal-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 20px;
-      padding-bottom: 14px;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
       border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
     }
 
     .settings-modal-title {
       font-size: 19px;
       font-weight: 700;
       color: var(--text-main);
-      margin: 0 0 3px 0;
+      margin: 0 0 2px 0;
     }
 
     .settings-modal-sub {
@@ -1263,22 +1270,201 @@
       margin: 0;
     }
 
-    .settings-section-label {
-      font-size: 13px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+    /* Tab Bar */
+    .settings-tabs-bar {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 10px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      scrollbar-width: none;
+      flex-shrink: 0;
+    }
+    .settings-tabs-bar::-webkit-scrollbar { display: none; }
+
+    .settings-tab-btn {
+      padding: 7px 12px;
+      border-radius: 12px;
+      background: #18181c;
+      border: 1px solid var(--border);
       color: var(--text-muted);
-      margin-bottom: 4px;
-    }
-
-    .settings-section-desc {
       font-size: 12px;
-      color: var(--text-dim);
-      margin-bottom: 16px;
-      line-height: 1.4;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s var(--parabola-ease);
+    }
+    .settings-tab-btn:hover {
+      background: #222227;
+      color: var(--text-main);
+      border-color: var(--border-hover);
+    }
+    .settings-tab-btn.active {
+      background: var(--accent);
+      color: #000000;
+      border-color: var(--accent);
+      box-shadow: 0 2px 12px var(--accent-glow);
     }
 
+    .settings-tab-pane {
+      display: none;
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+    .settings-tab-pane.active {
+      display: block;
+    }
+
+    /* Settings Sections, Rows & Form Controls */
+    .settings-section-head {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--accent-light);
+      margin: 16px 0 8px 0;
+    }
+    .settings-section-head:first-child { margin-top: 0; }
+
+    .settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 11px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      gap: 16px;
+    }
+    .settings-row:last-child {
+      border-bottom: none;
+    }
+
+    .settings-col-left {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .settings-row-title {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 2px;
+    }
+
+    .settings-row-desc {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+
+    .settings-col-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    /* Switch Component */
+    .settings-switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+    .settings-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .settings-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #27272a;
+      border: 1px solid var(--border);
+      transition: 0.22s var(--parabola-ease);
+      border-radius: 24px;
+    }
+    .settings-slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 2px;
+      bottom: 2px;
+      background-color: #8e8e93;
+      transition: 0.22s var(--parabola-ease);
+      border-radius: 50%;
+    }
+    .settings-switch input:checked + .settings-slider {
+      background-color: var(--accent);
+      border-color: var(--accent);
+    }
+    .settings-switch input:checked + .settings-slider:before {
+      transform: translateX(20px);
+      background-color: #ffffff;
+    }
+
+    /* Inputs, Selects & Buttons */
+    .settings-input, .settings-select {
+      background: #18181c;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 7px 11px;
+      color: #ffffff;
+      font-size: 12.5px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .settings-input:focus, .settings-select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent-glow);
+    }
+    .settings-select option {
+      background: #18181c;
+      color: #ffffff;
+    }
+
+    .settings-btn-action {
+      background: #222227;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      color: #ffffff;
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.18s var(--parabola-ease);
+    }
+    .settings-btn-action:hover {
+      background: #2a2a30;
+      border-color: var(--border-hover);
+      transform: translateY(-1px);
+    }
+    .settings-btn-action.primary {
+      background: var(--accent);
+      color: #000000;
+      border-color: var(--accent);
+    }
+    .settings-btn-action.danger {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+    }
+    .settings-btn-action.danger:hover {
+      background: #ef4444;
+      color: #ffffff;
+    }
+
+    /* Tint Squircles (Appearance Tab) */
     .tint-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -1343,6 +1529,242 @@
       border-color: var(--accent) !important;
       box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), 0 0 16px var(--accent-glow) !important;
     }
+
+    /* Pinned Games & Search in Settings */
+    .pinned-list-container {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 180px;
+      overflow-y: auto;
+      margin-top: 8px;
+    }
+    .pinned-item-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 11px;
+      background: #18181c;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 12.5px;
+    }
+
+    /* Badges & Game Card Pinned States */
+    .badge-pinned {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--accent-subtle);
+      border: 1px solid var(--accent-border);
+      color: var(--accent-light);
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+    .btn-icon-sharp.btn-pin-toggle:hover {
+      color: var(--accent) !important;
+      border-color: var(--accent) !important;
+    }
+    .btn-icon-sharp.btn-pin-toggle.pinned-active {
+      color: var(--accent) !important;
+      border-color: var(--accent) !important;
+      background: var(--accent-subtle) !important;
+    }
+
+    /* Crosshair Overlay */
+    .screen-crosshair {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 9999999;
+      display: none;
+      line-height: 1;
+      font-weight: 900;
+      user-select: none;
+      text-shadow: 0 0 3px rgba(0,0,0,0.8);
+    }
+
+    /* Background Waves Layer */
+    .bg-waves-layer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100vw;
+      height: 32vh;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.16;
+      display: none;
+      overflow: hidden;
+    }
+    .bg-waves-layer svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Startup Loader Overlay */
+    .startup-loader-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #09090b;
+      z-index: 99999999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+    }
+    .startup-loader-overlay.fade-out {
+      opacity: 0;
+      visibility: hidden;
+    }
+    .startup-loader-bar {
+      width: 180px;
+      height: 3px;
+      background: #27272a;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 18px;
+      position: relative;
+    }
+    .startup-loader-fill {
+      height: 100%;
+      width: 40%;
+      background: var(--accent);
+      border-radius: 2px;
+      animation: startupBarAnim 1s ease-in-out infinite alternate;
+    }
+    @keyframes startupBarAnim {
+      0% { transform: translateX(-100%); width: 25%; }
+      100% { transform: translateX(300%); width: 50%; }
+    }
+
+    /* Performance Mode */
+    body.perf-mode,
+    body.perf-mode * {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      box-shadow: none !important;
+      text-shadow: none !important;
+      filter: none !important;
+      transition: none !important;
+    }
+    body.perf-mode .settings-modal-overlay {
+      background: rgba(0, 0, 0, 0.95) !important;
+    }
+
+    /* Liquid Glass Toggle */
+    body.liquid-glass-off .btn-sharp,
+    body.liquid-glass-off .btn-icon-sharp,
+    body.liquid-glass-off .player-btn-squircle,
+    body.liquid-glass-off .tint-squircle-btn {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      background: #18181c !important;
+    }
+
+    /* Stretched Res */
+    body.stretched-res-active {
+      transform: scaleX(1.3333);
+      transform-origin: center top;
+      width: 75.18vw !important;
+      margin: 0 auto !important;
+      overflow-x: hidden !important;
+    }
+
+    /* Hidden Google Classroom Cover */
+    .hidden-classroom-cover {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #f1f3f4;
+      color: #202124;
+      font-family: Roboto, 'Segoe UI', Arial, sans-serif;
+      font-size: 14px;
+      z-index: 999999999;
+      display: none;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    .hidden-classroom-cover header {
+      background: #ffffff;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      box-shadow: 0 1px 3px rgba(60,64,67,.3);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .hidden-classroom-cover .hc-hbtn {
+      background: none;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #5f6368;
+    }
+    .hidden-classroom-cover .hc-hbtn:hover { background: #f1f3f4; }
+    .hidden-classroom-cover .hc-logo { width: 28px; height: 28px; margin: 0 12px 0 4px; }
+    .hidden-classroom-cover .hc-brand { font-size: 22px; color: #5f6368; letter-spacing: .2px; font-weight: 400; cursor: pointer; user-select: none; }
+    .hidden-classroom-cover .hc-spacer { flex: 1; }
+    .hidden-classroom-cover .hc-wrap { display: flex; flex: 1; }
+    .hidden-classroom-cover nav { width: 220px; padding: 12px 8px; flex-shrink: 0; }
+    .hidden-classroom-cover nav a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 0 20px 20px 0;
+      color: #3c4043;
+      text-decoration: none;
+      margin-bottom: 2px;
+      font-size: 13.5px;
+    }
+    .hidden-classroom-cover nav a.on { background: #e8f0fe; color: #1967d2; font-weight: 500; }
+    .hidden-classroom-cover nav a.on svg { color: #1967d2; fill: #1967d2; }
+    .hidden-classroom-cover main { flex: 1; padding: 32px 40px; max-width: 1080px; }
+    .hidden-classroom-cover .hc-card {
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 1px 2px rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+    .hidden-classroom-cover .hc-c-head { display: flex; align-items: center; gap: 14px; padding: 16px 20px; }
+    .hidden-classroom-cover .hc-c-head h3 { font-size: 16px; font-weight: 500; color: #202124; margin: 0; }
+    .hidden-classroom-cover .hc-ico { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .hidden-classroom-cover .hc-ico.blue { background: #e8f0fe; color: #1967d2; }
+    .hidden-classroom-cover .hc-ico.green { background: #e6f4ea; color: #188038; }
+    .hidden-classroom-cover .hc-empty { padding: 36px 20px 40px; text-align: center; color: #5f6368; font-size: 13.5px; }
+    .hidden-classroom-cover .hc-btn {
+      background: #1a73e8;
+      color: #ffffff;
+      border: none;
+      border-radius: 4px;
+      padding: 9px 22px;
+      font-size: 13.5px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .hidden-classroom-cover .hc-btn:hover { background: #1765cc; }
+    .hidden-classroom-cover .hc-btn.ghost { background: transparent; color: #1a73e8; padding: 8px 16px; }
+    .hidden-classroom-cover .hc-btn.ghost:hover { background: rgba(26,115,232,.08); }
+    .hidden-classroom-cover footer { text-align: center; padding: 16px; color: #80868b; font-size: 12px; border-top: 1px solid #e8eaed; }
 
   </style>
 </head>
@@ -3717,6 +4139,15 @@ function renderGames() {
     return true;
   });
 
+  const showPinnedTop = localStorage.getItem('trashbin_show_pinned_top') !== 'false';
+  if (showPinnedTop) {
+    filtered.sort((a, b) => {
+      const aPinned = isGamePinned(a.title) ? 1 : 0;
+      const bPinned = isGamePinned(b.title) ? 1 : 0;
+      return bPinned - aPinned;
+    });
+  }
+
   if (summaryLabel) {
     summaryLabel.textContent = `${filtered.length} games`;
   }
@@ -3742,6 +4173,7 @@ function renderGames() {
     const isDownloaded = downloadedGameIds.has(id);
     const isDownloading = typeof PinpointGameStorage !== 'undefined' && PinpointGameStorage.isDownloading(id);
     const progress = activeProgressMap.get(id);
+    const isPinned = isGamePinned(game.title);
 
     html += `
       <div class="game-card" id="card-${id}" onclick="playGame('${encodeURIComponent(game.file)}', '${encodeURIComponent(game.title)}')">
@@ -3750,6 +4182,12 @@ function renderGames() {
             <span class="game-title">${game.title}</span>
             <div class="game-meta">
               <span>${game.isApp ? 'Web App' : formatBytes(game.sizeBytes)}</span>
+              ${isPinned ? `
+                <span class="badge-pinned">
+                  <span class="material-symbols-sharp" style="font-size: 13px;">keep</span>
+                  Pinned
+                </span>
+              ` : ''}
               ${isDownloaded ? `
                 <span class="badge-dl">
                   <span class="material-symbols-sharp" style="font-size: 14px;">check_circle</span>
@@ -3772,6 +4210,10 @@ function renderGames() {
         </div>
 
         <div class="game-actions">
+          <button class="btn-icon-sharp btn-pin-toggle ${isPinned ? 'pinned-active' : ''}" onclick="event.stopPropagation(); togglePinGame('${encodeURIComponent(game.title)}')" title="${isPinned ? 'Unpin game' : 'Pin to top'}">
+            <span class="material-symbols-sharp" style="font-size: 16px;">${isPinned ? 'keep' : 'keep_public'}</span>
+          </button>
+
           <button class="btn-sharp btn-primary-sharp" onclick="event.stopPropagation(); playGame('${encodeURIComponent(game.file)}', '${encodeURIComponent(game.title)}')">
             <span class="material-symbols-sharp">${game.isApp ? 'open_in_new' : 'play_arrow'}</span>
             <span>${game.isApp ? 'Open' : 'Play'}</span>
@@ -5265,12 +5707,651 @@ function renderTintOptions() {
   }).join("");
 }
 
+// ==== CLOAKING PRESETS ====
+const CLOAK_PRESETS = {
+  default: {
+    title: 'Trashbin',
+    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'><path d='M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z'/></svg>"
+  },
+  classroom: {
+    title: 'Home - Classroom',
+    icon: 'favicons/google-classroom.png'
+  },
+  docs: {
+    title: 'Google Docs',
+    icon: 'favicons/google-docs.png'
+  },
+  drive: {
+    title: 'Google Drive - My Drive',
+    icon: 'favicons/google-drive.png'
+  },
+  slides: {
+    title: 'Google Slides',
+    icon: 'favicons/google-slides.png'
+  },
+  canvas: {
+    title: 'Dashboard',
+    icon: 'https://du11hjcvx0uqb.cloudfront.net/dist/images/favicon-e10d657a73.ico'
+  },
+  clever: {
+    title: 'Clever | Portal',
+    icon: 'favicons/clever.png'
+  },
+  kahoot: {
+    title: 'Play Kahoot!',
+    icon: 'favicons/kahoot.png'
+  },
+  desmos: {
+    title: 'Desmos | Graphing Calculator',
+    icon: 'https://www.desmos.com/favicon.ico'
+  },
+  wikipedia: {
+    title: 'Wikipedia, the free encyclopedia',
+    icon: 'favicons/wikipedia.png'
+  }
+};
+
+function setTabTitleAndIcon(title, iconUrl) {
+  if (title) document.title = title;
+  if (iconUrl) {
+    let link = document.getElementById("dynamicFavicon") || document.querySelector("link[rel*='icon']");
+    if (!link) {
+      link = document.createElement("link");
+      link.rel = "icon";
+      link.id = "dynamicFavicon";
+      document.head.appendChild(link);
+    }
+    link.href = iconUrl;
+    link.type = iconUrl.endsWith('.ico') ? 'image/x-icon' : (iconUrl.endsWith('.png') ? 'image/png' : 'image/svg+xml');
+  }
+}
+
+function applyCloakPreset(presetKey) {
+  if (presetKey === 'custom') return;
+  const p = CLOAK_PRESETS[presetKey] || CLOAK_PRESETS.default;
+  setTabTitleAndIcon(p.title, p.icon);
+  try {
+    localStorage.setItem('trashbin_cloak_preset', presetKey);
+    localStorage.setItem('trashbin_cloak_title', p.title);
+    localStorage.setItem('trashbin_cloak_icon', p.icon);
+  } catch(e) {}
+  const tInput = document.getElementById('settingCustomTitle');
+  const iInput = document.getElementById('settingCustomIconUrl');
+  if (tInput) tInput.value = p.title;
+  if (iInput) iInput.value = p.icon;
+}
+
+function applyCustomCloak() {
+  const tInput = document.getElementById('settingCustomTitle');
+  const iInput = document.getElementById('settingCustomIconUrl');
+  const title = (tInput && tInput.value.trim()) || 'Home - Classroom';
+  const icon = (iInput && iInput.value.trim()) || 'favicons/google-classroom.png';
+  setTabTitleAndIcon(title, icon);
+  try {
+    localStorage.setItem('trashbin_cloak_preset', 'custom');
+    localStorage.setItem('trashbin_cloak_title', title);
+    localStorage.setItem('trashbin_cloak_icon', icon);
+  } catch(e) {}
+  const sel = document.getElementById('settingCloakPreset');
+  if (sel) sel.value = 'custom';
+}
+
+function handleFaviconFileUpload(e) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    const dataUrl = evt.target.result;
+    const iInput = document.getElementById('settingCustomIconUrl');
+    if (iInput) iInput.value = dataUrl;
+    applyCustomCloak();
+  };
+  reader.readAsDataURL(file);
+}
+
+// ==== PANIC KEY & HIDDEN PAGE COVER ====
+let isRecordingPanicKey = false;
+
+function startRecordingPanicKey() {
+  isRecordingPanicKey = true;
+  const btn = document.getElementById('btnRecordPanicKey');
+  if (btn) btn.textContent = 'Press any key...';
+}
+
+function executePanicAction() {
+  const action = localStorage.getItem('trashbin_panic_action') || 'redirect';
+  if (action === 'redirect') {
+    const url = localStorage.getItem('trashbin_panic_url') || 'https://classroom.google.com';
+    window.location.replace(url);
+  } else {
+    toggleHiddenClassroomCover(true);
+  }
+}
+
+let prevTitleBeforeCover = '';
+let prevIconBeforeCover = '';
+
+window.toggleHiddenClassroomCover = function(show) {
+  const cover = document.getElementById('hiddenClassroomCover');
+  if (!cover) return;
+  if (show) {
+    prevTitleBeforeCover = document.title;
+    const curIcon = document.getElementById('dynamicFavicon');
+    prevIconBeforeCover = curIcon ? curIcon.href : '';
+    setTabTitleAndIcon('Home - Classroom', 'https://www.gstatic.com/classroom/ic_product_classroom_32.png');
+    cover.style.display = 'flex';
+  } else {
+    cover.style.display = 'none';
+    if (prevTitleBeforeCover) {
+      setTabTitleAndIcon(prevTitleBeforeCover, prevIconBeforeCover);
+    } else {
+      const savedTitle = localStorage.getItem('trashbin_cloak_title') || 'Trashbin';
+      const savedIcon = localStorage.getItem('trashbin_cloak_icon') || CLOAK_PRESETS.default.icon;
+      setTabTitleAndIcon(savedTitle, savedIcon);
+    }
+  }
+};
+
+window.handleCoverLogoClick = function() {
+  window._coverClickCount = (window._coverClickCount || 0) + 1;
+  clearTimeout(window._coverClickTimer);
+  window._coverClickTimer = setTimeout(() => { window._coverClickCount = 0; }, 1800);
+  if (window._coverClickCount >= 3) {
+    window._coverClickCount = 0;
+    toggleHiddenClassroomCover(false);
+  }
+};
+
+window.addEventListener('keydown', (e) => {
+  if (isRecordingPanicKey) {
+    e.preventDefault();
+    e.stopPropagation();
+    isRecordingPanicKey = false;
+    let key = e.key;
+    if (key === ' ') key = 'Space';
+    try {
+      localStorage.setItem('trashbin_panic_key', key);
+    } catch(err) {}
+    const btn = document.getElementById('btnRecordPanicKey');
+    if (btn) btn.textContent = `Key: [ ${key} ]`;
+    return;
+  }
+
+  // Cover escape listener: double Escape tap
+  const cover = document.getElementById('hiddenClassroomCover');
+  if (cover && cover.style.display === 'flex') {
+    if (e.key === 'Escape') {
+      window._escPressCount = (window._escPressCount || 0) + 1;
+      clearTimeout(window._escTimer);
+      window._escTimer = setTimeout(() => { window._escPressCount = 0; }, 1200);
+      if (window._escPressCount >= 2) {
+        toggleHiddenClassroomCover(false);
+        return;
+      }
+    }
+  }
+
+  const enabled = localStorage.getItem('trashbin_panic_enabled') !== 'false';
+  const panicKey = localStorage.getItem('trashbin_panic_key') || ']';
+  const pressed = e.key === ' ' ? 'Space' : e.key;
+  if (enabled && pressed.toLowerCase() === panicKey.toLowerCase()) {
+    if (cover && cover.style.display === 'flex') {
+      toggleHiddenClassroomCover(false);
+      return;
+    }
+    e.preventDefault();
+    executePanicAction();
+  }
+}, true);
+
+// ==== LAUNCHER OPTIONS ====
+window.launchInAboutBlank = function() {
+  const win = window.open('about:blank', '_blank');
+  if (!win) {
+    alert('Pop-up was blocked. Please allow pop-ups for this site.');
+    return;
+  }
+  const doc = win.document;
+  doc.open();
+  doc.write(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="utf-8">
+      <title>${document.title || 'Classes'}</title>
+      <style>
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #0b0b0d; }
+        iframe { border: none; width: 100%; height: 100%; display: block; }
+      </style>
+    </head>
+    <body>
+      <iframe src="${window.location.href}" allowfullscreen="true" allow="autoplay; fullscreen; clipboard-read; clipboard-write; web-share"></iframe>
+    </body>
+    </html>
+  `);
+  doc.close();
+};
+
+window.launchInBlob = function() {
+  const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url, '_blank');
+  if (!win) {
+    alert('Pop-up was blocked. Please allow pop-ups for this site.');
+  }
+};
+
+window.downloadOfflineHtml = function() {
+  const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+  const blob = new Blob([html], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'trashbin_offline.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+};
+
+// ==== BACKUP & RESTORE ====
+window.exportBackupData = function() {
+  const backupObj = {
+    timestamp: new Date().toISOString(),
+    version: '3.8',
+    data: {}
+  };
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && (key.startsWith('trashbin_') || key.includes('save') || key.includes('game') || key.includes('retro'))) {
+      backupObj.data[key] = localStorage.getItem(key);
+    }
+  }
+  const blob = new Blob([JSON.stringify(backupObj, null, 2)], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `trashbin-backup-${new Date().toISOString().slice(0, 10)}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+};
+
+window.importBackupData = function(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      const entries = parsed.data || parsed;
+      let count = 0;
+      for (const [k, v] of Object.entries(entries)) {
+        if (typeof v === 'string') {
+          localStorage.setItem(k, v);
+          count++;
+        }
+      }
+      alert(`Imported ${count} backup configurations successfully!`);
+      location.reload();
+    } catch (err) {
+      alert('Could not parse backup file: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+};
+
+window.clearAllData = async function() {
+  if (!confirm('Are you sure you want to clear all data? This will reset all saved game states, downloaded games, and preferences.')) {
+    return;
+  }
+  try {
+    if ('caches' in window) {
+      await caches.delete('trashbin-game-cache');
+    }
+    localStorage.clear();
+    alert('All Trashbin data and caches have been cleared.');
+    location.reload();
+  } catch(err) {
+    alert('Error clearing data: ' + err.message);
+  }
+};
+
+// ==== CDN MIRROR SELECTOR ====
+window.onCdnMirrorChange = function(val) {
+  try {
+    localStorage.setItem('trashbin_cdn_mirror', val);
+  } catch(e) {}
+  if (val === 'auto') {
+    autoSelectMirror().then(() => updateMirrorStatus());
+  } else {
+    activeMirror = val;
+    updateMirrorStatus();
+  }
+};
+
+function updateMirrorStatus() {
+  const statusEl = document.getElementById('mirrorPingResult');
+  if (statusEl) {
+    statusEl.textContent = activeMirror.replace('https://', '');
+    statusEl.style.color = 'var(--accent)';
+  }
+}
+
+window.testMirrorPing = async function() {
+  const statusEl = document.getElementById('mirrorPingResult');
+  if (statusEl) statusEl.textContent = 'Pinging mirror...';
+  const start = performance.now();
+  try {
+    await fetch(activeMirror + '/gh/pinpoint-edu/assets@main/textbooks/2048.html', { method: 'HEAD', cache: 'no-store' });
+    const ms = Math.round(performance.now() - start);
+    if (statusEl) {
+      statusEl.textContent = `${activeMirror.replace('https://', '')} (${ms} ms)`;
+      statusEl.style.color = ms < 350 ? 'var(--accent)' : '#fbbf24';
+    }
+  } catch(e) {
+    if (statusEl) {
+      statusEl.textContent = 'Mirror unreachable';
+      statusEl.style.color = '#ef4444';
+    }
+  }
+};
+
+// ==== GAME PINNING ====
+function getPinnedGames() {
+  try {
+    return JSON.parse(localStorage.getItem('trashbin_pinned_games') || '[]');
+  } catch(e) {
+    return [];
+  }
+}
+
+function isGamePinned(title) {
+  return getPinnedGames().includes(title);
+}
+
+window.togglePinGame = function(encodedTitle) {
+  const title = decodeURIComponent(encodedTitle);
+  let pinned = getPinnedGames();
+  if (pinned.includes(title)) {
+    pinned = pinned.filter(t => t !== title);
+  } else {
+    pinned.unshift(title);
+  }
+  try {
+    localStorage.setItem('trashbin_pinned_games', JSON.stringify(pinned));
+  } catch(e) {}
+  renderGames();
+  renderPinnedGamesSettings();
+};
+
+function renderPinnedGamesSettings() {
+  const container = document.getElementById('pinnedGamesContainer');
+  if (!container) return;
+  const pinned = getPinnedGames();
+  if (pinned.length === 0) {
+    container.innerHTML = '<div style="font-size: 12px; color: var(--text-dim); padding: 8px 0;">No games pinned yet. Use the search below or click the pin icon on any game card.</div>';
+    return;
+  }
+  container.innerHTML = pinned.map(title => `
+    <div class="pinned-item-row">
+      <span style="font-weight: 500; color: #fff;">${title}</span>
+      <button class="settings-btn-action" onclick="togglePinGame('${encodeURIComponent(title)}')" style="padding: 4px 8px; font-size: 11px;">
+        <span class="material-symbols-sharp" style="font-size: 14px;">close</span> Unpin
+      </button>
+    </div>
+  `).join('');
+}
+
+window.searchAndRenderPinOptions = function(query) {
+  const resultsBox = document.getElementById('pinSearchResults');
+  if (!resultsBox) return;
+  const q = (query || '').trim().toLowerCase();
+  if (!q) {
+    resultsBox.style.display = 'none';
+    resultsBox.innerHTML = '';
+    return;
+  }
+  const matches = games.filter(g => g.title.toLowerCase().includes(q)).slice(0, 5);
+  if (matches.length === 0) {
+    resultsBox.style.display = 'block';
+    resultsBox.innerHTML = '<div style="font-size: 12px; color: var(--text-dim); padding: 6px;">No matching games found</div>';
+    return;
+  }
+  resultsBox.style.display = 'block';
+  resultsBox.innerHTML = matches.map(g => {
+    const pinned = isGamePinned(g.title);
+    return `
+      <div class="pinned-item-row" style="margin-bottom: 4px;">
+        <span>${g.title}</span>
+        <button class="settings-btn-action ${pinned ? '' : 'primary'}" onclick="togglePinGame('${encodeURIComponent(g.title)}')" style="padding: 4px 8px; font-size: 11px;">
+          ${pinned ? 'Unpin' : '+ Pin'}
+        </button>
+      </div>
+    `;
+  }).join('');
+};
+
+// ==== STARTUP & PERFORMANCE ====
+function playStartupChime() {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const freqs = [523.25, 659.25, 783.99, 1046.50];
+    freqs.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.08);
+      gain.gain.setValueAtTime(0.001, ctx.currentTime + idx * 0.08);
+      gain.gain.exponentialRampToValueAtTime(0.12, ctx.currentTime + idx * 0.08 + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + idx * 0.08 + 0.85);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(ctx.currentTime + idx * 0.08);
+      osc.stop(ctx.currentTime + idx * 0.08 + 0.95);
+    });
+  } catch(e) {}
+}
+
+function initStartupAndPerformance() {
+  // Startup Loader
+  const showLoader = localStorage.getItem('trashbin_startup_loader') !== 'false';
+  const overlay = document.getElementById('startupLoaderOverlay');
+  if (overlay) {
+    if (!showLoader) {
+      overlay.style.display = 'none';
+    } else {
+      setTimeout(() => {
+        overlay.classList.add('fade-out');
+        setTimeout(() => { overlay.style.display = 'none'; }, 400);
+      }, 950);
+    }
+  }
+
+  // Startup Chime
+  if (localStorage.getItem('trashbin_startup_chime') === 'true') {
+    playStartupChime();
+    const unlock = () => {
+      playStartupChime();
+      window.removeEventListener('click', unlock);
+      window.removeEventListener('keydown', unlock);
+    };
+    window.addEventListener('click', unlock, { once: true });
+    window.addEventListener('keydown', unlock, { once: true });
+  }
+
+  // Performance Mode
+  if (localStorage.getItem('trashbin_perf_mode') === 'true') {
+    document.body.classList.add('perf-mode');
+  }
+
+  // Liquid Glass Buttons
+  if (localStorage.getItem('trashbin_liquid_glass') === 'false') {
+    document.body.classList.add('liquid-glass-off');
+  }
+
+  // Background Waves
+  if (localStorage.getItem('trashbin_bg_waves') === 'true') {
+    const waves = document.getElementById('bgWavesLayer');
+    if (waves) waves.style.display = 'block';
+  }
+
+  // Stretched Res
+  if (localStorage.getItem('trashbin_stretched_res') === 'true') {
+    document.body.classList.add('stretched-res-active');
+  }
+
+  // Custom Cursor
+  if (localStorage.getItem('trashbin_custom_cursor_enabled') === 'true') {
+    applyCustomCursor(true, localStorage.getItem('trashbin_custom_cursor_url'));
+  }
+
+  // Crosshair
+  if (localStorage.getItem('trashbin_crosshair_enabled') === 'true') {
+    applyCrosshair(
+      true,
+      localStorage.getItem('trashbin_crosshair_style') || 'plus',
+      localStorage.getItem('trashbin_crosshair_size') || 18,
+      localStorage.getItem('trashbin_crosshair_color') || '#00ff88'
+    );
+  }
+}
+
+// ==== COSMETICS & GAMING TOOLS ====
+function applyCustomCursor(enabled, url) {
+  let styleEl = document.getElementById('trashbinCustomCursorStyle');
+  if (!enabled || !url) {
+    if (styleEl) styleEl.remove();
+    return;
+  }
+  if (!styleEl) {
+    styleEl = document.createElement('style');
+    styleEl.id = 'trashbinCustomCursorStyle';
+    document.head.appendChild(styleEl);
+  }
+  styleEl.innerHTML = `
+    *, *::before, *::after {
+      cursor: url("${url}") 0 0, auto !important;
+    }
+    button, a, input, select, textarea, [onclick], .game-card, .pill-chip, .settings-tab-btn {
+      cursor: url("${url}") 0 0, pointer !important;
+    }
+  `;
+}
+
+function handleCursorFileUpload(e) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    const dataUrl = evt.target.result;
+    const input = document.getElementById('settingCursorUrl');
+    if (input) input.value = dataUrl;
+  };
+  reader.readAsDataURL(file);
+}
+
+function applyCrosshair(enabled, style, size, color) {
+  const el = document.getElementById('screenCrosshair');
+  if (!el) return;
+  if (!enabled) {
+    el.style.display = 'none';
+    return;
+  }
+  el.style.display = 'block';
+  el.style.fontSize = `${size || 18}px`;
+  el.style.color = color || '#00ff88';
+
+  let symbol = '+';
+  if (style === 'dot') symbol = '•';
+  else if (style === 'circle') symbol = '○';
+  else if (style === 'dot-circle') symbol = '⊙';
+  else if (style === 'x') symbol = '✕';
+  else symbol = '+';
+
+  el.textContent = symbol;
+}
+
+// ==== SETTINGS MODAL TABS & UI SYNC ====
+window.switchSettingsTab = function(tabName) {
+  document.querySelectorAll('.settings-tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-tab') === tabName);
+  });
+  document.querySelectorAll('.settings-tab-pane').forEach(pane => {
+    pane.classList.toggle('active', pane.id === `tab-${tabName}`);
+  });
+};
+
+function initSettingsUI() {
+  renderTintOptions();
+  renderPinnedGamesSettings();
+
+  // Stealth & Privacy
+  const panicEnabled = document.getElementById('settingPanicEnabled');
+  if (panicEnabled) panicEnabled.checked = localStorage.getItem('trashbin_panic_enabled') !== 'false';
+  const panicBtn = document.getElementById('btnRecordPanicKey');
+  if (panicBtn) panicBtn.textContent = `Key: [ ${localStorage.getItem('trashbin_panic_key') || ']'} ]`;
+  const panicAction = document.getElementById('settingPanicAction');
+  if (panicAction) panicAction.value = localStorage.getItem('trashbin_panic_action') || 'redirect';
+  const panicUrl = document.getElementById('settingPanicUrl');
+  if (panicUrl) panicUrl.value = localStorage.getItem('trashbin_panic_url') || 'https://classroom.google.com';
+
+  const cloakPreset = document.getElementById('settingCloakPreset');
+  if (cloakPreset) cloakPreset.value = localStorage.getItem('trashbin_cloak_preset') || 'default';
+  const customTitle = document.getElementById('settingCustomTitle');
+  if (customTitle) customTitle.value = localStorage.getItem('trashbin_cloak_title') || '';
+  const customIcon = document.getElementById('settingCustomIconUrl');
+  if (customIcon) customIcon.value = localStorage.getItem('trashbin_cloak_icon') || '';
+
+  // Core & Deployment
+  const cdnSel = document.getElementById('settingCdnMirror');
+  if (cdnSel) cdnSel.value = localStorage.getItem('trashbin_cdn_mirror') || 'auto';
+  updateMirrorStatus();
+
+  // Navigation & Pinning
+  const showPinned = document.getElementById('settingShowPinnedTop');
+  if (showPinned) showPinned.checked = localStorage.getItem('trashbin_show_pinned_top') !== 'false';
+
+  // Startup & Performance
+  const startupLoader = document.getElementById('settingStartupLoader');
+  if (startupLoader) startupLoader.checked = localStorage.getItem('trashbin_startup_loader') !== 'false';
+  const startupChime = document.getElementById('settingStartupChime');
+  if (startupChime) startupChime.checked = localStorage.getItem('trashbin_startup_chime') === 'true';
+  const perfMode = document.getElementById('settingPerfMode');
+  if (perfMode) perfMode.checked = localStorage.getItem('trashbin_perf_mode') === 'true';
+  const liquidGlass = document.getElementById('settingLiquidGlass');
+  if (liquidGlass) liquidGlass.checked = localStorage.getItem('trashbin_liquid_glass') !== 'false';
+
+  // Cosmetics
+  const bgWaves = document.getElementById('settingBgWaves');
+  if (bgWaves) bgWaves.checked = localStorage.getItem('trashbin_bg_waves') === 'true';
+  const customCursorToggle = document.getElementById('settingCustomCursor');
+  if (customCursorToggle) customCursorToggle.checked = localStorage.getItem('trashbin_custom_cursor_enabled') === 'true';
+  const cursorUrl = document.getElementById('settingCursorUrl');
+  if (cursorUrl) cursorUrl.value = localStorage.getItem('trashbin_custom_cursor_url') || '';
+
+  // Gaming
+  const stretchedRes = document.getElementById('settingStretchedRes');
+  if (stretchedRes) stretchedRes.checked = localStorage.getItem('trashbin_stretched_res') === 'true';
+  const crosshairToggle = document.getElementById('settingCrosshairEnabled');
+  if (crosshairToggle) crosshairToggle.checked = localStorage.getItem('trashbin_crosshair_enabled') === 'true';
+  const crosshairStyle = document.getElementById('settingCrosshairStyle');
+  if (crosshairStyle) crosshairStyle.value = localStorage.getItem('trashbin_crosshair_style') || 'plus';
+  const crosshairSize = document.getElementById('settingCrosshairSize');
+  if (crosshairSize) crosshairSize.value = localStorage.getItem('trashbin_crosshair_size') || 18;
+  const crosshairColor = document.getElementById('settingCrosshairColor');
+  if (crosshairColor) crosshairColor.value = localStorage.getItem('trashbin_crosshair_color') || '#00ff88';
+}
+
 window.toggleSettingsModal = function() {
   const modal = document.getElementById("settingsModalOverlay");
   if (!modal) return;
   const isHidden = modal.style.display === "none" || !modal.style.display;
   modal.style.display = isHidden ? "flex" : "none";
-  if (isHidden) renderTintOptions();
+  if (isHidden) initSettingsUI();
 };
 
 window.closeSettingsModal = function(e) {
@@ -5279,32 +6360,550 @@ window.closeSettingsModal = function(e) {
   }
 };
 
-// Initialize tint on page load
-applyTint(currentTintId);
+// Initial load routines
+(function initTrashbinStartup() {
+  applyTint(currentTintId);
+  const savedTitle = localStorage.getItem('trashbin_cloak_title');
+  const savedIcon = localStorage.getItem('trashbin_cloak_icon');
+  if (savedTitle && savedIcon) {
+    setTabTitleAndIcon(savedTitle, savedIcon);
+  }
+  const savedMirror = localStorage.getItem('trashbin_cdn_mirror');
+  if (savedMirror && savedMirror !== 'auto') {
+    activeMirror = savedMirror;
+  }
+  initStartupAndPerformance();
+})();
 
   </script>
 
-  <!-- Settings Modal (Squircle Theme Tint Picker) -->
+  <!-- Comprehensive 6-Tab Settings Modal -->
   <div id="settingsModalOverlay" class="settings-modal-overlay" style="display: none;" onclick="closeSettingsModal(event)">
     <div class="settings-modal-card" onclick="event.stopPropagation()">
       <div class="settings-modal-header">
         <div class="settings-modal-title-col">
           <h2 class="settings-modal-title">Settings</h2>
-          <p class="settings-modal-sub">Personalize Trashbin appearance</p>
+          <p class="settings-modal-sub">Stealth, launch modes, performance & appearance</p>
         </div>
         <button class="player-btn-squircle" onclick="toggleSettingsModal()" title="Close Settings">
           <span class="material-symbols-sharp" style="font-size: 18px;">close</span>
         </button>
       </div>
 
-      <div class="settings-modal-section">
-        <div class="settings-section-label">Accent Tint</div>
-        <div class="settings-section-desc">Choose a website accent color tint (default is white). Tint will not affect Yolk.</div>
+      <!-- Settings Navigation Tabs -->
+      <div class="settings-tabs-bar">
+        <button class="settings-tab-btn active" data-tab="stealth" onclick="switchSettingsTab('stealth')">
+          <span class="material-symbols-sharp" style="font-size: 16px;">security</span> Stealth
+        </button>
+        <button class="settings-tab-btn" data-tab="core" onclick="switchSettingsTab('core')">
+          <span class="material-symbols-sharp" style="font-size: 16px;">rocket_launch</span> Core
+        </button>
+        <button class="settings-tab-btn" data-tab="pinning" onclick="switchSettingsTab('pinning')">
+          <span class="material-symbols-sharp" style="font-size: 16px;">keep</span> Pinning
+        </button>
+        <button class="settings-tab-btn" data-tab="speed" onclick="switchSettingsTab('speed')">
+          <span class="material-symbols-sharp" style="font-size: 16px;">bolt</span> Speed
+        </button>
+        <button class="settings-tab-btn" data-tab="appearance" onclick="switchSettingsTab('appearance')">
+          <span class="material-symbols-sharp" style="font-size: 16px;">palette</span> Appearance
+        </button>
+        <button class="settings-tab-btn" data-tab="gaming" onclick="switchSettingsTab('gaming')">
+          <span class="material-symbols-sharp" style="font-size: 16px;">sports_esports</span> Gaming
+        </button>
+      </div>
+
+      <!-- TAB 1: STEALTH & PRIVACY -->
+      <div class="settings-tab-pane active" id="tab-stealth">
+        <div class="settings-section-head">Panic Key & Cloaking Trigger</div>
+        <div class="settings-row">
+          <div class="settings-col-left">
+            <div class="settings-row-title">Enable Panic Key</div>
+            <div class="settings-row-desc">Instantly disguise or redirect the page when pressed.</div>
+          </div>
+          <div class="settings-col-right">
+            <label class="settings-switch">
+              <input type="checkbox" id="settingPanicEnabled" onchange="localStorage.setItem('trashbin_panic_enabled', this.checked)">
+              <span class="settings-slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-col-left">
+            <div class="settings-row-title">Panic Key</div>
+            <div class="settings-row-desc">Click record and press any keyboard key to set as panic trigger.</div>
+          </div>
+          <div class="settings-col-right">
+            <button class="settings-btn-action" id="btnRecordPanicKey" onclick="startRecordingPanicKey()">Key: [ ] ]</button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-col-left">
+            <div class="settings-row-title">Panic Action</div>
+            <div class="settings-row-desc">Choose whether to redirect to an external URL or show Google Classroom cover.</div>
+          </div>
+          <div class="settings-col-right">
+            <select class="settings-select" id="settingPanicAction" onchange="localStorage.setItem('trashbin_panic_action', this.value)">
+              <option value="redirect">Redirect URL</option>
+              <option value="cover">Hidden Classroom Cover</option>
+            </select>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-col-left">
+            <div class="settings-row-title">Redirect URL</div>
+            <div class="settings-row-desc">Destination webpage used when panic trigger redirects.</div>
+          </div>
+          <div class="settings-col-right">
+            <input type="text" class="settings-input" id="settingPanicUrl" style="width: 190px;" placeholder="https://classroom.google.com" onchange="localStorage.setItem('trashbin_panic_url', this.value.trim())">
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-col-left">
+            <div class="settings-row-title">Test Panic Trigger</div>
+            <div class="settings-row-desc">Immediately triggers the panic action configured above.</div>
+          </div>
+          <div class="settings-col-right">
+            <button class="settings-btn-action" onclick="executePanicAction()">Test Trigger</button>
+          </div>
+        </div>
+
+        <div class="settings-section-head">Tab Cloaking Presets</div>
+        <div class="settings-row">
+          <div class="settings-col-left">
+            <div class="settings-row-title">Disguise Tab Preset</div>
+            <div class="settings-row-desc">Change the tab title and favicon to appear as common school tools.</div>
+          </div>
+          <div class="settings-col-right">
+            <select class="settings-select" id="settingCloakPreset" onchange="applyCloakPreset(this.value)">
+              <option value="default">Default (Trashbin)</option>
+              <option value="classroom">Google Classroom</option>
+              <option value="docs">Google Docs</option>
+              <option value="drive">Google Drive</option>
+              <option value="slides">Google Slides</option>
+              <option value="canvas">Canvas LMS</option>
+              <option value="clever">Clever</option>
+              <option value="kahoot">Kahoot!</option>
+              <option value="desmos">Desmos Calculator</option>
+              <option value="wikipedia">Wikipedia</option>
+              <option value="custom">Custom...</option>
+            </select>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-col-left">
+            <div class="settings-row-title">Custom Tab Title</div>
+            <div class="settings-row-desc">Type your own custom text for the browser tab.</div>
+          </div>
+          <div class="settings-col-right">
+            <input type="text" class="settings-input" id="settingCustomTitle" style="width: 140px;" placeholder="Home - Classroom">
+            <button class="settings-btn-action primary" onclick="applyCustomCloak()">Apply</button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-col-left">
+            <div class="settings-row-title">Custom Favicon Icon</div>
+            <div class="settings-row-desc">Enter an image URL or upload an icon from your device.</div>
+          </div>
+          <div class="settings-col-right">
+            <input type="text" class="settings-input" id="settingCustomIconUrl" style="width: 140px;" placeholder="Icon URL">
+            <input type="file" id="fileCloakUpload" accept="image/*" style="display: none;" onchange="handleFaviconFileUpload(event)">
+            <button class="settings-btn-action" onclick="document.getElementById('fileCloakUpload').click()">Upload</button>
+            <button class="settings-btn-action primary" onclick="applyCustomCloak()">Apply</button>
+          </div>
+        </div>
+
+        <div class="settings-section-head">Hidden Page Cover</div>
+        <div class="settings-row">
+          <div class="settings-col-left">
+            <div class="settings-row-title">Google Classroom Mask</div>
+            <div class="settings-row-desc">Full-screen authentic visual mask. Exit anytime by double-tapping Escape or clicking the Classroom logo 3 times.</div>
+          </div>
+          <div class="settings-col-right">
+            <button class="settings-btn-action primary" onclick="toggleHiddenClassroomCover(true)">Open Mask</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: CORE INFRASTRUCTURE & DEPLOYMENT -->
+      <div class="settings-tab-pane" id="tab-core">
+        <div class="settings-section-head">Launcher Options (Bypass URL Filters)</div>
+        <div class="settings-row">
+          <div class="settings-col-left">
+            <div class="settings-row-title">Open in about:blank</div>
+            <div class="settings-row-desc">Opens Trashbin in a clean about:blank window to bypass URL inspection.</div>
+          </div>
+          <div class="settings-col-right">
+            <button class="settings-btn-action primary" onclick="launchInAboutBlank()">Launch about:blank</button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-col-left">
+            <div class="settings-row-title">Open in Blob URL</div>
+            <div class="settings-row-desc">Creates an in-memory blob HTML instance to evade domain blocklists.</div>
+          </div>
+          <div class="settings-col-right">
+            <button class="settings-btn-action" onclick="launchInBlob()">Launch Blob Tab</button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-col-left">
+            <div class="settings-row-title">Download HTML Offline File</div>
+            <div class="settings-row-desc">Saves the entire standalone application locally to run offline.</div>
+          </div>
+          <div class="settings-col-right">
+            <button class="settings-btn-action" onclick="downloadOfflineHtml()">Download HTML</button>
+          </div>
+        </div>
+
+        <div class="settings-section-head">Backup Settings & Game Data</div>
+        <div class="settings-row">
+          <div class="settings-col-left">
+            <div class="settings-row-title">Export Backup (.txt)</div>
+            <div class="settings-row-desc">Downloads a text file containing all saved game states and configurations.</div>
+          </div>
+          <div class="settings-col-right">
+            <button class="settings-btn-action" onclick="exportBackupData()">Save .txt</button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-col-left">
+            <div class="settings-row-title">Import Backup (.txt)</div>
+            <div class="settings-row-desc">Restores your saved game progress and custom preferences from file.</div>
+          </div>
+          <div class="settings-col-right">
+            <input type="file" id="fileBackupInput" accept=".txt,.json" style="display: none;" onchange="importBackupData(event)">
+            <button class="settings-btn-action" onclick="document.getElementById('fileBackupInput').click()">Load .txt</button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-col-left">
+            <div class="settings-row-title">Clear Site Data</div>
+            <div class="settings-row-desc">Permanently erases all offline game caches, downloads, and preferences.</div>
+          </div>
+          <div class="settings-col-right">
+            <button class="settings-btn-action danger" onclick="clearAllData()">Clear Data</button>
+          </div>
+        </div>
+
+        <div class="settings-section-head">CDN Network Mirror</div>
+        <div class="settings-row">
+          <div class="settings-col-left">
+            <div class="settings-row-title">Select Mirror</div>
+            <div class="settings-row-desc">Choose which CDN delivery network serves game assets and scripts.</div>
+          </div>
+          <div class="settings-col-right">
+            <select class="settings-select" id="settingCdnMirror" onchange="onCdnMirrorChange(this.value)">
+              <option value="auto">Auto-Detect (Fastest)</option>
+              <option value="https://cdn.jsdelivr.net">cdn.jsdelivr.net (Primary)</option>
+              <option value="https://fastly.jsdelivr.net">fastly.jsdelivr.net</option>
+              <option value="https://quantil.jsdelivr.net">quantil.jsdelivr.net</option>
+              <option value="https://testingcf.jsdelivr.net">testingcf.jsdelivr.net</option>
+              <option value="https://gcore.jsdelivr.net">gcore.jsdelivr.net</option>
+              <option value="https://originfastly.jsdelivr.net">originfastly.jsdelivr.net</option>
+            </select>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-col-left">
+            <div class="settings-row-title">Mirror Latency Test</div>
+            <div class="settings-row-desc" id="mirrorPingResult">Testing active mirror...</div>
+          </div>
+          <div class="settings-col-right">
+            <button class="settings-btn-action" onclick="testMirrorPing()">Test Ping</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: NAVIGATION & PINNING -->
+      <div class="settings-tab-pane" id="tab-pinning">
+        <div class="settings-section-head">Home Screen Layout</div>
+        <div class="settings-row">
+          <div class="settings-col-left">
+            <div class="settings-row-title">Show Pinned Games Above Others</div>
+            <div class="settings-row-desc">Prioritizes all pinned games at the very beginning of the catalog.</div>
+          </div>
+          <div class="settings-col-right">
+            <label class="settings-switch">
+              <input type="checkbox" id="settingShowPinnedTop" onchange="localStorage.setItem('trashbin_show_pinned_top', this.checked); renderGames();">
+              <span class="settings-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="settings-section-head">Search & Pin Games</div>
+        <div style="margin-bottom: 8px;">
+          <input type="text" class="settings-input" style="width: 100%; box-sizing: border-box;" id="settingPinSearch" placeholder="Search game title to pin..." oninput="searchAndRenderPinOptions(this.value)">
+        </div>
+        <div id="pinSearchResults" style="display: none; margin-bottom: 12px;"></div>
+
+        <div class="settings-section-head">Currently Pinned Games</div>
+        <div class="pinned-list-container" id="pinnedGamesContainer">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+      <!-- TAB 4: STARTUP & SPEED -->
+      <div class="settings-tab-pane" id="tab-speed">
+        <div class="settings-section-head">Startup Options</div>
+        <div class="settings-row">
+          <div class="settings-col-left">
+            <div class="settings-row-title">Loading Screen on Startup</div>
+            <div class="settings-row-desc">Displays a sleek animated Trashbin loading splash when site opens.</div>
+          </div>
+          <div class="settings-col-right">
+            <label class="settings-switch">
+              <input type="checkbox" id="settingStartupLoader" onchange="localStorage.setItem('trashbin_startup_loader', this.checked)">
+              <span class="settings-slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-col-left">
+            <div class="settings-row-title">Music / Chime on Startup</div>
+            <div class="settings-row-desc">Plays an ambient synth chime when the app initializes.</div>
+          </div>
+          <div class="settings-col-right">
+            <label class="settings-switch">
+              <input type="checkbox" id="settingStartupChime" onchange="localStorage.setItem('trashbin_startup_chime', this.checked)">
+              <span class="settings-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="settings-section-head">Performance Hardware Modes</div>
+        <div class="settings-row">
+          <div class="settings-col-left">
+            <div class="settings-row-title">Performance Mode</div>
+            <div class="settings-row-desc">Disables backdrop blurs, glow filters, and complex transitions for 60fps on Chromebooks.</div>
+          </div>
+          <div class="settings-col-right">
+            <label class="settings-switch">
+              <input type="checkbox" id="settingPerfMode" onchange="localStorage.setItem('trashbin_perf_mode', this.checked); document.body.classList.toggle('perf-mode', this.checked);">
+              <span class="settings-slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-col-left">
+            <div class="settings-row-title">Liquid Glass Buttons</div>
+            <div class="settings-row-desc">Frosted-glass sheen and specular highlight reflections on interactive controls.</div>
+          </div>
+          <div class="settings-col-right">
+            <label class="settings-switch">
+              <input type="checkbox" id="settingLiquidGlass" onchange="localStorage.setItem('trashbin_liquid_glass', this.checked); document.body.classList.toggle('liquid-glass-off', !this.checked);">
+              <span class="settings-slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 5: PURE VISUAL AESTHETICS -->
+      <div class="settings-tab-pane" id="tab-appearance">
+        <div class="settings-section-head">Accent Color Theme</div>
+        <div class="settings-row-desc" style="margin-bottom: 12px;">Choose a saturated squircle theme tint (default is Emerald). Will not affect Yolk.</div>
         <div class="tint-grid" id="tintGrid">
           <!-- 8 squircle color buttons rendered dynamically -->
         </div>
+
+        <div class="settings-section-head" style="margin-top: 18px;">Background Ambient Effects</div>
+        <div class="settings-row">
+          <div class="settings-col-left">
+            <div class="settings-row-title">Background Waves</div>
+            <div class="settings-row-desc">Displays dynamic ambient flowing wave gradients behind content.</div>
+          </div>
+          <div class="settings-col-right">
+            <label class="settings-switch">
+              <input type="checkbox" id="settingBgWaves" onchange="localStorage.setItem('trashbin_bg_waves', this.checked); document.getElementById('bgWavesLayer').style.display = this.checked ? 'block' : 'none';">
+              <span class="settings-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="settings-section-head">Custom Cursor</div>
+        <div class="settings-row">
+          <div class="settings-col-left">
+            <div class="settings-row-title">Enable Custom Cursor</div>
+            <div class="settings-row-desc">Replaces standard mouse pointer with custom image cursor.</div>
+          </div>
+          <div class="settings-col-right">
+            <label class="settings-switch">
+              <input type="checkbox" id="settingCustomCursor" onchange="localStorage.setItem('trashbin_custom_cursor_enabled', this.checked); applyCustomCursor(this.checked, document.getElementById('settingCursorUrl').value);">
+              <span class="settings-slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-col-left">
+            <div class="settings-row-title">Cursor Image</div>
+            <div class="settings-row-desc">Input image URL or upload .cur / .png file.</div>
+          </div>
+          <div class="settings-col-right">
+            <input type="text" class="settings-input" id="settingCursorUrl" style="width: 140px;" placeholder="Image URL">
+            <input type="file" id="fileCursorUpload" accept="image/*" style="display: none;" onchange="handleCursorFileUpload(event)">
+            <button class="settings-btn-action" onclick="document.getElementById('fileCursorUpload').click()">Upload</button>
+            <button class="settings-btn-action primary" onclick="localStorage.setItem('trashbin_custom_cursor_url', document.getElementById('settingCursorUrl').value); applyCustomCursor(true, document.getElementById('settingCursorUrl').value);">Apply</button>
+            <button class="settings-btn-action" onclick="applyCustomCursor(false); localStorage.removeItem('trashbin_custom_cursor_url'); document.getElementById('settingCursorUrl').value = '';">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 6: GAMING TOOLS -->
+      <div class="settings-tab-pane" id="tab-gaming">
+        <div class="settings-section-head">Display Modes</div>
+        <div class="settings-row">
+          <div class="settings-col-left">
+            <div class="settings-row-title">Stretched Resolution (4:3)</div>
+            <div class="settings-row-desc">Applies horizontal stretched aspect ratio for competitive game viewports.</div>
+          </div>
+          <div class="settings-col-right">
+            <label class="settings-switch">
+              <input type="checkbox" id="settingStretchedRes" onchange="localStorage.setItem('trashbin_stretched_res', this.checked); document.body.classList.toggle('stretched-res-active', this.checked);">
+              <span class="settings-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="settings-section-head">Screen Crosshair Overlay</div>
+        <div class="settings-row">
+          <div class="settings-col-left">
+            <div class="settings-row-title">Enable Crosshair</div>
+            <div class="settings-row-desc">Draws an on-screen crosshair overlay at the dead center of the display.</div>
+          </div>
+          <div class="settings-col-right">
+            <label class="settings-switch">
+              <input type="checkbox" id="settingCrosshairEnabled" onchange="localStorage.setItem('trashbin_crosshair_enabled', this.checked); applyCrosshair(this.checked, document.getElementById('settingCrosshairStyle').value, document.getElementById('settingCrosshairSize').value, document.getElementById('settingCrosshairColor').value);">
+              <span class="settings-slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-col-left">
+            <div class="settings-row-title">Crosshair Style</div>
+            <div class="settings-row-desc">Reticle symbol appearance.</div>
+          </div>
+          <div class="settings-col-right">
+            <select class="settings-select" id="settingCrosshairStyle" onchange="localStorage.setItem('trashbin_crosshair_style', this.value); applyCrosshair(true, this.value, document.getElementById('settingCrosshairSize').value, document.getElementById('settingCrosshairColor').value);">
+              <option value="plus">+ Plus Reticle</option>
+              <option value="dot">• Center Dot</option>
+              <option value="dot-circle">⊙ Dot in Circle</option>
+              <option value="circle">○ Open Ring</option>
+              <option value="x">✕ Cross Reticle</option>
+            </select>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-col-left">
+            <div class="settings-row-title">Crosshair Size</div>
+            <div class="settings-row-desc">Reticle pixel dimension scale.</div>
+          </div>
+          <div class="settings-col-right">
+            <input type="range" id="settingCrosshairSize" min="10" max="36" value="18" style="width: 120px;" oninput="localStorage.setItem('trashbin_crosshair_size', this.value); applyCrosshair(true, document.getElementById('settingCrosshairStyle').value, this.value, document.getElementById('settingCrosshairColor').value);">
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-col-left">
+            <div class="settings-row-title">Crosshair Color</div>
+            <div class="settings-row-desc">High visibility reticle tint.</div>
+          </div>
+          <div class="settings-col-right">
+            <select class="settings-select" id="settingCrosshairColor" onchange="localStorage.setItem('trashbin_crosshair_color', this.value); applyCrosshair(true, document.getElementById('settingCrosshairStyle').value, document.getElementById('settingCrosshairSize').value, this.value);">
+              <option value="#00ff88">Emerald Green</option>
+              <option value="#ff3333">Bright Red</option>
+              <option value="#00f0ff">Electric Cyan</option>
+              <option value="#ffffff">Pure White</option>
+              <option value="#fbbf24">Amber Yellow</option>
+            </select>
+          </div>
+        </div>
       </div>
     </div>
+  </div>
+
+  <!-- Background Animated Waves Layer -->
+  <div id="bgWavesLayer" class="bg-waves-layer">
+    <svg viewBox="0 0 1440 320" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path fill="var(--accent)" fill-opacity="0.32" d="M0,192L48,202.7C96,213,192,235,288,218.7C384,203,480,149,576,144C672,139,768,181,864,197.3C960,213,1056,203,1152,181.3C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+      <path fill="var(--accent)" fill-opacity="0.18" d="M0,96L60,122.7C120,149,240,203,360,208C480,213,600,171,720,154.7C840,139,960,149,1080,165.3C1200,181,1320,203,1380,213.3L1440,224L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"></path>
+    </svg>
+  </div>
+
+  <!-- Screen Crosshair Overlay -->
+  <div id="screenCrosshair" class="screen-crosshair">+</div>
+
+  <!-- Startup Loader Overlay -->
+  <div id="startupLoaderOverlay" class="startup-loader-overlay">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="var(--accent)"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+      <span style="font-family: 'Libre Baskerville', serif; font-size: 24px; font-weight: 700; color: #ffffff;">Trashbin</span>
+    </div>
+    <div style="font-size: 12px; color: #8e8e93; letter-spacing: 0.3px;">Starting environment...</div>
+    <div class="startup-loader-bar">
+      <div class="startup-loader-fill"></div>
+    </div>
+  </div>
+
+  <!-- Hidden Google Classroom Cover -->
+  <div id="hiddenClassroomCover" class="hidden-classroom-cover">
+    <header>
+      <button class="hc-hbtn" aria-label="Main menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="#5f6368"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+      </button>
+      <img class="hc-logo" src="https://www.gstatic.com/classroom/ic_product_classroom_32.png" alt="Classroom" onclick="handleCoverLogoClick()">
+      <span class="hc-brand" onclick="handleCoverLogoClick()">Classroom</span>
+      <div class="hc-spacer"></div>
+      <button class="hc-hbtn" aria-label="Add" onclick="alert('Google Classroom is operating normally.');">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="#5f6368"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+      </button>
+      <button class="hc-hbtn" aria-label="Apps">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="#5f6368"><path d="M6 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm6 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm6 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4zM6 14a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm6 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm6 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4zM6 20a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm6 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm6 0a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/></svg>
+      </button>
+      <button class="hc-hbtn" aria-label="Account">
+        <svg width="28" height="28" viewBox="0 0 16 16" fill="#80868b"><path d="M8 2a2.84 2.84 0 0 0-1.12.221c-.345.141-.651.348-.906.615v.003l-.001.002c-.248.269-.44.592-.574.96-.137.367-.203.769-.203 1.2 0 .435.065.841.203 1.209.135.361.327.68.574.95l.001.002c.254.267.558.477.901.624v.003c.346.141.723.21 1.12.21.395 0 .77-.069 1.117-.21v-.002c.343-.147.644-.357.892-.625.255-.268.45-.59.586-.952.138-.368.204-.774.204-1.21h.01c0-.43-.065-.831-.203-1.198a2.771 2.771 0 0 0-.585-.963 2.5 2.5 0 0 0-.897-.618A2.835 2.835 0 0 0 7.999 2z"/><path d="M8.024 10.002c-2.317 0-3.561.213-4.486.91-.462.35-.767.825-.939 1.378-.172.553-.226.975-.228 1.71L8 14.002h5.629c-.001-.736-.052-1.159-.225-1.712-.172-.553-.477-1.027-.94-1.376-.923-.697-2.124-.912-4.44-.912z"/></svg>
+      </button>
+    </header>
+
+    <div class="hc-wrap">
+      <nav>
+        <a class="on" href="#"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Home</a>
+        <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="#5f6368"><path d="M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 16H5V10h14v10z"/></svg>Calendar</a>
+        <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="#5f6368"><path d="M17 1H7a2 2 0 0 0-2 2v18l7-4 7 4V3a2 2 0 0 0-2-2z"/></svg>Archived classes</a>
+        <a href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="#5f6368"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/></svg>Settings</a>
+      </nav>
+
+      <main>
+        <div class="hc-card">
+          <div class="hc-c-head">
+            <span class="hc-ico blue"><svg width="20" height="20" viewBox="0 0 24 24" fill="#1967d2"><path d="M12 2a10 10 0 0 0-6.32 17.82l1.5-1.5A8 8 0 1 1 20 12a8 8 0 0 1-2.32 5.68l1.5 1.5A10 10 0 0 0 12 2zm1 5h-2v5l4.25 2.52.75-1.23-3.5-2.08V7z"/></svg></span>
+            <h3>Due soon</h3>
+            <span style="margin-left: auto;"><button class="hc-btn ghost">View To-do</button></span>
+          </div>
+          <div class="hc-empty">You don't have any work due in the next 7 days</div>
+        </div>
+
+        <div class="hc-card">
+          <div class="hc-c-head">
+            <span class="hc-ico green"><svg width="20" height="20" viewBox="0 0 24 24" fill="#188038"><path d="M12 2 2 7l10 5 10-5-10-5zM2 17l10 5 10-5v-3l-10 5-10-5v3z"/></svg></span>
+            <h3>Class learning tools</h3>
+          </div>
+          <div class="hc-empty">You don't have any assigned class learning tools</div>
+        </div>
+
+        <div class="hc-card">
+          <div class="hc-c-head"><h3>Classes</h3></div>
+          <div class="hc-empty">
+            <button class="hc-btn" onclick="alert('Join code requested.');" style="display: inline-flex; align-items: center; gap: 8px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>Add class
+            </button>
+            <br><br>Add a class to get started
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <footer>
+      This site is not affiliated with Google or any Google product or service.
+      <span onclick="toggleHiddenClassroomCover(false)" style="margin-left: 10px; cursor: pointer; opacity: 0.35;" title="Click to dismiss mask">v4.2.1</span>
+    </footer>
   </div>
 
   <!-- Fake Resuming Screen Overlay -->

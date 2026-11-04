@@ -8651,20 +8651,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function applyThemeMode(mode, notify = false) {
-        if (!['light', 'dark', 'system'].includes(mode)) {
-            mode = 'system';
-        }
-        localStorage.setItem('yolk_theme_mode', mode);
+        mode = 'dark';
+        localStorage.setItem('yolk_theme_mode', 'dark');
 
-        const isDark = (mode === 'dark') || (mode === 'system' && isSystemDark());
-        document.documentElement.classList.toggle('dark-mode', isDark);
-        document.body.classList.toggle('dark-mode', isDark);
-        document.documentElement.classList.toggle('dark', isDark);
-        document.body.classList.toggle('dark', isDark);
+        const isDark = true;
+        document.documentElement.classList.add('dark-mode', 'dark');
+        document.body.classList.add('dark-mode', 'dark');
 
         const metaTheme = document.getElementById('meta-theme-color') || document.querySelector('meta[name="theme-color"]');
         if (metaTheme) {
-            metaTheme.setAttribute('content', isDark ? '#0c0c0e' : '#FCFBF8');
+            metaTheme.setAttribute('content', '#0c0c0e');
         }
 
         // Highlight active theme choice button
