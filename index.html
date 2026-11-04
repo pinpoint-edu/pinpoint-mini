@@ -1616,7 +1616,7 @@
       height: 100vh;
       background: #09090b;
       z-index: 99999999;
-      display: flex;
+      display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -6157,17 +6157,18 @@ function playStartupChime() {
 }
 
 function initStartupAndPerformance() {
-  // Startup Loader
-  const showLoader = localStorage.getItem('trashbin_startup_loader') !== 'false';
+  // Startup Loader: only show if explicitly enabled by user
+  const showLoader = localStorage.getItem('trashbin_startup_loader') === 'true';
   const overlay = document.getElementById('startupLoaderOverlay');
   if (overlay) {
     if (!showLoader) {
       overlay.style.display = 'none';
     } else {
+      overlay.style.display = 'flex';
       setTimeout(() => {
         overlay.classList.add('fade-out');
-        setTimeout(() => { overlay.style.display = 'none'; }, 400);
-      }, 950);
+        setTimeout(() => { overlay.style.display = 'none'; }, 300);
+      }, 600);
     }
   }
 
@@ -6317,7 +6318,7 @@ function initSettingsUI() {
 
   // Startup & Performance
   const startupLoader = document.getElementById('settingStartupLoader');
-  if (startupLoader) startupLoader.checked = localStorage.getItem('trashbin_startup_loader') !== 'false';
+  if (startupLoader) startupLoader.checked = localStorage.getItem('trashbin_startup_loader') === 'true';
   const startupChime = document.getElementById('settingStartupChime');
   if (startupChime) startupChime.checked = localStorage.getItem('trashbin_startup_chime') === 'true';
   const perfMode = document.getElementById('settingPerfMode');
@@ -6361,7 +6362,7 @@ window.closeSettingsModal = function(e) {
 };
 
 // Initial load routines
-(function initTrashbinStartup() {
+function initTrashbinStartup() {
   applyTint(currentTintId);
   const savedTitle = localStorage.getItem('trashbin_cloak_title');
   const savedIcon = localStorage.getItem('trashbin_cloak_icon');
@@ -6373,7 +6374,13 @@ window.closeSettingsModal = function(e) {
     activeMirror = savedMirror;
   }
   initStartupAndPerformance();
-})();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initTrashbinStartup);
+} else {
+  initTrashbinStartup();
+}
 
   </script>
 
@@ -6830,8 +6837,8 @@ window.closeSettingsModal = function(e) {
   <!-- Screen Crosshair Overlay -->
   <div id="screenCrosshair" class="screen-crosshair">+</div>
 
-  <!-- Startup Loader Overlay -->
-  <div id="startupLoaderOverlay" class="startup-loader-overlay">
+  <!-- Startup Loader Overlay (Default Hidden, dismissible on click) -->
+  <div id="startupLoaderOverlay" class="startup-loader-overlay" style="display: none;" onclick="this.style.display='none'">
     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
       <svg width="32" height="32" viewBox="0 0 24 24" fill="var(--accent)"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
       <span style="font-family: 'Libre Baskerville', serif; font-size: 24px; font-weight: 700; color: #ffffff;">Trashbin</span>
@@ -6841,6 +6848,14 @@ window.closeSettingsModal = function(e) {
       <div class="startup-loader-fill"></div>
     </div>
   </div>
+  <script>
+    (function() {
+      var ov = document.getElementById('startupLoaderOverlay');
+      if (ov && localStorage.getItem('trashbin_startup_loader') !== 'true') {
+        ov.style.display = 'none';
+      }
+    })();
+  </script>
 
   <!-- Hidden Google Classroom Cover -->
   <div id="hiddenClassroomCover" class="hidden-classroom-cover">
