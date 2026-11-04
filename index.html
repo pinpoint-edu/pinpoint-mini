@@ -3640,7 +3640,7 @@ const DEFAULT_GAMES = [
       {
             "title": "Tetris",
             "file": "textbooks/tetrominoes/index.html",
-            "sizeBytes": 1133121
+            "sizeBytes": 355003
       },
       {
             "title": "Vex5",
@@ -4728,7 +4728,9 @@ async function playGame(encodedFile, encodedTitle) {
     try {
       const record = await PinpointGameStorage.getGame(id);
       if (record && record.content && record.content.length > 50) {
-        const offlineBase = (/^https?:\/\//i.test(file)) ? file : (activeMirror + '/gh/pinpoint-edu/assets@main/' + file);
+        const isMiniRepo = file.startsWith('yolk/') || file === 'ai.html' || file.startsWith('pages/') || file.includes('superhot') || file.includes('tetrominoes') || file.includes('tetris');
+        const primaryRepo = isMiniRepo ? 'pinpoint-edu/pinpoint-mini@main/' : 'pinpoint-edu/assets@main/';
+        const offlineBase = (/^https?:\/\//i.test(file)) ? file : (activeMirror + '/gh/' + primaryRepo + file);
         writeGameIntoFrame(iframe, record.content, offlineBase);
         return;
       }
