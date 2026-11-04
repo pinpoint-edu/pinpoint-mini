@@ -224,6 +224,11 @@
     "sizeBytes": 489000
   },
   {
+    "title": "Tetris",
+    "file": "textbooks/tetrominoes/index.html",
+    "sizeBytes": 30038
+  },
+  {
     "title": "Vex5",
     "file": "textbooks/vex5.html",
     "sizeBytes": 15661734

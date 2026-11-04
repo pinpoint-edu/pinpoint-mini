@@ -1,7 +1,7 @@
 {
-  "version": "3.8.1",
-  "releaseTag": "v3.8.1",
+  "version": "3.9",
+  "releaseTag": "v3.9",
   "name": "Trashbin",
-  "timestamp": 1793748000000,
+  "timestamp": 1793750000000,
   "forceRefresh": true
 }

@@ -2200,6 +2200,9 @@ const GAME_MANIFESTS = {
         "/textbooks/escape-road-3/Build/webgl/sharedassets4.resource",
         "/textbooks/escape-road-3/StreamingAssets/UnityServicesProjectConfiguration.json"
     ],
+    "textbooks/tetrominoes/index.html": [
+        "/textbooks/tetrominoes/index.html"
+    ],
     "textbooks/crazy-pixel-apocalypse-9/index.html": [
         "/textbooks/crazy-pixel-apocalypse-9/index.html",
         "/textbooks/crazy-pixel-apocalypse-9/Build/puxx.data.unityweb",
@@ -3196,7 +3199,7 @@ const PinpointGameStorage = {
                         candidateUrls.push(rawGh);
                     }
                 } else {
-                    const isMini = clean.startsWith('yolk/') || clean === 'ai.html' || clean.startsWith('pages/') || clean.includes('superhot');
+                    const isMini = clean.startsWith('yolk/') || clean === 'ai.html' || clean.startsWith('pages/') || clean.includes('superhot') || clean.includes('tetrominoes') || clean.includes('tetris');
                     const primaryRepo = isMini ? 'pinpoint-edu/pinpoint-mini@main/' : 'pinpoint-edu/assets@main/';
                     const fallbackRepo = isMini ? 'pinpoint-edu/assets@main/' : 'pinpoint-edu/pinpoint-mini@main/';
                     const mirrors = [activeMirror, ...CDN_MIRRORS.filter(m => m !== activeMirror)];
@@ -3632,6 +3635,11 @@ const DEFAULT_GAMES = [
             "title": "Sprinter",
             "file": "textbooks/sprinter/index.html",
             "sizeBytes": 489000
+      },
+      {
+            "title": "Tetris",
+            "file": "textbooks/tetrominoes/index.html",
+            "sizeBytes": 30038
       },
       {
             "title": "Vex5",
@@ -4653,7 +4661,7 @@ async function fetchGameHtml(file) {
   const mirrors = [activeMirror, ...CDN_MIRRORS.filter(m => m !== activeMirror)];
 
   // Apps live in pinpoint-mini, game textbooks live in assets
-  const isMiniRepo = fetchFile.startsWith('yolk/') || fetchFile === 'ai.html' || fetchFile.startsWith('pages/') || fetchFile.includes('superhot');
+  const isMiniRepo = fetchFile.startsWith('yolk/') || fetchFile === 'ai.html' || fetchFile.startsWith('pages/') || fetchFile.includes('superhot') || fetchFile.includes('tetrominoes') || fetchFile.includes('tetris');
   const primaryRepo = isMiniRepo ? 'pinpoint-edu/pinpoint-mini@main/' : 'pinpoint-edu/assets@main/';
   const fallbackRepo = isMiniRepo ? 'pinpoint-edu/assets@main/' : 'pinpoint-edu/pinpoint-mini@main/';
 
@@ -5576,6 +5584,12 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
+window.addEventListener('message', (e) => {
+  if (e && e.data && (e.data === 'closePlayer' || e.data.type === 'closePlayer')) {
+    closePlayer();
+  }
+});
+
 // Start clock and battery monitor immediately
 updateClockDisplay();
 setInterval(updateClockDisplay, 1000);
@@ -5958,7 +5972,7 @@ window.downloadOfflineHtml = function() {
 window.exportBackupData = function() {
   const backupObj = {
     timestamp: new Date().toISOString(),
-    version: '3.8',
+    version: '3.9',
     data: {}
   };
   for (let i = 0; i < localStorage.length; i++) {
