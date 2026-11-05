@@ -4274,6 +4274,9 @@ function prepareGameHtml(html, fileUrl) {
   if (mRepo) {
     repoBase = mRepo[1];
   }
+  if (fileUrl.includes('movies/')) {
+    repoBase = base;
+  }
 
   // Strip dead preceding HTML shell if concatenated (e.g., Minecraft PE duplicate shells)
   if (html.includes('<!DOCTYPE html>') && html.indexOf('<!DOCTYPE html>') !== html.lastIndexOf('<!DOCTYPE html>')) {
@@ -4498,6 +4501,12 @@ function prepareGameHtml(html, fileUrl) {
     '      return rb + "textbooks/" + sub;',
     '    }',
     '  }',
+    '  if(b.indexOf("movies/") !== -1){',
+    '    if(u.indexOf("_app/") !== -1 || u.indexOf("/_app/") !== -1){ return b + (u.indexOf("/") === 0 ? u.slice(1) : u); }',
+    '    if(u.indexOf("assets/") !== -1 || u.indexOf("/assets/") !== -1){ return b + (u.indexOf("/") === 0 ? u.slice(1) : u); }',
+    '    if(u.indexOf("brand/") !== -1 || u.indexOf("/brand/") !== -1){ return b + (u.indexOf("/") === 0 ? u.slice(1) : u); }',
+    '    if(u.indexOf("img/") !== -1 || u.indexOf("/img/") !== -1){ return b + (u.indexOf("/") === 0 ? u.slice(1) : u); }',
+    '  }',
     '  if(u.indexOf("/assets/") !== -1 || u.indexOf("assets/") === 0){',
     '    if(u.indexOf("cdn.jsdelivr.net") === -1 && u.indexOf("githubusercontent.com") === -1){',
     '      var sub = u.substring(u.indexOf("assets/") + 7);',
@@ -4594,6 +4603,11 @@ function prepareGameHtml(html, fileUrl) {
   // 3. Resolve root-relative paths in HTML attributes
   html = html.replace(/(\s(?:src|href))=(['"])\/(?!\/)/gi, (m, p1, p2) => p1 + '=' + p2 + repoBase);
 
+  // 3b. Rewrite dynamic module imports for movies
+  if (fileUrl.includes('movies/')) {
+    html = html.replace(/import\((['"])\/?_app\//g, (m, q) => 'import(' + q + repoBase + '_app/');
+  }
+
   // 4. Normalize jsdelivr mirror domains to current active mirror
   html = html.replace(/https?:\/\/[^/]*\.jsdelivr\.net\//g, activeMirror + '/');
 
@@ -4603,10 +4617,15 @@ function prepareGameHtml(html, fileUrl) {
 
 function writeGameIntoFrame(iframe, rawHtml, fileUrl) {
   const preparedHtml = prepareGameHtml(rawHtml, fileUrl);
-  const doc = iframe.contentDocument || iframe.contentWindow.document;
-  doc.open();
-  doc.write(preparedHtml);
-  doc.close();
+  try {
+    const doc = iframe.contentDocument || iframe.contentWindow.document;
+    doc.open();
+    doc.write(preparedHtml);
+    doc.close();
+  } catch(e) {
+    console.warn("doc.write failed, falling back to srcdoc:", e);
+    iframe.srcdoc = preparedHtml;
+  }
   try {
     iframe.contentWindow.focus();
   } catch(e) {}
@@ -4680,7 +4699,16 @@ async function fetchGameHtml(file) {
   const primaryRepo = isMiniRepo ? 'pinpoint-edu/pinpoint-mini@main/' : 'pinpoint-edu/assets@main/';
   const fallbackRepo = isMiniRepo ? 'pinpoint-edu/assets@main/' : 'pinpoint-edu/pinpoint-mini@main/';
 
-  const urlsToTry = [
+  const isLargeGame = fetchFile.includes('gladihoppers') || fetchFile.includes('highway-traffic') || fetchFile.includes('drivemad') || (typeof allGames !== 'undefined' && allGames.some(g => g.file && g.file.includes(fetchFile) && g.sizeBytes > 19000000));
+
+  const urlsToTry = isLargeGame ? [
+    'https://raw.githubusercontent.com/' + primaryRepo.replace('@main/', '/main/') + fetchFile,
+    'https://cdn.statically.io/gh/' + primaryRepo + fetchFile,
+    ...mirrors.map(m => m + '/gh/' + primaryRepo + fetchFile),
+    'https://raw.githubusercontent.com/' + fallbackRepo.replace('@main/', '/main/') + fetchFile,
+    'https://cdn.statically.io/gh/' + fallbackRepo + fetchFile,
+    ...mirrors.map(m => m + '/gh/' + fallbackRepo + fetchFile)
+  ] : [
     ...mirrors.map(m => m + '/gh/' + primaryRepo + fetchFile),
     'https://cdn.statically.io/gh/' + primaryRepo + fetchFile,
     'https://raw.githubusercontent.com/' + primaryRepo.replace('@main/', '/main/') + fetchFile,
