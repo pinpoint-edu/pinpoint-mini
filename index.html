@@ -3689,6 +3689,12 @@ const DEFAULT_GAMES = [
             "sizeBytes": 489000
       },
       {
+            "title": "Superhot",
+            "file": "textbooks/superhot.html",
+            "img": "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/swat/ts3.png",
+            "sizeBytes": 8890237
+      },
+      {
             "title": "Tetris",
             "file": "textbooks/tetrominoes/index.html",
             "sizeBytes": 2899856
@@ -3714,12 +3720,6 @@ const DEFAULT_GAMES = [
             "file": "https://scratch.mit.edu/projects/1291919322/embed",
             "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/8ballpool.png",
             "sizeBytes": 1500000
-      },
-      {
-            "title": "Superhot",
-            "file": "textbooks/superhot.html",
-            "img": "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/swat/ts3.png",
-            "sizeBytes": 8890237
       },
       {
             "title": "Bank Robbery 2",
@@ -4305,6 +4305,12 @@ function renderGames() {
 function prepareGameHtml(html, fileUrl) {
   let base = fileUrl.replace(/[^/]*$/, '');
   if (!base.endsWith('/')) base += '/';
+
+  // CRITICAL: raw.githubusercontent.com serves CSS/JS as text/plain with X-Content-Type-Options: nosniff
+  // which causes browsers to block stylesheets and scripts! Always convert raw.githubusercontent.com base to CDN mirror!
+  if (base.includes('raw.githubusercontent.com/')) {
+    base = base.replace('https://raw.githubusercontent.com/', activeMirror + '/gh/').replace('/main/', '@main/');
+  }
 
   let repoBase = base;
   const mRepo = base.match(/^(https?:\/\/[^/]+\/(?:gh\/[^/]+\/[^/@]+@[^/]+\/|[^/]+\/[^/]+\/[^/]+\/))/i);
