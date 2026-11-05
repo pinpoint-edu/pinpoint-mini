@@ -413,6 +413,15 @@
       <div class="board-container">
         <canvas id="tetris-canvas" width="400" height="800"></canvas>
 
+        <!-- Start Game Overlay -->
+        <div id="start-overlay" class="overlay active">
+          <h2 class="overlay-title" style="font-size: 34px; letter-spacing: 2px;">TETRIS</h2>
+          <p class="overlay-subtitle">Press to Play</p>
+          <button id="start-btn" class="btn-action-square" style="width: 80px; height: 80px; background: #1d4ed8;" data-tooltip="Start Game" title="Start Game">
+            <span class="material-symbols-sharp" style="font-size: 52px;">play_arrow</span>
+          </button>
+        </div>
+
         <!-- Pause Overlay -->
         <div id="pause-overlay" class="overlay">
           <h2 class="overlay-title">PAUSED</h2>
@@ -521,7 +530,7 @@
         try {
           bgAudio = new Audio(BG_MUSIC_B64);
           bgAudio.loop = true;
-          bgAudio.volume = 0.5;
+          bgAudio.volume = 0.18;
         } catch (e) {
           console.warn("HTMLAudioElement init error:", e);
         }
@@ -583,7 +592,7 @@
         webAudioSource.buffer = buffer;
         webAudioSource.loop = true;
         const gainNode = audioCtx.createGain();
-        gainNode.gain.value = 0.5;
+        gainNode.gain.value = 0.18;
         webAudioSource.connect(gainNode);
         gainNode.connect(audioCtx.destination);
         webAudioSource.start(0);
@@ -777,6 +786,7 @@
     let lastTime = 0;
     let isPaused = false;
     let isGameOver = false;
+    let hasGameStarted = false;
     let isFastDropping = false;
     let lastNextPiece = null;
     let lastNextBoxW = 0;
@@ -792,6 +802,8 @@
     const linesDisplay = document.getElementById('lines-display');
     const levelDisplay = document.getElementById('level-display');
 
+    const startOverlay = document.getElementById('start-overlay');
+    const startBtn = document.getElementById('start-btn');
     const pauseOverlay = document.getElementById('pause-overlay');
     const gameoverOverlay = document.getElementById('gameover-overlay');
     const finalScore = document.getElementById('final-score');
@@ -994,6 +1006,14 @@
       scoreDisplay.textContent = score.toLocaleString();
       linesDisplay.textContent = lines;
       levelDisplay.textContent = level;
+    }
+
+    function startGame() {
+      if (hasGameStarted) return;
+      hasGameStarted = true;
+      startOverlay.classList.remove("active");
+      playMusic();
+      resetGame();
     }
 
     function togglePause() {
@@ -1199,7 +1219,7 @@
       const deltaTime = time - lastTime;
       lastTime = time;
 
-      if (!isPaused && !isGameOver) {
+      if (hasGameStarted && !isPaused && !isGameOver) {
         dropCounter += deltaTime;
         const currentInterval = isFastDropping ? 45 : dropInterval;
         if (dropCounter > currentInterval) {
@@ -1213,6 +1233,14 @@
 
     // --- Input Handling ---
     window.addEventListener('keydown', (e) => {
+      if (!hasGameStarted) {
+        if (e.code === 'Space' || e.keyCode === 32 || e.code === 'Enter' || e.keyCode === 13) {
+          e.preventDefault();
+          startGame();
+        }
+        return;
+      }
+
       playMusic();
 
       if (e.code === 'Space' || e.keyCode === 32) {
@@ -1256,9 +1284,9 @@
     });
 
     // Inverted-T Keyboard Arrow Button Listeners
-    btnUp.addEventListener('click', () => { playerRotate(1); });
-    btnLeft.addEventListener('click', () => { playerMove(-1); });
-    btnRight.addEventListener('click', () => { playerMove(1); });
+    btnUp.addEventListener('click', () => { if (hasGameStarted) playerRotate(1); });
+    btnLeft.addEventListener('click', () => { if (hasGameStarted) playerMove(-1); });
+    btnRight.addEventListener('click', () => { if (hasGameStarted) playerMove(1); });
 
     btnDown.addEventListener('mousedown', (e) => {
       e.preventDefault();
@@ -1281,7 +1309,8 @@
       isFastDropping = false;
     });
 
-    pauseBtn.addEventListener('click', togglePause);
+    pauseBtn.addEventListener('click', () => { if (hasGameStarted) togglePause(); });
+    startBtn.addEventListener('click', startGame);
     musicBtn.addEventListener('click', toggleMusic);
     resumeBtn.addEventListener('click', togglePause);
     restartBtn.addEventListener('click', resetGame);
@@ -1290,8 +1319,23 @@
       drawNextPreview();
     });
 
-    // Initial start
-    resetGame();
+    // Initial setup: attempt immediate music playback on load
+    try {
+      initAudio();
+      playMusic();
+    } catch(e) {}
+
+    window.addEventListener("load", () => {
+      playMusic();
+    });
+
+    // Prepare initial board & preview behind start overlay
+    board = createMatrix(ROWS, COLS);
+    bag = [];
+    nextPiece = getNextPieceFromBag();
+    currentPiece = getNextPieceFromBag();
+    drawNextPreview();
+    draw();
     requestAnimationFrame(update);
   </script>
 </body>
