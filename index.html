@@ -3404,6 +3404,16 @@ const PinpointGameStorage = {
 
 window.PinpointGameStorage = PinpointGameStorage;
 
+// Invalidate stale cached entries for apps & textbooks so updates are applied immediately
+setTimeout(async () => {
+    try {
+        if (typeof PinpointGameStorage !== 'undefined') {
+            await PinpointGameStorage.deleteGame('soundboard', 'textbooks/Soundboard.html');
+            await PinpointGameStorage.deleteGame('moss-movies', 'movies/index.html');
+        }
+    } catch(e) {}
+}, 500);
+
 // Service Worker for offline PWA
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.protocol === 'http:')) {
     window.addEventListener('load', () => {
@@ -4593,8 +4603,12 @@ function prepareGameHtml(html, fileUrl) {
 
   const interceptScript = '<scr' + 'ipt>(function(){\n' + innerScriptBody + '\n})()</scr' + 'ipt>';
 
-  const firstHead = html.toLowerCase().indexOf('<head');
-  if (firstHead !== -1) {
+  const lowerHtml = html.toLowerCase();
+  const earlyScript = lowerHtml.indexOf('<script');
+  const earlyHead = lowerHtml.indexOf('<head');
+  const hasRealHeadTag = earlyHead !== -1 && (earlyScript === -1 || earlyHead < earlyScript);
+
+  if (hasRealHeadTag) {
     html = html.replace(/<head([^>]*)>/i, (m, p1) => '<head' + p1 + '>' + interceptScript + frameStyle);
   } else {
     html = interceptScript + frameStyle + html;
@@ -4603,9 +4617,10 @@ function prepareGameHtml(html, fileUrl) {
   // 3. Resolve root-relative paths in HTML attributes
   html = html.replace(/(\s(?:src|href))=(['"])\/(?!\/)/gi, (m, p1, p2) => p1 + '=' + p2 + repoBase);
 
-  // 3b. Rewrite dynamic module imports for movies
+  // 3b. Rewrite dynamic module imports and modulepreloads for movies
   if (fileUrl.includes('movies/')) {
     html = html.replace(/import\((['"])\/?_app\//g, (m, q) => 'import(' + q + repoBase + '_app/');
+    html = html.replace(/(<link[^>]*\bhref\s*=\s*)(['"])(\/?_app\/[^'"]*)\2/gi, (m, p1, q, p2) => p1 + q + repoBase + p2.replace(/^\/+/, '') + q);
   }
 
   // 4. Normalize jsdelivr mirror domains to current active mirror
@@ -4699,7 +4714,7 @@ async function fetchGameHtml(file) {
   const primaryRepo = isMiniRepo ? 'pinpoint-edu/pinpoint-mini@main/' : 'pinpoint-edu/assets@main/';
   const fallbackRepo = isMiniRepo ? 'pinpoint-edu/assets@main/' : 'pinpoint-edu/pinpoint-mini@main/';
 
-  const isLargeGame = fetchFile.includes('gladihoppers') || fetchFile.includes('highway-traffic') || fetchFile.includes('drivemad') || (typeof allGames !== 'undefined' && allGames.some(g => g.file && g.file.includes(fetchFile) && g.sizeBytes > 19000000));
+  const isLargeGame = fetchFile.includes('gladihoppers') || fetchFile.includes('highway-traffic') || fetchFile.includes('drivemad') || fetchFile.includes('bloonsTD5') || fetchFile.includes('bloonsTD4') || (typeof allGames !== 'undefined' && allGames.some(g => g.file && g.file.includes(fetchFile) && g.sizeBytes > 19000000));
 
   const urlsToTry = isLargeGame ? [
     'https://raw.githubusercontent.com/' + primaryRepo.replace('@main/', '/main/') + fetchFile,
@@ -4765,8 +4780,9 @@ async function playGame(encodedFile, encodedTitle) {
     return;
   }
 
-  // 1. Check if game is saved offline in IndexedDB
-  if (typeof PinpointGameStorage !== 'undefined') {
+  // 1. Check if game is saved offline in IndexedDB (apps and textbooks always load latest live code)
+  const isMiniApp = file.startsWith('yolk/') || file.startsWith('movies/') || file === 'ai.html' || file.includes('Soundboard.html');
+  if (!isMiniApp && typeof PinpointGameStorage !== 'undefined') {
     try {
       const record = await PinpointGameStorage.getGame(id);
       if (record && record.content && record.content.length > 50) {

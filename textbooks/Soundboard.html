@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Soundboard</title>
-    <base href="https://cdn.jsdelivr.net/gh/genizymath/soundboard@main/" />
 
     <!-- Google Fonts & Material Symbols Sharp matching pinpoint-mini -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -449,7 +448,7 @@
 
     <!-- Custom Soundboard Engine (Only Labels, Shortcuts, Left-Click Pin, No TTS) -->
     <script type="module">
-      import { sounds } from './sounds.js';
+      import { sounds } from 'https://cdn.jsdelivr.net/gh/genizymath/soundboard@main/sounds.js';
 
       let allowOverlap = false;
       let showFavorites = false;

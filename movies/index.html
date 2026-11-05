@@ -33,7 +33,8 @@
                 };
 
                 var CLOUDFLARE_WORKER_PROXY = "https://moss-movies-proxy.yolkmusic.workers.dev/__cors_proxy__/";
-                var PROXY_PREFIX = (window.location.protocol === 'file:' || !window.location.hostname || window.location.hostname.includes('github.io') || window.location.hostname.includes('vercel.app')) ? CLOUDFLARE_WORKER_PROXY : "/__cors_proxy__/";
+                var isLocalHost = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+                var PROXY_PREFIX = isLocalHost ? "/__cors_proxy__/" : CLOUDFLARE_WORKER_PROXY;
 
                 function isBlockedAdUrl(url) {
                     if (!url || typeof url !== "string") return false;
@@ -64,6 +65,12 @@
                         return Promise.resolve(new Response(JSON.stringify({ status: "blocked" }), {
                             status: 200,
                             headers: { "Content-Type": "application/json" }
+                        }));
+                    }
+                    if (url.includes("version.json") || url.endsWith("/version.json")) {
+                        return Promise.resolve(new Response(JSON.stringify({ version: "1789685502888" }), {
+                            status: 200,
+                            headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
                         }));
                     }
                     if (typeof input === "string") {
@@ -208,9 +215,49 @@
 
 					Promise.all([
 						import(relBase + "_app/immutable/entry/start.Cb-AOP25.js"),
-						import(relBase + "_app/immutable/entry/app.BG_KW6jq.js")
-					]).then(([kit, app]) => {
+						import(relBase + "_app/immutable/entry/app.BG_KW6jq.js"),
+						import(relBase + "_app/immutable/chunks/Dr38vCwT.js")
+					]).then(([kit, app, runtime]) => {
+						// 1. Cleanly reroute unrecognized pathnames (like /userCodeAppPanel) to '/'
+						const origReroute = app.hooks && app.hooks.reroute;
+						app.hooks = app.hooks || {};
+						app.hooks.reroute = function(event) {
+							if (origReroute) {
+								try {
+									const res = origReroute(event);
+									if (res) return res;
+								} catch(e) {}
+							}
+							const path = event && event.url ? event.url.pathname : '';
+							const knownPrefixes = ['/movie', '/series', '/watch', '/search', '/anime', '/trending', '/genre', '/person'];
+							if (path && path !== '/' && !knownPrefixes.some(p => path.startsWith(p))) {
+								return '/';
+							}
+						};
+
+						// 2. Start SvelteKit app
 						kit.start(app, element);
+
+						// 3. Intercept all internal navigation link clicks so they never navigate natively to cdn.jsdelivr.net!
+						const goto = runtime && runtime.g;
+						document.addEventListener('click', function(e) {
+							if (e.button || e.which !== 1 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.defaultPrevented) return;
+							let a = e.target;
+							while (a && a.tagName !== 'A') {
+								a = a.parentElement;
+							}
+							if (!a) return;
+							const href = a.getAttribute('href');
+							if (!href) return;
+							if (href.startsWith('/') || href.startsWith('movie/') || href.startsWith('series/') || href.startsWith('watch/')) {
+								e.preventDefault();
+								e.stopPropagation();
+								const target = href.startsWith('/') ? href : '/' + href;
+								if (typeof goto === 'function') {
+									goto(target).catch(() => {});
+								}
+							}
+						}, true);
 					}).catch((err) => {
 						console.error("[Moss] Module start error:", err);
 					});
