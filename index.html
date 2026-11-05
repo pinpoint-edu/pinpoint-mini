@@ -4721,20 +4721,20 @@ async function fetchGameHtml(file) {
 
   const isLargeGame = fetchFile.includes('gladihoppers') || fetchFile.includes('highway-traffic') || fetchFile.includes('drivemad') || fetchFile.includes('bloonsTD5') || fetchFile.includes('bloonsTD4') || (typeof allGames !== 'undefined' && allGames.some(g => g.file && g.file.includes(fetchFile) && g.sizeBytes > 19000000));
 
-  const urlsToTry = isLargeGame ? [
-    'https://raw.githubusercontent.com/' + primaryRepo.replace('@main/', '/main/') + fetchFile,
+  const urlsToTry = (isLargeGame || isMiniRepo) ? [
+    'https://raw.githubusercontent.com/' + primaryRepo.replace(/@[^/]+\//, '/main/') + fetchFile,
     'https://cdn.statically.io/gh/' + primaryRepo + fetchFile,
     ...mirrors.map(m => m + '/gh/' + primaryRepo + fetchFile),
-    'https://raw.githubusercontent.com/' + fallbackRepo.replace('@main/', '/main/') + fetchFile,
+    'https://raw.githubusercontent.com/' + fallbackRepo.replace(/@[^/]+\//, '/main/') + fetchFile,
     'https://cdn.statically.io/gh/' + fallbackRepo + fetchFile,
     ...mirrors.map(m => m + '/gh/' + fallbackRepo + fetchFile)
   ] : [
     ...mirrors.map(m => m + '/gh/' + primaryRepo + fetchFile),
     'https://cdn.statically.io/gh/' + primaryRepo + fetchFile,
-    'https://raw.githubusercontent.com/' + primaryRepo.replace('@main/', '/main/') + fetchFile,
+    'https://raw.githubusercontent.com/' + primaryRepo.replace(/@[^/]+\//, '/main/') + fetchFile,
     ...mirrors.map(m => m + '/gh/' + fallbackRepo + fetchFile),
     'https://cdn.statically.io/gh/' + fallbackRepo + fetchFile,
-    'https://raw.githubusercontent.com/' + fallbackRepo.replace('@main/', '/main/') + fetchFile
+    'https://raw.githubusercontent.com/' + fallbackRepo.replace(/@[^/]+\//, '/main/') + fetchFile
   ];
 
   for (const url of urlsToTry) {

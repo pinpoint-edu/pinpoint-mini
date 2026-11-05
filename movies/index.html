@@ -3,6 +3,20 @@
     <head>
         <script>
             (function () {
+                // Self-destruct and purge any stale service workers & caches immediately
+                try {
+                    if (navigator.serviceWorker) {
+                        navigator.serviceWorker.getRegistrations().then(function(regs) {
+                            for (var r of regs) r.unregister();
+                        }).catch(function(){});
+                    }
+                    if (window.caches) {
+                        caches.keys().then(function(keys) {
+                            for (var k of keys) caches.delete(k);
+                        }).catch(function(){});
+                    }
+                } catch(e) {}
+
                 // Restore saved theme immediately to prevent any flicker
                 try {
                     var savedTheme = localStorage.getItem('moss_theme') || 'moss';
@@ -262,12 +276,6 @@
 					}).catch((err) => {
 						console.error("[Moss] Module start error:", err);
 					});
-
-					if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.protocol === 'http:') && window === window.top) {
-						addEventListener('load', function () {
-							navigator.serviceWorker.register(relBase + 'service-worker.js').catch(function(){});
-						});
-					}
 				}
 			</script>
 		</div>
