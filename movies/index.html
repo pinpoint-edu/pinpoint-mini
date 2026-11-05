@@ -205,7 +205,8 @@
 			<script>
 				{
 					const element = document.currentScript.parentElement;
-					const docBase = (document.baseURI || window.location.href).replace(/\/[^/]*$/, '/');
+					const isCdn = document.baseURI && (document.baseURI.includes('jsdelivr.net') || document.baseURI.includes('github'));
+					const docBase = isCdn ? document.baseURI.replace(/\/[^/]*$/, '/') : "https://cdn.jsdelivr.net/gh/pinpoint-edu/pinpoint-mini@main/movies/";
 					const relBase = docBase.endsWith('/') ? docBase : docBase + '/';
 
 					__sveltekit_c82yie = {

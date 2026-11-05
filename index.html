@@ -4332,14 +4332,17 @@ function prepareGameHtml(html, fileUrl) {
       html = html.replace(/(<base\b[^>]*\bhref\s*=\s*)(['"])(.*?)\2/i, (m, p1, p2) => p1 + p2 + resolvedBase + p2);
     }
   } else {
-    const lower = html.toLowerCase();
-    const firstScript = lower.indexOf('<script');
-    const firstHead = lower.indexOf('<head');
-    const hasRealHead = firstHead !== -1 && (firstScript === -1 || firstHead < firstScript);
-    if (hasRealHead) {
-      html = html.replace(/<head([^>]*)>/i, (m, p1) => '<head' + p1 + '><base href="' + base + '">');
-    } else {
-      html = '<base href="' + base + '">' + html;
+    const isMoviesApp = fileUrl.includes('movies/');
+    if (!isMoviesApp) {
+      const lower = html.toLowerCase();
+      const firstScript = lower.indexOf('<script');
+      const firstHead = lower.indexOf('<head');
+      const hasRealHead = firstHead !== -1 && (firstScript === -1 || firstHead < firstScript);
+      if (hasRealHead) {
+        html = html.replace(/<head([^>]*)>/i, (m, p1) => '<head' + p1 + '><base href="' + base + '">');
+      } else {
+        html = '<base href="' + base + '">' + html;
+      }
     }
   }
 
@@ -4621,6 +4624,8 @@ function prepareGameHtml(html, fileUrl) {
   if (fileUrl.includes('movies/')) {
     html = html.replace(/import\((['"])\/?_app\//g, (m, q) => 'import(' + q + repoBase + '_app/');
     html = html.replace(/(<link[^>]*\bhref\s*=\s*)(['"])(\/?_app\/[^'"]*)\2/gi, (m, p1, q, p2) => p1 + q + repoBase + p2.replace(/^\/+/, '') + q);
+    html = html.replace(/(<link[^>]*\bhref\s*=\s*)(['"])assets\//gi, '$1$2' + repoBase + 'assets/');
+    html = html.replace(/(<script[^>]*\bsrc\s*=\s*)(['"])assets\//gi, '$1$2' + repoBase + 'assets/');
   }
 
   // 4. Normalize jsdelivr mirror domains to current active mirror
