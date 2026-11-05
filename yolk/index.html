@@ -2188,19 +2188,24 @@
     </style>
     <script>
         try {
-            document.documentElement.classList.add('dark-mode', 'dark');
-            localStorage.setItem('yolk_theme_mode', 'dark');
+            if (localStorage.getItem('yolk_theme_mode') === 'dark') {
+                document.documentElement.classList.add('dark-mode');
+                document.documentElement.classList.add('dark');
+            }
         } catch (_) {}
     </script>
 </head>
-<body class="dark-mode dark text-zinc-200 h-screen w-screen overflow-hidden selection:bg-zinc-800 selection:text-white relative bg-[#0c0c0e]" data-page="search">
+<body class="text-zinc-800 h-screen w-screen overflow-hidden selection:bg-zinc-200 selection:text-zinc-900 relative" data-page="search">
     <script>
         try {
-            document.body.classList.add('dark-mode', 'dark');
-            document.documentElement.classList.add('dark-mode', 'dark');
-            localStorage.setItem('yolk_theme_mode', 'dark');
-            const metaTheme = document.getElementById('meta-theme-color');
-            if (metaTheme) metaTheme.setAttribute('content', '#0c0c0e');
+            if (localStorage.getItem('yolk_theme_mode') === 'dark') {
+                document.body.classList.add('dark-mode');
+                document.body.classList.add('dark');
+                document.documentElement.classList.add('dark-mode');
+                document.documentElement.classList.add('dark');
+                const metaTheme = document.getElementById('meta-theme-color');
+                if (metaTheme) metaTheme.setAttribute('content', '#0c0c0e');
+            }
             const isTvDevice = /TV|AndroidTV|GoogleTV|LargeScreen|SmartTV|AppleTV|AFT|CrKey|HbbTV|NetCast|Viera|BRAVIA/i.test(navigator.userAgent);
             if (isTvDevice || localStorage.getItem('yolk_tv_mode') === 'true') {
                 document.body.classList.add('tv-mode');
@@ -2730,6 +2735,34 @@
                 </div>
 
                 <div class="flex flex-col gap-5">
+                    <!-- 1. Theme Setting Card -->
+                    <div class="bg-white/85 dark:bg-zinc-900/85 backdrop-blur-xl rounded-3xl border border-zinc-200/80 dark:border-white/10 p-5 sm:p-7 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col gap-4">
+                        <div class="flex items-center gap-3.5">
+                            <div class="settings-icon-box w-11 h-11 rounded-2xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200/80 dark:border-white/10 flex items-center justify-center text-zinc-800 dark:text-zinc-200 shrink-0">
+                                <span class="material-symbols-rounded text-[22px]">palette</span>
+                            </div>
+                            <div>
+                                <h2 class="text-base sm:text-lg font-bold text-zinc-900 dark:text-white">Theme</h2>
+                                <p class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">Select light, dark, or system appearance</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-center gap-4 pt-3 border-t border-zinc-100 dark:border-white/10">
+                            <!-- Light Mode -->
+                            <button id="theme-btn-light" type="button" class="theme-choice-btn w-13 h-13 sm:w-14 sm:h-14 rounded-full flex items-center justify-center transition-all cursor-pointer bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:scale-105 active:scale-95" title="Light" aria-label="Light">
+                                <span class="material-symbols-rounded text-[24px]">light_mode</span>
+                            </button>
+                            <!-- Dark Mode -->
+                            <button id="theme-btn-dark" type="button" class="theme-choice-btn w-13 h-13 sm:w-14 sm:h-14 rounded-full flex items-center justify-center transition-all cursor-pointer bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:scale-105 active:scale-95" title="Dark" aria-label="Dark">
+                                <span class="material-symbols-rounded text-[24px]">dark_mode</span>
+                            </button>
+                            <!-- System Mode -->
+                            <button id="theme-btn-system" type="button" class="theme-choice-btn w-13 h-13 sm:w-14 sm:h-14 rounded-full flex items-center justify-center transition-all cursor-pointer bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:scale-105 active:scale-95" title="System" aria-label="System">
+                                <span class="material-symbols-rounded text-[24px]">desktop_windows</span>
+                            </button>
+                        </div>
+                    </div>
+
                     <!-- 2. Crossfade & Seamless Transitions Setting Card -->
                     <div class="bg-white/85 backdrop-blur-xl rounded-3xl border border-zinc-200/80 p-5 sm:p-7 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col gap-4">
                         <div class="flex items-center justify-between gap-4 flex-wrap">

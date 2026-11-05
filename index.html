@@ -4289,11 +4289,35 @@ function prepareGameHtml(html, fileUrl) {
   }
 
   // Strip dead preceding HTML shell if concatenated (e.g., Minecraft PE duplicate shells)
-  if (html.includes('<!DOCTYPE html>') && html.indexOf('<!DOCTYPE html>') !== html.lastIndexOf('<!DOCTYPE html>')) {
-    html = html.substring(html.lastIndexOf('<!DOCTYPE html>'));
-  } else if (html.includes('<html') && html.indexOf('<html') !== html.lastIndexOf('<html')) {
-    html = html.substring(html.lastIndexOf('<html'));
+  const docTypeRegex = /<!DOCTYPE\s+html>/gi;
+  const matches = [...html.matchAll(docTypeRegex)];
+  if (matches.length > 1) {
+    const lastIdx = matches[matches.length - 1].index;
+    const prevText = html.substring(0, lastIdx);
+    if (/<\/html>\s*$/i.test(prevText.trim())) {
+      html = html.substring(lastIdx);
+    }
   }
+
+  // Strip Google Gadget / Module XML wrappers if outer shell (e.g. Russia, Google Sites games)
+  if (html.includes('<module') || html.includes('<Module') || html.includes('<![CDATA[') || html.includes('[CDATA[')) {
+    const cdataMatch = html.match(/(?:<!(?:--)?\[CDATA\[|<!--\[CDATA\[)([\s\S]*?)(?:\]\](?:-->)?|\]\]&gt;|\]\]>)/i);
+    if (cdataMatch && cdataMatch[1] && cdataMatch[1].trim().length > 50) {
+      const modStart = html.search(/<module/i);
+      const modEnd = html.search(/<\/module>/i);
+      if (modStart !== -1 && modEnd !== -1) {
+        const beforeMod = html.substring(0, modStart);
+        const afterMod = html.substring(modEnd + 9);
+        html = beforeMod + cdataMatch[1] + afterMod;
+      }
+    }
+    html = html.replace(/<module[^>]*>[\s\S]*?<content[^>]*>(?:<!--|<!(?:--)?)?\[CDATA\[/gi, '')
+               .replace(/(?:\]\](?:-->)?|\]\]&gt;|\]\]>)\s*<\/content>\s*<\/moduleprefs>\s*<\/module>/gi, '')
+               .replace(/<\/?(?:module|moduleprefs|content)\b[^>]*>/gi, '');
+  }
+
+  // Strip dead blob scripts
+  html = html.replace(/<script[^>]*src=["']blob:https?:[^"']*["'][^>]*>\s*<\/script>/gi, '');
 
   // Strip broken wrapper scripts that fail with 404 / ERR_FILE_NOT_FOUND
   html = html.replace(/<script[^>]*src=["'][^"']*(?:all\.js|settings\/js\/index\.js)[^"']*["'][^>]*>\s*<\/script>/gi, '');
@@ -4394,9 +4418,18 @@ function prepareGameHtml(html, fileUrl) {
     '  }',
     '} catch(e){}',
     'try {',
-    '  var _origWrite = document.write;',
-    '  document.write = function(s){',
-    '    if(typeof s === "string" && (s.indexOf("all.js")!==-1 || s.indexOf("settings/js")!==-1)){ return; }',
+    '  var _origWrite = Document.prototype.write;',
+    '  Document.prototype.write = function(s){',
+    '    if(typeof s === "string"){',
+    '      if(s.indexOf("all.js")!==-1 || s.indexOf("settings/js")!==-1){ return; }',
+    '      var cdataM = s.match(/(?:<!(?:--)?\\[CDATA\\[|<!--\\[CDATA\\[)([\\s\\S]*?)(?:\\]\\](?:-->)?|\\]\\]&gt;|\\]\\]>)/i);',
+    '      if(cdataM && cdataM[1]){ s = cdataM[1].trim(); }',
+    '      else if(s.indexOf("<module") !== -1 || s.indexOf("<Module") !== -1){',
+    '        s = s.replace(/<module[^>]*>[\\s\\S]*?<content[^>]*>(?:<!--|<!(?:--)?)?\\[CDATA\\[/gi, "")',
+    '             .replace(/(?:\\]\\](?:-->)?|\\]\\]&gt;|\\]\\]>)\\s*<\\/content>\\s*<\\/moduleprefs>\\s*<\\/module>/gi, "")',
+    '             .replace(/<\\/?(?:module|moduleprefs|content)\\b[^>]*>/gi, "");',
+    '      }',
+    '    }',
     '    return _origWrite.call(this, s);',
     '  };',
     '} catch(e){}',
