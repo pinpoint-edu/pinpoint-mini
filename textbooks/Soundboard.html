@@ -113,6 +113,31 @@
         border-color: var(--border-hover);
       }
 
+      .nav-return-home-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        height: 32px;
+        padding: 0 12px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid var(--border);
+        border-radius: 9999px;
+        color: var(--text-main);
+        font-family: 'Geist', system-ui, sans-serif;
+        font-size: 12.5px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        white-space: nowrap;
+      }
+
+      .nav-return-home-btn:hover {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: var(--border-hover);
+        transform: scale(1.02);
+      }
+
       .controls-brand {
         display: inline-flex;
         align-items: center;
@@ -382,6 +407,11 @@
   <body>
     <!-- Top Glassmorphism Navigation & Controls Bar -->
     <div id="controls">
+      <button class="nav-return-home-btn" onclick="returnToMainHome()" title="Return to Home Screen">
+        <span class="material-symbols-sharp" style="font-size: 16px;">arrow_back</span>
+        <span>Home</span>
+      </button>
+
       <div class="controls-brand">
         <span class="material-symbols-sharp">volume_up</span>
         <span>Soundboard</span>
@@ -416,6 +446,14 @@
 
     <!-- Theme synchronization script -->
     <script>
+      function returnToMainHome() {
+        if (window.parent && window.parent !== window && typeof window.parent.closePlayer === 'function') {
+          window.parent.closePlayer();
+        } else {
+          window.location.href = '../index.html';
+        }
+      }
+
       (function() {
         const TINTS = {
           green: { color: "#00ff88", light: "#a7f3d0", subtle: "rgba(0, 255, 136, 0.12)", badgeBg: "rgba(0, 255, 136, 0.22)", border: "rgba(0, 255, 136, 0.35)", glow: "rgba(0, 255, 136, 0.45)" },

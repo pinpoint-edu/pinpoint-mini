@@ -90,6 +90,33 @@
       gap: 12px;
     }
 
+    .nav-return-home-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 34px;
+      padding: 0 13px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      color: var(--text-main);
+      font-family: 'Geist', system-ui, sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      margin-right: 4px;
+      white-space: nowrap;
+    }
+
+    .nav-return-home-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: var(--border-hover);
+      transform: scale(1.02);
+      color: #ffffff;
+    }
+
     .brand-link {
       display: flex;
       align-items: center;
@@ -414,6 +441,10 @@
   <!-- Header -->
   <header>
     <div class="header-left">
+      <button class="nav-return-home-btn" onclick="returnToMainHome()" title="Return to Home Screen">
+        <span class="material-symbols-sharp" style="font-size: 16px;">arrow_back</span>
+        <span>Home</span>
+      </button>
       <div class="brand-link">
         <span class="material-symbols-sharp" style="color: #60a5fa;">psychology</span>
         <span class="brand-name">Trashbin AI</span>
@@ -473,6 +504,14 @@
   </div>
 
   <script>
+    function returnToMainHome() {
+      if (window.parent && window.parent !== window && typeof window.parent.closePlayer === 'function') {
+        window.parent.closePlayer();
+      } else {
+        window.location.href = 'index.html';
+      }
+    }
+
     const chatHistory = document.getElementById('chatHistory');
     const chatInput = document.getElementById('chatInput');
     const sendBtn = document.getElementById('sendBtn');

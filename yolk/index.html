@@ -2230,8 +2230,14 @@
     </div>
 
 
+    <!-- Return to Home Screen Button -->
+    <button onclick="returnToMainHome()" class="fixed top-5 left-4 sm:top-7 sm:left-8 z-50 flex items-center gap-1.5 px-3 py-1.5 bg-white/90 dark:bg-zinc-800/90 backdrop-blur-md border border-zinc-200 dark:border-zinc-700 rounded-full shadow-xs text-xs font-semibold text-zinc-800 dark:text-zinc-200 hover:scale-105 active:scale-95 transition-all cursor-pointer select-none" title="Return to Home Screen">
+        <span class="material-symbols-rounded text-base">arrow_back</span>
+        <span>Home</span>
+    </button>
+
     <!-- Small Top-Left Logo (Circle gradient sits BEHIND the icon, not bigger than it) -->
-    <div id="smallLogo" class="fixed top-5 left-4 sm:top-7 sm:left-8 z-40 flex items-center gap-2.5 cursor-pointer pointer-events-auto select-none transition-transform hover:scale-105 active:scale-95" title="Return to Home">
+    <div id="smallLogo" class="fixed top-5 left-28 sm:top-7 sm:left-32 z-40 flex items-center gap-2.5 cursor-pointer pointer-events-auto select-none transition-transform hover:scale-105 active:scale-95" title="Return to Home">
         <div class="relative flex items-center justify-center shrink-0 w-6 h-6">
             <div id="smallLogo-icon-glow" class="absolute inset-[2px] rounded-full pointer-events-none"></div>
             <img src="yolk-circle.png" alt="" class="w-6 h-6 object-contain relative z-10 pointer-events-none select-none">
@@ -3871,6 +3877,14 @@
                     });
                 });
             });
+
+            window.returnToMainHome = function() {
+                if (window.parent && window.parent !== window && typeof window.parent.closePlayer === 'function') {
+                    window.parent.closePlayer();
+                } else {
+                    window.location.href = '../index.html';
+                }
+            };
 
             // Attempt native OS orientation lock to portrait on mobile phones only (never on TVs)
             const tryLockPortrait = () => {

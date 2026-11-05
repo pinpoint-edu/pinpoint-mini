@@ -108,6 +108,33 @@
             gap: 28px;
         }
 
+        .nav-return-home-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            height: 36px;
+            padding: 0 13px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-full);
+            color: var(--text-main);
+            font-family: 'Geist', system-ui, sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            margin-right: 4px;
+            white-space: nowrap;
+        }
+
+        .nav-return-home-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--border-highlight);
+            transform: scale(1.02);
+            color: #ffffff;
+        }
+
         .moss-brand {
             font-family: 'IBM Plex Sans Thai Looped', sans-serif;
             font-weight: 600;
@@ -1069,6 +1096,10 @@
     <!-- Header -->
     <header class="moss-header">
         <div class="header-left">
+            <button class="nav-return-home-btn" onclick="returnToMainHome()" title="Return to Home Screen">
+                <span class="material-symbols-sharp" style="font-size: 18px;">arrow_back</span>
+                <span>Home</span>
+            </button>
             <a class="moss-brand" onclick="switchTab('home')">
                 <span class="m-glass">M</span>oss
             </a>
@@ -1222,7 +1253,7 @@
 
                 <!-- 16:9 Player Frame -->
                 <div class="player-frame-wrap">
-                    <iframe id="moss-player-frame" allowfullscreen="true" allow="autoplay; fullscreen; picture-in-picture"></iframe>
+                    <iframe id="moss-player-frame" allowfullscreen="true" allow="autoplay; fullscreen; picture-in-picture; encrypted-media; clipboard-write; web-share" referrerpolicy="no-referrer"></iframe>
                 </div>
             </div>
 
@@ -1599,6 +1630,14 @@
             }
         }
 
+        function returnToMainHome() {
+            if (window.parent && window.parent !== window && typeof window.parent.closePlayer === 'function') {
+                window.parent.closePlayer();
+            } else {
+                window.location.href = '../index.html';
+            }
+        }
+
         // Watch View & Player Server URLs
         function getPlayerUrl(serverNum, tmdbId, type, season = 1, episode = 1) {
             const isMovie = (type === 'movie');
@@ -1611,8 +1650,8 @@
                 case '2':
                     // Server 2: VidSrc
                     return isMovie
-                        ? `https://vidsrc.to/embed/movie/${tmdbId}`
-                        : `https://vidsrc.to/embed/tv/${tmdbId}/${season}/${episode}`;
+                        ? `https://vidsrc.cc/v2/embed/movie/${tmdbId}`
+                        : `https://vidsrc.cc/v2/embed/tv/${tmdbId}/${season}/${episode}`;
                 case '3':
                     // Server 3: Embed.su
                     return isMovie
