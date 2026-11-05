@@ -1426,7 +1426,7 @@
     }
     .settings-switch input:checked + .settings-slider:before {
       transform: translateX(20px);
-      background-color: #ffffff;
+      background-color: var(--slider-knob, #ffffff) !important;
     }
 
     /* Inputs, Selects & Buttons */
@@ -1486,56 +1486,37 @@
     /* Tint Squircles (Appearance Tab) */
     .tint-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
       gap: 12px;
+      padding: 4px 0;
     }
 
     .tint-squircle-btn {
-      aspect-ratio: 1;
-      border-radius: 18px;
-      border: 2px solid var(--border);
+      width: 44px;
+      height: 44px;
+      border-radius: 13px;
+      border: 2px solid rgba(255, 255, 255, 0.14);
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 6px;
       cursor: pointer;
       position: relative;
-      transition: all 0.2s var(--parabola-ease);
-      background: #18181b;
-      padding: 8px;
+      transition: transform 0.18s var(--parabola-ease), box-shadow 0.18s var(--parabola-ease), border-color 0.18s var(--parabola-ease);
+      padding: 0;
+      outline: none;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
     }
 
     .tint-squircle-btn:hover {
-      transform: translateY(-2px) scale(1.04);
-      border-color: var(--border-hover);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      transform: translateY(-2px) scale(1.08);
+      border-color: rgba(255, 255, 255, 0.45);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
     }
 
     .tint-squircle-btn.active {
-      border-color: #ffffff;
-      box-shadow: 0 0 0 2px var(--accent-glow), 0 8px 24px var(--accent-glow);
-      background: #222226;
-    }
-
-    .tint-squircle-color {
-      width: 28px;
-      height: 28px;
-      border-radius: 10px;
-      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 3px 10px rgba(0, 0, 0, 0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .tint-squircle-label {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-muted);
-    }
-
-    .tint-squircle-btn.active .tint-squircle-label {
-      color: var(--text-main);
+      border-color: #ffffff !important;
+      box-shadow: 0 0 0 2px #ffffff, 0 4px 16px var(--accent-glow) !important;
+      transform: scale(1.05);
     }
 
     .pill-chip.active {
@@ -1690,13 +1671,10 @@
       background: #18181c !important;
     }
 
-    /* Stretched Res */
-    body.stretched-res-active {
-      transform: scaleX(1.3333);
-      transform-origin: center top;
-      width: 75.18vw !important;
-      margin: 0 auto !important;
-      overflow-x: hidden !important;
+    /* Stretched Res (Applied ONLY to Game Player on 4:3 detection, symmetric from middle) */
+    #player-view.stretched-res-4-3 #gameIframe {
+      transform: scaleX(1.33333);
+      transform-origin: 50% 50% !important;
     }
 
     /* Hidden Google Classroom Cover */
@@ -4424,7 +4402,7 @@ function prepareGameHtml(html, fileUrl) {
     '  game: { firstFrameReady: function(){}, gameReady: function(){}, pause: function(){}, resume: function(){} },',
     '  engagement: { sendScore: function(){} }',
     '};',
-    'var ruffleCdn = ' + JSON.stringify(repoBase + 'textbooks/ruffle/') + ';',
+    'var ruffleCdn = "https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle/";',
     'window.RufflePlayer = window.RufflePlayer || {};',
     'var _rConfig = { autoplay: "on", unmuteOverlay: "hidden", letterbox: "on", warnOnUnsupportedContent: false, publicPath: ruffleCdn };',
     'try {',
@@ -4574,9 +4552,9 @@ function prepareGameHtml(html, fileUrl) {
     '    }',
     '  }',
     '  if(u.indexOf("f9db7455c2c80fac021b") !== -1 || u.indexOf("5db40605896b9147a8a1") !== -1 || (u.indexOf("ruffle") !== -1 && u.indexOf(".unityweb") === -1)){',
-    '    if(u.indexOf(".wasm") !== -1){',
+    '    if(u.indexOf(".wasm") !== -1 || u.indexOf(".js") !== -1){',
     '      var fn = u.substring(u.lastIndexOf("/") + 1).split("?")[0].split("#")[0];',
-    '      return rb + "textbooks/ruffle/" + fn;',
+    '      return "https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle/" + fn;',
     '    }',
     '  }',
     '  if(u.indexOf("/textbooks/") !== -1 || u.indexOf("textbooks/") === 0){',
@@ -4700,6 +4678,9 @@ function prepareGameHtml(html, fileUrl) {
     html = html.replace(/(<script[^>]*\bsrc\s*=\s*)(['"])assets\//gi, '$1$2' + repoBase + 'assets/');
   }
 
+  // 3c. Rewrite ruffle script tags to official npm CDN
+  html = html.replace(/(<script[^>]*\bsrc\s*=\s*)(['"])[^'"]*ruffle(?:\.min)?\.js\2/gi, '$1$2https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle/ruffle.js$2');
+
   // 4. Normalize jsdelivr mirror domains to current active mirror
   html = html.replace(/https?:\/\/[^/]*\.jsdelivr\.net\//g, activeMirror + '/');
 
@@ -4721,6 +4702,8 @@ function writeGameIntoFrame(iframe, rawHtml, fileUrl) {
   try {
     iframe.contentWindow.focus();
   } catch(e) {}
+  setTimeout(checkAndApplyStretchedRes, 250);
+  setTimeout(checkAndApplyStretchedRes, 1000);
 }
 
 async function fetchGameHtml(file) {
@@ -4787,11 +4770,11 @@ async function fetchGameHtml(file) {
   const mirrors = [activeMirror, ...CDN_MIRRORS.filter(m => m !== activeMirror)];
 
   // Apps live in pinpoint-mini, game textbooks live in assets
-  const isMiniRepo = fetchFile.startsWith('yolk/') || fetchFile.startsWith('movies/') || fetchFile === 'ai.html' || fetchFile.startsWith('pages/') || fetchFile.includes('Soundboard.html') || fetchFile.includes('superhot') || fetchFile.includes('tetrominoes') || fetchFile.includes('tetris') || fetchFile.includes('retro-bowl');
+  const isMiniRepo = fetchFile.startsWith('yolk/') || fetchFile.startsWith('movies/') || fetchFile === 'ai.html' || fetchFile.startsWith('pages/') || fetchFile.includes('Soundboard.html') || fetchFile.includes('happy-wheels') || fetchFile.includes('superhot') || fetchFile.includes('tetrominoes') || fetchFile.includes('tetris') || fetchFile.includes('retro-bowl');
   const primaryRepo = isMiniRepo ? 'pinpoint-edu/pinpoint-mini@main/' : 'pinpoint-edu/assets@main/';
   const fallbackRepo = isMiniRepo ? 'pinpoint-edu/assets@main/' : 'pinpoint-edu/pinpoint-mini@main/';
 
-  const isLargeGame = fetchFile.includes('retro-bowl') || fetchFile.includes('gladihoppers') || fetchFile.includes('highway-traffic') || fetchFile.includes('drivemad') || fetchFile.includes('bloonsTD5') || fetchFile.includes('bloonsTD4') || (typeof allGames !== 'undefined' && allGames.some(g => g.file && g.file.includes(fetchFile) && g.sizeBytes > 19000000));
+  const isLargeGame = fetchFile.includes('happy-wheels') || fetchFile.includes('retro-bowl') || fetchFile.includes('gladihoppers') || fetchFile.includes('highway-traffic') || fetchFile.includes('drivemad') || fetchFile.includes('bloonsTD5') || fetchFile.includes('bloonsTD4') || (typeof allGames !== 'undefined' && allGames.some(g => g.file && g.file.includes(fetchFile) && g.sizeBytes > 19000000));
 
   const urlsToTry = (isLargeGame || isMiniRepo) ? [
     'https://raw.githubusercontent.com/' + primaryRepo.replace(/@[^/]+\//, '/main/') + fetchFile,
@@ -4866,12 +4849,12 @@ async function playGame(encodedFile, encodedTitle) {
   }
 
   // 1. Check if game is saved offline in IndexedDB (apps and textbooks always load latest live code)
-  const isMiniApp = file.startsWith('yolk/') || file.startsWith('movies/') || file === 'ai.html' || file.includes('Soundboard.html');
+  const isMiniApp = file.startsWith('yolk/') || file.startsWith('movies/') || file === 'ai.html' || file.includes('Soundboard.html') || file.includes('happy-wheels');
   if (!isMiniApp && typeof PinpointGameStorage !== 'undefined') {
     try {
       const record = await PinpointGameStorage.getGame(id);
       if (record && record.content && record.content.length > 50) {
-        const isMiniRepo = file.startsWith('yolk/') || file.startsWith('movies/') || file === 'ai.html' || file.startsWith('pages/') || file.includes('Soundboard.html') || file.includes('superhot') || file.includes('tetrominoes') || file.includes('tetris');
+        const isMiniRepo = file.startsWith('yolk/') || file.startsWith('movies/') || file === 'ai.html' || file.startsWith('pages/') || file.includes('Soundboard.html') || file.includes('happy-wheels') || file.includes('superhot') || file.includes('tetrominoes') || file.includes('tetris');
         const primaryRepo = isMiniRepo ? 'pinpoint-edu/pinpoint-mini@main/' : 'pinpoint-edu/assets@main/';
         const offlineBase = (/^https?:\/\//i.test(file)) ? file : (activeMirror + '/gh/' + primaryRepo + file);
         writeGameIntoFrame(iframe, record.content, offlineBase);
@@ -5293,6 +5276,7 @@ function closePlayer() {
   const playerView = document.getElementById('player-view');
   playerView.style.display = 'none';
   playerView.classList.remove('is-web-app');
+  playerView.classList.remove('stretched-res-4-3');
   currentPlayingFile = null;
   currentPlayingTitle = null;
   if (window.PinpointSaveManager) {
@@ -5765,6 +5749,17 @@ initGames();
 // ==== THEME TINT & SETTINGS SYSTEM ====
 const TRASHBIN_TINTS = [
   {
+    id: "christmas",
+    label: "Christmas (Festive)",
+    color: "#ef4444",
+    color2: "#22c55e",
+    light: "#fca5a5",
+    subtle: "rgba(239, 68, 68, 0.14)",
+    badgeBg: "rgba(239, 68, 68, 0.24)",
+    border: "rgba(239, 68, 68, 0.35)",
+    glow: "rgba(239, 68, 68, 0.45)"
+  },
+  {
     id: "green",
     label: "Emerald",
     color: "#00ff88",
@@ -5843,12 +5838,170 @@ const TRASHBIN_TINTS = [
     badgeBg: "rgba(255, 255, 255, 0.16)",
     border: "rgba(255, 255, 255, 0.28)",
     glow: "rgba(255, 255, 255, 0.35)"
+  },
+  {
+    id: "orange",
+    label: "Vibrant Orange",
+    color: "#ff7b00",
+    light: "#fed7aa",
+    subtle: "rgba(255, 123, 0, 0.14)",
+    badgeBg: "rgba(255, 123, 0, 0.24)",
+    border: "rgba(255, 123, 0, 0.35)",
+    glow: "rgba(255, 123, 0, 0.45)"
+  },
+  {
+    id: "lime",
+    label: "Neon Lime",
+    color: "#84cc16",
+    light: "#d9f99d",
+    subtle: "rgba(132, 204, 22, 0.14)",
+    badgeBg: "rgba(132, 204, 22, 0.24)",
+    border: "rgba(132, 204, 22, 0.35)",
+    glow: "rgba(132, 204, 22, 0.45)"
+  },
+  {
+    id: "violet",
+    label: "Electric Violet",
+    color: "#8b5cf6",
+    light: "#ddd6fe",
+    subtle: "rgba(139, 92, 246, 0.14)",
+    badgeBg: "rgba(139, 92, 246, 0.24)",
+    border: "rgba(139, 92, 246, 0.35)",
+    glow: "rgba(139, 92, 246, 0.45)"
+  },
+  {
+    id: "rose",
+    label: "Rose",
+    color: "#f43f5e",
+    light: "#fecdd3",
+    subtle: "rgba(244, 63, 94, 0.14)",
+    badgeBg: "rgba(244, 63, 94, 0.24)",
+    border: "rgba(244, 63, 94, 0.35)",
+    glow: "rgba(244, 63, 94, 0.45)"
+  },
+  {
+    id: "teal",
+    label: "Teal",
+    color: "#14b8a6",
+    light: "#99f6e4",
+    subtle: "rgba(20, 184, 166, 0.14)",
+    badgeBg: "rgba(20, 184, 166, 0.24)",
+    border: "rgba(20, 184, 166, 0.35)",
+    glow: "rgba(20, 184, 166, 0.45)"
+  },
+  {
+    id: "yellow",
+    label: "Electric Yellow",
+    color: "#eab308",
+    light: "#fef08a",
+    subtle: "rgba(234, 179, 8, 0.14)",
+    badgeBg: "rgba(234, 179, 8, 0.24)",
+    border: "rgba(234, 179, 8, 0.35)",
+    glow: "rgba(234, 179, 8, 0.45)"
+  },
+  {
+    id: "indigo",
+    label: "Indigo",
+    color: "#6366f1",
+    light: "#c7d2fe",
+    subtle: "rgba(99, 102, 241, 0.14)",
+    badgeBg: "rgba(99, 102, 241, 0.24)",
+    border: "rgba(99, 102, 241, 0.35)",
+    glow: "rgba(99, 102, 241, 0.45)"
+  },
+  {
+    id: "cyberpunk",
+    label: "Cyberpunk",
+    color: "#ffe600",
+    color2: "#00f0ff",
+    light: "#fef08a",
+    subtle: "rgba(255, 230, 0, 0.14)",
+    badgeBg: "rgba(255, 230, 0, 0.24)",
+    border: "rgba(255, 230, 0, 0.35)",
+    glow: "rgba(255, 230, 0, 0.45)"
+  },
+  {
+    id: "sunset",
+    label: "Sunset",
+    color: "#ff5e36",
+    color2: "#d946ef",
+    light: "#fbcfe8",
+    subtle: "rgba(255, 94, 54, 0.14)",
+    badgeBg: "rgba(255, 94, 54, 0.24)",
+    border: "rgba(255, 94, 54, 0.35)",
+    glow: "rgba(255, 94, 54, 0.45)"
+  },
+  {
+    id: "fireice",
+    label: "Fire & Ice",
+    color: "#38bdf8",
+    color2: "#ff3b30",
+    light: "#bae6fd",
+    subtle: "rgba(56, 189, 248, 0.14)",
+    badgeBg: "rgba(56, 189, 248, 0.24)",
+    border: "rgba(56, 189, 248, 0.35)",
+    glow: "rgba(56, 189, 248, 0.45)"
+  },
+  {
+    id: "aurora",
+    label: "Aurora",
+    color: "#00ff88",
+    color2: "#a855f7",
+    light: "#a7f3d0",
+    subtle: "rgba(0, 255, 136, 0.14)",
+    badgeBg: "rgba(0, 255, 136, 0.24)",
+    border: "rgba(0, 255, 136, 0.35)",
+    glow: "rgba(0, 255, 136, 0.45)"
+  },
+  {
+    id: "bubblegum",
+    label: "Bubblegum",
+    color: "#f472b6",
+    color2: "#38bdf8",
+    light: "#fbcfe8",
+    subtle: "rgba(244, 114, 182, 0.14)",
+    badgeBg: "rgba(244, 114, 182, 0.24)",
+    border: "rgba(244, 114, 182, 0.35)",
+    glow: "rgba(244, 114, 182, 0.45)"
+  },
+  {
+    id: "midnight",
+    label: "Midnight Gold",
+    color: "#6366f1",
+    color2: "#eab308",
+    light: "#c7d2fe",
+    subtle: "rgba(99, 102, 241, 0.14)",
+    badgeBg: "rgba(99, 102, 241, 0.24)",
+    border: "rgba(99, 102, 241, 0.35)",
+    glow: "rgba(99, 102, 241, 0.45)"
+  },
+  {
+    id: "toxic",
+    label: "Toxic",
+    color: "#a3e635",
+    color2: "#06b6d4",
+    light: "#d9f99d",
+    subtle: "rgba(163, 230, 53, 0.14)",
+    badgeBg: "rgba(163, 230, 53, 0.24)",
+    border: "rgba(163, 230, 53, 0.35)",
+    glow: "rgba(163, 230, 53, 0.45)"
+  },
+  {
+    id: "matrix",
+    label: "Matrix",
+    color: "#15803d",
+    color2: "#22c55e",
+    light: "#86efac",
+    subtle: "rgba(34, 197, 94, 0.14)",
+    badgeBg: "rgba(34, 197, 94, 0.24)",
+    border: "rgba(34, 197, 94, 0.35)",
+    glow: "rgba(34, 197, 94, 0.45)"
   }
 ];
 
-let currentTintId = "green";
+let currentTintId = "christmas";
 try {
-  currentTintId = localStorage.getItem("trashbin_theme_tint") || "green";
+  currentTintId = localStorage.getItem("trashbin_theme_tint") || "christmas";
 } catch(e) {}
 
 function applyTint(tintId) {
@@ -5856,15 +6009,29 @@ function applyTint(tintId) {
   currentTintId = tint.id;
   const root = document.documentElement.style;
   root.setProperty("--accent", tint.color);
-  root.setProperty("--accent-light", tint.light);
-  root.setProperty("--accent-subtle", tint.subtle);
-  root.setProperty("--accent-badge-bg", tint.badgeBg);
-  root.setProperty("--accent-border", tint.border);
+  root.setProperty("--accent-secondary", tint.color2 || tint.color);
+  root.setProperty("--accent-light", tint.light || tint.color);
+  root.setProperty("--accent-subtle", tint.subtle || (tint.color + "22"));
+  root.setProperty("--accent-badge-bg", tint.badgeBg || (tint.color + "33"));
+  root.setProperty("--accent-border", tint.border || (tint.color + "55"));
   root.setProperty("--border-focus", tint.color);
-  root.setProperty("--accent-glow", tint.glow);
+  root.setProperty("--accent-glow", tint.glow || (tint.color + "66"));
+
+  // Toggle knob turns black in white theme so active switches are crisp and visible
+  if (tint.id === "white") {
+    root.setProperty("--slider-knob", "#000000");
+  } else {
+    root.setProperty("--slider-knob", "#ffffff");
+  }
+
   try {
     localStorage.setItem("trashbin_theme_tint", tint.id);
   } catch(e) {}
+
+  if (typeof syncCrosshairWithTheme === "function") {
+    syncCrosshairWithTheme();
+  }
+
   renderTintOptions();
 }
 
@@ -5873,12 +6040,13 @@ function renderTintOptions() {
   if (!grid) return;
   grid.innerHTML = TRASHBIN_TINTS.map(t => {
     const isActive = t.id === currentTintId;
+    const bgStyle = t.color2
+      ? `linear-gradient(135deg, ${t.color} 50%, ${t.color2} 50%)`
+      : t.color;
+    const checkColor = (t.id === "white" || (!t.color2 && (t.id === "yellow" || t.id === "amber"))) ? "#000000" : "#ffffff";
     return `
-      <button class="tint-squircle-btn ${isActive ? "active" : ""}" onclick="applyTint('${t.id}')" title="${t.label} Tint">
-        <div class="tint-squircle-color" style="background-color: ${t.color};">
-          ${isActive ? '<span class="material-symbols-sharp" style="font-size: 16px; color: ' + (t.id === "white" ? "#000" : "#fff") + ';">check</span>' : ""}
-        </div>
-        <span class="tint-squircle-label">${t.label}</span>
+      <button class="tint-squircle-btn ${isActive ? "active" : ""}" onclick="applyTint('${t.id}')" title="${t.label}" style="background: ${bgStyle};">
+        ${isActive ? '<span class="material-symbols-sharp" style="font-size: 20px; color: ' + checkColor + '; text-shadow: 0 1px 3px rgba(0,0,0,0.85);">check</span>' : ""}
       </button>
     `;
   }).join("");
@@ -6366,11 +6534,6 @@ function initStartupAndPerformance() {
     document.body.classList.add('perf-mode');
   }
 
-  // Liquid Glass Buttons
-  if (localStorage.getItem('trashbin_liquid_glass') === 'false') {
-    document.body.classList.add('liquid-glass-off');
-  }
-
   // Background Waves
   if (localStorage.getItem('trashbin_bg_waves') === 'true') {
     const waves = document.getElementById('bgWavesLayer');
@@ -6379,7 +6542,7 @@ function initStartupAndPerformance() {
 
   // Stretched Res
   if (localStorage.getItem('trashbin_stretched_res') === 'true') {
-    document.body.classList.add('stretched-res-active');
+    checkAndApplyStretchedRes();
   }
 
   // Custom Cursor
@@ -6393,7 +6556,7 @@ function initStartupAndPerformance() {
       true,
       localStorage.getItem('trashbin_crosshair_style') || 'plus',
       localStorage.getItem('trashbin_crosshair_size') || 18,
-      localStorage.getItem('trashbin_crosshair_color') || '#00ff88'
+      localStorage.getItem('trashbin_crosshair_color') || 'theme'
     );
   }
 }
@@ -6414,7 +6577,7 @@ function applyCustomCursor(enabled, url) {
     *, *::before, *::after {
       cursor: url("${url}") 0 0, auto !important;
     }
-    button, a, input, select, textarea, [onclick], .game-card, .pill-chip, .settings-tab-btn {
+    button, a, input, select, textarea, [onclick], .game-card, .pill-chip, .settings-tab-btn, .tint-squircle-btn {
       cursor: url("${url}") 0 0, pointer !important;
     }
   `;
@@ -6425,14 +6588,46 @@ function handleCursorFileUpload(e) {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = function(evt) {
-    const dataUrl = evt.target.result;
-    const input = document.getElementById('settingCursorUrl');
-    if (input) input.value = dataUrl;
+    const rawDataUrl = evt.target.result;
+    const img = new Image();
+    img.onload = function() {
+      const maxDim = 32;
+      let w = img.width;
+      let h = img.height;
+      if (w > maxDim || h > maxDim) {
+        if (w >= h) {
+          h = Math.max(1, Math.round((h * maxDim) / w));
+          w = maxDim;
+        } else {
+          w = Math.max(1, Math.round((w * maxDim) / h));
+          h = maxDim;
+        }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, w);
+      canvas.height = Math.max(1, h);
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const scaledDataUrl = canvas.toDataURL('image/png');
+
+      const input = document.getElementById('settingCursorUrl');
+      if (input) input.value = scaledDataUrl;
+      const toggle = document.getElementById('settingCustomCursor');
+      if (toggle) toggle.checked = true;
+
+      try {
+        localStorage.setItem('trashbin_custom_cursor_enabled', 'true');
+        localStorage.setItem('trashbin_custom_cursor_url', scaledDataUrl);
+      } catch(err) {}
+
+      applyCustomCursor(true, scaledDataUrl);
+    };
+    img.src = rawDataUrl;
   };
   reader.readAsDataURL(file);
 }
 
-function applyCrosshair(enabled, style, size, color) {
+function applyCrosshair(enabled, style, size, colorVal) {
   const el = document.getElementById('screenCrosshair');
   if (!el) return;
   if (!enabled) {
@@ -6441,7 +6636,11 @@ function applyCrosshair(enabled, style, size, color) {
   }
   el.style.display = 'block';
   el.style.fontSize = `${size || 18}px`;
-  el.style.color = color || '#00ff88';
+  if (colorVal === 'white' || colorVal === '#ffffff') {
+    el.style.color = '#ffffff';
+  } else {
+    el.style.color = 'var(--accent)';
+  }
 
   let symbol = '+';
   if (style === 'dot') symbol = '•';
@@ -6451,6 +6650,57 @@ function applyCrosshair(enabled, style, size, color) {
   else symbol = '+';
 
   el.textContent = symbol;
+}
+
+function syncCrosshairWithTheme() {
+  const isEnabled = localStorage.getItem('trashbin_crosshair_enabled') === 'true';
+  const colorPref = localStorage.getItem('trashbin_crosshair_color') || 'theme';
+  if (isEnabled && (colorPref === 'theme' || colorPref === '')) {
+    const el = document.getElementById('screenCrosshair');
+    if (el) el.style.color = 'var(--accent)';
+  }
+}
+
+function checkAndApplyStretchedRes() {
+  const player = document.getElementById('player-view');
+  if (!player) return;
+  const isEnabled = localStorage.getItem('trashbin_stretched_res') === 'true';
+  if (!isEnabled) {
+    player.classList.remove('stretched-res-4-3');
+    return;
+  }
+  let is43 = false;
+  try {
+    const iframe = document.getElementById('gameIframe');
+    if (iframe) {
+      const doc = iframe.contentDocument || (iframe.contentWindow && iframe.contentWindow.document);
+      if (doc) {
+        const canvas = doc.querySelector('canvas');
+        const ruffle = doc.querySelector('ruffle-player, embed, object');
+        if (ruffle) {
+          is43 = true;
+        } else if (canvas && canvas.width && canvas.height) {
+          const ratio = canvas.width / canvas.height;
+          if (ratio >= 1.25 && ratio <= 1.45) is43 = true;
+        } else {
+          const w = doc.body ? (doc.body.scrollWidth || doc.body.clientWidth) : 0;
+          const h = doc.body ? (doc.body.scrollHeight || doc.body.clientHeight) : 0;
+          if (w > 0 && h > 0) {
+            const ratio = w / h;
+            if (ratio >= 1.25 && ratio <= 1.45) is43 = true;
+          }
+        }
+      }
+    }
+  } catch(e) {}
+
+  if (!is43 && typeof currentPlayingFile === 'string') {
+    const f = currentPlayingFile.toLowerCase();
+    if (f.endsWith('.swf') || f.includes('happy-wheels') || f.includes('bloontd') || f.includes('bloons-td') || f.includes('bloonstd') || f.includes('sprinter') || f.includes('retro-bowl')) {
+      is43 = true;
+    }
+  }
+  player.classList.toggle('stretched-res-4-3', is43);
 }
 
 // ==== SETTINGS MODAL TABS & UI SYNC ====
@@ -6500,8 +6750,6 @@ function initSettingsUI() {
   if (startupChime) startupChime.checked = localStorage.getItem('trashbin_startup_chime') === 'true';
   const perfMode = document.getElementById('settingPerfMode');
   if (perfMode) perfMode.checked = localStorage.getItem('trashbin_perf_mode') === 'true';
-  const liquidGlass = document.getElementById('settingLiquidGlass');
-  if (liquidGlass) liquidGlass.checked = localStorage.getItem('trashbin_liquid_glass') !== 'false';
 
   // Cosmetics
   const bgWaves = document.getElementById('settingBgWaves');
@@ -6521,7 +6769,10 @@ function initSettingsUI() {
   const crosshairSize = document.getElementById('settingCrosshairSize');
   if (crosshairSize) crosshairSize.value = localStorage.getItem('trashbin_crosshair_size') || 18;
   const crosshairColor = document.getElementById('settingCrosshairColor');
-  if (crosshairColor) crosshairColor.value = localStorage.getItem('trashbin_crosshair_color') || '#00ff88';
+  if (crosshairColor) {
+    const stored = localStorage.getItem('trashbin_crosshair_color') || 'theme';
+    crosshairColor.value = (stored === 'white' || stored === '#ffffff') ? 'white' : 'theme';
+  }
 }
 
 window.toggleSettingsModal = function() {
@@ -6623,12 +6874,11 @@ if (document.readyState === 'loading') {
         <div class="settings-row">
           <div class="settings-col-left">
             <div class="settings-row-title">Panic Action</div>
-            <div class="settings-row-desc">Choose whether to redirect to an external URL or show Google Classroom cover.</div>
+            <div class="settings-row-desc">Choose whether to redirect to an external URL when panic trigger fires.</div>
           </div>
           <div class="settings-col-right">
             <select class="settings-select" id="settingPanicAction" onchange="localStorage.setItem('trashbin_panic_action', this.value)">
               <option value="redirect">Redirect URL</option>
-              <option value="cover">Hidden Classroom Cover</option>
             </select>
           </div>
         </div>
@@ -6693,17 +6943,6 @@ if (document.readyState === 'loading') {
             <input type="file" id="fileCloakUpload" accept="image/*" style="display: none;" onchange="handleFaviconFileUpload(event)">
             <button class="settings-btn-action" onclick="document.getElementById('fileCloakUpload').click()">Upload</button>
             <button class="settings-btn-action primary" onclick="applyCustomCloak()">Apply</button>
-          </div>
-        </div>
-
-        <div class="settings-section-head">Hidden Page Cover</div>
-        <div class="settings-row">
-          <div class="settings-col-left">
-            <div class="settings-row-title">Google Classroom Mask</div>
-            <div class="settings-row-desc">Full-screen authentic visual mask. Exit anytime by double-tapping Escape or clicking the Classroom logo 3 times.</div>
-          </div>
-          <div class="settings-col-right">
-            <button class="settings-btn-action primary" onclick="toggleHiddenClassroomCover(true)">Open Mask</button>
           </div>
         </div>
       </div>
@@ -6867,26 +7106,14 @@ if (document.readyState === 'loading') {
             </label>
           </div>
         </div>
-        <div class="settings-row">
-          <div class="settings-col-left">
-            <div class="settings-row-title">Liquid Glass Buttons</div>
-            <div class="settings-row-desc">Frosted-glass sheen and specular highlight reflections on interactive controls.</div>
-          </div>
-          <div class="settings-col-right">
-            <label class="settings-switch">
-              <input type="checkbox" id="settingLiquidGlass" onchange="localStorage.setItem('trashbin_liquid_glass', this.checked); document.body.classList.toggle('liquid-glass-off', !this.checked);">
-              <span class="settings-slider"></span>
-            </label>
-          </div>
-        </div>
       </div>
 
       <!-- TAB 5: PURE VISUAL AESTHETICS -->
       <div class="settings-tab-pane" id="tab-appearance">
         <div class="settings-section-head">Accent Color Theme</div>
-        <div class="settings-row-desc" style="margin-bottom: 12px;">Choose a saturated squircle theme tint (default is Emerald). Will not affect Yolk.</div>
+        <div class="settings-row-desc" style="margin-bottom: 12px;">Choose an accent squircle theme tint (Default is Christmas).</div>
         <div class="tint-grid" id="tintGrid">
-          <!-- 8 squircle color buttons rendered dynamically -->
+          <!-- 24 squircle color buttons rendered dynamically -->
         </div>
 
         <div class="settings-section-head" style="margin-top: 18px;">Background Ambient Effects</div>
@@ -6937,11 +7164,11 @@ if (document.readyState === 'loading') {
         <div class="settings-row">
           <div class="settings-col-left">
             <div class="settings-row-title">Stretched Resolution (4:3)</div>
-            <div class="settings-row-desc">Applies horizontal stretched aspect ratio for competitive game viewports.</div>
+            <div class="settings-row-desc">Applies horizontal stretched aspect ratio to 4:3 games symmetrically from center.</div>
           </div>
           <div class="settings-col-right">
             <label class="settings-switch">
-              <input type="checkbox" id="settingStretchedRes" onchange="localStorage.setItem('trashbin_stretched_res', this.checked); document.body.classList.toggle('stretched-res-active', this.checked);">
+              <input type="checkbox" id="settingStretchedRes" onchange="localStorage.setItem('trashbin_stretched_res', this.checked); checkAndApplyStretchedRes();">
               <span class="settings-slider"></span>
             </label>
           </div>
@@ -6987,15 +7214,12 @@ if (document.readyState === 'loading') {
         <div class="settings-row">
           <div class="settings-col-left">
             <div class="settings-row-title">Crosshair Color</div>
-            <div class="settings-row-desc">High visibility reticle tint.</div>
+            <div class="settings-row-desc">High visibility reticle tint (Theme Accent or Pure White).</div>
           </div>
           <div class="settings-col-right">
             <select class="settings-select" id="settingCrosshairColor" onchange="localStorage.setItem('trashbin_crosshair_color', this.value); applyCrosshair(true, document.getElementById('settingCrosshairStyle').value, document.getElementById('settingCrosshairSize').value, this.value);">
-              <option value="#00ff88">Emerald Green</option>
-              <option value="#ff3333">Bright Red</option>
-              <option value="#00f0ff">Electric Cyan</option>
-              <option value="#ffffff">Pure White</option>
-              <option value="#fbbf24">Amber Yellow</option>
+              <option value="theme">Theme Accent (Syncs)</option>
+              <option value="white">Pure White</option>
             </select>
           </div>
         </div>
