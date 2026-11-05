@@ -792,13 +792,22 @@
     }
 
     .player-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: #ffffff;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #f4f4f5;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 260px;
+      max-width: 320px;
+      padding: 5px 14px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 9999px;
+      letter-spacing: -0.01em;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
     /* Small Squircle Buttons */
@@ -4252,7 +4261,7 @@ function renderGames() {
             <span>${game.isApp ? 'Open' : 'Play'}</span>
           </button>
 
-          ${!game.isApp ? (isDownloaded ? `
+          ${isGameDownloadable(game.file, game.isApp) ? (isDownloaded ? `
             <button class="btn-icon-sharp" onclick="event.stopPropagation(); deleteGame('${id}', '${encodeURIComponent(game.file)}', '${encodeURIComponent(game.title)}')" title="Remove">
               <span class="material-symbols-sharp">delete</span>
             </button>
@@ -4442,18 +4451,20 @@ function prepareGameHtml(html, fileUrl) {
     '    return _origSetAttr.call(this, k, v);',
     '  };',
     '} catch(e){}',
-    'try {',
-    '  document.addEventListener("click", function(e){',
-    '    var a = e.target && e.target.closest && e.target.closest("a");',
-    '    if(a){',
-    '      var href = a.getAttribute("href");',
-    '      if(href && href.charAt(0) === "#"){',
-    '        e.preventDefault();',
-    '        if(window.location.hash !== href){ window.location.hash = href; } else { window.dispatchEvent(new Event("hashchange")); }',
-    '      }',
-    '    }',
-    '  }, true);',
-    '} catch(e){}',
+    (!isApp ? [
+      'try {',
+      '  document.addEventListener("click", function(e){',
+      '    var a = e.target && e.target.closest && e.target.closest("a");',
+      '    if(a){',
+      '      var href = a.getAttribute("href");',
+      '      if(href && href.charAt(0) === "#"){',
+      '        e.preventDefault();',
+      '        if(window.location.hash !== href){ window.location.hash = href; } else { window.dispatchEvent(new Event("hashchange")); }',
+      '      }',
+      '    }',
+      '  }, true);',
+      '} catch(e){}'
+    ].join('\n') : ''),
     'window.__allAudioContexts = window.__allAudioContexts || [];',
     'try {',
     '  var OrigAC = window.AudioContext || window.webkitAudioContext;',
@@ -5506,6 +5517,20 @@ function renderBatteryFallback() {
   }
 }
 
+function isGameDownloadable(file, isApp) {
+  if (isApp) return false;
+  if (!file || typeof file !== 'string') return false;
+  // Web apps: Yolk, Movies, AI, Soundboard, pages
+  if (file.startsWith('yolk/') || file.startsWith('movies/') || file.includes('Soundboard.html') || file === 'ai.html' || file.startsWith('pages/')) {
+    return false;
+  }
+  // External games not from our own cdn / repo
+  if (file.startsWith('http://') || file.startsWith('https://') || file.includes('://')) {
+    return false;
+  }
+  return true;
+}
+
 // Player Download Button State Manager
 function updatePlayerDownloadBtn() {
   const btn = document.getElementById('playerDownloadBtn');
@@ -5522,7 +5547,7 @@ function updatePlayerDownloadBtn() {
   const isDownloading = typeof PinpointGameStorage !== 'undefined' && PinpointGameStorage.isDownloading(id);
   const progress = activeProgressMap.get(id);
 
-  if (currentPlayingFile.startsWith('yolk/') || currentPlayingFile === 'ai.html' || currentPlayingFile.startsWith('pages/') || currentPlayingFile.includes('scratch.mit.edu')) {
+  if (!isGameDownloadable(currentPlayingFile, false)) {
     btn.style.display = 'none';
     return;
   }
@@ -5548,6 +5573,7 @@ function updatePlayerDownloadBtn() {
 
 async function downloadCurrentGame() {
   if (!currentPlayingFile || !currentPlayingTitle) return;
+  if (!isGameDownloadable(currentPlayingFile, false)) return;
   const id = getGameId(currentPlayingFile);
   if (downloadedGameIds.has(id)) {
     return;
