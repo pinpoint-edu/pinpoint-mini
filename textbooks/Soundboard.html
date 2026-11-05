@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Soundboard</title>
+    <base href="https://cdn.jsdelivr.net/gh/genizymath/soundboard@main/" />
+
+    <!-- Google Fonts & Material Symbols Sharp matching pinpoint-mini -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500&family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* ─── Pinpoint-Mini Design System ─────────────────────────────── */
+      :root {
+        --bg-base: #09090b;
+        --bg-surface: #121215;
+        --bg-card: #18181b;
+        --bg-card-hover: #222226;
+        --border: #27272a;
+        --border-hover: #3f3f46;
+        --border-focus: #00ff88;
+        --text-main: #fafafa;
+        --text-muted: #a1a1aa;
+        --text-dim: #71717a;
+        --accent: #00ff88;
+        --accent-light: #a7f3d0;
+        --accent-subtle: rgba(0, 255, 136, 0.12);
+        --accent-badge-bg: rgba(0, 255, 136, 0.22);
+        --accent-border: rgba(0, 255, 136, 0.35);
+        --accent-glow: rgba(0, 255, 136, 0.45);
+        --success: #00ff88;
+        --danger: #ef4444;
+        --parabola-ease: cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      html, body {
+        width: 100%;
+        min-height: 100vh;
+        background-color: var(--bg-base) !important;
+        color: var(--text-main) !important;
+        font-family: 'Geist', system-ui, -apple-system, sans-serif !important;
+        font-size: 14px;
+        line-height: 1.5;
+        overflow-x: hidden;
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: var(--bg-base);
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #27272a;
+        border-radius: 9999px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #3f3f46;
+      }
+
+      .material-symbols-sharp {
+        font-family: 'Material Symbols Sharp' !important;
+        font-weight: normal;
+        font-style: normal;
+        font-size: 18px;
+        line-height: 1;
+        letter-spacing: normal;
+        text-transform: none;
+        display: inline-block;
+        white-space: nowrap;
+        word-wrap: normal;
+        direction: ltr;
+        vertical-align: middle;
+      }
+
+      /* ─── Controls Header Bar ───────────────────────────────────────── */
+      #controls {
+        position: fixed;
+        top: 14px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: calc(100% - 32px);
+        max-width: 1200px;
+        z-index: 1000;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 8px 14px;
+        background: rgba(18, 18, 21, 0.82) !important;
+        backdrop-filter: blur(20px) saturate(180%);
+        -webkit-backdrop-filter: blur(20px) saturate(180%);
+        border: 1px solid var(--border) !important;
+        border-radius: 18px !important;
+        box-shadow: 0 10px 32px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+        transition: border-color 0.2s var(--parabola-ease);
+      }
+
+      #controls:hover {
+        border-color: var(--border-hover) !important;
+      }
+
+      .controls-brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        letter-spacing: -0.01em;
+        color: var(--text-main);
+        padding-right: 6px;
+        user-select: none;
+      }
+
+      .controls-brand .material-symbols-sharp {
+        color: var(--accent);
+        font-size: 20px;
+      }
+
+      .controls-buttons {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .control-button {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 6px !important;
+        height: 36px !important;
+        padding: 0 14px !important;
+        border-radius: 9999px !important;
+        font-family: 'Geist', sans-serif !important;
+        font-size: 13px !important;
+        font-weight: 500 !important;
+        letter-spacing: -0.01em !important;
+        cursor: pointer;
+        border: 1px solid var(--border) !important;
+        background: var(--bg-card) !important;
+        color: var(--text-muted) !important;
+        transition: all 0.18s var(--parabola-ease) !important;
+        user-select: none;
+        white-space: nowrap;
+      }
+
+      .control-button:hover {
+        background: var(--bg-card-hover) !important;
+        color: var(--text-main) !important;
+        border-color: var(--border-hover) !important;
+        transform: translateY(-1px) !important;
+        filter: none !important;
+      }
+
+      .control-button:active {
+        transform: translateY(0) scale(0.98) !important;
+      }
+
+      .favorites-toggle {
+        background: var(--bg-card) !important;
+        color: var(--text-muted) !important;
+      }
+      .favorites-toggle.active,
+      .favorites-toggle:hover {
+        border-color: rgba(234, 179, 8, 0.4) !important;
+        color: #fef08a !important;
+      }
+
+      .overlap-toggle {
+        background: var(--bg-card) !important;
+        color: var(--text-muted) !important;
+      }
+
+      .stop-button {
+        background: rgba(239, 68, 68, 0.12) !important;
+        color: #fca5a5 !important;
+        border-color: rgba(239, 68, 68, 0.28) !important;
+      }
+      .stop-button:hover {
+        background: rgba(239, 68, 68, 0.22) !important;
+        color: #fee2e2 !important;
+        border-color: rgba(239, 68, 68, 0.5) !important;
+      }
+
+      .tts-toggle {
+        background: var(--accent-subtle) !important;
+        color: var(--accent-light) !important;
+        border-color: var(--accent-border) !important;
+      }
+      .tts-toggle:hover,
+      .tts-toggle-active {
+        background: var(--accent) !important;
+        color: #000 !important;
+        border-color: var(--accent) !important;
+        box-shadow: 0 0 16px var(--accent-glow) !important;
+      }
+
+      /* Search Box */
+      .search-box-wrap {
+        position: relative;
+        display: flex;
+        align-items: center;
+        flex: 1 1 200px;
+        max-width: 320px;
+      }
+
+      .search-box-wrap .search-icon {
+        position: absolute;
+        left: 12px;
+        color: var(--text-dim);
+        font-size: 16px;
+        pointer-events: none;
+      }
+
+      #searchInput {
+        width: 100%;
+        height: 36px;
+        padding: 0 12px 0 34px !important;
+        background: var(--bg-card) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 9999px !important;
+        font-family: 'Geist', sans-serif !important;
+        font-size: 13px !important;
+        color: var(--text-main) !important;
+        outline: none;
+        transition: all 0.2s var(--parabola-ease);
+      }
+
+      #searchInput::placeholder {
+        color: var(--text-dim);
+      }
+
+      #searchInput:focus {
+        border-color: var(--border-focus) !important;
+        background: var(--bg-surface) !important;
+        box-shadow: 0 0 0 3px var(--accent-subtle) !important;
+      }
+
+      /* ─── Soundboard Grid ───────────────────────────────────────────── */
+      #soundboard {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
+        gap: 12px !important;
+        width: calc(100% - 32px);
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 90px 0 60px !important;
+      }
+
+      .sound-wrapper {
+        position: relative;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 10px !important;
+        padding: 14px 10px !important;
+        background: var(--bg-card) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 16px !important;
+        cursor: pointer;
+        user-select: none;
+        transition: transform 0.2s var(--parabola-ease),
+                    background-color 0.2s var(--parabola-ease),
+                    border-color 0.2s var(--parabola-ease),
+                    box-shadow 0.2s var(--parabola-ease) !important;
+      }
+
+      .sound-wrapper:hover {
+        background: var(--bg-card-hover) !important;
+        border-color: var(--border-hover) !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+      }
+
+      .sound-wrapper:active {
+        transform: translateY(0) scale(0.97) !important;
+      }
+
+      .sound-button-img {
+        position: relative;
+        width: 58px;
+        height: 58px;
+        border-radius: 14px;
+        border: none;
+        background: transparent !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        padding: 0;
+        outline: none;
+      }
+
+      .sound-image {
+        width: 52px !important;
+        height: 52px !important;
+        border-radius: 12px !important;
+        background-color: var(--btn-color, #27272a) !important;
+        background-position: center;
+        background-size: cover;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35) !important;
+        transition: transform 0.15s var(--parabola-ease), box-shadow 0.15s ease !important;
+      }
+
+      .sound-image.pressed {
+        transform: scale(0.9) !important;
+        box-shadow: 0 0 16px var(--accent-glow), 0 0 0 2px var(--accent) !important;
+      }
+
+      .sound-label {
+        font-family: 'Geist', sans-serif !important;
+        font-size: 12px !important;
+        font-weight: 500 !important;
+        color: var(--text-muted) !important;
+        text-align: center;
+        letter-spacing: -0.01em;
+        line-height: 1.3;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        word-break: break-word;
+        transition: color 0.18s ease;
+      }
+
+      .sound-wrapper:hover .sound-label {
+        color: var(--text-main) !important;
+      }
+
+      /* ─── TTS Panel (Modern Flyout Modal) ───────────────────────────── */
+      .hidden {
+        display: none !important;
+      }
+
+      #ttsPanel {
+        position: fixed;
+        top: 80px;
+        right: 24px;
+        width: calc(100% - 48px);
+        max-width: 440px;
+        max-height: calc(100vh - 100px);
+        overflow-y: auto;
+        z-index: 1001;
+        padding: 20px !important;
+        background: rgba(18, 18, 21, 0.94) !important;
+        backdrop-filter: blur(28px) saturate(180%);
+        -webkit-backdrop-filter: blur(28px) saturate(180%);
+        border: 1px solid var(--border) !important;
+        border-radius: 20px !important;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.05) inset !important;
+        animation: panelFadeIn 0.24s var(--parabola-ease);
+      }
+
+      @keyframes panelFadeIn {
+        from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+      }
+
+      .tts-panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 14px;
+      }
+
+      .tts-title {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        font-size: 15px;
+        color: var(--text-main);
+      }
+
+      .tts-close {
+        width: 30px;
+        height: 30px;
+        border-radius: 9999px;
+        background: transparent;
+        border: 1px solid transparent;
+        color: var(--text-muted);
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+
+      .tts-close:hover {
+        background: var(--bg-card-hover);
+        color: var(--text-main);
+        border-color: var(--border);
+      }
+
+      .tts-textarea {
+        width: 100%;
+        min-height: 80px;
+        padding: 10px 12px !important;
+        background: var(--bg-card) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 12px !important;
+        font-family: 'Geist', sans-serif !important;
+        font-size: 13px !important;
+        color: var(--text-main) !important;
+        resize: vertical;
+        outline: none;
+        margin-bottom: 14px;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .tts-textarea:focus {
+        border-color: var(--border-focus) !important;
+        box-shadow: 0 0 0 3px var(--accent-subtle) !important;
+      }
+
+      .tts-controls-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .tts-control-group.full-width {
+        grid-column: 1 / -1;
+      }
+
+      .tts-label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text-muted);
+        margin-bottom: 5px;
+      }
+
+      .tts-val {
+        color: var(--accent);
+        font-family: 'Geist Mono', monospace;
+        font-size: 11px;
+      }
+
+      .tts-select {
+        width: 100%;
+        height: 34px;
+        padding: 0 10px;
+        background: var(--bg-card) !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 10px !important;
+        font-family: 'Geist', sans-serif !important;
+        font-size: 12px !important;
+        color: var(--text-main) !important;
+        outline: none;
+        transition: border-color 0.15s ease;
+      }
+
+      .tts-select:focus {
+        border-color: var(--border-focus) !important;
+      }
+
+      .tts-slider {
+        width: 100%;
+        accent-color: var(--accent);
+        cursor: pointer;
+      }
+
+      .tts-status {
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 8px;
+        font-size: 12px;
+        color: var(--text-dim);
+        margin-bottom: 14px;
+        font-family: 'Geist Mono', monospace;
+      }
+
+      .tts-status--speaking {
+        color: var(--accent) !important;
+      }
+
+      .tts-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .tts-btn {
+        flex: 1 1 auto;
+        height: 34px;
+        padding: 0 12px;
+        border-radius: 9999px !important;
+        font-family: 'Geist', sans-serif !important;
+        font-size: 12px !important;
+        font-weight: 500 !important;
+        border: 1px solid var(--border) !important;
+        background: var(--bg-card) !important;
+        color: var(--text-main) !important;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        transition: all 0.15s ease;
+      }
+
+      .tts-btn:hover:not(:disabled) {
+        background: var(--bg-card-hover) !important;
+        border-color: var(--border-hover) !important;
+      }
+
+      .tts-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      .tts-btn-speak {
+        background: var(--accent) !important;
+        color: #000 !important;
+        border-color: var(--accent) !important;
+        font-weight: 600 !important;
+      }
+      .tts-btn-speak:hover:not(:disabled) {
+        background: var(--accent-light) !important;
+        box-shadow: 0 0 14px var(--accent-glow) !important;
+      }
+
+      .tts-speaking-display {
+        margin-top: 12px;
+        padding: 8px 12px;
+        background: var(--accent-subtle);
+        border: 1px solid var(--accent-border);
+        border-radius: 8px;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .tts-speaking-label {
+        color: var(--text-muted);
+      }
+
+      .tts-current-word {
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      /* ─── Right Click Context Menu ──────────────────────────────────── */
+      .right-click-panel {
+        position: absolute;
+        z-index: 2000;
+        background: rgba(24, 24, 27, 0.95) !important;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--border-hover) !important;
+        border-radius: 12px !important;
+        padding: 6px !important;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7) !important;
+        min-width: 140px;
+        animation: panelFadeIn 0.15s ease;
+      }
+
+      .right-click-panel-button {
+        width: 100%;
+        padding: 8px 12px !important;
+        border-radius: 8px !important;
+        background: transparent !important;
+        border: none !important;
+        color: var(--text-main) !important;
+        font-family: 'Geist', sans-serif !important;
+        font-size: 12px !important;
+        font-weight: 500 !important;
+        text-align: left;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: background-color 0.12s ease;
+      }
+
+      .right-click-panel-button:hover {
+        background: var(--accent-subtle) !important;
+        color: var(--accent) !important;
+      }
+
+      @media (max-width: 768px) {
+        #controls {
+          top: 10px;
+          padding: 8px 10px;
+          gap: 8px;
+        }
+        .search-box-wrap {
+          order: 3;
+          flex: 1 1 100%;
+          max-width: 100%;
+        }
+        #soundboard {
+          grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)) !important;
+          gap: 10px !important;
+          padding-top: 130px !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Top Glassmorphism Navigation & Controls Bar -->
+    <div id="controls">
+      <div class="controls-brand">
+        <span class="material-symbols-sharp">volume_up</span>
+        <span>Soundboard</span>
+      </div>
+
+      <div class="controls-buttons">
+        <button id="toggleFavorites" class="control-button favorites-toggle" title="Filter Favorites">
+          ⭐ Favorites: OFF
+        </button>
+
+        <button id="toggleButton" class="control-button overlap-toggle" title="Toggle audio overlapping">
+          🔇 Overlap: OFF
+        </button>
+
+        <button id="stopButton" class="control-button stop-button" title="Stop all playing audio">
+          ⏹️ Stop All
+        </button>
+
+        <button id="ttsToggle" class="control-button tts-toggle" title="Text-to-Speech panel">
+          🗣️ TTS
+        </button>
+      </div>
+
+      <div class="search-box-wrap">
+        <span class="material-symbols-sharp search-icon">search</span>
+        <input id="searchInput" type="text" placeholder="Search sounds..." />
+      </div>
+    </div>
+
+    <!-- Text-to-Speech Panel -->
+    <div id="ttsPanel" class="tts-panel hidden">
+      <div class="tts-panel-header">
+        <span class="tts-title">
+          <span class="material-symbols-sharp" style="color: var(--accent);">record_voice_over</span>
+          Text-to-Speech
+        </span>
+        <button id="ttsClose" class="tts-close" title="Close Panel">✕</button>
+      </div>
+
+      <textarea
+        id="ttsText"
+        class="tts-textarea"
+        placeholder="Type something to speak..."
+      ></textarea>
+
+      <div class="tts-controls-grid">
+        <div class="tts-control-group full-width">
+          <label class="tts-label">Voice</label>
+          <select id="ttsVoice" class="tts-select"></select>
+        </div>
+        <div class="tts-control-group">
+          <label class="tts-label">
+            Volume
+            <span id="ttsVolumeVal" class="tts-val">1.0</span>
+          </label>
+          <input
+            type="range"
+            id="ttsVolume"
+            class="tts-slider"
+            min="0"
+            max="1"
+            step="0.05"
+            value="1"
+          />
+        </div>
+        <div class="tts-control-group">
+          <label class="tts-label">
+            Speed Rate
+            <span id="ttsRateVal" class="tts-val">1.0</span>
+          </label>
+          <input
+            type="range"
+            id="ttsRate"
+            class="tts-slider"
+            min="0.1"
+            max="10"
+            step="0.1"
+            value="1"
+          />
+        </div>
+        <div class="tts-control-group">
+          <label class="tts-label">
+            Pitch
+            <span id="ttsPitchVal" class="tts-val">1.0</span>
+          </label>
+          <input
+            type="range"
+            id="ttsPitch"
+            class="tts-slider"
+            min="0"
+            max="2"
+            step="0.05"
+            value="1"
+          />
+        </div>
+        <div class="tts-control-group">
+          <label class="tts-label">Filter Language</label>
+          <select id="ttsLangFilter" class="tts-select"></select>
+        </div>
+      </div>
+
+      <div id="ttsStatus" class="tts-status">Ready</div>
+
+      <div class="tts-actions">
+        <button id="ttsSpeak" class="tts-btn tts-btn-speak">
+          ▶ Speak
+        </button>
+        <button id="ttsPause" class="tts-btn tts-btn-pause" disabled="">
+          ⏸ Pause
+        </button>
+        <button id="ttsResume" class="tts-btn tts-btn-resume" disabled="">
+          ▶ Resume
+        </button>
+        <button id="ttsStop" class="tts-btn tts-btn-stop" disabled="">
+          ⏹ Stop
+        </button>
+        <button id="ttsReset" class="tts-btn tts-btn-reset">
+          ↺ Reset
+        </button>
+      </div>
+
+      <div id="ttsSpeaking" class="tts-speaking-display hidden">
+        <span class="tts-speaking-label">Speaking:</span>
+        <span id="ttsCurrentWord" class="tts-current-word"></span>
+      </div>
+    </div>
+
+    <!-- Sounds Grid -->
+    <div id="soundboard"></div>
+
+    <!-- Theme synchronization script -->
+    <script>
+      (function() {
+        const TINTS = {
+          green: { color: "#00ff88", light: "#a7f3d0", subtle: "rgba(0, 255, 136, 0.12)", badgeBg: "rgba(0, 255, 136, 0.22)", border: "rgba(0, 255, 136, 0.35)", glow: "rgba(0, 255, 136, 0.45)" },
+          cyan: { color: "#00f0ff", light: "#a5f3fc", subtle: "rgba(0, 240, 255, 0.12)", badgeBg: "rgba(0, 240, 255, 0.22)", border: "rgba(0, 240, 255, 0.35)", glow: "rgba(0, 240, 255, 0.45)" },
+          violet: { color: "#bf5af2", light: "#e9d5ff", subtle: "rgba(191, 90, 242, 0.12)", badgeBg: "rgba(191, 90, 242, 0.22)", border: "rgba(191, 90, 242, 0.35)", glow: "rgba(191, 90, 242, 0.45)" },
+          rose: { color: "#ff375f", light: "#fecdd3", subtle: "rgba(255, 55, 95, 0.12)", badgeBg: "rgba(255, 55, 95, 0.22)", border: "rgba(255, 55, 95, 0.35)", glow: "rgba(255, 55, 95, 0.45)" },
+          amber: { color: "#ff9f0a", light: "#fde68a", subtle: "rgba(255, 159, 10, 0.12)", badgeBg: "rgba(255, 159, 10, 0.22)", border: "rgba(255, 159, 10, 0.35)", glow: "rgba(255, 159, 10, 0.45)" },
+          blue: { color: "#0a84ff", light: "#bfdbfe", subtle: "rgba(10, 132, 255, 0.12)", badgeBg: "rgba(10, 132, 255, 0.22)", border: "rgba(10, 132, 255, 0.35)", glow: "rgba(10, 132, 255, 0.45)" },
+          white: { color: "#ffffff", light: "#ffffff", subtle: "rgba(255, 255, 255, 0.12)", badgeBg: "rgba(255, 255, 255, 0.22)", border: "rgba(255, 255, 255, 0.35)", glow: "rgba(255, 255, 255, 0.35)" }
+        };
+
+        function syncTint() {
+          try {
+            const tintId = localStorage.getItem("trashbin_theme_tint") || "green";
+            const tint = TINTS[tintId] || TINTS.green;
+            const r = document.documentElement.style;
+            r.setProperty("--accent", tint.color);
+            r.setProperty("--accent-light", tint.light);
+            r.setProperty("--accent-subtle", tint.subtle);
+            r.setProperty("--accent-badge-bg", tint.badgeBg);
+            r.setProperty("--accent-border", tint.border);
+            r.setProperty("--border-focus", tint.color);
+            r.setProperty("--accent-glow", tint.glow);
+          } catch(e) {}
+        }
+        syncTint();
+        window.addEventListener("storage", syncTint);
+      })();
+    </script>
+
+    <!-- Load official soundboard module scripts -->
+    <script src="sounds.js" type="module"></script>
+    <script src="main.js" type="module"></script>
+  </body>
+</html>

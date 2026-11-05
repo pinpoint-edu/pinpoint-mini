@@ -7,6 +7,20 @@
     "isApp": true
   },
   {
+    "title": "Moss - Movies & Shows",
+    "file": "movies/index.html",
+    "img": "movies/apple-touch-icon.png",
+    "sizeBytes": 5242880,
+    "isApp": true
+  },
+  {
+    "title": "Soundboard",
+    "file": "textbooks/Soundboard.html",
+    "img": "favicons/google-classroom.png",
+    "sizeBytes": 350000,
+    "isApp": true
+  },
+  {
     "title": "Trashbin AI",
     "file": "ai.html",
     "img": "favicons/google-classroom.png",
