@@ -1257,86 +1257,86 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(0, 0, 0, 0.78);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
+      background: var(--bg-base);
       z-index: 1000000;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
+      align-items: stretch;
+      justify-content: stretch;
+      padding: 0;
     }
 
     .settings-modal-card {
-      background: #121216;
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 22px 24px;
+      background: var(--bg-base);
+      border: none;
+      border-radius: 0;
+      padding: 0;
       width: 100%;
-      max-width: 660px;
-      max-height: 86vh;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.06);
+      height: 100%;
+      max-width: none;
+      max-height: none;
       animation: modalFadeIn 0.25s var(--parabola-ease);
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      grid-template-rows: auto 1fr;
       overflow: hidden;
     }
 
     .settings-modal-header {
+      grid-column: 1 / -1;
+      grid-row: 1;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 12px;
-      padding-bottom: 12px;
+      padding: 18px 28px;
       border-bottom: 1px solid var(--border);
-      flex-shrink: 0;
     }
 
     .settings-modal-title {
-      font-size: 19px;
+      font-size: 22px;
       font-weight: 700;
       color: var(--text-main);
       margin: 0 0 2px 0;
     }
 
     .settings-modal-sub {
-      font-size: 12px;
+      font-size: 12.5px;
       color: var(--text-muted);
       margin: 0;
     }
 
-    /* Tab Bar */
+    /* Left Sidebar Tabs */
     .settings-tabs-bar {
+      grid-column: 1;
+      grid-row: 2;
       display: flex;
+      flex-direction: column;
       gap: 6px;
-      overflow-x: auto;
-      padding-bottom: 10px;
-      margin-bottom: 14px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-      scrollbar-width: none;
-      flex-shrink: 0;
+      overflow-y: auto;
+      padding: 18px 14px;
+      border-right: 1px solid var(--border);
+      background: var(--bg-surface);
     }
-    .settings-tabs-bar::-webkit-scrollbar { display: none; }
 
     .settings-tab-btn {
-      padding: 7px 12px;
+      width: 100%;
+      padding: 11px 14px;
       border-radius: 12px;
-      background: #18181c;
-      border: 1px solid var(--border);
+      background: transparent;
+      border: 1px solid transparent;
       color: var(--text-muted);
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 600;
-      display: inline-flex;
+      display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 10px;
       cursor: pointer;
       white-space: nowrap;
+      text-align: left;
       transition: all 0.2s var(--parabola-ease);
     }
     .settings-tab-btn:hover {
-      background: #222227;
+      background: var(--bg-card);
       color: var(--text-main);
-      border-color: var(--border-hover);
     }
     .settings-tab-btn.active {
       background: var(--accent);
@@ -1345,12 +1345,23 @@
       box-shadow: 0 2px 12px var(--accent-glow);
     }
 
+    @media (max-width: 720px) {
+      .settings-modal-card { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr; }
+      .settings-modal-header { padding: 12px 16px; }
+      .settings-tabs-bar { grid-column: 1; grid-row: 2; flex-direction: row; overflow-x: auto; overflow-y: hidden; padding: 10px 12px; border-right: none; border-bottom: 1px solid var(--border); }
+      .settings-tab-btn { width: auto; font-size: 12.5px; padding: 8px 12px; }
+      .settings-tab-pane { grid-row: 3 !important; padding: 16px !important; }
+    }
+
     .settings-tab-pane {
       display: none;
-      flex: 1;
+      grid-column: 2;
+      grid-row: 2;
       overflow-y: auto;
-      padding-right: 6px;
+      padding: 24px 40px 60px;
+      min-height: 0;
     }
+    .settings-tab-pane > * { max-width: 860px; }
     .settings-tab-pane.active {
       display: block;
     }
@@ -1653,14 +1664,10 @@
     }
     .startup-loader-fill {
       height: 100%;
-      width: 40%;
+      width: 4%;
       background: var(--accent);
       border-radius: 2px;
-      animation: startupBarAnim 1s ease-in-out infinite alternate;
-    }
-    @keyframes startupBarAnim {
-      0% { transform: translateX(-100%); width: 25%; }
-      100% { transform: translateX(300%); width: 50%; }
+      transition: width 0.25s ease-out;
     }
 
     /* Performance Mode */
@@ -4292,9 +4299,8 @@ function renderGames() {
               <span>Cancel</span>
             </button>
           ` : `
-            <button class="btn-sharp" onclick="event.stopPropagation(); startDownload('${id}', '${encodeURIComponent(game.title)}', '${encodeURIComponent(game.file)}')" title="Download for offline">
+            <button class="btn-icon-sharp" onclick="event.stopPropagation(); startDownload('${id}', '${encodeURIComponent(game.title)}', '${encodeURIComponent(game.file)}')" title="Download for offline">
               <span class="material-symbols-sharp">download</span>
-              <span>Download</span>
             </button>
           `) : ''}
         </div>
@@ -5825,6 +5831,17 @@ const TRASHBIN_TINTS = [
     glow: "rgba(239, 68, 68, 0.45)"
   },
   {
+    id: "winter",
+    label: "Winter (Snowfall)",
+    color: "#60a5fa",
+    color2: "#f1f5f9",
+    light: "#dbeafe",
+    subtle: "rgba(96, 165, 250, 0.14)",
+    badgeBg: "rgba(96, 165, 250, 0.24)",
+    border: "rgba(96, 165, 250, 0.38)",
+    glow: "rgba(147, 197, 253, 0.5)"
+  },
+  {
     id: "green",
     label: "Emerald",
     color: "#00ff88",
@@ -6101,6 +6118,7 @@ function applyTint(tintId) {
   }
   window.__currentTint = tint;
   if (typeof pushThemeToFrames === "function") pushThemeToFrames();
+  if (typeof updateSnowfall === "function") updateSnowfall();
 
   // Toggle knob turns black in white theme so active switches are crisp and visible
   if (tint.id === "white") {
@@ -6564,54 +6582,112 @@ window.searchAndRenderPinOptions = function(query) {
 };
 
 // ==== STARTUP & PERFORMANCE ====
+let __chimePlayed = false;
 function playStartupChime() {
+  // Calm, gentle chime: soft sine bells (pentatonic), slow attack, long decay, low-passed with a soft echo
+  if (__chimePlayed) return;
   try {
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     if (!AudioCtx) return;
     const ctx = new AudioCtx();
-    const freqs = [523.25, 659.25, 783.99, 1046.50];
-    freqs.forEach((freq, idx) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.08);
-      gain.gain.setValueAtTime(0.001, ctx.currentTime + idx * 0.08);
-      gain.gain.exponentialRampToValueAtTime(0.12, ctx.currentTime + idx * 0.08 + 0.03);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + idx * 0.08 + 0.85);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start(ctx.currentTime + idx * 0.08);
-      osc.stop(ctx.currentTime + idx * 0.08 + 0.95);
-    });
+    const start = () => {
+      if (__chimePlayed) return;
+      __chimePlayed = true;
+      const t0 = ctx.currentTime + 0.05;
+      const master = ctx.createGain();
+      master.gain.value = 0.5;
+      const lp = ctx.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.value = 2400;
+      const delay = ctx.createDelay(1.0);
+      delay.delayTime.value = 0.32;
+      const fb = ctx.createGain();
+      fb.gain.value = 0.32;
+      const wet = ctx.createGain();
+      wet.gain.value = 0.35;
+      master.connect(lp);
+      lp.connect(ctx.destination);
+      lp.connect(delay);
+      delay.connect(fb);
+      fb.connect(delay);
+      delay.connect(wet);
+      wet.connect(ctx.destination);
+      const notes = [392.00, 523.25, 659.25];
+      notes.forEach((freq, idx) => {
+        const t = t0 + idx * 0.28;
+        [[1, 0.10], [2, 0.025]].forEach(([mult, vol]) => {
+          const osc = ctx.createOscillator();
+          const g = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = freq * mult;
+          g.gain.setValueAtTime(0.0001, t);
+          g.gain.linearRampToValueAtTime(vol, t + 0.09);
+          g.gain.exponentialRampToValueAtTime(0.0001, t + 2.2);
+          osc.connect(g);
+          g.connect(master);
+          osc.start(t);
+          osc.stop(t + 2.3);
+        });
+      });
+      setTimeout(() => { try { ctx.close(); } catch(e) {} }, 5000);
+    };
+    if (ctx.state === 'running') start();
+    else {
+      ctx.resume().then(() => { if (ctx.state === 'running') start(); }).catch(() => {});
+      const unlock = () => {
+        ctx.resume().then(start).catch(() => {});
+        window.removeEventListener('click', unlock);
+        window.removeEventListener('keydown', unlock);
+      };
+      window.addEventListener('click', unlock);
+      window.addEventListener('keydown', unlock);
+    }
   } catch(e) {}
 }
 
 function initStartupAndPerformance() {
-  // Startup Loader: only show if explicitly enabled by user
-  const showLoader = localStorage.getItem('trashbin_startup_loader') === 'true';
+  // Startup Loader: shown by default, can be disabled in Settings
+  const showLoader = localStorage.getItem('trashbin_startup_loader') !== 'false';
   const overlay = document.getElementById('startupLoaderOverlay');
   if (overlay) {
     if (!showLoader) {
       overlay.style.display = 'none';
     } else {
       overlay.style.display = 'flex';
-      setTimeout(() => {
-        overlay.classList.add('fade-out');
-        setTimeout(() => { overlay.style.display = 'none'; }, 300);
-      }, 600);
+      const fill = document.getElementById('startupLoaderFill');
+      const label = document.getElementById('startupLoaderLabel');
+      const began = Date.now();
+      const MIN_MS = 1600;
+      let pct = 0, done = false;
+      const steps = ['Starting environment...', 'Loading game catalog...', 'Applying theme...', 'Almost ready...'];
+      const tick = setInterval(() => {
+        const target = done ? 100 : Math.min(90, pct + Math.random() * 9 + 3);
+        pct = Math.max(pct, target);
+        if (fill) fill.style.width = pct + '%';
+        if (label && !done) label.textContent = steps[Math.min(steps.length - 1, Math.floor(pct / 26))];
+      }, 160);
+      const finish = () => {
+        done = true;
+        const wait = Math.max(0, MIN_MS - (Date.now() - began));
+        setTimeout(() => {
+          if (fill) fill.style.width = '100%';
+          if (label) label.textContent = 'Ready';
+          clearInterval(tick);
+          setTimeout(() => {
+            overlay.classList.add('fade-out');
+            setTimeout(() => { overlay.style.display = 'none'; }, 450);
+          }, 250);
+        }, wait);
+      };
+      if (document.readyState === 'complete') finish();
+      else window.addEventListener('load', finish, { once: true });
+      setTimeout(finish, 6000);
     }
   }
 
   // Startup Chime
   if (localStorage.getItem('trashbin_startup_chime') === 'true') {
     playStartupChime();
-    const unlock = () => {
-      playStartupChime();
-      window.removeEventListener('click', unlock);
-      window.removeEventListener('keydown', unlock);
-    };
-    window.addEventListener('click', unlock, { once: true });
-    window.addEventListener('keydown', unlock, { once: true });
   }
 
   // Performance Mode
@@ -6620,7 +6696,7 @@ function initStartupAndPerformance() {
   }
 
   // Background Waves
-  if (localStorage.getItem('trashbin_bg_waves') === 'true') {
+  if (localStorage.getItem('trashbin_bg_waves') !== 'false') {
     const waves = document.getElementById('bgWavesLayer');
     if (waves) waves.style.display = 'block';
   }
@@ -6788,6 +6864,55 @@ function checkAndApplyStretchedRes() {
   player.classList.toggle('stretched-res-4-3', is43);
 }
 
+// ==== WINTER SNOWFALL (only with the Winter theme + background effects on) ====
+let __snowRAF = null, __snowFlakes = [];
+function updateSnowfall() {
+  const wantSnow = currentTintId === 'winter'
+    && localStorage.getItem('trashbin_bg_waves') !== 'false'
+    && !document.body.classList.contains('perf-mode');
+  let cv = document.getElementById('snowCanvas');
+  if (!wantSnow) {
+    if (__snowRAF) { cancelAnimationFrame(__snowRAF); __snowRAF = null; }
+    if (cv) cv.remove();
+    return;
+  }
+  if (cv) return;
+  cv = document.createElement('canvas');
+  cv.id = 'snowCanvas';
+  cv.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:0;';
+  document.body.appendChild(cv);
+  const ctx = cv.getContext('2d');
+  const resize = () => { cv.width = window.innerWidth; cv.height = window.innerHeight; };
+  resize();
+  window.addEventListener('resize', resize);
+  const count = Math.min(160, Math.floor(window.innerWidth / 9));
+  __snowFlakes = Array.from({ length: count }, () => ({
+    x: Math.random() * cv.width,
+    y: Math.random() * cv.height,
+    r: Math.random() * 2.6 + 0.8,
+    v: Math.random() * 0.9 + 0.4,
+    d: Math.random() * Math.PI * 2,
+    o: Math.random() * 0.5 + 0.4
+  }));
+  const frame = () => {
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    for (const f of __snowFlakes) {
+      f.d += 0.012;
+      f.y += f.v;
+      f.x += Math.sin(f.d) * 0.5;
+      if (f.y > cv.height + 5) { f.y = -5; f.x = Math.random() * cv.width; }
+      if (f.x > cv.width + 5) f.x = -5;
+      if (f.x < -5) f.x = cv.width + 5;
+      ctx.beginPath();
+      ctx.fillStyle = 'rgba(255,255,255,' + f.o + ')';
+      ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    __snowRAF = requestAnimationFrame(frame);
+  };
+  frame();
+}
+
 // ==== SETTINGS MODAL TABS & UI SYNC ====
 window.switchSettingsTab = function(tabName) {
   document.querySelectorAll('.settings-tab-btn').forEach(btn => {
@@ -6830,7 +6955,7 @@ function initSettingsUI() {
 
   // Startup & Performance
   const startupLoader = document.getElementById('settingStartupLoader');
-  if (startupLoader) startupLoader.checked = localStorage.getItem('trashbin_startup_loader') === 'true';
+  if (startupLoader) startupLoader.checked = localStorage.getItem('trashbin_startup_loader') !== 'false';
   const startupChime = document.getElementById('settingStartupChime');
   if (startupChime) startupChime.checked = localStorage.getItem('trashbin_startup_chime') === 'true';
   const perfMode = document.getElementById('settingPerfMode');
@@ -6838,7 +6963,7 @@ function initSettingsUI() {
 
   // Cosmetics
   const bgWaves = document.getElementById('settingBgWaves');
-  if (bgWaves) bgWaves.checked = localStorage.getItem('trashbin_bg_waves') === 'true';
+  if (bgWaves) bgWaves.checked = localStorage.getItem('trashbin_bg_waves') !== 'false';
   const customCursorToggle = document.getElementById('settingCustomCursor');
   if (customCursorToggle) customCursorToggle.checked = localStorage.getItem('trashbin_custom_cursor_enabled') === 'true';
   const cursorUrl = document.getElementById('settingCursorUrl');
@@ -6867,6 +6992,11 @@ window.toggleSettingsModal = function() {
   modal.style.display = isHidden ? "flex" : "none";
   if (isHidden) initSettingsUI();
 };
+
+document.addEventListener('keydown', (e) => {
+  const m = document.getElementById('settingsModalOverlay');
+  if (e.key === 'Escape' && m && m.style.display === 'flex') window.toggleSettingsModal();
+});
 
 window.closeSettingsModal = function(e) {
   if (e && e.target && e.target.id === "settingsModalOverlay") {
@@ -7168,7 +7298,7 @@ if (document.readyState === 'loading') {
         <div class="settings-row">
           <div class="settings-col-left">
             <div class="settings-row-title">Music / Chime on Startup</div>
-            <div class="settings-row-desc">Plays an ambient synth chime when the app initializes.</div>
+            <div class="settings-row-desc">Plays a soft, calm chime when the app starts.</div>
           </div>
           <div class="settings-col-right">
             <label class="settings-switch">
@@ -7209,7 +7339,7 @@ if (document.readyState === 'loading') {
           </div>
           <div class="settings-col-right">
             <label class="settings-switch">
-              <input type="checkbox" id="settingBgWaves" onchange="localStorage.setItem('trashbin_bg_waves', this.checked); document.getElementById('bgWavesLayer').style.display = this.checked ? 'block' : 'none';">
+              <input type="checkbox" id="settingBgWaves" onchange="localStorage.setItem('trashbin_bg_waves', this.checked); document.getElementById('bgWavesLayer').style.display = this.checked ? 'block' : 'none'; updateSnowfall();">
               <span class="settings-slider"></span>
             </label>
           </div>
@@ -7324,20 +7454,20 @@ if (document.readyState === 'loading') {
   <div id="screenCrosshair" class="screen-crosshair">+</div>
 
   <!-- Startup Loader Overlay (Default Hidden, dismissible on click) -->
-  <div id="startupLoaderOverlay" class="startup-loader-overlay" style="display: none;" onclick="this.style.display='none'">
+  <div id="startupLoaderOverlay" class="startup-loader-overlay" style="display: flex;" onclick="this.style.display='none'">
     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
       <svg width="32" height="32" viewBox="0 0 24 24" fill="var(--accent)"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
       <span style="font-family: 'Libre Baskerville', serif; font-size: 24px; font-weight: 700; color: #ffffff;">Trashbin</span>
     </div>
-    <div style="font-size: 12px; color: #8e8e93; letter-spacing: 0.3px;">Starting environment...</div>
+    <div id="startupLoaderLabel" style="font-size: 12px; color: #8e8e93; letter-spacing: 0.3px;">Starting environment...</div>
     <div class="startup-loader-bar">
-      <div class="startup-loader-fill"></div>
+      <div class="startup-loader-fill" id="startupLoaderFill"></div>
     </div>
   </div>
   <script>
     (function() {
       var ov = document.getElementById('startupLoaderOverlay');
-      if (ov && localStorage.getItem('trashbin_startup_loader') !== 'true') {
+      if (ov && localStorage.getItem('trashbin_startup_loader') === 'false') {
         ov.style.display = 'none';
       }
     })();
