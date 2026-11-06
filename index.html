@@ -936,6 +936,7 @@
     }
 
     .status-fullscreen-close-btn {
+      z-index: 2;
       position: absolute;
       top: 24px;
       right: 24px;
@@ -961,6 +962,8 @@
     }
 
     .status-fullscreen-content {
+      position: relative;
+      z-index: 1;
       width: 100%;
       max-width: 640px;
       display: flex;
@@ -6938,27 +6941,14 @@ function showWinterPopup() {
 setTimeout(showWinterPopup, 3200);
 
 // ==== WINTER SNOWFALL (only with the Winter theme + background effects on) ====
-let __snowRAF = null, __snowFlakes = [];
-function updateSnowfall() {
-  const wantSnow = currentTintId === 'winter'
-    && !document.body.classList.contains('perf-mode');
-  let cv = document.getElementById('snowCanvas');
-  if (!wantSnow) {
-    if (__snowRAF) { cancelAnimationFrame(__snowRAF); __snowRAF = null; }
-    if (cv) cv.remove();
-    return;
-  }
-  if (cv) return;
-  cv = document.createElement('canvas');
-  cv.id = 'snowCanvas';
-  cv.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:0;';
-  document.body.appendChild(cv);
+const __snowInstances = {};
+function __startSnow(cv, visibleCheck) {
   const ctx = cv.getContext('2d');
   const resize = () => { cv.width = window.innerWidth; cv.height = window.innerHeight; };
   resize();
   window.addEventListener('resize', resize);
   const count = Math.min(160, Math.floor(window.innerWidth / 9));
-  __snowFlakes = Array.from({ length: count }, () => ({
+  const flakes = Array.from({ length: count }, () => ({
     x: Math.random() * cv.width,
     y: Math.random() * cv.height,
     r: Math.random() * 2.6 + 0.8,
@@ -6966,23 +6956,68 @@ function updateSnowfall() {
     d: Math.random() * Math.PI * 2,
     o: Math.random() * 0.5 + 0.4
   }));
+  const inst = { raf: null, resize };
   const frame = () => {
-    ctx.clearRect(0, 0, cv.width, cv.height);
-    for (const f of __snowFlakes) {
-      f.d += 0.012;
-      f.y += f.v;
-      f.x += Math.sin(f.d) * 0.5;
-      if (f.y > cv.height + 5) { f.y = -5; f.x = Math.random() * cv.width; }
-      if (f.x > cv.width + 5) f.x = -5;
-      if (f.x < -5) f.x = cv.width + 5;
-      ctx.beginPath();
-      ctx.fillStyle = 'rgba(255,255,255,' + f.o + ')';
-      ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
-      ctx.fill();
+    if (visibleCheck()) {
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      for (const f of flakes) {
+        f.d += 0.012;
+        f.y += f.v;
+        f.x += Math.sin(f.d) * 0.5;
+        if (f.y > cv.height + 5) { f.y = -5; f.x = Math.random() * cv.width; }
+        if (f.x > cv.width + 5) f.x = -5;
+        if (f.x < -5) f.x = cv.width + 5;
+        ctx.beginPath();
+        ctx.fillStyle = 'rgba(255,255,255,' + f.o + ')';
+        ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
-    __snowRAF = requestAnimationFrame(frame);
+    inst.raf = requestAnimationFrame(frame);
   };
   frame();
+  return inst;
+}
+
+function __setSnow(id, parent, want, visibleCheck) {
+  let cv = document.getElementById(id);
+  if (!want || !parent) {
+    const inst = __snowInstances[id];
+    if (inst) { cancelAnimationFrame(inst.raf); window.removeEventListener('resize', inst.resize); delete __snowInstances[id]; }
+    if (cv) cv.remove();
+    return;
+  }
+  if (cv) return;
+  cv = document.createElement('canvas');
+  cv.id = id;
+  cv.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:0;';
+  parent.insertBefore(cv, parent.firstChild);
+  __snowInstances[id] = __startSnow(cv, visibleCheck);
+}
+
+function updateSnowfall() {
+  const wantSnow = currentTintId === 'winter' && !document.body.classList.contains('perf-mode');
+  const wavesOn = localStorage.getItem('trashbin_bg_waves') !== 'false';
+  const modal = document.getElementById('status-modal-overlay');
+
+  __setSnow('snowCanvas', document.body, wantSnow, () => true);
+
+  // Clock/battery fullscreen menu: its own snow + waves (it fully covers the page background)
+  if (modal) {
+    let mw = document.getElementById('modalWavesLayer');
+    if (!mw) {
+      const src = document.getElementById('bgWavesLayer');
+      if (src) {
+        mw = document.createElement('div');
+        mw.id = 'modalWavesLayer';
+        mw.className = 'bg-waves-layer';
+        mw.innerHTML = src.innerHTML;
+        modal.insertBefore(mw, modal.firstChild);
+      }
+    }
+    if (mw) mw.style.display = wavesOn ? 'block' : 'none';
+    __setSnow('modalSnowCanvas', modal, wantSnow, () => modal.style.display !== 'none');
+  }
 }
 
 // ==== SETTINGS MODAL TABS & UI SYNC ====
