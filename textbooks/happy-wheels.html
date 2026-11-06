@@ -33,22 +33,42 @@
       unmuteOverlay: "hidden",
       letterbox: "on",
       warnOnUnsupportedContent: false,
-      publicPath: "https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle/"
+      publicPath: "./ruffle/"
     };
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle/ruffle.js"></script>
+  <script src="./ruffle/ruffle.js"></script>
 </head>
 <body>
   <div id="player-container"></div>
   <script>
-    window.addEventListener("DOMContentLoaded", async () => {
+    async function initHappyWheels() {
       try {
-        const ruffle = window.RufflePlayer.newest();
+        let ruffle = null;
+        if (window.RufflePlayer && typeof window.RufflePlayer.newest === 'function') {
+          ruffle = window.RufflePlayer.newest();
+        } else {
+          for (let i = 0; i < 30; i++) {
+            await new Promise(r => setTimeout(r, 100));
+            if (window.RufflePlayer && typeof window.RufflePlayer.newest === 'function') {
+              ruffle = window.RufflePlayer.newest();
+              break;
+            }
+          }
+        }
+
+        if (!ruffle) {
+          throw new Error("Ruffle failed to initialize");
+        }
+
         const player = ruffle.createPlayer();
         const container = document.getElementById("player-container");
         container.appendChild(player);
 
         const swfUrls = [
+          "./happy-wheels.swf",
+          "happy-wheels.swf",
+          "https://cdn.jsdelivr.net/gh/pinpoint-edu/pinpoint-mini@main/textbooks/happy-wheels.swf",
+          "https://raw.githubusercontent.com/pinpoint-edu/pinpoint-mini/main/textbooks/happy-wheels.swf",
           "https://cdn.jsdelivr.net/gh/pinpoint-edu/assets@main/textbooks/happy-wheels.swf",
           "https://raw.githubusercontent.com/pinpoint-edu/assets/main/textbooks/happy-wheels.swf"
         ];
@@ -60,9 +80,13 @@
             if (res.ok) {
               const buffer = await res.arrayBuffer();
               if (buffer && buffer.byteLength > 1000) {
-                player.load({ data: buffer });
-                loaded = true;
-                break;
+                const header = new Uint8Array(buffer.slice(0, 3));
+                const magic = String.fromCharCode(header[0], header[1], header[2]);
+                if (magic === 'FWS' || magic === 'CWS' || magic === 'ZWS') {
+                  player.load({ data: buffer });
+                  loaded = true;
+                  break;
+                }
               }
             }
           } catch(e) {}
@@ -73,7 +97,13 @@
       } catch (err) {
         console.error("Error loading Happy Wheels:", err);
       }
-    });
+    }
+
+    if (document.readyState === "loading") {
+      window.addEventListener("DOMContentLoaded", initHappyWheels);
+    } else {
+      initHappyWheels();
+    }
   </script>
 </body>
 </html>

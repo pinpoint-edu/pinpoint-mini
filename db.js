@@ -23,8 +23,10 @@ const GAME_MANIFESTS = {
         "/textbooks/plants-vs-zombies/music/winmusic.mp3",
         "/textbooks/plants-vs-zombies/music/zengarden.mp3",
         "/textbooks/ruffle/ruffle.js",
-        "/textbooks/ruffle/core.ruffle.e1ab5671fe9d69a41e55.js",
-        "/textbooks/ruffle/f9db7455c2c80fac021b.wasm"
+        "/textbooks/ruffle/core.ruffle.16d61072ac7fdc4d5013.js",
+        "/textbooks/ruffle/core.ruffle.994eeef0a471a88cd0e3.js",
+        "/textbooks/ruffle/172de42e6619eac8f371.wasm",
+        "/textbooks/ruffle/878d548199cddef07035.wasm"
     ],
     "textbooks/getaway-shootout/index.html": [
         "/textbooks/getaway-shootout/index.html",
@@ -47,8 +49,10 @@ const GAME_MANIFESTS = {
         "/textbooks/sprinter/index.html",
         "/textbooks/sprinter/sprinter.swf",
         "/textbooks/ruffle/ruffle.js",
-        "/textbooks/ruffle/core.ruffle.e1ab5671fe9d69a41e55.js",
-        "/textbooks/ruffle/f9db7455c2c80fac021b.wasm"
+        "/textbooks/ruffle/core.ruffle.16d61072ac7fdc4d5013.js",
+        "/textbooks/ruffle/core.ruffle.994eeef0a471a88cd0e3.js",
+        "/textbooks/ruffle/172de42e6619eac8f371.wasm",
+        "/textbooks/ruffle/878d548199cddef07035.wasm"
     ],
     "textbooks/basket-random/index.html": [
         "/textbooks/basket-random/index.html",
@@ -152,15 +156,19 @@ const GAME_MANIFESTS = {
         "/textbooks/happy-wheels.html",
         "/textbooks/happy-wheels.swf",
         "/textbooks/ruffle/ruffle.js",
-        "/textbooks/ruffle/core.ruffle.e1ab5671fe9d69a41e55.js",
-        "/textbooks/ruffle/f9db7455c2c80fac021b.wasm"
+        "/textbooks/ruffle/core.ruffle.16d61072ac7fdc4d5013.js",
+        "/textbooks/ruffle/core.ruffle.994eeef0a471a88cd0e3.js",
+        "/textbooks/ruffle/172de42e6619eac8f371.wasm",
+        "/textbooks/ruffle/878d548199cddef07035.wasm"
     ],
     "textbooks/Bloons-TD.html": [
         "/textbooks/Bloons-TD.html",
         "/textbooks/Bloons-TD.swf",
         "/textbooks/ruffle/ruffle.js",
-        "/textbooks/ruffle/core.ruffle.e1ab5671fe9d69a41e55.js",
-        "/textbooks/ruffle/f9db7455c2c80fac021b.wasm"
+        "/textbooks/ruffle/core.ruffle.16d61072ac7fdc4d5013.js",
+        "/textbooks/ruffle/core.ruffle.994eeef0a471a88cd0e3.js",
+        "/textbooks/ruffle/172de42e6619eac8f371.wasm",
+        "/textbooks/ruffle/878d548199cddef07035.wasm"
     ],
     "textbooks/bloonsTD2.html": [
         "/textbooks/bloonsTD2.html"
