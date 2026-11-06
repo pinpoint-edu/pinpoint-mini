@@ -244,6 +244,11 @@
     "sizeBytes": 8890237
   },
   {
+    "title": "Terraria",
+    "file": "https://cdn.jsdelivr.net/gh/web-ports/terraria@main/index.html",
+    "sizeBytes": 78000000
+  },
+  {
     "title": "Tetris",
     "file": "textbooks/tetrominoes/index.html",
     "sizeBytes": 2899856
