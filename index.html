@@ -576,8 +576,8 @@
       background: var(--accent);
     }
     .game-card {
-      background: var(--bg-surface);
-      border: 1px solid var(--border);
+      background: var(--cat-bg, var(--bg-surface));
+      border: 1px solid var(--cat-border, var(--border));
       border-radius: 14px;
       padding: 12px 18px;
       display: flex;
@@ -919,7 +919,7 @@
     .status-fullscreen-overlay {
       position: fixed;
       inset: 0;
-      background: #09090b;
+      background: var(--clock-bg, #09090b);
       z-index: 300;
       display: flex;
       flex-direction: column;
@@ -984,10 +984,13 @@
     }
 
     .fullscreen-clock-time {
+      background: var(--clock-text-bg, none);
+      -webkit-background-clip: var(--clock-text-clip, border-box);
+      background-clip: var(--clock-text-clip, border-box);
       font-family: 'Libre Baskerville', serif;
       font-size: clamp(48px, 9vw, 84px);
       font-weight: 700;
-      color: #ffffff;
+      color: var(--clock-text-color, #ffffff);
       letter-spacing: -1.5px;
       line-height: 1.1;
       font-variant-numeric: tabular-nums;
@@ -1003,8 +1006,8 @@
 
     .status-battery-card {
       width: 100%;
-      background: #121215;
-      border: 1px solid #27272a;
+      background: var(--menu-bg, #121215);
+      border: 1px solid var(--menu-border, #27272a);
       border-radius: 20px;
       padding: 24px 28px;
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
@@ -4640,7 +4643,8 @@ function prepareGameHtml(html, fileUrl) {
     'if(typeof window.fetch!=="undefined"){',
     '  var _f=window.fetch;',
     '  window.fetch=function(inp,init){',
-    '    var u = typeof inp==="string" ? inp : (inp && inp.url ? inp.url : "");',
+    '    var u = typeof inp==="string" ? inp : (inp && inp.href ? inp.href : (inp && inp.url ? inp.url : ""));',
+     '    if(typeof inp!=="string" && inp && inp.href && !inp.url){ inp = u; }',
     '    if(u.indexOf("all.js")!==-1 || u.indexOf("settings/js")!==-1){ return Promise.resolve(new Response("", {status: 200, headers: {"Content-Type": "application/javascript"}})); }',
     '    var targetUrl=fix(u);',
     '    if(targetUrl.endsWith("/textbooks/basket-random/") || targetUrl.endsWith("/textbooks/basket-random")){',
@@ -4710,6 +4714,31 @@ function prepareGameHtml(html, fileUrl) {
 }
 
 
+// Push the active tint into themable embedded apps (Moss, Soundboard, AI). Yolk is intentionally never themed.
+function themeCssForTint(tint) {
+  if (!tint) return "";
+  let css = `:root{--accent:${tint.color} !important;--accent-hover:${tint.light || tint.color} !important;--accent-light:${tint.light || tint.color} !important;--accent-glow:${tint.glow || tint.color + "66"} !important;--accent-subtle:${tint.subtle || tint.color + "22"} !important;--accent-badge-bg:${tint.badgeBg || tint.color + "33"} !important;--accent-border:${tint.border || tint.color + "55"} !important;--border-focus:${tint.color} !important;`;
+  if (tint.color2) {
+    const c2 = tint.color2;
+    css += `--bg-base:color-mix(in srgb, ${c2} 7%, #09090b) !important;--bg-surface:color-mix(in srgb, ${c2} 10%, #121215) !important;--bg-card:color-mix(in srgb, ${c2} 14%, #18181b) !important;--bg-card-hover:color-mix(in srgb, ${c2} 20%, #222226) !important;--border:color-mix(in srgb, ${c2} 35%, #27272a) !important;--border-subtle:color-mix(in srgb, ${c2} 35%, #27272a) !important;`;
+  }
+  return css + "}";
+}
+
+function pushThemeToFrames() {
+  const frame = document.getElementById("gameIframe");
+  if (!frame) return;
+  try {
+    const f = (typeof lastPlayingGame !== "undefined" && lastPlayingGame && lastPlayingGame.file) || "";
+    if (!(f.startsWith("movies/") || f === "ai.html" || f.includes("Soundboard.html"))) return;
+    const doc = frame.contentDocument;
+    if (!doc || !doc.head) return;
+    let st = doc.getElementById("trashbin-theme-style");
+    if (!st) { st = doc.createElement("style"); st.id = "trashbin-theme-style"; doc.head.appendChild(st); }
+    st.textContent = themeCssForTint(window.__currentTint);
+  } catch (e) {}
+}
+
 function writeGameIntoFrame(iframe, rawHtml, fileUrl) {
   const preparedHtml = prepareGameHtml(rawHtml, fileUrl);
   try {
@@ -4717,6 +4746,14 @@ function writeGameIntoFrame(iframe, rawHtml, fileUrl) {
     doc.open();
     doc.write(preparedHtml);
     doc.close();
+    if (/movies\/|ai\.html|Soundboard\.html/.test(fileUrl) && !/yolk\//.test(fileUrl)) {
+      try {
+        const st = doc.createElement("style");
+        st.id = "trashbin-theme-style";
+        st.textContent = themeCssForTint(window.__currentTint);
+        (doc.head || doc.documentElement).appendChild(st);
+      } catch(e2) {}
+    }
   } catch(e) {
     console.warn("doc.write failed, falling back to srcdoc:", e);
     iframe.srcdoc = preparedHtml;
@@ -6044,6 +6081,26 @@ function applyTint(tintId) {
   root.setProperty("--accent-border", tint.border || (tint.color + "55"));
   root.setProperty("--border-focus", tint.color);
   root.setProperty("--accent-glow", tint.glow || (tint.color + "66"));
+
+  // Double tints: secondary color washes catalog, background and menus; both colors tint the clock menu
+  const dbl = ["--cat-bg","--cat-border","--menu-bg","--menu-border","--bg-base","--bg-surface","--clock-bg","--clock-text-bg","--clock-text-clip","--clock-text-color"];
+  if (tint.color2) {
+    const c2 = tint.color2, c1 = tint.color;
+    root.setProperty("--cat-bg", `color-mix(in srgb, ${c2} 14%, #121215)`);
+    root.setProperty("--cat-border", `color-mix(in srgb, ${c2} 40%, #27272a)`);
+    root.setProperty("--menu-bg", `color-mix(in srgb, ${c2} 12%, #121215)`);
+    root.setProperty("--menu-border", `color-mix(in srgb, ${c2} 40%, #27272a)`);
+    root.setProperty("--bg-base", `color-mix(in srgb, ${c2} 7%, #09090b)`);
+    root.setProperty("--bg-surface", `color-mix(in srgb, ${c2} 10%, #121215)`);
+    root.setProperty("--clock-bg", `linear-gradient(135deg, color-mix(in srgb, ${c1} 14%, #09090b), color-mix(in srgb, ${c2} 14%, #09090b))`);
+    root.setProperty("--clock-text-bg", `linear-gradient(90deg, ${c1}, ${c2})`);
+    root.setProperty("--clock-text-clip", "text");
+    root.setProperty("--clock-text-color", "transparent");
+  } else {
+    dbl.forEach(k => root.removeProperty(k));
+  }
+  window.__currentTint = tint;
+  if (typeof pushThemeToFrames === "function") pushThemeToFrames();
 
   // Toggle knob turns black in white theme so active switches are crisp and visible
   if (tint.id === "white") {

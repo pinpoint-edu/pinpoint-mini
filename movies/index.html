@@ -1691,32 +1691,32 @@
             const isMovie = (type === 'movie');
             switch (String(serverNum)) {
                 case '1':
-                    // Server 1: VidLink
-                    return isMovie
-                        ? `https://vidlink.pro/movie/${tmdbId}?primaryColor=22c55e`
-                        : `https://vidlink.pro/tv/${tmdbId}/${season}/${episode}?primaryColor=22c55e`;
-                case '2':
-                    // Server 2: VidSrc
-                    return isMovie
-                        ? `https://vidsrc.cc/v2/embed/movie/${tmdbId}`
-                        : `https://vidsrc.cc/v2/embed/tv/${tmdbId}/${season}/${episode}`;
-                case '3':
-                    // Server 3: Embed.su
-                    return isMovie
-                        ? `https://embed.su/embed/movie/${tmdbId}`
-                        : `https://embed.su/embed/tv/${tmdbId}/${season}/${episode}`;
-                case '4':
-                    // Server 4: AutoEmbed
-                    return isMovie
-                        ? `https://player.autoembed.cc/embed/movie/${tmdbId}`
-                        : `https://player.autoembed.cc/embed/tv/${tmdbId}/${season}/${episode}`;
-                case '5':
-                    // Server 5: 2Embed
+                    // Server 1: 2Embed
                     return isMovie
                         ? `https://www.2embed.cc/embed/${tmdbId}`
                         : `https://www.2embed.cc/embedtv/${tmdbId}&s=${season}&e=${episode}`;
+                case '2':
+                    // Server 2: VidLink
+                    return isMovie
+                        ? `https://vidlink.pro/movie/${tmdbId}?primaryColor=22c55e`
+                        : `https://vidlink.pro/tv/${tmdbId}/${season}/${episode}?primaryColor=22c55e`;
+                case '3':
+                    // Server 3: VidSrc
+                    return isMovie
+                        ? `https://vidsrc.cc/v2/embed/movie/${tmdbId}`
+                        : `https://vidsrc.cc/v2/embed/tv/${tmdbId}/${season}/${episode}`;
+                case '4':
+                    // Server 4: Embed.su
+                    return isMovie
+                        ? `https://embed.su/embed/movie/${tmdbId}`
+                        : `https://embed.su/embed/tv/${tmdbId}/${season}/${episode}`;
+                case '5':
+                    // Server 5: AutoEmbed
+                    return isMovie
+                        ? `https://player.autoembed.cc/embed/movie/${tmdbId}`
+                        : `https://player.autoembed.cc/embed/tv/${tmdbId}/${season}/${episode}`;
                 default:
-                    return `https://vidlink.pro/movie/${tmdbId}?primaryColor=22c55e`;
+                    return `https://www.2embed.cc/embed/${tmdbId}`;
             }
         }
 
