@@ -6593,16 +6593,16 @@ function playStartupChime() {
     const start = () => {
       if (__chimePlayed) return;
       __chimePlayed = true;
-      const t0 = ctx.currentTime + 0.05;
+      const t0 = ctx.currentTime + 0.01;
       const master = ctx.createGain();
-      master.gain.value = 0.5;
+      master.gain.value = 0.38;
       const lp = ctx.createBiquadFilter();
       lp.type = 'lowpass';
-      lp.frequency.value = 2400;
+      lp.frequency.value = 1800;
       const delay = ctx.createDelay(1.0);
-      delay.delayTime.value = 0.32;
+      delay.delayTime.value = 0.22;
       const fb = ctx.createGain();
-      fb.gain.value = 0.32;
+      fb.gain.value = 0.28;
       const wet = ctx.createGain();
       wet.gain.value = 0.35;
       master.connect(lp);
@@ -6612,21 +6612,21 @@ function playStartupChime() {
       fb.connect(delay);
       delay.connect(wet);
       wet.connect(ctx.destination);
-      const notes = [392.00, 523.25, 659.25];
+      const notes = [392.00, 587.33];
       notes.forEach((freq, idx) => {
-        const t = t0 + idx * 0.28;
-        [[1, 0.10], [2, 0.025]].forEach(([mult, vol]) => {
+        const t = t0 + idx * 0.11;
+        [[1, 0.09], [2, 0.015]].forEach(([mult, vol]) => {
           const osc = ctx.createOscillator();
           const g = ctx.createGain();
           osc.type = 'sine';
           osc.frequency.value = freq * mult;
           g.gain.setValueAtTime(0.0001, t);
-          g.gain.linearRampToValueAtTime(vol, t + 0.09);
-          g.gain.exponentialRampToValueAtTime(0.0001, t + 2.2);
+          g.gain.linearRampToValueAtTime(vol, t + 0.035);
+          g.gain.exponentialRampToValueAtTime(0.0001, t + 1.5);
           osc.connect(g);
           g.connect(master);
           osc.start(t);
-          osc.stop(t + 2.3);
+          osc.stop(t + 1.6);
         });
       });
       setTimeout(() => { try { ctx.close(); } catch(e) {} }, 5000);
@@ -6636,11 +6636,8 @@ function playStartupChime() {
       ctx.resume().then(() => { if (ctx.state === 'running') start(); }).catch(() => {});
       const unlock = () => {
         ctx.resume().then(start).catch(() => {});
-        window.removeEventListener('click', unlock);
-        window.removeEventListener('keydown', unlock);
       };
-      window.addEventListener('click', unlock);
-      window.addEventListener('keydown', unlock);
+      ['pointerdown', 'click', 'keydown', 'touchstart'].forEach(ev => window.addEventListener(ev, unlock, { once: true }));
     }
   } catch(e) {}
 }
