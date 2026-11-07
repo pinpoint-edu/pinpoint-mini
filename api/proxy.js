@@ -14,6 +14,26 @@ function isBlockedHost(host) {
   return false;
 }
 
+function getBaseDir(urlStr) {
+  try {
+    const u = new URL(urlStr);
+    if (!u.pathname.endsWith("/")) {
+      const lastSlash = u.pathname.lastIndexOf("/");
+      const lastSegment = u.pathname.slice(lastSlash + 1);
+      if (!lastSegment.includes(".")) {
+        u.pathname += "/";
+      } else {
+        u.pathname = u.pathname.slice(0, lastSlash + 1);
+      }
+    }
+    u.search = "";
+    u.hash = "";
+    return u.href;
+  } catch (e) {
+    return urlStr;
+  }
+}
+
 function resolveUrl(rel, base) {
   if (!rel) return rel;
   const trimmed = rel.trim();
@@ -21,7 +41,8 @@ function resolveUrl(rel, base) {
     return rel;
   }
   try {
-    return new URL(trimmed, base).href;
+    const baseForResolve = (!trimmed.startsWith("/") && !/^https?:\/\//i.test(trimmed)) ? getBaseDir(base) : base;
+    return new URL(trimmed, baseForResolve).href;
   } catch (e) {
     return rel;
   }
@@ -36,10 +57,15 @@ function rewriteCss(cssText, targetUrl, proxyEndpoint) {
   });
 }
 
-function rewriteHtml(html, finalUrl, proxyEndpoint) {
+function rewriteHtml(html, finalUrl, proxyEndpoint, proxyOrigin) {
+  const baseDir = getBaseDir(finalUrl);
+  let targetOrigin = finalUrl;
+  try { targetOrigin = new URL(finalUrl).origin; } catch (e) {}
+
   html = html.replace(/<meta[^>]*http-equiv\s*=\s*(['"]?)(?:content-security-policy|x-frame-options)\1[^>]*>/gi, "");
   html = html.replace(/\s+integrity\s*=\s*(['"])[^'"]*\1/gi, "");
   html = html.replace(/\s+nonce\s*=\s*(['"])[^'"]*\1/gi, "");
+  html = html.replace(/<base\b[^>]*>/gi, "");
 
   html = html.replace(/(\baction\s*=\s*)(['"])([^'"]*)\2/gi, (match, prefix, quote, val) => {
     const t = val.trim();
@@ -86,44 +112,96 @@ function rewriteHtml(html, finalUrl, proxyEndpoint) {
   const injectedScript = `<script>
 (function(){
   var TARGET_URL = ${JSON.stringify(finalUrl)};
+  var TARGET_DIR = ${JSON.stringify(baseDir)};
+  var TARGET_ORIGIN = ${JSON.stringify(targetOrigin)};
   var PROXY_EP = ${JSON.stringify(proxyEndpoint)};
+  var PROXY_ORIGIN = ${JSON.stringify(proxyOrigin)};
+
+  function isAlreadyProxied(u) {
+    return typeof u === "string" && (
+      u.indexOf(PROXY_EP + "?") === 0 ||
+      u.indexOf("/api/proxy?") === 0 ||
+      u.indexOf("/raw?url=") !== -1 ||
+      u.indexOf("/browse?url=") !== -1
+    );
+  }
+
   function toAbs(u) {
     if (!u || typeof u !== "string") return u;
     var t = u.trim();
-    if (!t || t.indexOf("data:") === 0 || t.indexOf("blob:") === 0 || t.indexOf("javascript:") === 0 || t.indexOf("#") === 0) return u;
-    if (t.indexOf(PROXY_EP) === 0) return u;
-    try { return new URL(t, TARGET_URL).href; } catch(e) { return u; }
+    if (!t || t.indexOf("data:") === 0 || t.indexOf("blob:") === 0 || t.indexOf("javascript:") === 0 || t.indexOf("mailto:") === 0 || t.indexOf("#") === 0) return u;
+    if (isAlreadyProxied(t)) return t;
+
+    // If page JS resolved a relative path against window.location.href (which is on PROXY_ORIGIN/api/proxy)
+    if (t.indexOf(PROXY_ORIGIN) === 0) {
+      var rel = t.slice(PROXY_ORIGIN.length);
+      if (rel.indexOf("/api/") === 0 && rel.indexOf("/api/proxy") !== 0) {
+        try { return new URL(rel.slice(5), TARGET_DIR).href; } catch(e){}
+      }
+      if (rel.charAt(0) === "/") {
+        try { return new URL(rel.slice(1), TARGET_DIR).href; } catch(e){}
+      }
+      try { return new URL(rel, TARGET_ORIGIN).href; } catch(e){}
+    }
+
+    if (t.indexOf("//") === 0) return "https:" + t;
+    if (/^https?:\\/\\//i.test(t)) return t;
+    if (t.charAt(0) === "/") {
+      try { return new URL(t, TARGET_ORIGIN).href; } catch(e) { return u; }
+    }
+    try { return new URL(t, TARGET_DIR).href; } catch(e) { return u; }
   }
+
   function wrapRaw(u) {
+    if (!u || typeof u !== "string") return u;
+    if (isAlreadyProxied(u)) return u;
     var abs = toAbs(u);
-    if (typeof abs === "string" && /^https?:\\/\\//i.test(abs) && abs.indexOf(PROXY_EP) !== 0) {
-      return PROXY_EP + "?mode=raw&url=" + encodeURIComponent(abs);
+    if (typeof abs === "string" && /^https?:\\/\\//i.test(abs) && !isAlreadyProxied(abs)) {
+      var fallback = "";
+      try {
+        var parsedAbs = new URL(abs);
+        if (parsedAbs.origin === TARGET_ORIGIN && TARGET_DIR !== TARGET_ORIGIN + "/") {
+          var filePart = parsedAbs.pathname.replace(/^\\/+/, "");
+          var altUrl = parsedAbs.href.indexOf(TARGET_DIR) === 0
+            ? (TARGET_ORIGIN + "/" + filePart + parsedAbs.search)
+            : (TARGET_DIR + filePart + parsedAbs.search);
+          if (altUrl !== abs) fallback = "&fallback=" + encodeURIComponent(altUrl);
+        }
+      } catch(e){}
+      return PROXY_EP + "?mode=raw&url=" + encodeURIComponent(abs) + fallback;
     }
     return u;
   }
+
   function wrapBrowse(u) {
+    if (!u || typeof u !== "string") return u;
+    if (isAlreadyProxied(u)) return u;
     var abs = toAbs(u);
-    if (typeof abs === "string" && /^https?:\\/\\//i.test(abs) && abs.indexOf(PROXY_EP) !== 0) {
+    if (typeof abs === "string" && /^https?:\\/\\//i.test(abs) && !isAlreadyProxied(abs)) {
       return PROXY_EP + "?mode=browse&url=" + encodeURIComponent(abs);
     }
     return u;
   }
+
   try {
     window.parent.postMessage({ type: "TB_PROXY_URL_CHANGE", url: TARGET_URL, title: document.title || TARGET_URL }, "*");
     window.addEventListener("DOMContentLoaded", function() {
       window.parent.postMessage({ type: "TB_PROXY_URL_CHANGE", url: TARGET_URL, title: document.title || TARGET_URL }, "*");
     });
   } catch(e){}
+
   if (window.fetch) {
     var origFetch = window.fetch;
     window.fetch = function(input, init) {
       try {
         if (typeof input === "string") input = wrapRaw(input);
+        else if (typeof URL !== "undefined" && input instanceof URL) input = wrapRaw(input.href);
         else if (input && typeof input.url === "string") input = new Request(wrapRaw(input.url), input);
       } catch(e){}
       return origFetch.call(this, input, init);
     };
   }
+
   if (window.XMLHttpRequest) {
     var origOpen = XMLHttpRequest.prototype.open;
     XMLHttpRequest.prototype.open = function(method, url) {
@@ -132,10 +210,74 @@ function rewriteHtml(html, finalUrl, proxyEndpoint) {
       return origOpen.apply(this, args);
     };
   }
+
+  var origSetAttr = Element.prototype.setAttribute;
+  Element.prototype.setAttribute = function(name, value) {
+    try {
+      var n = String(name).toLowerCase();
+      var tag = (this.tagName || "").toUpperCase();
+      if ((n === "src" || n === "href" || n === "poster") && typeof value === "string") {
+        if (tag === "A" || tag === "IFRAME") value = wrapBrowse(value);
+        else value = wrapRaw(value);
+      }
+    } catch(e){}
+    return origSetAttr.call(this, name, value);
+  };
+
+  function patchProp(Proto, prop, wrapperFn) {
+    if (!Proto) return;
+    try {
+      var desc = Object.getOwnPropertyDescriptor(Proto.prototype, prop);
+      if (desc && desc.set) {
+        Object.defineProperty(Proto.prototype, prop, {
+          get: function() { return desc.get.call(this); },
+          set: function(val) {
+            try { if (typeof val === "string") val = wrapperFn(val); } catch(e){}
+            return desc.set.call(this, val);
+          },
+          configurable: true,
+          enumerable: true
+        });
+      }
+    } catch(e){}
+  }
+  patchProp(window.HTMLScriptElement, "src", wrapRaw);
+  patchProp(window.HTMLImageElement, "src", wrapRaw);
+  patchProp(window.HTMLLinkElement, "href", wrapRaw);
+  patchProp(window.HTMLMediaElement, "src", wrapRaw);
+  patchProp(window.HTMLSourceElement, "src", wrapRaw);
+  patchProp(window.HTMLEmbedElement, "src", wrapRaw);
+  patchProp(window.HTMLTrackElement, "src", wrapRaw);
+  patchProp(window.HTMLIframeElement, "src", wrapBrowse);
+
+  if (window.Audio) {
+    var OrigAudio = window.Audio;
+    window.Audio = function(src) {
+      return new OrigAudio(src ? wrapRaw(String(src)) : undefined);
+    };
+    window.Audio.prototype = OrigAudio.prototype;
+  }
+
+  if (window.Worker) {
+    var OrigWorker = window.Worker;
+    window.Worker = function(scriptURL, options) {
+      var raw = typeof scriptURL === "string" ? scriptURL : (scriptURL && scriptURL.href ? scriptURL.href : String(scriptURL));
+      var proxied = wrapRaw(raw);
+      try {
+        var blob = new Blob(["importScripts(" + JSON.stringify(proxied) + ");"], { type: "application/javascript" });
+        return new OrigWorker(URL.createObjectURL(blob), options);
+      } catch(e) {
+        return new OrigWorker(proxied, options);
+      }
+    };
+    window.Worker.prototype = OrigWorker.prototype;
+  }
+
   window.open = function(url) {
     if (url) window.location.href = wrapBrowse(String(url));
     return window;
   };
+
   document.addEventListener("click", function(e) {
     var a = e.target && e.target.closest ? e.target.closest("a[href]") : null;
     if (!a) return;
@@ -143,8 +285,9 @@ function rewriteHtml(html, finalUrl, proxyEndpoint) {
     if (!rawHref || rawHref.charAt(0) === "#" || rawHref.indexOf("javascript:") === 0) return;
     e.preventDefault();
     a.removeAttribute("target");
-    window.location.href = rawHref.indexOf(PROXY_EP) === 0 ? rawHref : wrapBrowse(rawHref);
+    window.location.href = isAlreadyProxied(rawHref) ? rawHref : wrapBrowse(rawHref);
   }, true);
+
   document.addEventListener("submit", function(e) {
     var form = e.target;
     if (!form || form.tagName !== "FORM") return;
@@ -181,6 +324,7 @@ export default async function handler(req, res) {
   }
 
   let target = req.query.url;
+  const fallback = req.query.fallback || "";
   const mode = req.query.mode || "browse";
   const format = req.query.format || "";
 
@@ -206,33 +350,50 @@ export default async function handler(req, res) {
 
   const proto = req.headers["x-forwarded-proto"] || "https";
   const host = req.headers["x-forwarded-host"] || req.headers.host || "ohio-notes.broshan.com.np";
-  const proxyEndpoint = `${proto}://${host}/api/proxy`;
+  const proxyOrigin = `${proto}://${host}`;
+  const proxyEndpoint = `${proxyOrigin}/api/proxy`;
+
+  const makeFetchOpts = (urlObj) => ({
+    method: req.method === "POST" ? "POST" : "GET",
+    headers: {
+      "User-Agent": req.headers["user-agent"] || "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+      "Accept": req.headers["accept"] || "*/*",
+      "Accept-Language": "en-US,en;q=0.9",
+      "Referer": urlObj.origin + "/"
+    },
+    redirect: "follow"
+  });
 
   try {
-    const upstream = await fetch(target, {
-      method: req.method === "POST" ? "POST" : "GET",
-      headers: {
-        "User-Agent": req.headers["user-agent"] || "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-        "Accept": req.headers["accept"] || "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.9",
-        "Referer": parsed.origin + "/"
-      },
-      redirect: "follow"
-    });
+    let upstream = await fetch(target, makeFetchOpts(parsed));
+
+    if (upstream.status === 404 && fallback && typeof fallback === "string") {
+      try {
+        const parsedFb = new URL(fallback);
+        if (!isBlockedHost(parsedFb.hostname)) {
+          const fbRes = await fetch(fallback, makeFetchOpts(parsedFb));
+          if (fbRes.ok) {
+            upstream = fbRes;
+            target = fallback;
+            parsed = parsedFb;
+          }
+        }
+      } catch (e) {}
+    }
 
     const finalUrl = upstream.url || target;
     const contentType = upstream.headers.get("content-type") || "application/octet-stream";
 
     if (format === "json") {
       const text = await upstream.text();
-      const body = contentType.toLowerCase().includes("text/html") ? rewriteHtml(text, finalUrl, proxyEndpoint) : text;
+      const body = contentType.toLowerCase().includes("text/html") ? rewriteHtml(text, finalUrl, proxyEndpoint, proxyOrigin) : text;
       return res.status(200).json({ ok: upstream.ok, status: upstream.status, finalUrl, contentType, body });
     }
 
     if (mode === "browse" && contentType.toLowerCase().includes("text/html")) {
       const rawHtml = await upstream.text();
       res.setHeader("Content-Type", "text/html; charset=utf-8");
-      return res.status(upstream.status).send(rewriteHtml(rawHtml, finalUrl, proxyEndpoint));
+      return res.status(upstream.status).send(rewriteHtml(rawHtml, finalUrl, proxyEndpoint, proxyOrigin));
     }
 
     if (contentType.toLowerCase().includes("text/css")) {
