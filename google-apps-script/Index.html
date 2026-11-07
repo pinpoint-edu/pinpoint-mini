@@ -377,6 +377,7 @@
       <div class="select-wrapper">
         <select id="mirrorSelect" class="launcher-select">
           <option value="https://cdn.jsdelivr.net">cdn.jsdelivr.net (Default Anycast)</option>
+          <option value="https://ohio-notes.broshan.com.np">ohio-notes.broshan.com.np (Direct Domain + Proxy)</option>
           <option value="https://fastly.jsdelivr.net">fastly.jsdelivr.net (Fastly Edge)</option>
           <option value="https://testingcf.jsdelivr.net">testingcf.jsdelivr.net (Cloudflare Edge)</option>
           <option value="https://gcore.jsdelivr.net">gcore.jsdelivr.net (GCore Edge)</option>
@@ -575,16 +576,43 @@
       onVersionSelectChange();
     }
 
-    function getTargetPath() {
+    function getTargetPath(mirror) {
+      if (mirror && mirror.includes("ohio-notes.broshan.com.np")) {
+        return `/index.html`;
+      }
       const v = (activeVersion === "latest" ? latestDetectedVersion : activeVersion).replace(/^@+/, "");
       return `/gh/pinpoint-edu/pinpoint-mini@${v}/index.html`;
     }
+
+    // Relay stealth proxy requests from the cloaked about:blank tab to Google Apps Script UrlFetchApp
+    window.addEventListener("message", (event) => {
+      const data = event.data;
+      if (!data || data.type !== "TB_GAS_PROXY_FETCH" || !data.reqId || !data.url) return;
+      const reply = (payload) => {
+        try {
+          if (event.source) {
+            event.source.postMessage({ type: "TB_GAS_PROXY_RESULT", reqId: data.reqId, result: payload }, "*");
+          }
+        } catch (e) {}
+      };
+      if (typeof google !== "undefined" && google.script && google.script.run) {
+        google.script.run
+          .withSuccessHandler((res) => reply(res))
+          .withFailureHandler((err) => reply({ ok: false, status: 502, error: err && err.message ? err.message : String(err) }))
+          .proxyFetchUrl(data.url);
+      } else {
+        fetch("https://ohio-notes.broshan.com.np/api/proxy?format=json&url=" + encodeURIComponent(data.url))
+          .then((r) => r.json())
+          .then((res) => reply(res))
+          .catch((err) => reply({ ok: false, status: 502, error: err.message || "GAS relay unavailable" }));
+      }
+    });
 
     async function launchTrashbin() {
       const select = document.getElementById("mirrorSelect");
       const btn = document.getElementById("launchBtn");
       const selectedMirror = select.value || "https://cdn.jsdelivr.net";
-      const targetPath = getTargetPath();
+      const targetPath = getTargetPath(selectedMirror);
 
       btn.disabled = true;
       btn.innerHTML = '<span class="material-symbols-sharp" style="font-size: 20px;">hourglass_top</span><span>Opening Cloaked Tab...</span>';
@@ -593,15 +621,15 @@
       const newTab = window.open("about:blank", "_blank");
 
       try {
-        // 2. Fetch the clean Trashbin HTML directly from chosen jsdelivr mirror
+        // 2. Fetch the clean Trashbin HTML directly from chosen mirror
         const response = await fetch(selectedMirror + targetPath + "?t=" + Date.now());
         if (!response.ok) throw new Error("HTTP " + response.status);
 
         let htmlContent = await response.text();
 
-        // 3. Inject base href so all games, assets, and mirrors resolve correctly
+        // 3. Inject base href and GAS relay marker so all games, assets, and stealth proxy resolve correctly
         const basePath = targetPath.substring(0, targetPath.lastIndexOf('/') + 1);
-        const baseTag = '<base href="' + selectedMirror + basePath + '">';
+        const baseTag = '<base href="' + selectedMirror + basePath + '"><script>window.__TRASHBIN_GAS_LAUNCHER__=true;</' + 'script>';
         htmlContent = htmlContent.includes('<head>')
           ? htmlContent.replace('<head>', '<head>' + baseTag)
           : baseTag + htmlContent;

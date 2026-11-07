@@ -1926,6 +1926,10 @@
         <span class="material-symbols-sharp" style="font-size: 15px; color: #60a5fa;">psychology</span>
         <span>AI</span>
       </button>
+      <button class="pill-chip" onclick="playGame('proxy.html', 'Trashbin Proxy')">
+        <span class="material-symbols-sharp" style="font-size: 15px; color: #10b981;">travel_explore</span>
+        <span>Proxy</span>
+      </button>
     </div>
   </div>
 
@@ -3283,7 +3287,7 @@ const PinpointGameStorage = {
                         candidateUrls.push(rawGh);
                     }
                 } else {
-                    const isMini = clean.startsWith('yolk/') || clean === 'ai.html' || clean.startsWith('pages/') || clean.includes('superhot') || clean.includes('tetrominoes') || clean.includes('tetris');
+                    const isMini = clean.startsWith('yolk/') || clean === 'ai.html' || clean === 'proxy.html' || clean.startsWith('pages/') || clean.includes('superhot') || clean.includes('tetrominoes') || clean.includes('tetris');
                     const primaryRepo = isMini ? 'pinpoint-edu/pinpoint-mini@main/' : 'pinpoint-edu/assets@main/';
                     const fallbackRepo = isMini ? 'pinpoint-edu/assets@main/' : 'pinpoint-edu/pinpoint-mini@main/';
                     const mirrors = [activeMirror, ...CDN_MIRRORS.filter(m => m !== activeMirror)];
@@ -3532,6 +3536,13 @@ const DEFAULT_GAMES = [
             "file": "ai.html",
             "img": "favicons/google-classroom.png",
             "sizeBytes": 125000,
+            "isApp": true
+      },
+      {
+            "title": "Trashbin Proxy",
+            "file": "proxy.html",
+            "img": "favicons/google-classroom.png",
+            "sizeBytes": 140000,
             "isApp": true
       },
       {
@@ -4460,7 +4471,7 @@ function prepareGameHtml(html, fileUrl) {
   }
 
   // 2. Inject frame viewport style and runtime fetch/XHR interceptor
-  const isApp = fileUrl.includes('ai.html') || fileUrl.includes('yolk/') || fileUrl.includes('movies/') || fileUrl.includes('Soundboard.html') || fileUrl.includes('pages/');
+  const isApp = fileUrl.includes('ai.html') || fileUrl.includes('proxy.html') || fileUrl.includes('yolk/') || fileUrl.includes('movies/') || fileUrl.includes('Soundboard.html') || fileUrl.includes('pages/');
   if (isApp) {
     // Web apps have their own modern scripts and styles; do not inject game canvas/audio monkey-patches
     return html;
@@ -4603,6 +4614,7 @@ function prepareGameHtml(html, fileUrl) {
     '  }',
     '  if(u.indexOf("yolk/") !== -1){ return m + "/gh/pinpoint-edu/pinpoint-mini@main/" + u.substring(u.indexOf("yolk/")); }',
     '  if(u.indexOf("ai.html") !== -1){ return m + "/gh/pinpoint-edu/pinpoint-mini@main/ai.html"; }',
+    '  if(u.indexOf("proxy.html") !== -1){ return m + "/gh/pinpoint-edu/pinpoint-mini@main/proxy.html"; }',
     '  if(u.indexOf("savedata") !== -1 || u.indexOf("optiondata.dat") !== -1){',
     '    var cleanSave = u;',
     '    if(cleanSave.indexOf("/textbooks/") !== -1) cleanSave = cleanSave.substring(cleanSave.indexOf("/textbooks/") + 11);',
@@ -4783,7 +4795,7 @@ function pushThemeToFrames() {
   if (!frame) return;
   try {
     const f = (typeof lastPlayingGame !== "undefined" && lastPlayingGame && lastPlayingGame.file) || "";
-    if (!(f.startsWith("movies/") || f === "ai.html" || f.includes("Soundboard.html"))) return;
+    if (!(f.startsWith("movies/") || f === "ai.html" || f === "proxy.html" || f.includes("Soundboard.html"))) return;
     const doc = frame.contentDocument;
     if (!doc || !doc.head) return;
     let st = doc.getElementById("trashbin-theme-style");
@@ -4799,7 +4811,7 @@ function writeGameIntoFrame(iframe, rawHtml, fileUrl) {
     doc.open();
     doc.write(preparedHtml);
     doc.close();
-    if (/movies\/|ai\.html|Soundboard\.html/.test(fileUrl) && !/yolk\//.test(fileUrl)) {
+    if (/movies\/|ai\.html|proxy\.html|Soundboard\.html/.test(fileUrl) && !/yolk\//.test(fileUrl)) {
       try {
         const st = doc.createElement("style");
         st.id = "trashbin-theme-style";
@@ -4862,7 +4874,7 @@ async function fetchGameHtml(file) {
   }
 
   // First try direct local / relative fetch (only when running on local dev: file://, localhost, or Vercel)
-  const isLocalDev = typeof location !== 'undefined' && (location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname.endsWith('.vercel.app'));
+  const isLocalDev = typeof location !== 'undefined' && (location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname.endsWith('.vercel.app') || location.hostname.endsWith('.broshan.com.np'));
   if (isLocalDev) {
     try {
       const localRes = await fetch(fetchFile);
@@ -4882,7 +4894,7 @@ async function fetchGameHtml(file) {
   const mirrors = [activeMirror, ...CDN_MIRRORS.filter(m => m !== activeMirror)];
 
   // Apps live in pinpoint-mini, game textbooks live in assets
-  const isMiniRepo = fetchFile.startsWith('yolk/') || fetchFile.startsWith('movies/') || fetchFile === 'ai.html' || fetchFile.startsWith('pages/') || fetchFile.includes('Soundboard.html') || fetchFile.includes('happy-wheels') || fetchFile.includes('superhot') || fetchFile.includes('tetrominoes') || fetchFile.includes('tetris') || fetchFile.includes('retro-bowl');
+  const isMiniRepo = fetchFile.startsWith('yolk/') || fetchFile.startsWith('movies/') || fetchFile === 'ai.html' || fetchFile === 'proxy.html' || fetchFile.startsWith('pages/') || fetchFile.includes('Soundboard.html') || fetchFile.includes('happy-wheels') || fetchFile.includes('superhot') || fetchFile.includes('tetrominoes') || fetchFile.includes('tetris') || fetchFile.includes('retro-bowl');
   const primaryRepo = isMiniRepo ? 'pinpoint-edu/pinpoint-mini@main/' : 'pinpoint-edu/assets@main/';
   const fallbackRepo = isMiniRepo ? 'pinpoint-edu/assets@main/' : 'pinpoint-edu/pinpoint-mini@main/';
 
@@ -4942,7 +4954,7 @@ async function playGame(encodedFile, encodedTitle) {
     playerTitleEl.classList.remove('is-moss-title');
   }
   
-  const isApp = file.startsWith('yolk/') || file.startsWith('movies/') || file === 'ai.html' || file.includes('Soundboard.html') || file.startsWith('pages/');
+  const isApp = file.startsWith('yolk/') || file.startsWith('movies/') || file === 'ai.html' || file === 'proxy.html' || file.includes('Soundboard.html') || file.startsWith('pages/');
   const playerView = document.getElementById('player-view');
   if (isApp) {
     playerView.classList.add('is-web-app');
@@ -4958,6 +4970,14 @@ async function playGame(encodedFile, encodedTitle) {
 
   const iframe = document.getElementById('gameIframe');
 
+  // Direct same-origin iframe navigation for proxy.html when hosted on custom domain / localhost so UV ServiceWorker registers natively
+  if (file === 'proxy.html' && typeof location !== 'undefined' && (location.protocol === 'https:' || location.protocol === 'http:') && location.origin !== 'null' && !location.hostname.includes('jsdelivr.net') && !location.hostname.includes('googleusercontent.com')) {
+    iframe.removeAttribute('srcdoc');
+    iframe.src = 'proxy.html';
+    try { iframe.contentWindow.focus(); } catch(e) {}
+    return;
+  }
+
   // Direct iframe navigation for external embeds
   if (file.startsWith('http') && file.includes('scratch.mit.edu')) {
     iframe.removeAttribute('srcdoc');
@@ -4967,12 +4987,12 @@ async function playGame(encodedFile, encodedTitle) {
   }
 
   // 1. Check if game is saved offline in IndexedDB (apps and textbooks always load latest live code)
-  const isMiniApp = file.startsWith('yolk/') || file.startsWith('movies/') || file === 'ai.html' || file.includes('Soundboard.html') || file.includes('happy-wheels');
+  const isMiniApp = file.startsWith('yolk/') || file.startsWith('movies/') || file === 'ai.html' || file === 'proxy.html' || file.includes('Soundboard.html') || file.includes('happy-wheels');
   if (!isMiniApp && typeof PinpointGameStorage !== 'undefined') {
     try {
       const record = await PinpointGameStorage.getGame(id);
       if (record && record.content && record.content.length > 50) {
-        const isMiniRepo = file.startsWith('yolk/') || file.startsWith('movies/') || file === 'ai.html' || file.startsWith('pages/') || file.includes('Soundboard.html') || file.includes('happy-wheels') || file.includes('superhot') || file.includes('tetrominoes') || file.includes('tetris');
+        const isMiniRepo = file.startsWith('yolk/') || file.startsWith('movies/') || file === 'ai.html' || file === 'proxy.html' || file.startsWith('pages/') || file.includes('Soundboard.html') || file.includes('happy-wheels') || file.includes('superhot') || file.includes('tetrominoes') || file.includes('tetris');
         const primaryRepo = isMiniRepo ? 'pinpoint-edu/pinpoint-mini@main/' : 'pinpoint-edu/assets@main/';
         const offlineBase = (/^https?:\/\//i.test(file)) ? file : (activeMirror + '/gh/' + primaryRepo + file);
         writeGameIntoFrame(iframe, record.content, offlineBase);
@@ -5660,8 +5680,8 @@ function renderBatteryFallback() {
 function isGameDownloadable(file, isApp) {
   if (isApp) return false;
   if (!file || typeof file !== 'string') return false;
-  // Web apps: Yolk, Movies, AI, Soundboard, pages
-  if (file.startsWith('yolk/') || file.startsWith('movies/') || file.includes('Soundboard.html') || file === 'ai.html' || file.startsWith('pages/')) {
+  // Web apps: Yolk, Movies, AI, Proxy, Soundboard, pages
+  if (file.startsWith('yolk/') || file.startsWith('movies/') || file.includes('Soundboard.html') || file === 'ai.html' || file === 'proxy.html' || file.startsWith('pages/')) {
     return false;
   }
   // External games not from our own cdn / repo

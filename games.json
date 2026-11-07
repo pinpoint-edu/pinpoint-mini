@@ -28,6 +28,13 @@
     "isApp": true
   },
   {
+    "title": "Trashbin Proxy",
+    "file": "proxy.html",
+    "img": "favicons/google-classroom.png",
+    "sizeBytes": 140000,
+    "isApp": true
+  },
+  {
     "title": "2048",
     "file": "textbooks/2048.html",
     "sizeBytes": 46342

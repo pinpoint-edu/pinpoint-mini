@@ -1,8 +1,26 @@
+let uv = null;
+try {
+    importScripts('/uv.bundle.js');
+    importScripts('/uv.config.js');
+    importScripts(self.__uv$config?.sw || '/uv.sw.js');
+    uv = new UVServiceWorker();
+} catch (e) {
+    try {
+        importScripts('uv.bundle.js');
+        importScripts('uv.config.js');
+        importScripts(self.__uv$config?.sw || 'uv.sw.js');
+        uv = new UVServiceWorker();
+    } catch (e2) {
+        console.warn('[SW] Ultraviolet not loaded:', e2);
+    }
+}
+
 let textbookHTML = "";
 
 const LOCAL_PATHS = [
     "/",
     "/index.html",
+    "/proxy.html",
     "/db.js",
     "/sw.js",
     "/favicon.ico",
@@ -35,6 +53,7 @@ function fixContentType(response, pathname) {
     const mimeMap = {
         'wasm': 'application/wasm',
         'js': 'application/javascript; charset=utf-8',
+        'mjs': 'application/javascript; charset=utf-8',
         'json': 'application/json; charset=utf-8',
         'swf': 'application/x-shockwave-flash',
         'html': 'text/html; charset=utf-8',
@@ -73,6 +92,15 @@ function fixContentType(response, pathname) {
 }
 
 self.addEventListener("fetch", (event) => {
+    try {
+        if (uv && uv.route(event)) {
+            event.respondWith(uv.fetch(event));
+            return;
+        }
+    } catch (uvErr) {
+        console.warn("[SW] UV route error:", uvErr);
+    }
+
     if (event.request.method !== "GET") return;
 
     const rawUrl = event.request.url;
