@@ -444,19 +444,6 @@
       transition: color 0.2s ease;
     }
 
-    .moss-title-tag {
-      font-family: 'Cabin', sans-serif !important;
-      font-weight: 500 !important;
-      font-size: 15.5px !important;
-      letter-spacing: -0.2px;
-    }
-
-    #currentPlayerTitle.is-moss-title {
-      font-family: 'Cabin', sans-serif !important;
-      font-weight: 500 !important;
-      font-size: 18px !important;
-    }
-
     .pill-chip .material-symbols-sharp {
       color: var(--accent);
       transition: color 0.2s ease;
@@ -1915,8 +1902,8 @@
         <span>Yolk!</span>
       </button>
       <button class="pill-chip pill-chip-moss" onclick="playGame('movies/index.html', 'Moss - Movies & Shows')">
-        <span class="material-symbols-sharp" style="font-size: 16px; color: #22c55e;">movie</span>
-        <span class="moss-title-tag">Moss</span>
+        <img src="movies/moss-logo.png" alt="M" style="width: 14px; height: 14px; object-fit: contain;">
+        <span>Moss</span>
       </button>
       <button class="pill-chip" onclick="playGame('textbooks/Soundboard.html', 'Soundboard')">
         <span class="material-symbols-sharp" style="font-size: 15px; color: #a855f7;">volume_up</span>
@@ -3520,7 +3507,7 @@ const DEFAULT_GAMES = [
       {
             "title": "Moss - Movies & Shows",
             "file": "movies/index.html",
-            "img": "movies/apple-touch-icon.png",
+            "img": "movies/moss-logo.png",
             "sizeBytes": 5242880,
             "isApp": true
       },
