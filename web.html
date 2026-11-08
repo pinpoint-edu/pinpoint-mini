@@ -275,41 +275,11 @@
       align-items: center;
     }
 
-    .newtab-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 5px 12px;
-      border-radius: 9999px;
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      color: #34d399;
-      font-size: 12px;
-      font-weight: 600;
-      margin-bottom: 16px;
-    }
-
-    .newtab-badge-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #10b981;
-      box-shadow: 0 0 8px #10b981;
-    }
-
     .newtab-title {
-      font-size: 34px;
+      font-size: 38px;
       font-weight: 700;
       color: #ffffff;
-      margin-bottom: 8px;
-    }
-
-    .newtab-sub {
-      font-size: 14px;
-      color: var(--text-muted);
       margin-bottom: 24px;
-      max-width: 480px;
-      line-height: 1.5;
     }
 
     .hero-search-form {
@@ -321,7 +291,6 @@
       border-radius: 16px;
       padding: 6px 8px 6px 16px;
       gap: 10px;
-      margin-bottom: 26px;
       box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
       transition: border-color 0.2s ease;
     }
@@ -498,17 +467,6 @@
       <button type="submit" class="omnibox-go-btn">Go</button>
     </form>
 
-    <div class="engine-select-wrap" title="Select Connection Mode">
-      <select id="engineSelect" class="engine-select" onchange="onEngineChange()">
-        <option value="auto" selected>Auto (Smart)</option>
-        <option value="stream">Direct Stream (Full)</option>
-        <option value="ohio">Ohio-Notes Cloud</option>
-        <option value="cf">Edge Cloud</option>
-        <option value="gas">Docs Reader</option>
-      </select>
-      <span class="material-symbols-sharp engine-select-arrow">expand_more</span>
-    </div>
-
     <button class="nav-icon-btn" onclick="popOutCurrent()" title="Open in New Tab">
       <span class="material-symbols-sharp">open_in_new</span>
     </button>
@@ -520,13 +478,7 @@
   <div class="web-main">
     <div class="newtab-screen" id="newtabScreen">
       <div class="newtab-card">
-        <div class="newtab-badge">
-          <span class="newtab-badge-dot"></span>
-          <span id="activeEngineLabel">Trashbin Web Ready • Multi-Cloud Connected</span>
-        </div>
-
         <h1 class="newtab-title">Trashbin Web</h1>
-        <p class="newtab-sub">Fast, private web browsing powered by <code>ohio-notes.broshan.com.np</code>, Edge Cloud, and Docs Reader.</p>
 
         <form class="hero-search-form" id="heroSearchForm">
           <span class="material-symbols-sharp" style="color: var(--text-muted);">travel_explore</span>
@@ -543,65 +495,6 @@
             <span class="material-symbols-sharp" style="font-size: 17px;">arrow_forward</span>
           </button>
         </form>
-
-        <div class="quick-grid">
-          <button class="quick-tile" onclick="launchUrl('https://duckduckgo.com')">
-            <div class="quick-tile-icon"><span class="material-symbols-sharp" style="color:#f97316;">search</span></div>
-            <span>DuckDuckGo</span>
-          </button>
-          <button class="quick-tile" onclick="launchUrl('https://en.wikipedia.org')">
-            <div class="quick-tile-icon"><span class="material-symbols-sharp" style="color:#fafafa;">menu_book</span></div>
-            <span>Wikipedia</span>
-          </button>
-          <button class="quick-tile" onclick="launchUrl('https://old.reddit.com')">
-            <div class="quick-tile-icon"><span class="material-symbols-sharp" style="color:#ef4444;">forum</span></div>
-            <span>Reddit</span>
-          </button>
-          <button class="quick-tile" onclick="launchUrl('https://poki.com')">
-            <div class="quick-tile-icon"><span class="material-symbols-sharp" style="color:#38bdf8;">sports_esports</span></div>
-            <span>Poki</span>
-          </button>
-          <button class="quick-tile" onclick="launchUrl('https://news.ycombinator.com')">
-            <div class="quick-tile-icon"><span class="material-symbols-sharp" style="color:#fb923c;">newspaper</span></div>
-            <span>Hacker News</span>
-          </button>
-          <button class="quick-tile" onclick="launchUrl('https://github.com')">
-            <div class="quick-tile-icon"><span class="material-symbols-sharp" style="color:#a855f7;">code</span></div>
-            <span>GitHub</span>
-          </button>
-          <button class="quick-tile" onclick="launchUrl('https://crazygames.com')">
-            <div class="quick-tile-icon"><span class="material-symbols-sharp" style="color:#818cf8;">joystick</span></div>
-            <span>CrazyGames</span>
-          </button>
-          <button class="quick-tile" onclick="launchUrl('https://example.com')">
-            <div class="quick-tile-icon"><span class="material-symbols-sharp" style="color:#22c55e;">speed</span></div>
-            <span>Connection Test</span>
-          </button>
-        </div>
-
-        <div class="engine-cards">
-          <div class="engine-info-card selected" id="cardEngineStream" onclick="selectEngineCard('auto')">
-            <div class="engine-info-title">
-              <span class="material-symbols-sharp" style="font-size:15px;color:#10b981;">bolt</span>
-              <span>Direct Stream</span>
-            </div>
-            <div class="engine-info-desc">Full web app & socket streaming via Ohio-Notes & Edge Cloud.</div>
-          </div>
-          <div class="engine-info-card" id="cardEngineOhio" onclick="selectEngineCard('ohio')">
-            <div class="engine-info-title">
-              <span class="material-symbols-sharp" style="font-size:15px;color:#60a5fa;">dns</span>
-              <span>Ohio-Notes Cloud</span>
-            </div>
-            <div class="engine-info-desc">Direct cloud reader on <code>ohio-notes.broshan.com.np</code> for instant page loading.</div>
-          </div>
-          <div class="engine-info-card" id="cardEngineGas" onclick="selectEngineCard('gas')">
-            <div class="engine-info-title">
-              <span class="material-symbols-sharp" style="font-size:15px;color:#a855f7;">shield_lock</span>
-              <span>Docs Reader</span>
-            </div>
-            <div class="engine-info-desc">Fetches pages through Google Apps Script when external networks are restricted.</div>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -611,33 +504,19 @@
   <script>
     const OHIO_DOMAIN = "https://ohio-notes.broshan.com.np";
     const EDGE_DOMAIN = "https://trashbin-web.yolkmusic.workers.dev";
-    const STREAM_SOCKET = "wss://trashbin-web.yolkmusic.workers.dev/ws/";
 
     const omniboxInput = document.getElementById("omniboxInput");
     const heroSearchInput = document.getElementById("heroSearchInput");
     const newtabScreen = document.getElementById("newtabScreen");
     const viewport = document.getElementById("webViewport");
     const loadingBar = document.getElementById("loadingBar");
-    const engineSelect = document.getElementById("engineSelect");
-    const activeEngineLabel = document.getElementById("activeEngineLabel");
 
     let navHistory = [];
     let navIndex = -1;
     let currentTargetUrl = "";
-    let localStreamReady = false;
     let ohioReachable = null;
     let cfReachable = null;
     let gasBridgeAvailable = false;
-
-    const dec = (arr) => String.fromCharCode(...arr);
-    const KEY_CFG = dec([95, 95, 117, 118, 36, 99, 111, 110, 102, 105, 103]);
-    const KEY_LIB = dec([85, 108, 116, 114, 97, 118, 105, 111, 108, 101, 116]);
-    const PATH_BUNDLE = dec([47, 117, 118, 46, 98, 117, 110, 100, 108, 101, 46, 106, 115]);
-    const PATH_CFG = dec([47, 117, 118, 46, 99, 111, 110, 102, 105, 103, 46, 106, 115]);
-    const PATH_MUX = dec([47, 98, 97, 114, 101, 109, 117, 120, 47, 105, 110, 100, 101, 120, 46, 109, 106, 115]);
-    const PATH_MUX_W = dec([47, 98, 97, 114, 101, 109, 117, 120, 47, 119, 111, 114, 107, 101, 114, 46, 106, 115]);
-    const PATH_EPX = dec([47, 101, 112, 111, 120, 121, 47, 105, 110, 100, 101, 120, 46, 109, 106, 115]);
-    const KEY_W = dec([119, 105, 115, 112]);
 
     function returnToMainHome() {
       if (window.parent && window.parent !== window && typeof window.parent.closePlayer === "function") {
@@ -666,24 +545,6 @@
       document.getElementById("btnForward").disabled = navIndex >= navHistory.length - 1;
     }
 
-    function canUseLocalServiceWorker() {
-      try {
-        if (!("serviceWorker" in navigator)) return false;
-        if (window.location.origin === "null" || window.location.protocol === "about:" || window.location.protocol === "blob:" || window.location.protocol === "file:") {
-          return false;
-        }
-        if (window.top && window.top.location && window.top.location.origin === "null") {
-          return false;
-        }
-        if (window.location.hostname.endsWith("jsdelivr.net") || window.location.hostname.endsWith("googleusercontent.com")) {
-          return false;
-        }
-        return window.location.protocol === "https:" || window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-      } catch (e) {
-        return false;
-      }
-    }
-
     function checkGasBridge() {
       try {
         if (window.__TRASHBIN_GAS_LAUNCHER__ || (window.parent && window.parent.__TRASHBIN_GAS_LAUNCHER__) || (window.top && window.top.__TRASHBIN_GAS_LAUNCHER__)) {
@@ -696,36 +557,6 @@
         }
       } catch (e) {}
       return false;
-    }
-
-    async function initLocalStream() {
-      if (!canUseLocalServiceWorker()) return false;
-      try {
-        const loadScript = (src) => new Promise((res, rej) => {
-          const s = document.createElement("script");
-          s.src = src;
-          s.onload = res;
-          s.onerror = rej;
-          document.head.appendChild(s);
-        });
-        if (!window[KEY_LIB]) await loadScript(PATH_BUNDLE);
-        if (!window[KEY_CFG]) await loadScript(PATH_CFG);
-
-        await navigator.serviceWorker.register("/sw.js", { scope: "/" });
-        await navigator.serviceWorker.ready;
-
-        const mod = await import(PATH_MUX);
-        const ConnClass = Object.values(mod)[0];
-        const conn = new ConnClass(PATH_MUX_W);
-        const transportOpts = {};
-        transportOpts[KEY_W] = STREAM_SOCKET;
-        await conn.setTransport(PATH_EPX, [transportOpts]);
-        localStreamReady = true;
-        return true;
-      } catch (err) {
-        localStreamReady = false;
-        return false;
-      }
     }
 
     async function probeNodes() {
@@ -747,51 +578,12 @@
       ]);
       ohioReachable = ohioOk;
       cfReachable = cfOk;
-      updateEngineStatusBadge();
     }
 
-    function updateEngineStatusBadge() {
-      const mode = engineSelect.value;
-      if (mode === "stream") {
-        activeEngineLabel.textContent = localStreamReady
-          ? "Direct Stream Active (Local Origin)"
-          : "Direct Stream Active (Edge Cloud)";
-      } else if (mode === "ohio") {
-        activeEngineLabel.textContent = "Ohio-Notes Cloud (ohio-notes.broshan.com.np)";
-      } else if (mode === "cf") {
-        activeEngineLabel.textContent = "Edge Cloud Connected";
-      } else if (mode === "gas") {
-        activeEngineLabel.textContent = "Docs Reader Active";
-      } else {
-        if (localStreamReady) {
-          activeEngineLabel.textContent = "Auto Smart • Direct Stream Active";
-        } else if (cfReachable) {
-          activeEngineLabel.textContent = "Auto Smart • Edge Cloud Active";
-        } else if (ohioReachable) {
-          activeEngineLabel.textContent = "Auto Smart • Ohio-Notes Cloud Active";
-        } else if (gasBridgeAvailable) {
-          activeEngineLabel.textContent = "Auto Smart • Docs Reader Active";
-        } else {
-          activeEngineLabel.textContent = "Trashbin Web Ready • Multi-Cloud Connected";
-        }
-      }
-    }
-
-    function selectEngineCard(val) {
-      engineSelect.value = val;
-      onEngineChange();
-    }
-
-    function onEngineChange() {
-      const val = engineSelect.value;
-      localStorage.setItem("trashbin_web_mode", val);
-      document.getElementById("cardEngineStream")?.classList.toggle("selected", val === "auto" || val === "stream" || val === "cf");
-      document.getElementById("cardEngineOhio")?.classList.toggle("selected", val === "ohio");
-      document.getElementById("cardEngineGas")?.classList.toggle("selected", val === "gas");
-      updateEngineStatusBadge();
-      if (currentTargetUrl) {
-        navigateWeb(currentTargetUrl, false);
-      }
+    function getAutoEngine() {
+      if (cfReachable !== false) return "cf";
+      if (ohioReachable !== false) return "ohio";
+      return "gas";
     }
 
     function rewriteHtmlForClientSrcdoc(html, baseUrl) {
@@ -897,33 +689,9 @@
       viewport.style.display = "block";
       setLoading(true);
 
-      let chosenEngine = engineSelect.value || "auto";
-      if (chosenEngine === "auto") {
-        if (localStreamReady && window[KEY_CFG]) {
-          chosenEngine = "local-stream";
-        } else if (cfReachable !== false) {
-          chosenEngine = "cf";
-        } else if (ohioReachable !== false) {
-          chosenEngine = "ohio";
-        } else {
-          chosenEngine = "gas";
-        }
-      }
+      const chosenEngine = getAutoEngine();
 
       try {
-        const cfgObj = window[KEY_CFG];
-        if ((chosenEngine === "local-stream" || chosenEngine === "stream") && localStreamReady && cfgObj) {
-          viewport.removeAttribute("srcdoc");
-          viewport.src = cfgObj.prefix + cfgObj.encodeUrl(target);
-          return;
-        }
-
-        if (chosenEngine === "stream") {
-          viewport.removeAttribute("srcdoc");
-          viewport.src = EDGE_DOMAIN + "/?embed=1&url=" + encodeURIComponent(target);
-          return;
-        }
-
         if (chosenEngine === "cf") {
           viewport.removeAttribute("srcdoc");
           viewport.src = EDGE_DOMAIN + "/browse?url=" + encodeURIComponent(target);
@@ -938,7 +706,7 @@
 
         if (chosenEngine === "gas") {
           viewport.removeAttribute("src");
-          viewport.srcdoc = `<body style="background:#09090b;color:#a1a1aa;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;">Loading via Docs Reader...</body>`;
+          viewport.srcdoc = `<body style="background:#09090b;color:#a1a1aa;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;">Loading...</body>`;
           const res = await fetchViaDocsReader(target);
           const rewritten = rewriteHtmlForClientSrcdoc(res.body, res.finalUrl || target);
           viewport.srcdoc = rewritten;
@@ -948,7 +716,7 @@
       } catch (err) {
         setLoading(false);
         viewport.removeAttribute("src");
-        viewport.srcdoc = `<!DOCTYPE html><html><body style="background:#09090b;color:#fafafa;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;"><div style="background:#18181b;border:1px solid #27272a;padding:28px;border-radius:18px;max-width:460px;text-align:center;"><h3 style="color:#ef4444;margin:0 0 10px;">Connection Error</h3><p style="color:#a1a1aa;font-size:14px;line-height:1.5;margin:0 0 16px;">${err.message || "Failed to load target URL."}</p><p style="color:#71717a;font-size:12px;">Try switching the Mode dropdown in the top-right bar (e.g. Ohio-Notes Cloud or Edge Cloud).</p></div></body></html>`;
+        viewport.srcdoc = `<!DOCTYPE html><html><body style="background:#09090b;color:#fafafa;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;"><div style="background:#18181b;border:1px solid #27272a;padding:28px;border-radius:18px;max-width:460px;text-align:center;"><h3 style="color:#ef4444;margin:0 0 10px;">Connection Error</h3><p style="color:#a1a1aa;font-size:14px;line-height:1.5;margin:0;">${err.message || "Failed to load target URL."}</p></div></body></html>`;
       }
     }
 
@@ -992,10 +760,10 @@
       const target = currentTargetUrl || normalizeTargetUrl(omniboxInput.value) || "https://duckduckgo.com";
       const win = window.open("about:blank", "_blank");
       if (!win) return;
-      const mode = engineSelect.value;
-      const iframeUrl = mode === "ohio"
+      const chosenEngine = getAutoEngine();
+      const iframeUrl = chosenEngine === "ohio"
         ? (OHIO_DOMAIN + "/api/web?mode=browse&url=" + encodeURIComponent(target))
-        : (EDGE_DOMAIN + "/?embed=1&url=" + encodeURIComponent(target));
+        : (EDGE_DOMAIN + "/browse?url=" + encodeURIComponent(target));
       win.document.open();
       win.document.write(
         `<!DOCTYPE html><html><head><title>Home - Classroom</title><link rel="icon" href="https://ssl.gstatic.com/classroom/favicon.png"><style>html,body,iframe{margin:0;padding:0;width:100%;height:100%;border:0;background:#09090b;overflow:hidden;}</style></head><body><iframe src="${iframeUrl}" allow="fullscreen; autoplay; clipboard-read; clipboard-write"></iframe></body></html>`
@@ -1029,19 +797,11 @@
       }
     });
 
-    const savedMode = localStorage.getItem("trashbin_web_mode");
-    if (savedMode && ["auto", "stream", "ohio", "cf", "gas"].includes(savedMode)) {
-      engineSelect.value = savedMode;
+    probeNodes();
+    const urlParam = new URLSearchParams(window.location.search).get("url");
+    if (urlParam) {
+      navigateWeb(urlParam, true);
     }
-
-    initLocalStream().then(() => {
-      probeNodes();
-      onEngineChange();
-      const urlParam = new URLSearchParams(window.location.search).get("url");
-      if (urlParam) {
-        navigateWeb(urlParam, true);
-      }
-    });
   </script>
 </body>
 </html>
