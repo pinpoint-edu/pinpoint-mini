@@ -2380,43 +2380,41 @@
         }
 
         // Watch View & Player Server URLs (All English-first & routed through Web gateway)
+        // Servers 1-2 use the built-in native player (no third-party embed, works inside sandboxed frames).
+        const NATIVE_PLAYER = "https://trashbin-web.yolkmusic.workers.dev/watch";
         function getPlayerUrl(serverNum, tmdbId, type, season = 1, episode = 1) {
             const isMovie = (type === 'movie');
+            const nativeQs = `type=${isMovie ? 'movie' : 'tv'}&id=${tmdbId}&s=${season}&e=${episode}`;
             switch (String(serverNum)) {
                 case '1':
-                    // Server 1: VidSrc SU (English Multi-Server)
-                    return isMovie
-                        ? `https://vidsrc.su/embed/movie/${tmdbId}`
-                        : `https://vidsrc.su/embed/tv/${tmdbId}/${season}/${episode}`;
+                    // Server 1: Built-in player (source A, English original audio)
+                    return { native: true, url: `${NATIVE_PLAYER}?${nativeQs}&p=a` };
                 case '2':
-                    // Server 2: VidLink Pro (English)
-                    return isMovie
-                        ? `https://vidlink.pro/movie/${tmdbId}?primaryColor=22c55e&autoplay=true`
-                        : `https://vidlink.pro/tv/${tmdbId}/${season}/${episode}?primaryColor=22c55e&autoplay=true`;
+                    // Server 2: Built-in player (source B first)
+                    return { native: true, url: `${NATIVE_PLAYER}?${nativeQs}&p=b` };
                 case '3':
                     // Server 3: VidNest (English)
                     return isMovie
                         ? `https://vidnest.fun/movie/${tmdbId}`
                         : `https://vidnest.fun/tv/${tmdbId}/${season}/${episode}`;
                 case '4':
-                    // Server 4: NontonGo Multi-Cloud (MIX / HD / VIP English)
+                    // Server 4: VidLink Pro (English)
                     return isMovie
-                        ? `https://nontongo.win/embed/movie/${tmdbId}`
-                        : `https://nontongo.win/embed/tv/${tmdbId}/${season}/${episode}`;
+                        ? `https://vidlink.pro/movie/${tmdbId}?primaryColor=22c55e&autoplay=true`
+                        : `https://vidlink.pro/tv/${tmdbId}/${season}/${episode}?primaryColor=22c55e&autoplay=true`;
                 case '5':
-                    // Server 5: AutoEmbed Player (English)
-                    return isMovie
-                        ? `https://player.autoembed.me/embed/movie/${tmdbId}/`
-                        : `https://player.autoembed.me/embed/tv/${tmdbId}/${season}/${episode}/`;
-                default:
+                    // Server 5: VidSrc SU (English Multi-Server)
                     return isMovie
                         ? `https://vidsrc.su/embed/movie/${tmdbId}`
                         : `https://vidsrc.su/embed/tv/${tmdbId}/${season}/${episode}`;
+                default:
+                    return { native: true, url: `${NATIVE_PLAYER}?${nativeQs}&p=a` };
             }
         }
 
         function wrapStreamUrl(rawUrl) {
             if (!rawUrl) return '';
+            if (typeof rawUrl === 'object' && rawUrl.native) return rawUrl.url;
             return `${activeStreamGateway}${encodeURIComponent(rawUrl)}`;
         }
 
