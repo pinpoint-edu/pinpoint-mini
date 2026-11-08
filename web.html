@@ -6,7 +6,7 @@
   <title>Trashbin Web</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cabin:wght@500;600&family=Geist:wght@300;400;500;600;700;800&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
 
   <style>
     :root {
@@ -16,17 +16,36 @@
       --bg-card-hover: #222226;
       --border: #27272a;
       --border-hover: #3f3f46;
-      --border-focus: #ffffff;
+      --border-focus: #00ff88;
       --text-main: #fafafa;
       --text-muted: #a1a1aa;
       --text-dim: #71717a;
-      --accent: #10b981;
-      --accent-glow: rgba(16, 185, 129, 0.25);
-      --danger: #ef4444;
+      --accent: #00ff88;
+      --accent-light: #a7f3d0;
+      --accent-subtle: rgba(0, 255, 136, 0.12);
+      --accent-badge-bg: rgba(0, 255, 136, 0.22);
+      --accent-border: rgba(0, 255, 136, 0.35);
+      --accent-glow: rgba(0, 255, 136, 0.45);
+      --danger: #ff3b30;
+      --parabola-ease: cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     * {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    input, textarea {
+      -webkit-user-select: text;
+      user-select: text;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
       margin: 0;
       padding: 0;
     }
@@ -35,13 +54,12 @@
       background-color: var(--bg-base);
       color: var(--text-main);
       font-family: 'Geist', system-ui, -apple-system, sans-serif;
-      height: 100vh;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
+      position: relative;
     }
 
-    h1, h2, h3, .brand-name {
+    h1, h2, h3, .logo-title, .brand-name {
       font-family: 'Libre Baskerville', Georgia, serif;
       letter-spacing: -0.02em;
     }
@@ -50,173 +68,159 @@
       font-family: 'Material Symbols Sharp' !important;
       font-weight: normal;
       font-style: normal;
-      font-size: 19px;
+      font-size: 20px;
       line-height: 1;
       display: inline-block;
+      text-transform: none;
+      letter-spacing: normal;
+      word-wrap: normal;
+      white-space: nowrap;
+      direction: ltr;
+      -webkit-font-smoothing: antialiased;
       vertical-align: middle;
       font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-      user-select: none;
     }
 
-    /* Browser Top Toolbar */
+    /* Top Browser Toolbar (Trashbin Squircle Aesthetics) */
     .web-toolbar {
-      height: 56px;
+      height: 58px;
       background: var(--bg-surface);
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       gap: 8px;
-      padding: 0 14px;
+      padding: 0 16px;
       flex-shrink: 0;
-      z-index: 20;
+      z-index: 50;
     }
 
-    .nav-return-home-btn {
+    .tb-squircle-btn {
+      height: 36px;
+      min-width: 36px;
+      padding: 0 10px;
+      border-radius: 11px;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 6px;
-      height: 36px;
-      padding: 0 12px;
-      background: rgba(255, 255, 255, 0.06);
+      background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 9999px;
       color: var(--text-main);
       font-family: inherit;
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.15s ease;
-      white-space: nowrap;
+      transition: all 0.2s var(--parabola-ease);
+      outline: none;
       flex-shrink: 0;
     }
 
-    .nav-return-home-btn:hover {
-      background: rgba(255, 255, 255, 0.12);
-      border-color: var(--border-hover);
+    .tb-squircle-btn.icon-only {
+      padding: 0;
+      width: 36px;
+    }
+
+    .tb-squircle-btn .accent-icon {
+      color: var(--accent);
+      transition: color 0.2s ease;
+    }
+
+    .tb-squircle-btn:hover:not(:disabled) {
+      background: var(--accent-subtle);
+      border-color: var(--accent);
       color: #ffffff;
+      box-shadow: 0 0 14px var(--accent-glow);
+      transform: translateY(-1px);
     }
 
-    .nav-icon-btn {
-      width: 34px;
-      height: 34px;
-      border-radius: 10px;
-      border: 1px solid transparent;
-      background: transparent;
-      color: var(--text-muted);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      flex-shrink: 0;
+    .tb-squircle-btn:active:not(:disabled) {
+      transform: scale(0.95);
+      background: var(--accent-badge-bg);
     }
 
-    .nav-icon-btn:hover:not(:disabled) {
-      background: var(--bg-card);
-      border-color: var(--border);
-      color: var(--text-main);
-    }
-
-    .nav-icon-btn:disabled {
+    .tb-squircle-btn:disabled {
       opacity: 0.35;
       cursor: not-allowed;
     }
 
-    /* Omnibox Address Bar */
+    /* Top Bar Address / Omnibox Pill */
     .omnibox-form {
       flex: 1;
+      position: relative;
       display: flex;
       align-items: center;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      height: 38px;
-      padding: 0 6px 0 12px;
-      gap: 8px;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease;
       min-width: 160px;
     }
 
-    .omnibox-form:focus-within {
-      border-color: var(--border-focus);
-      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.08);
-    }
-
-    .omnibox-lock {
-      color: #22c55e;
-      font-size: 16px;
-      flex-shrink: 0;
+    .omnibox-icon {
+      position: absolute;
+      left: 14px;
+      font-size: 18px;
+      color: var(--text-dim);
+      pointer-events: none;
+      transition: color 0.2s ease;
     }
 
     .omnibox-input {
-      flex: 1;
-      background: transparent;
-      border: none;
+      width: 100%;
+      height: 38px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0 84px 0 40px;
       color: var(--text-main);
       font-family: inherit;
       font-size: 13.5px;
+      font-weight: 500;
       outline: none;
-      min-width: 0;
+      transition: all 0.25s var(--parabola-ease);
+    }
+
+    .omnibox-input:focus {
+      background: #18181b;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent-glow);
+    }
+
+    .omnibox-input:focus ~ .omnibox-icon {
+      color: var(--accent-light);
     }
 
     .omnibox-input::placeholder {
       color: var(--text-dim);
     }
 
+    .omnibox-actions {
+      position: absolute;
+      right: 5px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
     .omnibox-go-btn {
-      height: 26px;
-      padding: 0 10px;
-      border-radius: 8px;
-      border: none;
-      background: #ffffff;
-      color: #09090b;
-      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 0 11px;
+      height: 28px;
+      background: var(--accent-subtle);
+      border: 1px solid var(--accent-border);
+      border-radius: 9px;
+      color: var(--accent-light);
       font-size: 12px;
-      font-weight: 700;
+      font-weight: 600;
+      font-family: inherit;
       cursor: pointer;
-      transition: opacity 0.15s ease;
-      flex-shrink: 0;
+      transition: all 0.15s ease;
+      outline: none;
     }
 
     .omnibox-go-btn:hover {
-      opacity: 0.9;
-    }
-
-    /* Mode Selector Pill */
-    .engine-select-wrap {
-      position: relative;
-      display: flex;
-      align-items: center;
-      flex-shrink: 0;
-    }
-
-    .engine-select {
-      height: 36px;
-      padding: 0 28px 0 11px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      color: var(--text-main);
-      font-family: inherit;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      outline: none;
-      appearance: none;
-      -webkit-appearance: none;
-      transition: border-color 0.15s ease;
-    }
-
-    .engine-select:hover, .engine-select:focus {
-      border-color: var(--border-hover);
-    }
-
-    .engine-select-arrow {
-      position: absolute;
-      right: 7px;
-      pointer-events: none;
-      color: var(--text-muted);
-      font-size: 16px;
+      background: var(--accent);
+      color: #000000;
+      border-color: var(--accent);
+      box-shadow: 0 2px 10px var(--accent-glow);
     }
 
     /* Loading Progress Bar */
@@ -236,7 +240,7 @@
       left: -40%;
       width: 40%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, #10b981, #ffffff, transparent);
+      background: linear-gradient(90deg, transparent, var(--accent), #ffffff, transparent);
       animation: webLoadAnim 1.1s infinite ease-in-out;
     }
 
@@ -245,7 +249,7 @@
       100% { left: 100%; }
     }
 
-    /* Main Content Area */
+    /* Main Workspace */
     .web-main {
       flex: 1;
       position: relative;
@@ -255,161 +259,158 @@
       background: var(--bg-base);
     }
 
-    /* New Tab Home Screen */
+    /* Trashbin Home-Styled Center Search Screen */
     .newtab-screen {
       flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 28px 20px;
-      overflow-y: auto;
-      text-align: center;
+      padding: 0 20px 6vh;
+      overflow: hidden;
     }
 
-    .newtab-card {
+    #search-block {
       width: 100%;
-      max-width: 640px;
+      max-width: 620px;
+      margin: 0 auto;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
 
-    .newtab-title {
-      font-size: 38px;
-      font-weight: 700;
-      color: #ffffff;
-      margin-bottom: 24px;
-    }
-
-    .hero-search-form {
-      width: 100%;
+    #large-logo-wrapper {
       display: flex;
-      align-items: center;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 6px 8px 6px 16px;
-      gap: 10px;
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
-      transition: border-color 0.2s ease;
-    }
-
-    .hero-search-form:focus-within {
-      border-color: #ffffff;
-    }
-
-    .hero-search-input {
-      flex: 1;
-      height: 40px;
-      background: transparent;
-      border: none;
-      color: #ffffff;
-      font-family: inherit;
-      font-size: 15px;
-      outline: none;
-    }
-
-    .hero-search-btn {
-      height: 40px;
-      padding: 0 18px;
-      border-radius: 11px;
-      border: none;
-      background: #ffffff;
-      color: #09090b;
-      font-family: inherit;
-      font-size: 13.5px;
-      font-weight: 700;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: transform 0.15s ease, background 0.15s ease;
-    }
-
-    .hero-search-btn:hover {
-      background: #e4e4e7;
-      transform: translateY(-1px);
-    }
-
-    .quick-grid {
-      width: 100%;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
-      gap: 10px;
-      margin-bottom: 24px;
-    }
-
-    .quick-tile {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 14px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      color: var(--text-main);
-      font-family: inherit;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      text-align: left;
-      transition: all 0.15s ease;
-    }
-
-    .quick-tile:hover {
-      background: var(--bg-card-hover);
-      border-color: var(--border-hover);
-      transform: translateY(-2px);
-    }
-
-    .quick-tile-icon {
-      width: 30px;
-      height: 30px;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.06);
-      display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .engine-cards {
-      width: 100%;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      text-align: left;
-    }
-
-    .engine-info-card {
-      background: rgba(24, 24, 27, 0.65);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px;
+      margin-bottom: 26px;
       cursor: pointer;
-      transition: border-color 0.15s ease, background 0.15s ease;
     }
 
-    .engine-info-card:hover, .engine-info-card.selected {
-      border-color: #10b981;
-      background: rgba(16, 185, 129, 0.07);
+    .logo-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
-    .engine-info-title {
-      font-size: 12px;
-      font-weight: 700;
+    .logo-row svg {
+      color: var(--accent);
+      filter: drop-shadow(0 0 14px var(--accent-glow));
+      transition: all 0.3s ease;
+    }
+
+    .logo-title {
+      font-size: 52px;
+      font-weight: 900;
+      letter-spacing: -1.5px;
       color: #ffffff;
+    }
+
+    /* Exact Trashbin Home Center Pill Search Bar */
+    .search-pill-wrapper {
+      position: relative;
+      width: 100%;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-pill-icon {
+      position: absolute;
+      left: 20px;
+      font-size: 22px;
+      color: var(--text-dim);
+      pointer-events: none;
+      transition: color 0.2s ease;
+    }
+
+    #heroSearchInput {
+      width: 100%;
+      height: 56px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 0 138px 0 54px;
+      color: var(--text-main);
+      font-size: 16px;
+      font-weight: 500;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.25s var(--parabola-ease);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    #heroSearchInput:focus {
+      background: #18181b;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent-glow), 0 8px 32px rgba(0, 0, 0, 0.7);
+    }
+
+    #heroSearchInput:focus ~ .search-pill-icon {
+      color: var(--accent-light);
+    }
+
+    #heroSearchInput::placeholder {
+      color: var(--text-dim);
+    }
+
+    .search-right-actions {
+      position: absolute;
+      right: 12px;
       display: flex;
       align-items: center;
       gap: 6px;
-      margin-bottom: 4px;
     }
 
-    .engine-info-desc {
-      font-size: 11px;
-      color: var(--text-dim);
-      line-height: 1.4;
+    .clear-search-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #27272a;
+      border: none;
+      color: #ffffff;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .clear-search-btn:hover {
+      background: var(--accent-badge-bg);
+      color: var(--accent);
+      transform: scale(1.05);
+    }
+
+    .search-browse-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0 12px;
+      height: 32px;
+      background: var(--accent-subtle);
+      border: 1px solid var(--accent-border);
+      border-radius: 11px;
+      color: var(--accent-light);
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      outline: none;
+      white-space: nowrap;
+    }
+
+    .search-browse-btn:hover {
+      background: var(--accent);
+      color: #000000;
+      border-color: var(--accent);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px var(--accent-glow);
+    }
+
+    .search-browse-btn:active {
+      transform: scale(0.96);
     }
 
     /* Viewport Iframe */
@@ -423,10 +424,10 @@
     }
 
     @media (max-width: 640px) {
-      .engine-cards {
-        grid-template-columns: 1fr;
+      .logo-title {
+        font-size: 38px;
       }
-      .nav-return-home-btn span:not(.material-symbols-sharp) {
+      .hide-mobile {
         display: none;
       }
     }
@@ -436,39 +437,44 @@
 
   <!-- Top Browser Bar -->
   <header class="web-toolbar">
-    <button class="nav-return-home-btn" onclick="returnToMainHome()" title="Return to Trashbin Home">
-      <span class="material-symbols-sharp" style="font-size: 16px;">arrow_back</span>
-      <span>Home</span>
+    <button class="tb-squircle-btn" onclick="returnToMainHome()" title="Return to Trashbin Home">
+      <span class="material-symbols-sharp accent-icon" style="font-size: 17px;">arrow_back</span>
+      <span class="hide-mobile">Trashbin</span>
     </button>
 
-    <button class="nav-icon-btn" id="btnBack" onclick="goBack()" title="Back" disabled>
+    <button class="tb-squircle-btn icon-only" id="btnBack" onclick="goBack()" title="Back" disabled>
       <span class="material-symbols-sharp">chevron_left</span>
     </button>
-    <button class="nav-icon-btn" id="btnForward" onclick="goForward()" title="Forward" disabled>
+    <button class="tb-squircle-btn icon-only" id="btnForward" onclick="goForward()" title="Forward" disabled>
       <span class="material-symbols-sharp">chevron_right</span>
     </button>
-    <button class="nav-icon-btn" id="btnReload" onclick="reloadPage()" title="Reload">
+    <button class="tb-squircle-btn icon-only" id="btnReload" onclick="reloadPage()" title="Reload">
       <span class="material-symbols-sharp">refresh</span>
     </button>
-    <button class="nav-icon-btn" onclick="showNewTab()" title="Start Page">
+    <button class="tb-squircle-btn icon-only" onclick="showNewTab()" title="Web Start Page">
       <span class="material-symbols-sharp">home</span>
     </button>
 
     <form class="omnibox-form" id="omniboxForm">
-      <span class="material-symbols-sharp omnibox-lock" id="omniboxIcon">encrypted</span>
       <input
         type="text"
         id="omniboxInput"
         class="omnibox-input"
-        placeholder="Search DuckDuckGo or enter any URL (e.g. wikipedia.org)..."
+        placeholder="Search the web or enter a URL..."
         autocomplete="off"
         spellcheck="false"
       />
-      <button type="submit" class="omnibox-go-btn">Go</button>
+      <span class="material-symbols-sharp omnibox-icon">language</span>
+      <div class="omnibox-actions">
+        <button type="submit" class="omnibox-go-btn">
+          <span>Go</span>
+          <span class="material-symbols-sharp" style="font-size: 14px;">arrow_forward</span>
+        </button>
+      </div>
     </form>
 
-    <button class="nav-icon-btn" onclick="popOutCurrent()" title="Open in New Tab">
-      <span class="material-symbols-sharp">open_in_new</span>
+    <button class="tb-squircle-btn icon-only" onclick="popOutCurrent()" title="Open in New Tab">
+      <span class="material-symbols-sharp accent-icon" style="font-size: 18px;">open_in_new</span>
     </button>
   </header>
 
@@ -477,23 +483,34 @@
   <!-- Main Workspace -->
   <div class="web-main">
     <div class="newtab-screen" id="newtabScreen">
-      <div class="newtab-card">
-        <h1 class="newtab-title">Trashbin Web</h1>
+      <div id="search-block">
+        <div id="large-logo-wrapper" onclick="document.getElementById('heroSearchInput').focus()">
+          <div class="logo-row">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="40" height="40">
+              <path d="M15 16h4v2h-4zm0-8h7v2h-7zm0 4h6v2h-6zM3 18c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V8H3v10zm2-8h6v8H5v-8zm5-6H6L5 5H2v2h12V5h-3z"/>
+            </svg>
+            <h1 class="logo-title">Trashbin Web</h1>
+          </div>
+        </div>
 
-        <form class="hero-search-form" id="heroSearchForm">
-          <span class="material-symbols-sharp" style="color: var(--text-muted);">travel_explore</span>
+        <form class="search-pill-wrapper" id="heroSearchForm">
           <input
             type="text"
             id="heroSearchInput"
-            class="hero-search-input"
             placeholder="Search the web or type a URL..."
             autocomplete="off"
             spellcheck="false"
           />
-          <button type="submit" class="hero-search-btn">
-            <span>Browse</span>
-            <span class="material-symbols-sharp" style="font-size: 17px;">arrow_forward</span>
-          </button>
+          <span class="material-symbols-sharp search-pill-icon">search</span>
+          <div class="search-right-actions">
+            <button type="button" id="clearHeroBtn" class="clear-search-btn" onclick="clearHeroSearch()" title="Clear">
+              <span class="material-symbols-sharp" style="font-size: 16px;">close</span>
+            </button>
+            <button type="submit" class="search-browse-btn">
+              <span class="material-symbols-sharp" style="font-size: 16px;">travel_explore</span>
+              <span>Search</span>
+            </button>
+          </div>
         </form>
       </div>
     </div>
@@ -502,11 +519,77 @@
   </div>
 
   <script>
+    // Theme Syncing with Trashbin Home
+    const TRASHBIN_TINTS = [
+      { id: "christmas", color: "#ef4444", color2: "#22c55e", light: "#fca5a5", subtle: "rgba(239, 68, 68, 0.14)", badgeBg: "rgba(239, 68, 68, 0.24)", border: "rgba(239, 68, 68, 0.35)", glow: "rgba(239, 68, 68, 0.45)" },
+      { id: "winter", color: "#60a5fa", color2: "#f1f5f9", light: "#dbeafe", subtle: "rgba(96, 165, 250, 0.14)", badgeBg: "rgba(96, 165, 250, 0.24)", border: "rgba(96, 165, 250, 0.38)", glow: "rgba(147, 197, 253, 0.5)" },
+      { id: "green", color: "#00ff88", light: "#a7f3d0", subtle: "rgba(0, 255, 136, 0.12)", badgeBg: "rgba(0, 255, 136, 0.22)", border: "rgba(0, 255, 136, 0.35)", glow: "rgba(0, 255, 136, 0.45)" },
+      { id: "cyan", color: "#00f0ff", light: "#bae6fd", subtle: "rgba(0, 240, 255, 0.12)", badgeBg: "rgba(0, 240, 255, 0.22)", border: "rgba(0, 240, 255, 0.35)", glow: "rgba(0, 240, 255, 0.45)" },
+      { id: "blue", color: "#38bdf8", light: "#bae6fd", subtle: "rgba(56, 189, 248, 0.12)", badgeBg: "rgba(56, 189, 248, 0.22)", border: "rgba(56, 189, 248, 0.35)", glow: "rgba(56, 189, 248, 0.45)" },
+      { id: "purple", color: "#c084fc", light: "#e9d5ff", subtle: "rgba(192, 132, 252, 0.14)", badgeBg: "rgba(192, 132, 252, 0.24)", border: "rgba(192, 132, 252, 0.35)", glow: "rgba(192, 132, 252, 0.45)" },
+      { id: "pink", color: "#ff2a85", light: "#fbcfe8", subtle: "rgba(255, 42, 133, 0.14)", badgeBg: "rgba(255, 42, 133, 0.24)", border: "rgba(255, 42, 133, 0.35)", glow: "rgba(255, 42, 133, 0.45)" },
+      { id: "amber", color: "#fbbf24", light: "#fef08a", subtle: "rgba(251, 191, 36, 0.14)", badgeBg: "rgba(251, 191, 36, 0.24)", border: "rgba(251, 191, 36, 0.35)", glow: "rgba(251, 191, 36, 0.45)" },
+      { id: "red", color: "#ff3b30", light: "#fecaca", subtle: "rgba(255, 59, 48, 0.14)", badgeBg: "rgba(255, 59, 48, 0.24)", border: "rgba(255, 59, 48, 0.35)", glow: "rgba(255, 59, 48, 0.45)" },
+      { id: "white", color: "#ffffff", light: "#f4f4f5", subtle: "rgba(255, 255, 255, 0.08)", badgeBg: "rgba(255, 255, 255, 0.16)", border: "rgba(255, 255, 255, 0.28)", glow: "rgba(255, 255, 255, 0.35)" },
+      { id: "orange", color: "#ff7b00", light: "#fed7aa", subtle: "rgba(255, 123, 0, 0.14)", badgeBg: "rgba(255, 123, 0, 0.24)", border: "rgba(255, 123, 0, 0.35)", glow: "rgba(255, 123, 0, 0.45)" },
+      { id: "lime", color: "#84cc16", light: "#d9f99d", subtle: "rgba(132, 204, 22, 0.14)", badgeBg: "rgba(132, 204, 22, 0.24)", border: "rgba(132, 204, 22, 0.35)", glow: "rgba(132, 204, 22, 0.45)" },
+      { id: "violet", color: "#8b5cf6", light: "#ddd6fe", subtle: "rgba(139, 92, 246, 0.14)", badgeBg: "rgba(139, 92, 246, 0.24)", border: "rgba(139, 92, 246, 0.35)", glow: "rgba(139, 92, 246, 0.45)" },
+      { id: "rose", color: "#f43f5e", light: "#fecdd3", subtle: "rgba(244, 63, 94, 0.14)", badgeBg: "rgba(244, 63, 94, 0.24)", border: "rgba(244, 63, 94, 0.35)", glow: "rgba(244, 63, 94, 0.45)" },
+      { id: "teal", color: "#14b8a6", light: "#99f6e4", subtle: "rgba(20, 184, 166, 0.14)", badgeBg: "rgba(20, 184, 166, 0.24)", border: "rgba(20, 184, 166, 0.35)", glow: "rgba(20, 184, 166, 0.45)" },
+      { id: "yellow", color: "#eab308", light: "#fef08a", subtle: "rgba(234, 179, 8, 0.14)", badgeBg: "rgba(234, 179, 8, 0.24)", border: "rgba(234, 179, 8, 0.35)", glow: "rgba(234, 179, 8, 0.45)" },
+      { id: "indigo", color: "#6366f1", light: "#c7d2fe", subtle: "rgba(99, 102, 241, 0.14)", badgeBg: "rgba(99, 102, 241, 0.24)", border: "rgba(99, 102, 241, 0.35)", glow: "rgba(99, 102, 241, 0.45)" },
+      { id: "cyberpunk", color: "#ffe600", color2: "#00f0ff", light: "#fef08a", subtle: "rgba(255, 230, 0, 0.14)", badgeBg: "rgba(255, 230, 0, 0.24)", border: "rgba(255, 230, 0, 0.35)", glow: "rgba(255, 230, 0, 0.45)" },
+      { id: "sunset", color: "#ff5e36", color2: "#d946ef", light: "#fbcfe8", subtle: "rgba(255, 94, 54, 0.14)", badgeBg: "rgba(255, 94, 54, 0.24)", border: "rgba(255, 94, 54, 0.35)", glow: "rgba(255, 94, 54, 0.45)" },
+      { id: "fireice", color: "#38bdf8", color2: "#ff3b30", light: "#bae6fd", subtle: "rgba(56, 189, 248, 0.14)", badgeBg: "rgba(56, 189, 248, 0.24)", border: "rgba(56, 189, 248, 0.35)", glow: "rgba(56, 189, 248, 0.45)" },
+      { id: "aurora", color: "#00ff88", color2: "#a855f7", light: "#a7f3d0", subtle: "rgba(0, 255, 136, 0.14)", badgeBg: "rgba(0, 255, 136, 0.24)", border: "rgba(0, 255, 136, 0.35)", glow: "rgba(0, 255, 136, 0.45)" },
+      { id: "bubblegum", color: "#f472b6", color2: "#38bdf8", light: "#fbcfe8", subtle: "rgba(244, 114, 182, 0.14)", badgeBg: "rgba(244, 114, 182, 0.24)", border: "rgba(244, 114, 182, 0.35)", glow: "rgba(244, 114, 182, 0.45)" },
+      { id: "midnight", color: "#6366f1", color2: "#eab308", light: "#c7d2fe", subtle: "rgba(99, 102, 241, 0.14)", badgeBg: "rgba(99, 102, 241, 0.24)", border: "rgba(99, 102, 241, 0.35)", glow: "rgba(99, 102, 241, 0.45)" },
+      { id: "toxic", color: "#a3e635", color2: "#06b6d4", light: "#d9f99d", subtle: "rgba(163, 230, 53, 0.14)", badgeBg: "rgba(163, 230, 53, 0.24)", border: "rgba(163, 230, 53, 0.35)", glow: "rgba(163, 230, 53, 0.45)" },
+      { id: "matrix", color: "#15803d", color2: "#22c55e", light: "#86efac", subtle: "rgba(34, 197, 94, 0.14)", badgeBg: "rgba(34, 197, 94, 0.24)", border: "rgba(34, 197, 94, 0.35)", glow: "rgba(34, 197, 94, 0.45)" }
+    ];
+
+    function syncThemeFromTrashbin() {
+      let tint = null;
+      try {
+        if (window.parent && window.parent !== window && window.parent.__currentTint) {
+          tint = window.parent.__currentTint;
+        }
+      } catch (e) {}
+      if (!tint) {
+        let savedId = "christmas";
+        try { savedId = localStorage.getItem("trashbin_theme_tint") || "christmas"; } catch (e) {}
+        tint = TRASHBIN_TINTS.find(t => t.id === savedId) || TRASHBIN_TINTS[0];
+      }
+      const root = document.documentElement.style;
+      root.setProperty("--accent", tint.color);
+      root.setProperty("--accent-light", tint.light || tint.color);
+      root.setProperty("--accent-subtle", tint.subtle || (tint.color + "22"));
+      root.setProperty("--accent-badge-bg", tint.badgeBg || (tint.color + "33"));
+      root.setProperty("--accent-border", tint.border || (tint.color + "55"));
+      root.setProperty("--border-focus", tint.color);
+      root.setProperty("--accent-glow", tint.glow || (tint.color + "66"));
+      if (tint.color2) {
+        const c2 = tint.color2;
+        root.setProperty("--bg-base", `color-mix(in srgb, ${c2} 7%, #09090b)`);
+        root.setProperty("--bg-surface", `color-mix(in srgb, ${c2} 10%, #121215)`);
+        root.setProperty("--bg-card", `color-mix(in srgb, ${c2} 14%, #18181b)`);
+        root.setProperty("--bg-card-hover", `color-mix(in srgb, ${c2} 20%, #222226)`);
+        root.setProperty("--border", `color-mix(in srgb, ${c2} 35%, #27272a)`);
+      } else {
+        ["--bg-base", "--bg-surface", "--bg-card", "--bg-card-hover", "--border"].forEach(k => root.removeProperty(k));
+      }
+    }
+    syncThemeFromTrashbin();
+    window.addEventListener("storage", (e) => {
+      if (!e.key || e.key === "trashbin_theme_tint") syncThemeFromTrashbin();
+    });
+
     const OHIO_DOMAIN = "https://ohio-notes.broshan.com.np";
     const EDGE_DOMAIN = "https://trashbin-web.yolkmusic.workers.dev";
 
     const omniboxInput = document.getElementById("omniboxInput");
     const heroSearchInput = document.getElementById("heroSearchInput");
+    const clearHeroBtn = document.getElementById("clearHeroBtn");
     const newtabScreen = document.getElementById("newtabScreen");
     const viewport = document.getElementById("webViewport");
     const loadingBar = document.getElementById("loadingBar");
@@ -516,7 +599,16 @@
     let currentTargetUrl = "";
     let ohioReachable = null;
     let cfReachable = null;
-    let gasBridgeAvailable = false;
+
+    heroSearchInput.addEventListener("input", () => {
+      clearHeroBtn.style.display = heroSearchInput.value.length > 0 ? "flex" : "none";
+    });
+
+    function clearHeroSearch() {
+      heroSearchInput.value = "";
+      clearHeroBtn.style.display = "none";
+      heroSearchInput.focus();
+    }
 
     function returnToMainHome() {
       if (window.parent && window.parent !== window && typeof window.parent.closePlayer === "function") {
@@ -545,22 +637,7 @@
       document.getElementById("btnForward").disabled = navIndex >= navHistory.length - 1;
     }
 
-    function checkGasBridge() {
-      try {
-        if (window.__TRASHBIN_GAS_LAUNCHER__ || (window.parent && window.parent.__TRASHBIN_GAS_LAUNCHER__) || (window.top && window.top.__TRASHBIN_GAS_LAUNCHER__)) {
-          gasBridgeAvailable = true;
-          return true;
-        }
-        if (window.top && window.top.opener) {
-          gasBridgeAvailable = true;
-          return true;
-        }
-      } catch (e) {}
-      return false;
-    }
-
     async function probeNodes() {
-      checkGasBridge();
       const checkUrl = async (url) => {
         try {
           const ctrl = new AbortController();
@@ -665,7 +742,7 @@
               if (data2 && data2.body) return resolve(data2);
             }
           } catch (e2) {}
-          reject(new Error(sentToOpener ? "Docs Reader timed out" : "Launch via Google Apps Script to use Docs Reader when offline from Edge nodes."));
+          reject(new Error("Could not connect to web reader."));
         }, sentToOpener ? 9000 : 100);
       });
     }
@@ -677,6 +754,7 @@
       currentTargetUrl = target;
       omniboxInput.value = target;
       heroSearchInput.value = target;
+      clearHeroBtn.style.display = target.length > 0 ? "flex" : "none";
 
       if (pushHistory) {
         navHistory = navHistory.slice(0, navIndex + 1);
@@ -720,10 +798,6 @@
       }
     }
 
-    function launchUrl(u) {
-      navigateWeb(u, true);
-    }
-
     function showNewTab() {
       viewport.style.display = "none";
       viewport.removeAttribute("src");
@@ -731,6 +805,8 @@
       newtabScreen.style.display = "flex";
       currentTargetUrl = "";
       omniboxInput.value = "";
+      heroSearchInput.value = "";
+      clearHeroBtn.style.display = "none";
       setLoading(false);
     }
 
@@ -757,7 +833,7 @@
     }
 
     function popOutCurrent() {
-      const target = currentTargetUrl || normalizeTargetUrl(omniboxInput.value) || "https://duckduckgo.com";
+      const target = currentTargetUrl || normalizeTargetUrl(omniboxInput.value) || normalizeTargetUrl(heroSearchInput.value) || "https://duckduckgo.com";
       const win = window.open("about:blank", "_blank");
       if (!win) return;
       const chosenEngine = getAutoEngine();
