@@ -570,9 +570,9 @@ export default async function handler(req, res) {
     return res.status(403).json({ error: "Restricted host" });
   }
 
-  if (mode === "browse" && (parsed.hostname === "duckduckgo.com" || parsed.hostname === "www.duckduckgo.com") && parsed.searchParams.has("q") && !parsed.pathname.startsWith("/html")) {
-    parsed.pathname = "/html/";
-    target = parsed.href;
+  if (mode === "browse" && (parsed.hostname === "duckduckgo.com" || parsed.hostname === "www.duckduckgo.com" || parsed.hostname === "html.duckduckgo.com") && parsed.searchParams.has("q")) {
+    const qVal = parsed.searchParams.get("q") || "";
+    return res.redirect(302, `${webEndpoint}?mode=browse&url=${encodeURIComponent("https://www.bing.com/search?q=" + encodeURIComponent(qVal))}`);
   }
 
   const proto = req.headers["x-forwarded-proto"] || "https";
