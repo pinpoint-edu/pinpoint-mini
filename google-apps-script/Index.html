@@ -377,7 +377,7 @@
       <div class="select-wrapper">
         <select id="mirrorSelect" class="launcher-select">
           <option value="https://cdn.jsdelivr.net">cdn.jsdelivr.net (Default Anycast)</option>
-          <option value="https://ohio-notes.broshan.com.np">ohio-notes.broshan.com.np (Direct Domain + Proxy)</option>
+          <option value="https://ohio-notes.broshan.com.np">ohio-notes.broshan.com.np (Direct Domain + Web)</option>
           <option value="https://fastly.jsdelivr.net">fastly.jsdelivr.net (Fastly Edge)</option>
           <option value="https://testingcf.jsdelivr.net">testingcf.jsdelivr.net (Cloudflare Edge)</option>
           <option value="https://gcore.jsdelivr.net">gcore.jsdelivr.net (GCore Edge)</option>
@@ -584,14 +584,14 @@
       return `/gh/pinpoint-edu/pinpoint-mini@${v}/index.html`;
     }
 
-    // Relay stealth proxy requests from the cloaked about:blank tab to Google Apps Script UrlFetchApp
+    // Relay web reader requests from the tab to Google Apps Script UrlFetchApp
     window.addEventListener("message", (event) => {
       const data = event.data;
-      if (!data || data.type !== "TB_GAS_PROXY_FETCH" || !data.reqId || !data.url) return;
+      if (!data || data.type !== "TB_WEB_FETCH" || !data.reqId || !data.url) return;
       const reply = (payload) => {
         try {
           if (event.source) {
-            event.source.postMessage({ type: "TB_GAS_PROXY_RESULT", reqId: data.reqId, result: payload }, "*");
+            event.source.postMessage({ type: "TB_WEB_RESULT", reqId: data.reqId, result: payload }, "*");
           }
         } catch (e) {}
       };
@@ -599,12 +599,12 @@
         google.script.run
           .withSuccessHandler((res) => reply(res))
           .withFailureHandler((err) => reply({ ok: false, status: 502, error: err && err.message ? err.message : String(err) }))
-          .proxyFetchUrl(data.url);
+          .fetchWebResource(data.url);
       } else {
-        fetch("https://ohio-notes.broshan.com.np/api/proxy?format=json&url=" + encodeURIComponent(data.url))
+        fetch("https://ohio-notes.broshan.com.np/api/web?format=json&url=" + encodeURIComponent(data.url))
           .then((r) => r.json())
           .then((res) => reply(res))
-          .catch((err) => reply({ ok: false, status: 502, error: err.message || "GAS relay unavailable" }));
+          .catch((err) => reply({ ok: false, status: 502, error: err.message || "Reader unavailable" }));
       }
     });
 
@@ -627,7 +627,7 @@
 
         let htmlContent = await response.text();
 
-        // 3. Inject base href and GAS relay marker so all games, assets, and stealth proxy resolve correctly
+        // 3. Inject base href and launcher marker so all games, assets, and reader resolve correctly
         const basePath = targetPath.substring(0, targetPath.lastIndexOf('/') + 1);
         const baseTag = '<base href="' + selectedMirror + basePath + '"><script>window.__TRASHBIN_GAS_LAUNCHER__=true;</' + 'script>';
         htmlContent = htmlContent.includes('<head>')

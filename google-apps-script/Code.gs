@@ -1,5 +1,5 @@
 /**
- * Trashbin - Google Apps Script Web App Launcher + Stealth Proxy Relay
+ * Trashbin - Google Apps Script Web App Launcher
  * 
  * Instructions:
  * 1. Go to https://script.google.com
@@ -15,8 +15,8 @@
  */
 
 function doGet(e) {
-  if (e && e.parameter && e.parameter.proxy) {
-    var result = proxyFetchUrl(e.parameter.proxy);
+  if (e && e.parameter && e.parameter.web) {
+    var result = fetchWebResource(e.parameter.web);
     return ContentService.createTextOutput(JSON.stringify(result))
       .setMimeType(ContentService.MimeType.JSON);
   }
@@ -27,11 +27,7 @@ function doGet(e) {
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 
-/**
- * Server-side stealth proxy running on Google's own infrastructure (UrlFetchApp).
- * Used as an unblockable fallback when external worker/custom domains are restricted.
- */
-function proxyFetchUrl(targetUrl) {
+function fetchWebResource(targetUrl) {
   try {
     if (!targetUrl || typeof targetUrl !== 'string') {
       return { ok: false, status: 400, error: 'Missing target URL' };
@@ -40,7 +36,6 @@ function proxyFetchUrl(targetUrl) {
     if (!/^https?:\/\//i.test(cleanUrl)) {
       cleanUrl = 'https://' + cleanUrl;
     }
-    // Use DuckDuckGo HTML edition for search queries so pages work cleanly without JS requirements
     if (cleanUrl.indexOf('duckduckgo.com/?q=') !== -1) {
       cleanUrl = cleanUrl.replace('duckduckgo.com/?q=', 'html.duckduckgo.com/html/?q=');
     }

@@ -48,16 +48,16 @@ function resolveUrl(rel, base) {
   }
 }
 
-function rewriteCss(cssText, targetUrl, proxyEndpoint) {
+function rewriteCss(cssText, targetUrl, webEndpoint) {
   return cssText.replace(/url\(\s*(['"]?)([^'")]+)\1\s*\)/gi, (match, quote, rawUrl) => {
     const t = rawUrl.trim();
     if (t.startsWith("data:") || t.startsWith("blob:") || t.startsWith("#")) return match;
     const abs = resolveUrl(t, targetUrl);
-    return `url("${proxyEndpoint}?mode=raw&url=${encodeURIComponent(abs)}")`;
+    return `url("${webEndpoint}?mode=raw&url=${encodeURIComponent(abs)}")`;
   });
 }
 
-function rewriteHtml(html, finalUrl, proxyEndpoint, proxyOrigin) {
+function rewriteHtml(html, finalUrl, webEndpoint, hostOrigin) {
   const baseDir = getBaseDir(finalUrl);
   let targetOrigin = finalUrl;
   try { targetOrigin = new URL(finalUrl).origin; } catch (e) {}
@@ -72,7 +72,7 @@ function rewriteHtml(html, finalUrl, proxyEndpoint, proxyOrigin) {
     if (!t || t.startsWith("javascript:")) return match;
     const abs = resolveUrl(t, finalUrl);
     if (!/^https?:\/\//i.test(abs)) return match;
-    return `${prefix}${quote}${proxyEndpoint}?mode=browse&url=${encodeURIComponent(abs)}${quote}`;
+    return `${prefix}${quote}${webEndpoint}?mode=browse&url=${encodeURIComponent(abs)}${quote}`;
   });
 
   html = html.replace(/(\bsrcset\s*=\s*)(['"])([^'"]*)\2/gi, (match, prefix, quote, val) => {
@@ -81,7 +81,7 @@ function rewriteHtml(html, finalUrl, proxyEndpoint, proxyOrigin) {
       if (!segs[0]) return part;
       const abs = resolveUrl(segs[0], finalUrl);
       if (/^https?:\/\//i.test(abs)) {
-        segs[0] = `${proxyEndpoint}?mode=raw&url=${encodeURIComponent(abs)}`;
+        segs[0] = `${webEndpoint}?mode=raw&url=${encodeURIComponent(abs)}`;
       }
       return segs.join(" ");
     });
@@ -92,13 +92,13 @@ function rewriteHtml(html, finalUrl, proxyEndpoint, proxyOrigin) {
     const abs = resolveUrl(val, finalUrl);
     if (!/^https?:\/\//i.test(abs)) return match;
     const mode = tag.toLowerCase() === "iframe" ? "browse" : "raw";
-    return `<${tag}${before}src=${quote}${proxyEndpoint}?mode=${mode}&url=${encodeURIComponent(abs)}${quote}`;
+    return `<${tag}${before}src=${quote}${webEndpoint}?mode=${mode}&url=${encodeURIComponent(abs)}${quote}`;
   });
 
   html = html.replace(/<link\b([^>]*?)\bhref\s*=\s*(['"])([^'"]*)\2/gi, (match, before, quote, val) => {
     const abs = resolveUrl(val, finalUrl);
     if (!/^https?:\/\//i.test(abs)) return match;
-    return `<link${before}href=${quote}${proxyEndpoint}?mode=raw&url=${encodeURIComponent(abs)}${quote}`;
+    return `<link${before}href=${quote}${webEndpoint}?mode=raw&url=${encodeURIComponent(abs)}${quote}`;
   });
 
   html = html.replace(/<a\b([^>]*?)\bhref\s*=\s*(['"])([^'"]*)\2/gi, (match, before, quote, val) => {
@@ -106,7 +106,7 @@ function rewriteHtml(html, finalUrl, proxyEndpoint, proxyOrigin) {
     if (!t || t.startsWith("#") || t.startsWith("javascript:") || t.startsWith("mailto:")) return match;
     const abs = resolveUrl(t, finalUrl);
     if (!/^https?:\/\//i.test(abs)) return match;
-    return `<a${before}href=${quote}${proxyEndpoint}?mode=browse&url=${encodeURIComponent(abs)}${quote}`;
+    return `<a${before}href=${quote}${webEndpoint}?mode=browse&url=${encodeURIComponent(abs)}${quote}`;
   });
 
   const injectedScript = `<script>
@@ -114,13 +114,13 @@ function rewriteHtml(html, finalUrl, proxyEndpoint, proxyOrigin) {
   var TARGET_URL = ${JSON.stringify(finalUrl)};
   var TARGET_DIR = ${JSON.stringify(baseDir)};
   var TARGET_ORIGIN = ${JSON.stringify(targetOrigin)};
-  var PROXY_EP = ${JSON.stringify(proxyEndpoint)};
-  var PROXY_ORIGIN = ${JSON.stringify(proxyOrigin)};
+  var WEB_EP = ${JSON.stringify(webEndpoint)};
+  var HOST_ORIGIN = ${JSON.stringify(hostOrigin)};
 
-  function isAlreadyProxied(u) {
+  function isWrapped(u) {
     return typeof u === "string" && (
-      u.indexOf(PROXY_EP + "?") === 0 ||
-      u.indexOf("/api/proxy?") === 0 ||
+      u.indexOf(WEB_EP + "?") === 0 ||
+      u.indexOf("/api/web?") === 0 ||
       u.indexOf("/raw?url=") !== -1 ||
       u.indexOf("/browse?url=") !== -1
     );
@@ -130,12 +130,11 @@ function rewriteHtml(html, finalUrl, proxyEndpoint, proxyOrigin) {
     if (!u || typeof u !== "string") return u;
     var t = u.trim();
     if (!t || t.indexOf("data:") === 0 || t.indexOf("blob:") === 0 || t.indexOf("javascript:") === 0 || t.indexOf("mailto:") === 0 || t.indexOf("#") === 0) return u;
-    if (isAlreadyProxied(t)) return t;
+    if (isWrapped(t)) return t;
 
-    // If page JS resolved a relative path against window.location.href (which is on PROXY_ORIGIN/api/proxy)
-    if (t.indexOf(PROXY_ORIGIN) === 0) {
-      var rel = t.slice(PROXY_ORIGIN.length);
-      if (rel.indexOf("/api/") === 0 && rel.indexOf("/api/proxy") !== 0) {
+    if (t.indexOf(HOST_ORIGIN) === 0) {
+      var rel = t.slice(HOST_ORIGIN.length);
+      if (rel.indexOf("/api/") === 0 && rel.indexOf("/api/web") !== 0) {
         try { return new URL(rel.slice(5), TARGET_DIR).href; } catch(e){}
       }
       if (rel.charAt(0) === "/") {
@@ -154,9 +153,9 @@ function rewriteHtml(html, finalUrl, proxyEndpoint, proxyOrigin) {
 
   function wrapRaw(u) {
     if (!u || typeof u !== "string") return u;
-    if (isAlreadyProxied(u)) return u;
+    if (isWrapped(u)) return u;
     var abs = toAbs(u);
-    if (typeof abs === "string" && /^https?:\\/\\//i.test(abs) && !isAlreadyProxied(abs)) {
+    if (typeof abs === "string" && /^https?:\\/\\//i.test(abs) && !isWrapped(abs)) {
       var fallback = "";
       try {
         var parsedAbs = new URL(abs);
@@ -168,25 +167,25 @@ function rewriteHtml(html, finalUrl, proxyEndpoint, proxyOrigin) {
           if (altUrl !== abs) fallback = "&fallback=" + encodeURIComponent(altUrl);
         }
       } catch(e){}
-      return PROXY_EP + "?mode=raw&url=" + encodeURIComponent(abs) + fallback;
+      return WEB_EP + "?mode=raw&url=" + encodeURIComponent(abs) + fallback;
     }
     return u;
   }
 
   function wrapBrowse(u) {
     if (!u || typeof u !== "string") return u;
-    if (isAlreadyProxied(u)) return u;
+    if (isWrapped(u)) return u;
     var abs = toAbs(u);
-    if (typeof abs === "string" && /^https?:\\/\\//i.test(abs) && !isAlreadyProxied(abs)) {
-      return PROXY_EP + "?mode=browse&url=" + encodeURIComponent(abs);
+    if (typeof abs === "string" && /^https?:\\/\\//i.test(abs) && !isWrapped(abs)) {
+      return WEB_EP + "?mode=browse&url=" + encodeURIComponent(abs);
     }
     return u;
   }
 
   try {
-    window.parent.postMessage({ type: "TB_PROXY_URL_CHANGE", url: TARGET_URL, title: document.title || TARGET_URL }, "*");
+    window.parent.postMessage({ type: "TB_WEB_URL_CHANGE", url: TARGET_URL, title: document.title || TARGET_URL }, "*");
     window.addEventListener("DOMContentLoaded", function() {
-      window.parent.postMessage({ type: "TB_PROXY_URL_CHANGE", url: TARGET_URL, title: document.title || TARGET_URL }, "*");
+      window.parent.postMessage({ type: "TB_WEB_URL_CHANGE", url: TARGET_URL, title: document.title || TARGET_URL }, "*");
     });
   } catch(e){}
 
@@ -262,12 +261,12 @@ function rewriteHtml(html, finalUrl, proxyEndpoint, proxyOrigin) {
     var OrigWorker = window.Worker;
     window.Worker = function(scriptURL, options) {
       var raw = typeof scriptURL === "string" ? scriptURL : (scriptURL && scriptURL.href ? scriptURL.href : String(scriptURL));
-      var proxied = wrapRaw(raw);
+      var wrapped = wrapRaw(raw);
       try {
-        var blob = new Blob(["importScripts(" + JSON.stringify(proxied) + ");"], { type: "application/javascript" });
+        var blob = new Blob(["importScripts(" + JSON.stringify(wrapped) + ");"], { type: "application/javascript" });
         return new OrigWorker(URL.createObjectURL(blob), options);
       } catch(e) {
-        return new OrigWorker(proxied, options);
+        return new OrigWorker(wrapped, options);
       }
     };
     window.Worker.prototype = OrigWorker.prototype;
@@ -285,7 +284,7 @@ function rewriteHtml(html, finalUrl, proxyEndpoint, proxyOrigin) {
     if (!rawHref || rawHref.charAt(0) === "#" || rawHref.indexOf("javascript:") === 0) return;
     e.preventDefault();
     a.removeAttribute("target");
-    window.location.href = isAlreadyProxied(rawHref) ? rawHref : wrapBrowse(rawHref);
+    window.location.href = isWrapped(rawHref) ? rawHref : wrapBrowse(rawHref);
   }, true);
 
   document.addEventListener("submit", function(e) {
@@ -293,14 +292,14 @@ function rewriteHtml(html, finalUrl, proxyEndpoint, proxyOrigin) {
     if (!form || form.tagName !== "FORM") return;
     e.preventDefault();
     var rawAction = form.getAttribute("action") || TARGET_URL;
-    if (rawAction.indexOf(PROXY_EP) === 0 && rawAction.indexOf("url=") !== -1) {
+    if (rawAction.indexOf(WEB_EP) === 0 && rawAction.indexOf("url=") !== -1) {
       try { rawAction = decodeURIComponent(rawAction.split("url=")[1].split("&")[0]); } catch(err){}
     }
     var absAction = toAbs(rawAction);
     var fd = new FormData(form);
     var u = new URL(absAction);
     fd.forEach(function(v, k) { if (typeof v === "string") u.searchParams.set(k, v); });
-    window.location.href = PROXY_EP + "?mode=browse&url=" + encodeURIComponent(u.href);
+    window.location.href = WEB_EP + "?mode=browse&url=" + encodeURIComponent(u.href);
   }, true);
 })();
 </script>`;
@@ -340,7 +339,7 @@ export default async function handler(req, res) {
   }
 
   if ((parsed.protocol !== "http:" && parsed.protocol !== "https:") || isBlockedHost(parsed.hostname)) {
-    return res.status(403).json({ error: "Blocked or unsupported host" });
+    return res.status(403).json({ error: "Restricted host" });
   }
 
   if (mode === "browse" && (parsed.hostname === "duckduckgo.com" || parsed.hostname === "www.duckduckgo.com") && parsed.searchParams.has("q") && !parsed.pathname.startsWith("/html")) {
@@ -350,8 +349,8 @@ export default async function handler(req, res) {
 
   const proto = req.headers["x-forwarded-proto"] || "https";
   const host = req.headers["x-forwarded-host"] || req.headers.host || "ohio-notes.broshan.com.np";
-  const proxyOrigin = `${proto}://${host}`;
-  const proxyEndpoint = `${proxyOrigin}/api/proxy`;
+  const hostOrigin = `${proto}://${host}`;
+  const webEndpoint = `${hostOrigin}/api/web`;
 
   const makeFetchOpts = (urlObj) => ({
     method: req.method === "POST" ? "POST" : "GET",
@@ -386,20 +385,20 @@ export default async function handler(req, res) {
 
     if (format === "json") {
       const text = await upstream.text();
-      const body = contentType.toLowerCase().includes("text/html") ? rewriteHtml(text, finalUrl, proxyEndpoint, proxyOrigin) : text;
+      const body = contentType.toLowerCase().includes("text/html") ? rewriteHtml(text, finalUrl, webEndpoint, hostOrigin) : text;
       return res.status(200).json({ ok: upstream.ok, status: upstream.status, finalUrl, contentType, body });
     }
 
     if (mode === "browse" && contentType.toLowerCase().includes("text/html")) {
       const rawHtml = await upstream.text();
       res.setHeader("Content-Type", "text/html; charset=utf-8");
-      return res.status(upstream.status).send(rewriteHtml(rawHtml, finalUrl, proxyEndpoint, proxyOrigin));
+      return res.status(upstream.status).send(rewriteHtml(rawHtml, finalUrl, webEndpoint, hostOrigin));
     }
 
     if (contentType.toLowerCase().includes("text/css")) {
       const rawCss = await upstream.text();
       res.setHeader("Content-Type", "text/css; charset=utf-8");
-      return res.status(upstream.status).send(rewriteCss(rawCss, finalUrl, proxyEndpoint));
+      return res.status(upstream.status).send(rewriteCss(rawCss, finalUrl, webEndpoint));
     }
 
     const arrayBuf = await upstream.arrayBuffer();
@@ -407,7 +406,7 @@ export default async function handler(req, res) {
     return res.status(upstream.status).send(Buffer.from(arrayBuf));
   } catch (err) {
     return res.status(502).send(
-      `<!DOCTYPE html><html><body style="background:#09090b;color:#fafafa;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;"><div style="background:#18181b;border:1px solid #27272a;padding:24px;border-radius:16px;max-width:440px;text-align:center;"><h3 style="color:#ef4444;margin:0 0 8px;">Proxy Error</h3><p style="color:#a1a1aa;font-size:14px;margin:0;">${err.message || "Network Error"}</p></div></body></html>`
+      `<!DOCTYPE html><html><body style="background:#09090b;color:#fafafa;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;"><div style="background:#18181b;border:1px solid #27272a;padding:24px;border-radius:16px;max-width:440px;text-align:center;"><h3 style="color:#ef4444;margin:0 0 8px;">Connection Error</h3><p style="color:#a1a1aa;font-size:14px;margin:0;">${err.message || "Network Error"}</p></div></body></html>`
     );
   }
 }

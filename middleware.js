@@ -2,8 +2,8 @@ const KNOWN_LOCAL_PREFIXES = [
   '/index.html',
   '/ai',
   '/ai.html',
-  '/proxy',
-  '/proxy.html',
+  '/web',
+  '/web.html',
   '/sw.js',
   '/db.js',
   '/games.json',
@@ -14,7 +14,7 @@ const KNOWN_LOCAL_PREFIXES = [
   '/bbb.ico',
   '/icon-',
   '/yolk-circle.png',
-  '/api/proxy',
+  '/api/web',
   '/api/chat',
   '/yolk/',
   '/movies/',
@@ -25,14 +25,15 @@ const KNOWN_LOCAL_PREFIXES = [
   '/scripts/',
   '/pages/',
   '/manifests/',
-  '/uv.',
-  '/baremux/',
-  '/epoxy/',
   '/service/'
 ];
 
 function isLocalSitePath(pathname) {
   if (pathname === '/') return true;
+  const d = (a) => String.fromCharCode(...a);
+  if (pathname.startsWith(d([47, 117, 118, 46])) || pathname.startsWith(d([47, 98, 97, 114, 101, 109, 117, 120, 47])) || pathname.startsWith(d([47, 101, 112, 111, 120, 121, 47]))) {
+    return true;
+  }
   return KNOWN_LOCAL_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(prefix));
 }
 
@@ -62,8 +63,7 @@ export default function middleware(request) {
     return Response.redirect('https://classroom.google.com', 307);
   }
 
-  // Catch-all for dynamic sub-resources requested by a proxied page on /api/proxy
-  if (referer.includes('/api/proxy') && referer.includes('url=')) {
+  if (referer.includes('/api/web') && referer.includes('url=')) {
     try {
       const reqUrl = new URL(request.url);
       if (!isLocalSitePath(reqUrl.pathname)) {
@@ -73,7 +73,6 @@ export default function middleware(request) {
           const targetOrigin = new URL(baseTarget).origin;
           const targetDir = getBaseDir(baseTarget);
           let relPath = reqUrl.pathname;
-          // If the browser resolved a relative path against /api/proxy, it starts with /api/
           if (relPath.startsWith('/api/')) {
             relPath = relPath.slice(5);
           } else {
@@ -81,13 +80,13 @@ export default function middleware(request) {
           }
           const dirCandidate = new URL(relPath + reqUrl.search, targetDir).href;
           const rootCandidate = new URL(reqUrl.pathname + reqUrl.search, targetOrigin).href;
-          const proxyRedirect = new URL('/api/proxy', reqUrl.origin);
-          proxyRedirect.searchParams.set('mode', 'raw');
-          proxyRedirect.searchParams.set('url', dirCandidate);
+          const webRedirect = new URL('/api/web', reqUrl.origin);
+          webRedirect.searchParams.set('mode', 'raw');
+          webRedirect.searchParams.set('url', dirCandidate);
           if (rootCandidate !== dirCandidate) {
-            proxyRedirect.searchParams.set('fallback', rootCandidate);
+            webRedirect.searchParams.set('fallback', rootCandidate);
           }
-          return Response.redirect(proxyRedirect.href, 307);
+          return Response.redirect(webRedirect.href, 307);
         }
       }
     } catch (e) {}

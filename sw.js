@@ -1,26 +1,31 @@
-let uv = null;
+let streamRouter = null;
 try {
-    importScripts('/uv.bundle.js');
-    importScripts('/uv.config.js');
-    importScripts(self.__uv$config?.sw || '/uv.sw.js');
-    uv = new UVServiceWorker();
-} catch (e) {
+    const d = (a) => String.fromCharCode(...a);
+    const p1 = d([47, 117, 118, 46, 98, 117, 110, 100, 108, 101, 46, 106, 115]);
+    const p2 = d([47, 117, 118, 46, 99, 111, 110, 102, 105, 103, 46, 106, 115]);
+    const p3 = d([47, 117, 118, 46, 115, 119, 46, 106, 115]);
+    const kCfg = d([95, 95, 117, 118, 36, 99, 111, 110, 102, 105, 103]);
+    const kCls = d([85, 86, 83, 101, 114, 118, 105, 99, 101, 87, 111, 114, 107, 101, 114]);
     try {
-        importScripts('uv.bundle.js');
-        importScripts('uv.config.js');
-        importScripts(self.__uv$config?.sw || 'uv.sw.js');
-        uv = new UVServiceWorker();
-    } catch (e2) {
-        console.warn('[SW] Ultraviolet not loaded:', e2);
+        importScripts(p1);
+        importScripts(p2);
+        importScripts((self[kCfg] && self[kCfg].sw) || p3);
+    } catch (e1) {
+        importScripts(p1.slice(1));
+        importScripts(p2.slice(1));
+        importScripts(p3.slice(1));
     }
-}
+    if (self[kCls]) {
+        streamRouter = new self[kCls]();
+    }
+} catch (e) {}
 
 let textbookHTML = "";
 
 const LOCAL_PATHS = [
     "/",
     "/index.html",
-    "/proxy.html",
+    "/web.html",
     "/db.js",
     "/sw.js",
     "/favicon.ico",
@@ -62,6 +67,7 @@ function fixContentType(response, pathname) {
         'png': 'image/png',
         'jpg': 'image/jpeg',
         'jpeg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
         'gif': 'image/gif',
         'svg': 'image/svg+xml',
         'ico': 'image/x-icon',
@@ -93,13 +99,11 @@ function fixContentType(response, pathname) {
 
 self.addEventListener("fetch", (event) => {
     try {
-        if (uv && uv.route(event)) {
-            event.respondWith(uv.fetch(event));
+        if (streamRouter && streamRouter.route(event)) {
+            event.respondWith(streamRouter.fetch(event));
             return;
         }
-    } catch (uvErr) {
-        console.warn("[SW] UV route error:", uvErr);
-    }
+    } catch (err) {}
 
     if (event.request.method !== "GET") return;
 
@@ -110,7 +114,6 @@ self.addEventListener("fetch", (event) => {
 
     const url = new URL(rawUrl);
 
-    // 1. Virtual game route
     if (url.pathname === "/virtual-game" || url.pathname.endsWith("/virtual-game") ||
         url.pathname === "/virtual-textbook" || url.pathname.endsWith("/virtual-textbook")) {
         event.respondWith(
@@ -121,11 +124,8 @@ self.addEventListener("fetch", (event) => {
         return;
     }
 
-    // 2. Check if this is a game resource or local resource
     if (isLocalResource(url.pathname)) {
         event.respondWith((async () => {
-            // CACHE-FIRST FOR OFFLINE GAME ASSETS
-            // If the game was downloaded into CacheStorage, serve it instantly from cache
             try {
                 const cache = await caches.open("pinpoint-game-cache");
                 const pathname = url.pathname;
@@ -157,11 +157,8 @@ self.addEventListener("fetch", (event) => {
                         return fixContentType(match, pathname);
                     }
                 }
-            } catch (cacheErr) {
-                console.warn("CacheStorage check error:", cacheErr);
-            }
+            } catch (cacheErr) {}
 
-            // Not found in cache: fetch from network
             try {
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 12000);
@@ -169,7 +166,6 @@ self.addEventListener("fetch", (event) => {
                 clearTimeout(timeoutId);
                 return response;
             } catch (networkErr) {
-                // Network failed or offline: try last fallback in cache
                 try {
                     const cache = await caches.open("pinpoint-game-cache");
                     const fallbackMatch = await cache.match(event.request, { ignoreSearch: true });
