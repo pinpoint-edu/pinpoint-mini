@@ -1804,7 +1804,7 @@
 
                 <!-- 16:9 Player Frame -->
                 <div class="player-frame-wrap">
-                    <iframe id="moss-player-frame" allowfullscreen="true" allow="autoplay; fullscreen; picture-in-picture; encrypted-media; clipboard-write; web-share" referrerpolicy="no-referrer"></iframe>
+                    <iframe id="moss-player-frame" allowfullscreen="true" allow="autoplay; fullscreen; picture-in-picture; encrypted-media; clipboard-write; web-share"></iframe>
                 </div>
             </div>
 
@@ -1830,7 +1830,22 @@
     <!-- Moss Application Logic -->
     <script>
         const TMDB_KEY = "1cf50e6248dc270629e802686245c2c8";
-        const WORKER_PROXY = "https://moss-movies-proxy.yolkmusic.workers.dev/__cors_proxy__/";
+        const TMDB_GATEWAY = "https://moss-movies-proxy.yolkmusic.workers.dev/__cors_proxy__/";
+        const STREAM_GATEWAY_PRIMARY = "https://trashbin-web.yolkmusic.workers.dev/browse?embed=1&url=";
+        const STREAM_GATEWAY_FALLBACK = "https://ohio-notes.broshan.com.np/api/web?mode=browse&embed=1&url=";
+        let activeStreamGateway = STREAM_GATEWAY_PRIMARY;
+
+        (function initStreamGateway() {
+            const isCustomDomain = window.location.hostname && (
+                window.location.hostname.includes("broshan.com.np") ||
+                window.location.hostname.includes("vercel.app")
+            );
+            const fallbackEp = isCustomDomain ? "/api/web?mode=browse&embed=1&url=" : STREAM_GATEWAY_FALLBACK;
+            fetch("https://trashbin-web.yolkmusic.workers.dev/browse?url=" + encodeURIComponent("https://example.com") + "&format=json")
+                .then(r => { if (!r.ok) activeStreamGateway = fallbackEp; })
+                .catch(() => { activeStreamGateway = fallbackEp; });
+        })();
+
         const TMDB_BASE = "https://api.themoviedb.org/3";
         const IMG_W500 = "https://image.tmdb.org/t/p/w500";
         const IMG_W1280 = "https://image.tmdb.org/t/p/w1280";
@@ -1897,14 +1912,15 @@
             { id: 10765, name: "Sci-Fi & Fantasy" }
         ];
 
-        // API Fetch Helper with caching and Cloudflare proxy
+        // API Fetch Helper with caching and Cloudflare gateway
         async function fetchTMDB(endpoint, params = {}) {
             const queryParams = new URLSearchParams({
                 api_key: TMDB_KEY,
+                language: "en-US",
                 ...params
             });
             const directUrl = `${TMDB_BASE}${endpoint}?${queryParams.toString()}`;
-            const proxiedUrl = `${WORKER_PROXY}${directUrl}`;
+            const gatewayUrl = `${TMDB_GATEWAY}${directUrl}`;
 
             const cacheKey = "moss_cache_" + directUrl;
             try {
@@ -1913,7 +1929,7 @@
             } catch(e) {}
 
             try {
-                let res = await fetch(proxiedUrl);
+                let res = await fetch(gatewayUrl);
                 if (!res.ok) res = await fetch(directUrl);
                 const data = await res.json();
                 try {
@@ -2363,38 +2379,45 @@
             }
         }
 
-        // Watch View & Player Server URLs
+        // Watch View & Player Server URLs (All English-first & routed through Web gateway)
         function getPlayerUrl(serverNum, tmdbId, type, season = 1, episode = 1) {
             const isMovie = (type === 'movie');
             switch (String(serverNum)) {
                 case '1':
-                    // Server 1: 2Embed
+                    // Server 1: VidSrc SU (English Multi-Server)
                     return isMovie
-                        ? `https://www.2embed.cc/embed/${tmdbId}`
-                        : `https://www.2embed.cc/embedtv/${tmdbId}&s=${season}&e=${episode}`;
+                        ? `https://vidsrc.su/embed/movie/${tmdbId}`
+                        : `https://vidsrc.su/embed/tv/${tmdbId}/${season}/${episode}`;
                 case '2':
-                    // Server 2: VidLink
+                    // Server 2: VidLink Pro (English)
                     return isMovie
-                        ? `https://vidlink.pro/movie/${tmdbId}?primaryColor=22c55e`
-                        : `https://vidlink.pro/tv/${tmdbId}/${season}/${episode}?primaryColor=22c55e`;
+                        ? `https://vidlink.pro/movie/${tmdbId}?primaryColor=22c55e&autoplay=true`
+                        : `https://vidlink.pro/tv/${tmdbId}/${season}/${episode}?primaryColor=22c55e&autoplay=true`;
                 case '3':
-                    // Server 3: VidSrc
+                    // Server 3: VidNest (English)
                     return isMovie
-                        ? `https://vidsrc.cc/v2/embed/movie/${tmdbId}`
-                        : `https://vidsrc.cc/v2/embed/tv/${tmdbId}/${season}/${episode}`;
+                        ? `https://vidnest.fun/movie/${tmdbId}`
+                        : `https://vidnest.fun/tv/${tmdbId}/${season}/${episode}`;
                 case '4':
-                    // Server 4: Embed.su
+                    // Server 4: NontonGo Multi-Cloud (MIX / HD / VIP English)
                     return isMovie
-                        ? `https://embed.su/embed/movie/${tmdbId}`
-                        : `https://embed.su/embed/tv/${tmdbId}/${season}/${episode}`;
+                        ? `https://nontongo.win/embed/movie/${tmdbId}`
+                        : `https://nontongo.win/embed/tv/${tmdbId}/${season}/${episode}`;
                 case '5':
-                    // Server 5: AutoEmbed
+                    // Server 5: AutoEmbed Player (English)
                     return isMovie
-                        ? `https://player.autoembed.cc/embed/movie/${tmdbId}`
-                        : `https://player.autoembed.cc/embed/tv/${tmdbId}/${season}/${episode}`;
+                        ? `https://player.autoembed.me/embed/movie/${tmdbId}/`
+                        : `https://player.autoembed.me/embed/tv/${tmdbId}/${season}/${episode}/`;
                 default:
-                    return `https://www.2embed.cc/embed/${tmdbId}`;
+                    return isMovie
+                        ? `https://vidsrc.su/embed/movie/${tmdbId}`
+                        : `https://vidsrc.su/embed/tv/${tmdbId}/${season}/${episode}`;
             }
+        }
+
+        function wrapStreamUrl(rawUrl) {
+            if (!rawUrl) return '';
+            return `${activeStreamGateway}${encodeURIComponent(rawUrl)}`;
         }
 
         function switchServer(serverNum) {
@@ -2410,7 +2433,8 @@
         function updatePlayerSource() {
             const player = document.getElementById('moss-player-frame');
             const type = currentItem.media_type || (currentItem.first_air_date ? 'tv' : 'movie');
-            player.src = getPlayerUrl(currentServer, currentItem.id, type, currentSeason, currentEpisode);
+            const rawUrl = getPlayerUrl(currentServer, currentItem.id, type, currentSeason, currentEpisode);
+            player.src = wrapStreamUrl(rawUrl);
         }
 
         function scrollToPlayer() {

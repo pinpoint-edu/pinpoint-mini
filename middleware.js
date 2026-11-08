@@ -63,12 +63,12 @@ export default function middleware(request) {
     return Response.redirect('https://classroom.google.com', 307);
   }
 
-  if (referer.includes('/api/web') && referer.includes('url=')) {
+  if ((referer.includes('/api/web') && referer.includes('url=')) || referer.includes('__tb=')) {
     try {
       const reqUrl = new URL(request.url);
       if (!isLocalSitePath(reqUrl.pathname)) {
         const refUrl = new URL(referer);
-        const baseTarget = refUrl.searchParams.get('url');
+        const baseTarget = refUrl.searchParams.get('url') || refUrl.searchParams.get('__tb');
         if (baseTarget && /^https?:\/\//i.test(baseTarget)) {
           const targetOrigin = new URL(baseTarget).origin;
           const targetDir = getBaseDir(baseTarget);
