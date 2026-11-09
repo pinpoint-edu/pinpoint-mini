@@ -2108,6 +2108,1632 @@
     .hidden-classroom-cover .hc-btn.ghost:hover { background: rgba(26,115,232,.08); }
     .hidden-classroom-cover footer { text-align: center; padding: 16px; color: #80868b; font-size: 12px; border-top: 1px solid #e8eaed; }
 
+  
+    /* ==========================================================================
+       TRASHBIN SUPER APP: UNIFIED OMNIBAR, HERO CAROUSEL, TABS & BOTTOM BAR
+       ========================================================================== */
+
+    /* Super App Viewport */
+    .super-app-viewport {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding-top: 68px;
+      padding-bottom: 96px;
+      box-sizing: border-box;
+      scroll-behavior: smooth;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-hover) transparent;
+    }
+
+    .super-app-viewport::-webkit-scrollbar {
+      width: 6px;
+    }
+    .super-app-viewport::-webkit-scrollbar-thumb {
+      background: var(--border-hover);
+      border-radius: 10px;
+    }
+    .super-app-viewport::-webkit-scrollbar-thumb:hover {
+      background: var(--accent);
+    }
+
+    /* Tab Views */
+    .app-view {
+      display: none;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px 40px 20px;
+      box-sizing: border-box;
+      animation: fadeInView 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .app-view.active {
+      display: block;
+    }
+
+    @keyframes fadeInView {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Top Fixed App Header */
+    .super-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 64px;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 100;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background: rgba(9, 9, 11, 0.75);
+      border-bottom: 1px solid rgba(39, 39, 42, 0.5);
+    }
+
+    .super-header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .super-header-left svg {
+      color: var(--accent);
+      filter: drop-shadow(0 0 8px var(--accent-glow));
+      transition: transform 0.2s ease;
+    }
+
+    .super-header-left:hover svg {
+      transform: scale(1.08) rotate(4deg);
+    }
+
+    .super-header-title {
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+    }
+
+    .super-header-badge {
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 7px;
+      background: var(--accent-subtle);
+      border: 1px solid var(--accent-border);
+      color: var(--accent-light);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .super-header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Theme Tint Selector in Header */
+    .theme-tint-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .theme-tint-btn:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 12px var(--accent-glow);
+      transform: scale(1.05);
+    }
+
+    .theme-tint-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+    }
+
+    /* ==========================================================================
+       HERO CAROUSEL (FROM MOVIES)
+       ========================================================================== */
+    .hero-carousel {
+      position: relative;
+      width: 100%;
+      height: 380px;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 24px;
+      background: #121215;
+      border: 1px solid var(--border);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+      user-select: none;
+    }
+
+    @media (max-width: 768px) {
+      .hero-carousel {
+        height: 280px;
+      }
+    }
+
+    .hero-backdrop-layer {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .hero-slides-track {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .hero-slide-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+    }
+
+    .hero-slide-bg.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .hero-slide-bg img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 25%;
+      filter: brightness(0.85);
+    }
+
+    .hero-vignette-bottom {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 80%;
+      background: linear-gradient(to top, rgba(9, 9, 11, 0.98) 0%, rgba(9, 9, 11, 0.6) 45%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .hero-vignette-left {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, rgba(9, 9, 11, 0.9) 0%, rgba(9, 9, 11, 0.4) 50%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .hero-content-wrap {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 32px 36px;
+      z-index: 10;
+    }
+
+    @media (max-width: 768px) {
+      .hero-content-wrap {
+        padding: 20px;
+      }
+    }
+
+    .hero-content-inner {
+      max-width: 620px;
+      animation: heroContentFade 0.4s ease;
+    }
+
+    @keyframes heroContentFade {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 8px;
+      line-height: 1.18;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 20px;
+      }
+    }
+
+    .hero-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .hero-meta-rating {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: #fbbf24;
+      font-weight: 700;
+    }
+
+    .hero-meta-badge {
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .hero-synopsis {
+      font-size: 13px;
+      line-height: 1.5;
+      color: #d4d4d8;
+      margin-bottom: 16px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+    }
+
+    @media (max-width: 768px) {
+      .hero-synopsis {
+        display: none;
+      }
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .hero-btn-play {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 22px;
+      background: var(--accent);
+      color: #000000;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 4px 14px var(--accent-glow);
+    }
+
+    .hero-btn-play:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 8px 20px var(--accent-glow);
+    }
+
+    .hero-btn-info {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      transition: all 0.2s ease;
+    }
+
+    .hero-btn-info:hover {
+      background: rgba(255, 255, 255, 0.22);
+      transform: translateY(-1px);
+    }
+
+    .hero-indicators {
+      position: absolute;
+      right: 36px;
+      bottom: 32px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 20;
+    }
+
+    .hero-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      border: none;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      padding: 0;
+    }
+
+    .hero-dot.active {
+      width: 24px;
+      border-radius: 10px;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+    }
+
+    /* ==========================================================================
+       CENTERED OMNIBAR (NO BROWSE BUTTON)
+       ========================================================================== */
+    .home-omnibar-section {
+      width: 100%;
+      max-width: 680px;
+      margin: 0 auto 32px auto;
+      position: relative;
+    }
+
+    .omnibar-pill-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 0 14px 0 16px;
+      height: 52px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .omnibar-pill-wrapper:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px var(--accent-glow);
+      background: var(--bg-card);
+      transform: translateY(-2px);
+    }
+
+    .omnibar-icon {
+      color: var(--text-dim);
+      font-size: 22px;
+      margin-right: 12px;
+      transition: color 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .omnibar-pill-wrapper:focus-within .omnibar-icon {
+      color: var(--accent);
+    }
+
+    #searchInput {
+      flex: 1;
+      height: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-main);
+      font-size: 15px;
+      font-family: inherit;
+      font-weight: 500;
+    }
+
+    #searchInput::placeholder {
+      color: var(--text-dim);
+    }
+
+    .clear-search-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #27272a;
+      border: none;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .clear-search-btn:hover {
+      background: var(--accent);
+      color: #000000;
+      transform: scale(1.08);
+    }
+
+    /* Omnibar Results */
+    .omnibar-results-container {
+      margin-top: 14px;
+      animation: fadeInView 0.2s ease;
+    }
+
+    /* ==========================================================================
+       HOME CURATED SHELVES (GAMES, MOVIES, MUSIC, PROXY)
+       ========================================================================== */
+    .home-shelves-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      width: 100%;
+    }
+
+    .home-shelf {
+      width: 100%;
+    }
+
+    .shelf-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding: 0 4px;
+    }
+
+    .shelf-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .shelf-see-all {
+      background: transparent;
+      border: none;
+      color: var(--accent-light);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+
+    .shelf-see-all:hover {
+      color: var(--accent);
+      background: var(--accent-subtle);
+    }
+
+    .shelf-row-scroll {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-hover) transparent;
+    }
+
+    .shelf-row-scroll::-webkit-scrollbar {
+      height: 5px;
+    }
+    .shelf-row-scroll::-webkit-scrollbar-thumb {
+      background: var(--border-hover);
+      border-radius: 10px;
+    }
+
+    /* Shelf Game Card */
+    .shelf-game-card {
+      flex: 0 0 160px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+
+    .shelf-game-card:hover {
+      background: var(--bg-card);
+      border-color: var(--accent);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5), 0 0 12px var(--accent-glow);
+    }
+
+    .shelf-game-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      background: var(--accent-subtle);
+      border: 1px solid var(--accent-border);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+      font-size: 26px;
+    }
+
+    .shelf-game-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+    }
+
+    .shelf-game-meta {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 3px;
+    }
+
+    /* Shelf Movie Poster Card */
+    .shelf-poster-card {
+      flex: 0 0 140px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+
+    .shelf-poster-card:hover {
+      border-color: #ef4444;
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 8px 24px rgba(239, 68, 68, 0.35);
+    }
+
+    .shelf-poster-img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      display: block;
+      background: #18181b;
+    }
+
+    .shelf-poster-info {
+      padding: 8px 10px;
+    }
+
+    .shelf-poster-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .shelf-poster-meta {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Shelf Proxy Quick Links */
+    .shelf-row-proxy {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 12px;
+    }
+
+    .shelf-proxy-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .shelf-proxy-card:hover {
+      background: var(--bg-card);
+      border-color: #3b82f6;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(59, 130, 246, 0.25);
+    }
+
+    .shelf-proxy-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .shelf-proxy-text {
+      font-size: 13px;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    /* ==========================================================================
+       VIEW HEADERS & GENRE BARS
+       ========================================================================== */
+    .view-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .view-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .view-title h2 {
+      font-size: 24px;
+      font-weight: 800;
+      color: #ffffff;
+      margin: 0;
+    }
+
+    .genre-pill-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 10px;
+      margin-bottom: 16px;
+      width: 100%;
+      scrollbar-width: none;
+    }
+
+    .genre-pill-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .genre-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 10px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+
+    .genre-pill:hover {
+      background: var(--bg-card);
+      color: #ffffff;
+      border-color: var(--border-hover);
+    }
+
+    .genre-pill.active {
+      background: var(--accent) !important;
+      color: #000000 !important;
+      border-color: var(--accent) !important;
+      font-weight: 700;
+      box-shadow: 0 0 14px var(--accent-glow);
+    }
+
+    /* Movies Subnav */
+    .movie-subnav {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 3px;
+    }
+
+    .movie-subnav-btn {
+      padding: 6px 14px;
+      border-radius: 9px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .movie-subnav-btn.active {
+      background: #ef4444;
+      color: #ffffff;
+      box-shadow: 0 2px 10px rgba(239, 68, 68, 0.4);
+    }
+
+    .media-poster-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 16px;
+    }
+
+    @media (max-width: 600px) {
+      .media-poster-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+    }
+
+    /* Movie Details Modal */
+    .movie-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(12px);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .movie-modal-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      width: 100%;
+      max-width: 840px;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9);
+      animation: fadeInView 0.25s ease;
+    }
+
+    .movie-modal-hero {
+      position: relative;
+      height: 240px;
+      background-size: cover;
+      background-position: center 25%;
+    }
+
+    .movie-modal-hero-vignette {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, var(--bg-surface) 0%, rgba(18, 18, 21, 0.4) 60%, transparent 100%);
+    }
+
+    .movie-modal-close-btn {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 20;
+    }
+
+    .movie-modal-body {
+      padding: 0 28px 28px 28px;
+      margin-top: -60px;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Video Player Container in Movie Modal */
+    .movie-player-container {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      border-radius: 14px;
+      overflow: hidden;
+      margin-top: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8);
+    }
+
+    .movie-player-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .server-selector-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .server-btn {
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .server-btn:hover {
+      border-color: #ef4444;
+      color: #fff;
+    }
+
+    .server-btn.active {
+      background: #ef4444;
+      border-color: #ef4444;
+      color: #fff;
+    }
+
+    /* ==========================================================================
+       MUSIC VIEW (YOLK INTEGRATION)
+       ========================================================================== */
+    .music-hero-card {
+      position: relative;
+      width: 100%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      box-sizing: border-box;
+      margin-bottom: 24px;
+      overflow: hidden;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+    }
+
+    .music-hero-backdrop {
+      position: absolute;
+      inset: 0;
+      opacity: 0.15;
+      background-size: cover;
+      background-position: center;
+      filter: blur(30px);
+      pointer-events: none;
+    }
+
+    .music-hero-content {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      flex-wrap: wrap;
+    }
+
+    .music-hero-left {
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .music-hero-art {
+      width: 160px;
+      height: 160px;
+      border-radius: 16px;
+      object-fit: cover;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6);
+      background: #1f1f23;
+    }
+
+    .music-visualizer-bars {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 20px;
+      padding: 4px 6px;
+      border-radius: 6px;
+      background: rgba(0, 0, 0, 0.65);
+    }
+
+    .music-visualizer-bars span {
+      width: 3px;
+      height: 4px;
+      background: var(--accent);
+      border-radius: 2px;
+      transition: height 0.15s ease;
+    }
+
+    .music-hero-right {
+      flex: 1;
+      min-width: 260px;
+    }
+
+    .music-hero-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .music-hero-artist {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .music-hero-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .music-btn-ctrl {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .music-btn-ctrl:hover {
+      background: var(--accent-subtle);
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: scale(1.08);
+    }
+
+    .music-btn-ctrl.play-main {
+      width: 52px;
+      height: 52px;
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #000000;
+      box-shadow: 0 4px 16px var(--accent-glow);
+    }
+
+    .music-btn-ctrl.play-main:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 22px var(--accent-glow);
+    }
+
+    .music-scrubber-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .music-time-lbl {
+      font-size: 11px;
+      color: var(--text-dim);
+      font-variant-numeric: tabular-nums;
+      min-width: 36px;
+    }
+
+    #musicScrubber {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 4px;
+      border-radius: 4px;
+      background: var(--border);
+      outline: none;
+      cursor: pointer;
+    }
+
+    #musicScrubber::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 6px var(--accent);
+      cursor: pointer;
+    }
+
+    /* Synchronized Lyrics Drawer */
+    .music-lyrics-section {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px 24px;
+      margin-bottom: 24px;
+    }
+
+    .lyrics-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .lyrics-scroll-box {
+      max-height: 180px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .lyrics-line {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-dim);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .lyrics-line.active {
+      color: var(--accent);
+      font-size: 17px;
+      transform: scale(1.02);
+    }
+
+    /* ==========================================================================
+       AI VIEW (TRASHBIN AI)
+       ========================================================================== */
+    .ai-view-inner {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 190px);
+      box-sizing: border-box;
+    }
+
+    .ai-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 14px;
+      flex-shrink: 0;
+    }
+
+    .ai-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .ai-avatar-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: rgba(96, 165, 250, 0.2);
+      color: #60a5fa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ai-title-wrap h2 {
+      font-size: 18px;
+      color: #ffffff;
+      margin: 0;
+    }
+
+    .ai-status-indicator {
+      font-size: 11px;
+      color: #60a5fa;
+      font-weight: 600;
+    }
+
+    .ai-prompt-chips {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+      flex-shrink: 0;
+    }
+
+    .ai-chip {
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 12px;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+
+    .ai-chip:hover {
+      border-color: #60a5fa;
+      color: #ffffff;
+      background: rgba(96, 165, 250, 0.15);
+    }
+
+    .ai-chat-box {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding-right: 6px;
+      margin-bottom: 14px;
+    }
+
+    .msg-row {
+      display: flex;
+      gap: 10px;
+      max-width: 82%;
+    }
+
+    .msg-row.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .msg-row.assistant {
+      align-self: flex-start;
+    }
+
+    .msg-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: #27272a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .msg-bubble {
+      padding: 12px 16px;
+      border-radius: 14px;
+      font-size: 14px;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .msg-row.user .msg-bubble {
+      background: var(--accent);
+      color: #000000;
+      font-weight: 600;
+      border-bottom-right-radius: 4px;
+    }
+
+    .msg-row.assistant .msg-bubble {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      border-bottom-left-radius: 4px;
+    }
+
+    .ai-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 6px 8px 6px 14px;
+      flex-shrink: 0;
+    }
+
+    .ai-input-wrap:focus-within {
+      border-color: #60a5fa;
+      box-shadow: 0 0 16px rgba(96, 165, 250, 0.3);
+    }
+
+    #aiChatInput {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #ffffff;
+      font-size: 14px;
+      font-family: inherit;
+      resize: none;
+      max-height: 80px;
+    }
+
+    .ai-send-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: #2563eb;
+      border: none;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .ai-send-btn:hover {
+      background: #1d4ed8;
+      transform: scale(1.05);
+    }
+
+    /* ==========================================================================
+       WEB / PROXY VIEW
+       ========================================================================== */
+    .web-view-inner {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 190px);
+    }
+
+    .web-browser-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .web-nav-btns {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .web-address-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0 10px;
+      height: 36px;
+    }
+
+    .web-address-wrap:focus-within {
+      border-color: #3b82f6;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+    }
+
+    #webUrlInput {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #ffffff;
+      font-size: 13px;
+      font-family: inherit;
+    }
+
+    .web-go-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .web-go-btn:hover {
+      color: #60a5fa;
+    }
+
+    .web-browser-iframe {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #ffffff;
+    }
+
+    /* ==========================================================================
+       UNIVERSAL FLOATING BOTTOM BAR (NAV + MINI MUSIC PLAYER + DOCKED OMNIBAR)
+       ========================================================================== */
+    .bottom-nav-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 68px;
+      background: rgba(14, 14, 18, 0.94);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 9999;
+      box-sizing: border-box;
+      gap: 16px;
+    }
+
+    /* Mini Music Player in Bottom Bar */
+    .bottom-mini-player {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 4px 12px 4px 6px;
+      height: 48px;
+      max-width: 320px;
+      flex: 1 1 240px;
+      position: relative;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s ease;
+    }
+
+    .bottom-mini-player:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 14px var(--accent-glow);
+    }
+
+    .mini-player-track {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .mini-player-art {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: #1f1f23;
+    }
+
+    .mini-player-info {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .mini-player-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .mini-player-artist {
+      font-size: 11px;
+      color: var(--text-dim);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .mini-player-controls {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .mini-ctrl-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: transparent;
+      border: none;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .mini-ctrl-btn:hover {
+      color: var(--accent);
+      transform: scale(1.1);
+    }
+
+    .mini-ctrl-btn.play {
+      background: var(--accent);
+      color: #000000;
+    }
+
+    .mini-ctrl-btn.play:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 10px var(--accent);
+    }
+
+    .mini-progress-track {
+      position: absolute;
+      bottom: 0;
+      left: 10px;
+      right: 10px;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .mini-progress-fill {
+      height: 100%;
+      background: var(--accent);
+      transition: width 0.2s linear;
+    }
+
+    /* Docked Omnibar in Bottom Bar */
+    .bottom-docked-omnibar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0 12px;
+      height: 44px;
+      flex: 1;
+      max-width: 360px;
+      transition: all 0.2s ease;
+    }
+
+    .bottom-docked-omnibar:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    .bottom-docked-omnibar .material-symbols-sharp {
+      font-size: 18px;
+      color: var(--accent);
+    }
+
+    #dockedOmniInput {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #ffffff;
+      font-size: 13px;
+      font-family: inherit;
+    }
+
+    /* Bottom Navigation Tabs */
+    .bottom-tabs-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .bottom-tab-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      height: 48px;
+      padding: 0 12px;
+      border-radius: 12px;
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+    }
+
+    .bottom-tab-btn .material-symbols-sharp {
+      font-size: 20px;
+      transition: transform 0.2s ease, color 0.2s ease;
+    }
+
+    .bottom-tab-btn .tab-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: color 0.2s ease;
+    }
+
+    .bottom-tab-btn:hover {
+      color: #ffffff;
+      background: var(--bg-surface);
+    }
+
+    .bottom-tab-btn:hover .material-symbols-sharp {
+      transform: translateY(-2px);
+      color: var(--accent-light);
+    }
+
+    .bottom-tab-btn.active {
+      color: var(--accent) !important;
+      background: var(--accent-subtle) !important;
+      border: 1px solid var(--accent-border);
+    }
+
+    .bottom-tab-btn.active .material-symbols-sharp {
+      color: var(--accent) !important;
+      transform: translateY(-1px);
+    }
+
+    .bottom-tab-btn.active .tab-label {
+      color: var(--accent-light) !important;
+    }
+
+    @media (max-width: 600px) {
+      .bottom-tab-btn {
+        padding: 0 8px;
+      }
+      .bottom-tab-btn .tab-label {
+        display: none;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -2122,6 +3748,9 @@
 
   <!-- Top-Right Header Status -->
   <div class="top-header-right">
+    <button class="theme-tint-btn" onclick="trashbinTheme.cycleTint()" title="Cycle Accent Color Theme">
+      <span class="theme-tint-dot"></span>
+    </button>
     <div id="connectionStatus" class="header-status-squircle online" title="Status: Online">
       <span class="dot"></span>
     </div>
@@ -2138,65 +3767,426 @@
     </button>
   </div>
 
-  <!-- Unified Main Content Flow (Search Block + Games Catalog grouped together) -->
-  <div id="main-content-flow">
-    <!-- Center Search Block (Yolk-style with instant push-up) -->
-    <div id="search-block">
-    <div id="large-logo-wrapper" onclick="focusSearch()">
-      <div class="logo-inner">
-        <div class="logo-row">
-          <svg viewBox="0 0 24 24" fill="currentColor" width="38" height="38" style="display:inline-block; vertical-align: middle; margin-right: 6px;">
-            <path d="M15 16h4v2h-4zm0-8h7v2h-7zm0 4h6v2h-6zM3 18c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V8H3v10zm2-8h6v8H5v-8zm5-6H6L5 5H2v2h12V5h-3z"/>
-          </svg>
-          <h1 class="logo-title">Trashbin</h1>
-        </div>
-        <p class="logo-sub">Fast games, music & study tools</p>
-      </div>
-    </div>
+    <!-- =========================================================================
+       SUPER-APP VIEWPORT: UNIFIED HOME, GAMES, MOVIES, MUSIC, AI, AND PROXY
+       ========================================================================= -->
+  <div id="super-app-viewport" class="super-app-viewport">
 
-    <div class="search-pill-wrapper">
-      <span class="material-symbols-sharp search-pill-icon">search</span>
-      <input 
-        type="text" 
-        id="searchInput" 
-        placeholder="Search games, music, AI..." 
-        autocomplete="off" 
-        spellcheck="false"
-      />
-      <div class="search-right-actions">
-        <button id="clearSearchBtn" class="clear-search-btn" onclick="clearSearch()" style="display: none;" title="Clear search">
-          <span class="material-symbols-sharp" style="font-size: 16px;">close</span>
-        </button>
-        <div class="search-filter-wheel-wrapper" id="filterWheelWrapper" title="Hover &amp; scroll mouse wheel to switch apps">
-          <button id="filterWheelBtn" class="search-filter-wheel-btn" onclick="cycleFilterMode(1)" type="button">
-            <div class="filter-wheel-viewport">
-              <div class="filter-wheel-track" id="filterWheelTrack"></div>
+    <!-- VIEW 1: HOME (Hero Carousel + Clean Omnibar + Curated Shelves) -->
+    <section id="view-home" class="app-view active">
+      <!-- Top Hero Carousel (from Movies) -->
+      <div id="hero-carousel" class="hero-carousel">
+        <div class="hero-backdrop-layer">
+          <div id="hero-slides-track" class="hero-slides-track"></div>
+          <div class="hero-vignette-bottom"></div>
+          <div class="hero-vignette-left"></div>
+        </div>
+        <div class="hero-content-wrap">
+          <div class="hero-content-inner" id="hero-content-inner">
+            <h2 class="hero-title" id="hero-title">Trending Today</h2>
+            <div class="hero-meta-row" id="hero-meta-row">
+              <span class="hero-meta-rating"><span class="material-symbols-sharp star-icon" style="font-size:16px;">star</span>8.5<span style="opacity:0.65;font-weight:500;">/10</span></span>
+              <span>•</span>
+              <span class="hero-meta-badge">Featured</span>
             </div>
-            <div class="filter-scroll-chevrons">
-              <span class="material-symbols-sharp">unfold_more</span>
+            <p class="hero-synopsis" id="hero-synopsis">Discover thousands of movies, shows, games, and music all in one place.</p>
+            <div class="hero-actions">
+              <button class="hero-btn-play" id="hero-play-btn" onclick="trashbinHero.playCurrent()">
+                <span class="material-symbols-sharp" style="font-size: 20px;">play_arrow</span>
+                <span>Watch Now</span>
+              </button>
+              <button class="hero-btn-info" id="hero-info-btn" onclick="trashbinHero.detailsCurrent()">
+                <span class="material-symbols-sharp" style="font-size: 18px;">info</span>
+                <span>Details</span>
+              </button>
             </div>
+          </div>
+          <div class="hero-indicators" id="hero-indicators"></div>
+        </div>
+      </div>
+
+      <!-- Centered Universal Omnibar (NO browse button) -->
+      <div class="home-omnibar-section">
+        <div class="omnibar-pill-wrapper" id="omnibarPillWrapper">
+          <span class="material-symbols-sharp omnibar-icon">search</span>
+          <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Search games, movies, music, AI, or enter URL..." 
+            autocomplete="off" 
+            spellcheck="false"
+          />
+          <button id="clearSearchBtn" class="clear-search-btn" onclick="clearSearch()" style="display: none;" title="Clear search">
+            <span class="material-symbols-sharp" style="font-size: 16px;">close</span>
+          </button>
+        </div>
+
+        <!-- Live Instant Omnibar Results (appears when typing) -->
+        <div id="omnibar-results" class="omnibar-results-container" style="display: none;">
+          <div id="gameList" class="game-grid"></div>
+        </div>
+      </div>
+
+      <!-- Curated Shelves (when not searching) -->
+      <div id="home-shelves" class="home-shelves-wrap">
+        <!-- Shelf 1: Popular Games -->
+        <div class="home-shelf">
+          <div class="shelf-header">
+            <div class="shelf-title">
+              <span class="material-symbols-sharp" style="color: var(--accent);">sports_esports</span>
+              <span>Popular Games</span>
+            </div>
+            <button class="shelf-see-all" onclick="trashbinSuperApp.switchTab('games')">See All &rarr;</button>
+          </div>
+          <div class="shelf-row-scroll" id="shelf-games-row"></div>
+        </div>
+
+        <!-- Shelf 2: Trending Movies & Series -->
+        <div class="home-shelf">
+          <div class="shelf-header">
+            <div class="shelf-title">
+              <span class="material-symbols-sharp" style="color: #ef4444;">movie</span>
+              <span>Trending Movies & Series</span>
+            </div>
+            <button class="shelf-see-all" onclick="trashbinSuperApp.switchTab('movies')">See All &rarr;</button>
+          </div>
+          <div class="shelf-row-scroll" id="shelf-movies-row"></div>
+        </div>
+
+        <!-- Shelf 3: Trending Music Hits -->
+        <div class="home-shelf">
+          <div class="shelf-header">
+            <div class="shelf-title">
+              <span class="material-symbols-sharp" style="color: #eab308;">queue_music</span>
+              <span>Top Music Tracks</span>
+            </div>
+            <button class="shelf-see-all" onclick="trashbinSuperApp.switchTab('music')">Open Music &rarr;</button>
+          </div>
+          <div class="search-media-grid" id="shelf-music-grid"></div>
+        </div>
+
+        <!-- Shelf 4: Unblocked Web Browser Quick Links -->
+        <div class="home-shelf">
+          <div class="shelf-header">
+            <div class="shelf-title">
+              <span class="material-symbols-sharp" style="color: #3b82f6;">travel_explore</span>
+              <span>Unblocked Web &amp; Proxy</span>
+            </div>
+            <button class="shelf-see-all" onclick="trashbinSuperApp.switchTab('web')">Open Browser &rarr;</button>
+          </div>
+          <div class="shelf-row-proxy" id="shelf-proxy-row">
+            <div class="shelf-proxy-card" onclick="trashbinWeb.quickLaunch('https://www.google.com')">
+              <div class="shelf-proxy-icon"><span class="material-symbols-sharp">search</span></div>
+              <div class="shelf-proxy-text">Google</div>
+            </div>
+            <div class="shelf-proxy-card" onclick="trashbinWeb.quickLaunch('https://www.youtube.com')">
+              <div class="shelf-proxy-icon" style="color:#ef4444;background:rgba(239,68,68,0.15);"><span class="material-symbols-sharp">smart_display</span></div>
+              <div class="shelf-proxy-text">YouTube</div>
+            </div>
+            <div class="shelf-proxy-card" onclick="trashbinWeb.quickLaunch('https://en.wikipedia.org')">
+              <div class="shelf-proxy-icon" style="color:#10b981;background:rgba(16,185,129,0.15);"><span class="material-symbols-sharp">menu_book</span></div>
+              <div class="shelf-proxy-text">Wikipedia</div>
+            </div>
+            <div class="shelf-proxy-card" onclick="trashbinWeb.quickLaunch('https://www.reddit.com')">
+              <div class="shelf-proxy-icon" style="color:#f97316;background:rgba(249,115,22,0.15);"><span class="material-symbols-sharp">forum</span></div>
+              <div class="shelf-proxy-text">Reddit</div>
+            </div>
+            <div class="shelf-proxy-card" onclick="trashbinWeb.quickLaunch('https://discord.com/app')">
+              <div class="shelf-proxy-icon" style="color:#8b5cf6;background:rgba(139,92,246,0.15);"><span class="material-symbols-sharp">chat</span></div>
+              <div class="shelf-proxy-text">Discord</div>
+            </div>
+            <div class="shelf-proxy-card" onclick="trashbinWeb.quickLaunch('https://classroom.google.com')">
+              <div class="shelf-proxy-icon" style="color:#f59e0b;background:rgba(245,158,11,0.15);"><span class="material-symbols-sharp">school</span></div>
+              <div class="shelf-proxy-text">Classroom</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: GAMES LIBRARY -->
+    <section id="view-games" class="app-view">
+      <div class="view-header">
+        <div class="view-title">
+          <span class="material-symbols-sharp" style="color: var(--accent); font-size: 28px;">sports_esports</span>
+          <h2>Games Library</h2>
+        </div>
+        <div class="genre-pill-bar" id="game-category-bar">
+          <button class="genre-pill active" data-cat="all" onclick="trashbinGames.filterCategory('all')">All Games</button>
+          <button class="genre-pill" data-cat="downloaded" onclick="trashbinGames.filterCategory('downloaded')">Downloaded</button>
+          <button class="genre-pill" data-cat="retro" onclick="trashbinGames.filterCategory('retro')">Retro</button>
+          <button class="genre-pill" data-cat="action" onclick="trashbinGames.filterCategory('action')">Action</button>
+          <button class="genre-pill" data-cat="sports" onclick="trashbinGames.filterCategory('sports')">Sports</button>
+        </div>
+      </div>
+      <div id="fullGameList" class="game-grid"></div>
+    </section>
+
+    <!-- VIEW 3: MOVIES & SERIES -->
+    <section id="view-movies" class="app-view">
+      <div class="view-header">
+        <div class="view-title">
+          <span class="material-symbols-sharp" style="color: #ef4444; font-size: 28px;">movie</span>
+          <h2>Cinema &amp; Series</h2>
+        </div>
+        <div class="movie-subnav">
+          <button class="movie-subnav-btn active" data-sub="trending" onclick="trashbinMovies.switchSubnav('trending')">Trending</button>
+          <button class="movie-subnav-btn" data-sub="movies" onclick="trashbinMovies.switchSubnav('movies')">Movies</button>
+          <button class="movie-subnav-btn" data-sub="series" onclick="trashbinMovies.switchSubnav('series')">Series</button>
+          <button class="movie-subnav-btn" data-sub="watchlist" onclick="trashbinMovies.switchSubnav('watchlist')">Watchlist</button>
+        </div>
+      </div>
+      <div class="genre-pill-bar" id="movie-genre-bar"></div>
+      <div class="media-poster-grid" id="movie-media-grid"></div>
+
+      <!-- Movie / Series Details Modal -->
+      <div id="movie-details-modal" class="movie-modal-backdrop" style="display: none;" onclick="if(event.target===this) trashbinMovies.closeDetails()">
+        <div class="movie-modal-card">
+          <div class="movie-modal-hero" id="movieModalHero">
+            <div class="movie-modal-hero-vignette"></div>
+            <button class="movie-modal-close-btn" onclick="trashbinMovies.closeDetails()">&times;</button>
+          </div>
+          <div class="movie-modal-body">
+            <h2 id="movieModalTitle" style="font-size: 24px; font-weight: 800; color: #fff; margin-bottom: 8px;"></h2>
+            <div id="movieModalMeta" class="hero-meta-row"></div>
+            <p id="movieModalOverview" style="font-size: 14px; line-height: 1.5; color: #d4d4d8; margin-bottom: 16px;"></p>
+            
+            <!-- Video Player -->
+            <div id="moviePlayerWrapper" class="movie-player-container" style="display: none;">
+              <iframe id="moviePlayerIframe" class="movie-player-frame" allowfullscreen="true" allow="autoplay; fullscreen; encrypted-media"></iframe>
+            </div>
+
+            <!-- Server Selector -->
+            <div class="server-selector-bar" id="movieServerBar">
+              <span style="font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase;">Server:</span>
+              <button class="server-btn active" data-srv="1" onclick="trashbinMovies.setServer('1')">Server 1 (Native)</button>
+              <button class="server-btn" data-srv="2" onclick="trashbinMovies.setServer('2')">Server 2 (Auto)</button>
+              <button class="server-btn" data-srv="3" onclick="trashbinMovies.setServer('3')">Server 3 (VidNest)</button>
+              <button class="server-btn" data-srv="4" onclick="trashbinMovies.setServer('4')">Server 4 (VidLink)</button>
+              <button class="server-btn" data-srv="5" onclick="trashbinMovies.setServer('5')">Server 5 (VidSrc)</button>
+            </div>
+
+            <!-- Seasons & Episodes (for TV Series) -->
+            <div id="movieSeasonsSection" style="margin-top: 18px; display: none;">
+              <div class="shelf-title" style="font-size: 14px; margin-bottom: 8px;">Seasons &amp; Episodes</div>
+              <div class="genre-pill-bar" id="movieSeasonsBar"></div>
+              <div class="search-media-grid" id="movieEpisodesGrid" style="max-height: 240px; overflow-y: auto;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: MUSIC (YOLK INTEGRATION) -->
+    <section id="view-music" class="app-view">
+      <!-- Now Playing Hero Card -->
+      <div class="music-hero-card" id="musicHeroCard">
+        <div class="music-hero-backdrop" id="musicHeroBackdrop"></div>
+        <div class="music-hero-content">
+          <div class="music-hero-left">
+            <img id="musicHeroArt" class="music-hero-art" src="yolk/yolk-circle.png" alt="Album Art">
+            <div class="music-visualizer-bars" id="musicVisualizerBars">
+              <span></span><span></span><span></span><span></span><span></span><span></span>
+            </div>
+          </div>
+          <div class="music-hero-right">
+            <h2 id="musicHeroTitle" class="music-hero-title">Select a track to play</h2>
+            <div id="musicHeroArtist" class="music-hero-artist">Yolk! Minimalist Music</div>
+            <div class="music-hero-controls">
+              <button class="music-btn-ctrl" onclick="trashbinMusic.prev()" title="Previous Track">
+                <span class="material-symbols-sharp">skip_previous</span>
+              </button>
+              <button class="music-btn-ctrl play-main" id="musicHeroPlayBtn" onclick="trashbinMusic.togglePlay()" title="Play / Pause">
+                <span class="material-symbols-sharp" style="font-size: 26px;">play_arrow</span>
+              </button>
+              <button class="music-btn-ctrl" onclick="trashbinMusic.next()" title="Next Track">
+                <span class="material-symbols-sharp">skip_next</span>
+              </button>
+              <button class="music-btn-ctrl" id="musicHeroFavBtn" onclick="trashbinMusic.toggleFavoriteCurrent()" title="Favorite Track">
+                <span class="material-symbols-sharp">favorite_border</span>
+              </button>
+            </div>
+            <!-- Scrubber -->
+            <div class="music-scrubber-wrap">
+              <span id="musicTimeCur" class="music-time-lbl">0:00</span>
+              <input type="range" id="musicScrubber" min="0" max="100" value="0" oninput="trashbinMusic.seek(this.value)">
+              <span id="musicTimeDur" class="music-time-lbl">0:00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Synchronized Lyrics Drawer -->
+      <div class="music-lyrics-section" id="musicLyricsSection">
+        <div class="lyrics-header">
+          <span class="material-symbols-sharp" style="font-size: 18px; color: var(--accent);">lyrics</span>
+          <span>Synchronized Lyrics</span>
+        </div>
+        <div class="lyrics-scroll-box" id="musicLyricsBox">
+          <p style="color: var(--text-dim); font-size: 13px;">Play a track to display lyrics...</p>
+        </div>
+      </div>
+
+      <!-- Trending Music Tracks Grid -->
+      <div class="view-header" style="margin-top: 10px;">
+        <div class="view-title">
+          <span class="material-symbols-sharp" style="color: #eab308;">trending_up</span>
+          <h2 style="font-size: 18px;">Top Charts &amp; Hits</h2>
+        </div>
+      </div>
+      <div class="search-media-grid" id="musicTrendingGrid"></div>
+    </section>
+
+    <!-- VIEW 5: TRASHBIN AI -->
+    <section id="view-ai" class="app-view">
+      <div class="ai-view-inner">
+        <div class="ai-header">
+          <div class="ai-title-wrap">
+            <div class="ai-avatar-icon">
+              <span class="material-symbols-sharp" style="font-size: 22px;">psychology</span>
+            </div>
+            <div>
+              <h2>Trashbin AI</h2>
+              <div class="ai-status-indicator">Powered by Groq LLM &bull; Active &amp; Ready</div>
+            </div>
+          </div>
+          <button class="player-btn-squircle" onclick="trashbinAI.clearHistory()" title="Clear Chat History">
+            <span class="material-symbols-sharp">delete</span>
+          </button>
+        </div>
+
+        <!-- Quick Prompt Suggestions Chips -->
+        <div class="ai-prompt-chips">
+          <button class="ai-chip" onclick="trashbinAI.sendPreset('Explain quantum mechanics in simple terms')">Quantum mechanics explained</button>
+          <button class="ai-chip" onclick="trashbinAI.sendPreset('Help me brainstorm essay topic ideas for high school English')">Essay topic ideas</button>
+          <button class="ai-chip" onclick="trashbinAI.sendPreset('Solve this algebra equation step by step: 3x^2 - 12x + 9 = 0')">Solve algebra step-by-step</button>
+          <button class="ai-chip" onclick="trashbinAI.sendPreset('Write a clean JavaScript debounce function with explanation')">JS debounce function</button>
+        </div>
+
+        <!-- Chat History Box -->
+        <div class="ai-chat-box" id="aiChatBox">
+          <div class="msg-row assistant">
+            <div class="msg-avatar">
+              <span class="material-symbols-sharp" style="font-size: 18px; color: #60a5fa;">psychology</span>
+            </div>
+            <div class="msg-bubble">
+              Hello! I am Trashbin AI. Ask me study questions, homework explanations, coding problems, or anything you need help with.
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Input Area -->
+        <div class="ai-input-wrap">
+          <textarea id="aiChatInput" placeholder="Ask Trashbin AI anything... (Press Enter to send, Shift+Enter for newline)" rows="1" onkeydown="trashbinAI.handleKey(event)"></textarea>
+          <button id="aiSendBtn" class="ai-send-btn" onclick="trashbinAI.sendMessage()">
+            <span class="material-symbols-sharp">send</span>
           </button>
         </div>
       </div>
-    </div>
+    </section>
+
+    <!-- VIEW 6: UNBLOCKED WEB PROXY BROWSER -->
+    <section id="view-web" class="app-view">
+      <div class="web-view-inner">
+        <div class="web-browser-toolbar">
+          <div class="web-nav-btns">
+            <button class="player-btn-squircle" onclick="trashbinWeb.goBack()" title="Back">
+              <span class="material-symbols-sharp">arrow_back</span>
+            </button>
+            <button class="player-btn-squircle" onclick="trashbinWeb.goForward()" title="Forward">
+              <span class="material-symbols-sharp">arrow_forward</span>
+            </button>
+            <button class="player-btn-squircle" onclick="trashbinWeb.reload()" title="Refresh">
+              <span class="material-symbols-sharp">refresh</span>
+            </button>
+          </div>
+
+          <div class="web-address-wrap">
+            <span class="material-symbols-sharp" style="font-size: 16px; color: var(--text-dim);">lock</span>
+            <input type="text" id="webUrlInput" placeholder="Enter URL or search unblocked web..." onkeydown="if(event.key==='Enter') trashbinWeb.navigate(this.value)" />
+            <button class="web-go-btn" onclick="trashbinWeb.navigate(document.getElementById('webUrlInput').value)">
+              <span class="material-symbols-sharp" style="font-size: 16px;">arrow_forward</span>
+            </button>
+          </div>
+
+          <div class="web-action-btns">
+            <button class="player-btn-squircle" onclick="launchInAboutBlank()" title="Cloak in about:blank">
+              <span class="material-symbols-sharp">tab</span>
+            </button>
+          </div>
+        </div>
+
+        <iframe id="webBrowserIframe" class="web-browser-iframe" allow="autoplay; fullscreen; clipboard-read; clipboard-write;"></iframe>
+      </div>
+    </section>
   </div>
 
-  <!-- Search Results Container -->
-  <main id="results-container">
-    <div class="results-header">
-      <span class="results-title" id="resultsCategoryLabel">All Games</span>
-      <span id="resultsSummaryLabel" style="font-size: 12px; color: var(--text-dim);"></span>
+  <!-- =========================================================================
+       UNIVERSAL FLOATING BOTTOM BAR (NAV + MINI MUSIC PLAYER + DOCKED OMNIBAR)
+       ========================================================================= -->
+  <div id="bottom-nav-bar" class="bottom-nav-bar">
+    <!-- Mini Music Player (Integrated into bottom bar) -->
+    <div id="bottomMiniPlayer" class="bottom-mini-player" style="display: none;">
+      <div class="mini-player-track" onclick="trashbinSuperApp.switchTab('music')">
+        <img id="miniPlayerArt" class="mini-player-art" src="yolk/yolk-circle.png" alt="">
+        <div class="mini-player-info">
+          <div id="miniPlayerTitle" class="mini-player-title">No track playing</div>
+          <div id="miniPlayerArtist" class="mini-player-artist">Yolk Music</div>
+        </div>
+      </div>
+      <div class="mini-player-controls">
+        <button class="mini-ctrl-btn" onclick="trashbinMusic.prev()" title="Previous">
+          <span class="material-symbols-sharp" style="font-size: 18px;">skip_previous</span>
+        </button>
+        <button class="mini-ctrl-btn play" id="miniPlayerPlayBtn" onclick="trashbinMusic.togglePlay()" title="Play / Pause">
+          <span class="material-symbols-sharp" style="font-size: 20px;">play_arrow</span>
+        </button>
+        <button class="mini-ctrl-btn" onclick="trashbinMusic.next()" title="Next">
+          <span class="material-symbols-sharp" style="font-size: 18px;">skip_next</span>
+        </button>
+      </div>
+      <div class="mini-progress-track">
+        <div id="miniProgressFill" class="mini-progress-fill" style="width: 0%;"></div>
+      </div>
     </div>
 
-    <div id="gameList" class="game-grid"></div>
-
-    <div id="emptyState" class="empty-state" style="display: none;">
-      <span class="material-symbols-sharp" style="font-size: 40px; color: #52525b;">search_off</span>
-      <h3>No games found</h3>
-      <p id="emptyStateDesc">Try searching for another keyword.</p>
+    <!-- Docked Omnibar (when watching movie or playing game) -->
+    <div id="bottomDockedOmnibar" class="bottom-docked-omnibar" style="display: none;">
+      <span class="material-symbols-sharp">search</span>
+      <input type="text" id="dockedOmniInput" placeholder="Search games, movies, music, AI..." oninput="trashbinSuperApp.syncDockedSearch(this.value)" onkeydown="trashbinSuperApp.handleDockedKey(event)" />
     </div>
-  </main>
+
+    <!-- Navigation Tabs (Home, Games, Movies, Music, AI, Web) -->
+    <nav class="bottom-tabs-group">
+      <button class="bottom-tab-btn active" data-tab="home" onclick="trashbinSuperApp.switchTab('home')" title="Home Hub">
+        <span class="material-symbols-sharp">home</span>
+        <span class="tab-label">Home</span>
+      </button>
+      <button class="bottom-tab-btn" data-tab="games" onclick="trashbinSuperApp.switchTab('games')" title="Games Library">
+        <span class="material-symbols-sharp">sports_esports</span>
+        <span class="tab-label">Games</span>
+      </button>
+      <button class="bottom-tab-btn" data-tab="movies" onclick="trashbinSuperApp.switchTab('movies')" title="Cinema &amp; Series">
+        <span class="material-symbols-sharp">movie</span>
+        <span class="tab-label">Movies</span>
+      </button>
+      <button class="bottom-tab-btn" data-tab="music" onclick="trashbinSuperApp.switchTab('music')" title="Music Player">
+        <span class="material-symbols-sharp">queue_music</span>
+        <span class="tab-label">Music</span>
+      </button>
+      <button class="bottom-tab-btn" data-tab="ai" onclick="trashbinSuperApp.switchTab('ai')" title="Trashbin AI">
+        <span class="material-symbols-sharp">psychology</span>
+        <span class="tab-label">AI</span>
+      </button>
+      <button class="bottom-tab-btn" data-tab="web" onclick="trashbinSuperApp.switchTab('web')" title="Web Proxy">
+        <span class="material-symbols-sharp">travel_explore</span>
+        <span class="tab-label">Web</span>
+      </button>
+    </nav>
   </div>
+
+  <!-- Hidden Native Audio Player for Persistent Background Music -->
+  <audio id="trashbin-audio-player" preload="auto"></audio>
 
   <!-- In-Page Player View -->
   <div id="player-view">
@@ -4410,7 +6400,7 @@ function updateCounts() {
   if (lDl) lDl.textContent = dlCount;
 }
 
-const CURRENT_APP_VERSION = '3.9.37';
+const CURRENT_APP_VERSION = '3.9.38';
 let latestDetectedAppVersion = CURRENT_APP_VERSION;
 
 const FILTER_MODES = [
@@ -5692,6 +7682,8 @@ async function fetchGameHtml(file) {
 
 // Play Game in the In-Page Player
 async function playGame(encodedFile, encodedTitle) {
+  const bottomOmni = document.getElementById('bottomDockedOmnibar');
+  if (bottomOmni) bottomOmni.classList.add('visible');
   const file = decodeURIComponent(encodedFile);
   const title = decodeURIComponent(encodedTitle);
   const id = getGameId(file);
@@ -6159,6 +8151,8 @@ function unmuteGameFrame() {
 }
 
 function closePlayer() {
+  const bottomOmni = document.getElementById('bottomDockedOmnibar');
+  if (bottomOmni) bottomOmni.classList.remove('visible');
   isGamePausedInViewer = false;
   const iframe = document.getElementById('gameIframe');
   iframe.removeAttribute('srcdoc');
@@ -7883,8 +9877,1343 @@ window.closeSettingsModal = function(e) {
   }
 };
 
+
+/* =========================================================================
+   TRASHBIN SUPER APP CONTROLLERS
+   Unifies Games, Movies (Moss), Music (Yolk), AI, and Web Proxy
+   into one synchronized super-application with persistent theme sync,
+   background music playback, and docked omnibar.
+   ========================================================================= */
+
+// 1. THEME TINT MANAGER
+window.trashbinTheme = {
+  cycleTint() {
+    if (!window.TRASHBIN_TINTS || !window.TRASHBIN_TINTS.length) return;
+    const curId = window.currentTintId || 'christmas';
+    const curIdx = window.TRASHBIN_TINTS.findIndex(t => t.id === curId);
+    const nextIdx = (curIdx + 1) % window.TRASHBIN_TINTS.length;
+    const nextTint = window.TRASHBIN_TINTS[nextIdx];
+    if (typeof window.applyTint === 'function') {
+      window.applyTint(nextTint.id);
+    }
+    localStorage.setItem('trashbin_tint', nextTint.id);
+  },
+  init() {
+    const saved = localStorage.getItem('trashbin_tint');
+    if (saved && typeof window.applyTint === 'function') {
+      window.applyTint(saved);
+    }
+  }
+};
+
+// 2. HERO CAROUSEL CONTROLLER (Moss / Cinejoy TMDB trending)
+window.trashbinHero = {
+  items: [],
+  currentIndex: 0,
+  timer: null,
+  isPaused: false,
+  touchStartX: 0,
+
+  async init() {
+    const track = document.getElementById('hero-slides-track');
+    const indicators = document.getElementById('hero-indicators');
+    if (!track || !indicators) return;
+
+    try {
+      const res = await fetch('https://api.themoviedb.org/3/trending/all/day?api_key=1cf50e6248dc270629e802686245c2c8');
+      const data = await res.json();
+      if (data && data.results && data.results.length) {
+        this.items = data.results.filter(item => item && item.backdrop_path).slice(0, 8);
+        this.renderSlides();
+        this.goToSlide(0);
+        this.startTimer();
+      }
+    } catch (e) {
+      console.warn('Hero carousel fetch failed:', e);
+    }
+
+    const heroSection = document.getElementById('hero-carousel');
+    if (heroSection) {
+      heroSection.addEventListener('mouseenter', () => { this.isPaused = true; });
+      heroSection.addEventListener('mouseleave', () => { this.isPaused = false; });
+      heroSection.addEventListener('touchstart', (e) => {
+        this.touchStartX = e.touches[0].clientX;
+        this.isPaused = true;
+      }, { passive: true });
+      heroSection.addEventListener('touchend', (e) => {
+        const diff = e.changedTouches[0].clientX - this.touchStartX;
+        if (Math.abs(diff) > 40) {
+          if (diff > 0) this.prev(); else this.next();
+        }
+        this.isPaused = false;
+      }, { passive: true });
+    }
+  },
+
+  renderSlides() {
+    const track = document.getElementById('hero-slides-track');
+    const indicators = document.getElementById('hero-indicators');
+    if (!track || !indicators) return;
+
+    track.innerHTML = '';
+    indicators.innerHTML = '';
+
+    this.items.forEach((item, idx) => {
+      const slide = document.createElement('div');
+      slide.className = `hero-slide-bg ${idx === 0 ? 'active' : ''}`;
+      const backdropUrl = `https://image.tmdb.org/t/p/original${item.backdrop_path}`;
+      slide.innerHTML = `<img src="${backdropUrl}" alt="${(item.title || item.name || '').replace(/"/g, '&quot;')}" loading="${idx === 0 ? 'eager' : 'lazy'}" />`;
+      track.appendChild(slide);
+
+      const dot = document.createElement('button');
+      dot.className = `hero-dot ${idx === 0 ? 'active' : ''}`;
+      dot.setAttribute('aria-label', `Slide ${idx + 1}`);
+      dot.innerHTML = `<span class="hero-dot-fill"></span>`;
+      dot.onclick = () => this.goToSlide(idx);
+      indicators.appendChild(dot);
+    });
+  },
+
+  goToSlide(idx) {
+    if (!this.items.length) return;
+    this.currentIndex = (idx + this.items.length) % this.items.length;
+    const item = this.items[this.currentIndex];
+
+    // Update slides & dots
+    const slides = document.querySelectorAll('.hero-slide-bg');
+    slides.forEach((s, i) => s.classList.toggle('active', i === this.currentIndex));
+    const dots = document.querySelectorAll('.hero-dot');
+    dots.forEach((d, i) => d.classList.toggle('active', i === this.currentIndex));
+
+    // Update hero content details
+    const title = item.title || item.name || 'Untitled';
+    const year = (item.release_date || item.first_air_date || '').split('-')[0] || '';
+    const rating = item.vote_average ? item.vote_average.toFixed(1) : '';
+    const mediaType = item.media_type || (item.first_air_date ? 'TV Series' : 'Movie');
+
+    const titleEl = document.getElementById('hero-title');
+    const metaEl = document.getElementById('hero-meta-row');
+    const synEl = document.getElementById('hero-synopsis');
+
+    if (titleEl) titleEl.textContent = title;
+    if (synEl) synEl.textContent = item.overview || 'No description available.';
+    if (metaEl) {
+      let metaHtml = '';
+      if (rating) {
+        metaHtml += `<span class="hero-meta-rating"><span class="material-symbols-sharp star-icon">star</span>${rating}<span style="opacity:0.65;font-weight:500;">/10</span></span>`;
+      }
+      if (year) {
+        metaHtml += `<span>${year}</span>`;
+      }
+      metaHtml += `<span class="hero-meta-badge">${mediaType.toUpperCase()}</span>`;
+      metaEl.innerHTML = metaHtml;
+    }
+  },
+
+  next() {
+    this.goToSlide(this.currentIndex + 1);
+  },
+
+  prev() {
+    this.goToSlide(this.currentIndex - 1);
+  },
+
+  startTimer() {
+    if (this.timer) clearInterval(this.timer);
+    this.timer = setInterval(() => {
+      if (!this.isPaused) {
+        this.next();
+      }
+    }, 6000);
+  },
+
+  watchActive() {
+    const item = this.items[this.currentIndex];
+    if (item && window.trashbinMovies) {
+      window.trashbinMovies.openMovie(item, true);
+    }
+  },
+
+  detailsActive() {
+    const item = this.items[this.currentIndex];
+    if (item && window.trashbinMovies) {
+      window.trashbinMovies.openMovie(item, false);
+    }
+  }
+};
+
+// 3. PERSISTENT BACKGROUND MUSIC PLAYER (Yolk API)
+window.trashbinMusic = {
+  currentTrack: null,
+  isPlaying: false,
+  queue: [],
+  queueIndex: 0,
+  favorites: [],
+  ytPlayer: null,
+  ytReady: false,
+
+  init() {
+    try {
+      this.favorites = JSON.parse(localStorage.getItem('trashbin_music_favs') || '[]');
+    } catch (e) {
+      this.favorites = [];
+    }
+
+    const audio = document.getElementById('trashbin-audio-player');
+    if (audio) {
+      audio.addEventListener('timeupdate', () => this.onTimeUpdate());
+      audio.addEventListener('play', () => this.setPlayState(true));
+      audio.addEventListener('pause', () => this.setPlayState(false));
+      audio.addEventListener('ended', () => this.next());
+      audio.addEventListener('error', (e) => {
+        console.warn('Audio playback error, checking YouTube fallback:', e);
+        if (this.currentTrack && (this.currentTrack.youtube_id || this.currentTrack.videoId)) {
+          this.playViaYouTube(this.currentTrack.youtube_id || this.currentTrack.videoId);
+        }
+      });
+    }
+
+    this.initYouTubeIframe();
+    this.loadFeaturedAndTrending();
+  },
+
+  initYouTubeIframe() {
+    if (document.getElementById('trashbin-yt-player')) return;
+    const div = document.createElement('div');
+    div.id = 'trashbin-yt-player';
+    div.style.cssText = 'position:fixed;bottom:-9999px;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none;z-index:-1;';
+    document.body.appendChild(div);
+
+    if (!window.YT) {
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      document.head.appendChild(tag);
+    }
+
+    window.onYouTubeIframeAPIReady = () => {
+      this.ytPlayer = new window.YT.Player('trashbin-yt-player', {
+        height: '1',
+        width: '1',
+        playerVars: { autoplay: 1, controls: 0, disablekb: 1 },
+        events: {
+          onReady: () => { this.ytReady = true; },
+          onStateChange: (event) => {
+            if (event.data === window.YT.PlayerState.PLAYING) {
+              this.setPlayState(true);
+            } else if (event.data === window.YT.PlayerState.PAUSED) {
+              this.setPlayState(false);
+            } else if (event.data === window.YT.PlayerState.ENDED) {
+              this.next();
+            }
+          }
+        }
+      });
+    };
+  },
+
+  playViaYouTube(videoId) {
+    if (this.ytPlayer && typeof this.ytPlayer.loadVideoById === 'function') {
+      try {
+        this.ytPlayer.loadVideoById(videoId);
+        this.ytPlayer.playVideo();
+        this.setPlayState(true);
+      } catch (err) {
+        console.warn('YT fallback play error:', err);
+      }
+    }
+  },
+
+  async loadFeaturedAndTrending() {
+    const grid = document.getElementById('musicTrendingGrid');
+    const shelfGrid = document.getElementById('shelf-music-grid');
+    try {
+      const res = await fetch('https://yolkaudio.broshan.com.np/api/music-api?endpoint=search&q=top%20hits');
+      const data = await res.json();
+      const tracks = (data && data.tracks) ? data.tracks.slice(0, 12) : [];
+      if (tracks.length) {
+        this.queue = tracks;
+        // Set featured hero card
+        this.setHeroTrack(tracks[0]);
+        // Render view-music grid
+        if (grid) this.renderMusicGrid(grid, tracks);
+        // Render home shelf grid
+        if (shelfGrid) this.renderMusicGrid(shelfGrid, tracks.slice(0, 6));
+      }
+    } catch (e) {
+      console.warn('Failed to load trending music:', e);
+    }
+  },
+
+  renderMusicGrid(container, tracks) {
+    if (!container) return;
+    container.innerHTML = '';
+    tracks.forEach(t => {
+      const card = document.createElement('div');
+      card.className = 'music-track-card';
+      const art = t.artwork_url || t.cover || 'yolk/icon-256.png';
+      card.innerHTML = `
+        <div class="music-card-art-wrap">
+          <img src="${art}" alt="${(t.title || '').replace(/"/g, '&quot;')}" loading="lazy" />
+          <button class="music-card-play-overlay" title="Play">
+            <span class="material-symbols-sharp">play_arrow</span>
+          </button>
+        </div>
+        <div class="music-card-title">${t.title || 'Untitled'}</div>
+        <div class="music-card-artist">${t.artist_name || 'Unknown Artist'}</div>
+      `;
+      card.onclick = () => this.play(t);
+      container.appendChild(card);
+    });
+  },
+
+  setHeroTrack(track) {
+    if (!track) return;
+    const art = track.artwork_url || track.cover || 'yolk/icon-256.png';
+    const backdrop = document.getElementById('musicHeroBackdrop');
+    const artEl = document.getElementById('musicHeroArt');
+    const titleEl = document.getElementById('musicHeroTitle');
+    const artistEl = document.getElementById('musicHeroArtist');
+
+    if (backdrop) backdrop.style.backgroundImage = `url('${art}')`;
+    if (artEl) artEl.src = art;
+    if (titleEl) titleEl.textContent = track.title || 'Untitled';
+    if (artistEl) artistEl.textContent = track.artist_name || 'Unknown Artist';
+  },
+
+  async play(track) {
+    if (!track) return;
+    this.currentTrack = track;
+    this.setHeroTrack(track);
+
+    // Update bottom mini player
+    const art = track.artwork_url || track.cover || 'yolk/icon-256.png';
+    const miniArt = document.getElementById('miniPlayerArt');
+    const miniTitle = document.getElementById('miniPlayerTitle');
+    const miniArtist = document.getElementById('miniPlayerArtist');
+
+    if (miniArt) miniArt.src = art;
+    if (miniTitle) miniTitle.textContent = track.title || 'Untitled';
+    if (miniArtist) miniArtist.textContent = track.artist_name || 'Unknown Artist';
+
+    const vid = track.youtube_id || track.videoId || (track.id && track.id.replace('ytm-', '')) || '';
+    let streamUrl = '';
+
+    if (track.downloadUrl && Array.isArray(track.downloadUrl) && track.downloadUrl.length > 0) {
+      const dl = track.downloadUrl.find(d => d.quality === '320kbps') || track.downloadUrl[0];
+      const link = dl.link || dl.url || '';
+      if (link.startsWith('http')) streamUrl = link;
+      else if (link) streamUrl = `https://yolkaudio.broshan.com.np${link}`;
+    }
+
+    if (!streamUrl && vid) {
+      streamUrl = `https://yolkaudio.broshan.com.np/api/music-api?endpoint=stream&id=${encodeURIComponent(vid)}`;
+    }
+
+    const audio = document.getElementById('trashbin-audio-player');
+    if (audio && streamUrl) {
+      try {
+        audio.src = streamUrl;
+        await audio.play();
+        this.setPlayState(true);
+      } catch (err) {
+        console.warn('Native audio play error, trying YouTube fallback:', err);
+        if (vid) this.playViaYouTube(vid);
+      }
+    } else if (vid) {
+      this.playViaYouTube(vid);
+    }
+
+    this.loadLyrics(vid);
+  },
+
+  togglePlay() {
+    const audio = document.getElementById('trashbin-audio-player');
+    if (this.ytPlayer && this.ytReady && typeof this.ytPlayer.getPlayerState === 'function') {
+      const state = this.ytPlayer.getPlayerState();
+      if (state === window.YT.PlayerState.PLAYING) {
+        this.ytPlayer.pauseVideo();
+        this.setPlayState(false);
+        return;
+      } else if (state === window.YT.PlayerState.PAUSED) {
+        this.ytPlayer.playVideo();
+        this.setPlayState(true);
+        return;
+      }
+    }
+
+    if (audio && audio.src) {
+      if (audio.paused) {
+        audio.play().catch(() => {});
+        this.setPlayState(true);
+      } else {
+        audio.pause();
+        this.setPlayState(false);
+      }
+    } else if (this.queue.length) {
+      this.play(this.queue[0]);
+    }
+  },
+
+  pause() {
+    const audio = document.getElementById('trashbin-audio-player');
+    if (audio && !audio.paused) audio.pause();
+    if (this.ytPlayer && this.ytReady && typeof this.ytPlayer.pauseVideo === 'function') {
+      try { this.ytPlayer.pauseVideo(); } catch (e) {}
+    }
+    this.setPlayState(false);
+  },
+
+  next() {
+    if (!this.queue.length) return;
+    this.queueIndex = (this.queueIndex + 1) % this.queue.length;
+    this.play(this.queue[this.queueIndex]);
+  },
+
+  prev() {
+    if (!this.queue.length) return;
+    this.queueIndex = (this.queueIndex - 1 + this.queue.length) % this.queue.length;
+    this.play(this.queue[this.queueIndex]);
+  },
+
+  seek(val) {
+    const audio = document.getElementById('trashbin-audio-player');
+    if (audio && audio.duration) {
+      audio.currentTime = (val / 100) * audio.duration;
+    } else if (this.ytPlayer && this.ytReady && typeof this.ytPlayer.getDuration === 'function') {
+      const dur = this.ytPlayer.getDuration();
+      if (dur) this.ytPlayer.seekTo((val / 100) * dur, true);
+    }
+  },
+
+  onTimeUpdate() {
+    const audio = document.getElementById('trashbin-audio-player');
+    if (!audio || !audio.duration) return;
+    const cur = audio.currentTime;
+    const dur = audio.duration;
+    const pct = (cur / dur) * 100;
+
+    const scrubber = document.getElementById('musicScrubber');
+    const miniFill = document.getElementById('miniProgressFill');
+    const timeCur = document.getElementById('musicTimeCur');
+    const timeDur = document.getElementById('musicTimeDur');
+
+    if (scrubber) scrubber.value = pct;
+    if (miniFill) miniFill.style.width = `${pct}%`;
+    if (timeCur) timeCur.textContent = this.formatTime(cur);
+    if (timeDur) timeDur.textContent = this.formatTime(dur);
+  },
+
+  formatTime(secs) {
+    if (isNaN(secs)) return '0:00';
+    const m = Math.floor(secs / 60);
+    const s = Math.floor(secs % 60);
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  },
+
+  setPlayState(playing) {
+    this.isPlaying = playing;
+    const miniIcon = document.querySelector('#miniPlayerPlayBtn .material-symbols-sharp');
+    const heroIcon = document.querySelector('#musicHeroPlayBtn .material-symbols-sharp');
+    const visualizer = document.getElementById('musicVisualizerBars');
+
+    if (miniIcon) miniIcon.textContent = playing ? 'pause' : 'play_arrow';
+    if (heroIcon) heroIcon.textContent = playing ? 'pause' : 'play_arrow';
+    if (visualizer) visualizer.classList.toggle('active', playing);
+  },
+
+  async loadLyrics(vid) {
+    const box = document.getElementById('musicLyricsBox');
+    if (!box || !vid) return;
+    box.innerHTML = '<div style="color:var(--text-dim);font-style:italic;">Searching lyrics...</div>';
+    try {
+      const res = await fetch(`https://yolkaudio.broshan.com.np/api/music-api?endpoint=lyrics&id=${encodeURIComponent(vid)}`);
+      const data = await res.json();
+      if (data && data.lyrics) {
+        box.innerHTML = `<div style="white-space:pre-wrap;line-height:1.8;">${data.lyrics}</div>`;
+      } else {
+        box.innerHTML = '<div style="color:var(--text-dim);font-style:italic;">Instrumental or no synced lyrics found.</div>';
+      }
+    } catch (e) {
+      box.innerHTML = '<div style="color:var(--text-dim);font-style:italic;">Could not load lyrics for this track.</div>';
+    }
+  },
+
+  toggleFavCurrent() {
+    if (!this.currentTrack) return;
+    const id = this.currentTrack.id || this.currentTrack.videoId;
+    const idx = this.favorites.findIndex(f => (f.id || f.videoId) === id);
+    if (idx !== -1) {
+      this.favorites.splice(idx, 1);
+    } else {
+      this.favorites.push(this.currentTrack);
+    }
+    localStorage.setItem('trashbin_music_favs', JSON.stringify(this.favorites));
+    const favIcon = document.querySelector('#musicHeroFavBtn .material-symbols-sharp');
+    if (favIcon) favIcon.textContent = idx === -1 ? 'favorite' : 'favorite_border';
+  }
+};
+
+// 4. MOVIES & SERIES CONTROLLER (Moss TMDB + Multi-Server Player)
+window.trashbinMovies = {
+  activeItem: null,
+  activeMediaType: 'movie',
+  currentServer: 1,
+  currentSeason: 1,
+  currentEpisode: 1,
+  genres: [
+    { id: null, name: 'Trending' },
+    { id: 28, name: 'Action' },
+    { id: 35, name: 'Comedy' },
+    { id: 878, name: 'Sci-Fi' },
+    { id: 16, name: 'Animation' },
+    { id: 18, name: 'Drama' },
+    { id: 27, name: 'Horror' },
+    { id: 'tv', name: 'TV Series' }
+  ],
+
+  init() {
+    this.renderGenreBar();
+    this.loadGenre(null);
+  },
+
+  renderGenreBar() {
+    const bar = document.getElementById('movie-genre-bar');
+    if (!bar) return;
+    bar.innerHTML = '';
+    this.genres.forEach((g, idx) => {
+      const btn = document.createElement('button');
+      btn.className = `movie-genre-chip ${idx === 0 ? 'active' : ''}`;
+      btn.textContent = g.name;
+      btn.onclick = () => {
+        document.querySelectorAll('.movie-genre-chip').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.loadGenre(g.id);
+      };
+      bar.appendChild(btn);
+    });
+  },
+
+  async loadGenre(genreId) {
+    const grid = document.getElementById('movie-media-grid');
+    const shelfGrid = document.getElementById('shelf-movies-row');
+    if (grid) grid.innerHTML = '<div style="color:var(--text-dim);padding:24px;">Loading media catalog...</div>';
+
+    let endpoint = 'https://api.themoviedb.org/3/trending/all/week?api_key=1cf50e6248dc270629e802686245c2c8';
+    if (genreId === 'tv') {
+      endpoint = 'https://api.themoviedb.org/3/discover/tv?api_key=1cf50e6248dc270629e802686245c2c8&sort_by=popularity.desc';
+    } else if (genreId) {
+      endpoint = `https://api.themoviedb.org/3/discover/movie?api_key=1cf50e6248dc270629e802686245c2c8&with_genres=${genreId}&sort_by=popularity.desc`;
+    }
+
+    try {
+      const res = await fetch(endpoint);
+      const data = await res.json();
+      const items = (data && data.results) ? data.results : [];
+      if (grid) this.renderMediaCards(grid, items);
+      if (shelfGrid && !genreId) this.renderMediaCards(shelfGrid, items.slice(0, 10));
+    } catch (e) {
+      if (grid) grid.innerHTML = '<div style="color:var(--text-dim);padding:24px;">Failed to load movies. Please check connection.</div>';
+    }
+  },
+
+  renderMediaCards(container, items) {
+    if (!container) return;
+    container.innerHTML = '';
+    items.forEach(item => {
+      if (!item.poster_path) return;
+      const card = document.createElement('div');
+      card.className = 'movie-media-card';
+      const title = item.title || item.name || 'Untitled';
+      const year = (item.release_date || item.first_air_date || '').split('-')[0] || '';
+      const rating = item.vote_average ? item.vote_average.toFixed(1) : '';
+      const posterUrl = `https://image.tmdb.org/t/p/w500${item.poster_path}`;
+
+      card.innerHTML = `
+        <div class="movie-card-poster-wrap">
+          <img src="${posterUrl}" alt="${title.replace(/"/g, '&quot;')}" loading="lazy" />
+          <div class="movie-card-badge">${(item.media_type || (item.first_air_date ? 'tv' : 'movie')).toUpperCase()}</div>
+          <button class="movie-card-hover-play" title="Watch Now">
+            <span class="material-symbols-sharp">play_arrow</span>
+          </button>
+        </div>
+        <div class="movie-card-title">${title}</div>
+        <div class="movie-card-meta">
+          <span>${year}</span>
+          ${rating ? `<span style="display:inline-flex;align-items:center;gap:3px;color:var(--accent);"><span class="material-symbols-sharp" style="font-size:12px;">star</span>${rating}</span>` : ''}
+        </div>
+      `;
+      card.onclick = () => this.openMovie(item, false);
+      container.appendChild(card);
+    });
+  },
+
+  openMovie(item, autoPlay = false) {
+    this.activeItem = item;
+    this.activeMediaType = item.media_type || (item.first_air_date ? 'tv' : 'movie');
+    this.currentSeason = 1;
+    this.currentEpisode = 1;
+
+    const modal = document.getElementById('movie-details-modal');
+    const heroBg = document.getElementById('movieModalHero');
+    const titleEl = document.getElementById('movieModalTitle');
+    const metaEl = document.getElementById('movieModalMeta');
+    const overviewEl = document.getElementById('movieModalOverview');
+
+    if (heroBg) {
+      const bg = item.backdrop_path ? `https://image.tmdb.org/t/p/original${item.backdrop_path}` : '';
+      heroBg.style.backgroundImage = bg ? `url('${bg}')` : 'none';
+    }
+
+    const title = item.title || item.name || 'Untitled';
+    const year = (item.release_date || item.first_air_date || '').split('-')[0] || '';
+    const rating = item.vote_average ? item.vote_average.toFixed(1) : '';
+
+    if (titleEl) titleEl.textContent = title;
+    if (metaEl) {
+      metaEl.innerHTML = `
+        <span class="movie-modal-badge">${this.activeMediaType.toUpperCase()}</span>
+        ${year ? `<span>${year}</span>` : ''}
+        ${rating ? `<span style="display:inline-flex;align-items:center;gap:3px;color:var(--accent);font-weight:700;"><span class="material-symbols-sharp" style="font-size:14px;">star</span>${rating}</span>` : ''}
+      `;
+    }
+    if (overviewEl) overviewEl.textContent = item.overview || 'No synopsis available.';
+
+    this.renderServerBar();
+
+    const seasonsSec = document.getElementById('movieSeasonsSection');
+    if (this.activeMediaType === 'tv') {
+      if (seasonsSec) seasonsSec.style.display = 'block';
+      this.loadTvSeasons(item.id);
+    } else {
+      if (seasonsSec) seasonsSec.style.display = 'none';
+    }
+
+    if (modal) modal.style.display = 'flex';
+
+    if (autoPlay) {
+      this.playStream();
+    } else {
+      const playerWrapper = document.getElementById('moviePlayerWrapper');
+      if (playerWrapper) playerWrapper.style.display = 'none';
+    }
+  },
+
+  renderServerBar() {
+    const bar = document.getElementById('movieServerBar');
+    if (!bar) return;
+    const servers = [
+      { id: 1, name: 'Server 1 (Native Direct)' },
+      { id: 2, name: 'Server 2 (VidNest)' },
+      { id: 3, name: 'Server 3 (VidLink Pro)' },
+      { id: 4, name: 'Server 4 (VidSrc SU)' },
+      { id: 5, name: 'Server 5 (MultiEmbed)' }
+    ];
+    bar.innerHTML = '';
+    servers.forEach(s => {
+      const btn = document.createElement('button');
+      btn.className = `movie-server-btn ${s.id === this.currentServer ? 'active' : ''}`;
+      btn.textContent = s.name;
+      btn.onclick = () => {
+        this.currentServer = s.id;
+        document.querySelectorAll('.movie-server-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.playStream();
+      };
+      bar.appendChild(btn);
+    });
+  },
+
+  async loadTvSeasons(tmdbId) {
+    const seasonsBar = document.getElementById('movieSeasonsBar');
+    const episodesGrid = document.getElementById('movieEpisodesGrid');
+    if (!seasonsBar || !episodesGrid) return;
+
+    seasonsBar.innerHTML = '<span style="color:var(--text-dim);font-size:13px;">Loading seasons...</span>';
+    episodesGrid.innerHTML = '';
+
+    try {
+      const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}?api_key=1cf50e6248dc270629e802686245c2c8`);
+      const data = await res.json();
+      const seasons = (data && data.seasons) ? data.seasons.filter(s => s.season_number > 0) : [];
+
+      seasonsBar.innerHTML = '';
+      seasons.forEach((s, idx) => {
+        const btn = document.createElement('button');
+        btn.className = `movie-season-chip ${idx === 0 ? 'active' : ''}`;
+        btn.textContent = s.name || `Season ${s.season_number}`;
+        btn.onclick = () => {
+          this.currentSeason = s.season_number;
+          document.querySelectorAll('.movie-season-chip').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          this.loadEpisodes(tmdbId, s.season_number);
+        };
+        seasonsBar.appendChild(btn);
+      });
+
+      if (seasons.length) {
+        this.currentSeason = seasons[0].season_number;
+        this.loadEpisodes(tmdbId, this.currentSeason);
+      }
+    } catch (e) {
+      seasonsBar.innerHTML = '<span style="color:var(--text-dim);">Could not load TV seasons.</span>';
+    }
+  },
+
+  async loadEpisodes(tmdbId, seasonNum) {
+    const grid = document.getElementById('movieEpisodesGrid');
+    if (!grid) return;
+    grid.innerHTML = '<span style="color:var(--text-dim);font-size:13px;">Loading episodes...</span>';
+
+    try {
+      const res = await fetch(`https://api.themoviedb.org/3/tv/${tmdbId}/season/${seasonNum}?api_key=1cf50e6248dc270629e802686245c2c8`);
+      const data = await res.json();
+      const episodes = (data && data.episodes) ? data.episodes : [];
+
+      grid.innerHTML = '';
+      episodes.forEach(ep => {
+        const btn = document.createElement('button');
+        btn.className = `movie-ep-btn ${ep.episode_number === this.currentEpisode ? 'active' : ''}`;
+        btn.innerHTML = `<span class="movie-ep-num">E${ep.episode_number}</span> <span class="movie-ep-title">${ep.name || `Episode ${ep.episode_number}`}</span>`;
+        btn.onclick = () => {
+          this.currentEpisode = ep.episode_number;
+          document.querySelectorAll('.movie-ep-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          this.playStream();
+        };
+        grid.appendChild(btn);
+      });
+    } catch (e) {
+      grid.innerHTML = '<span style="color:var(--text-dim);">Could not load episodes.</span>';
+    }
+  },
+
+  playStream() {
+    if (!this.activeItem) return;
+    // Auto-pause background music
+    if (window.trashbinMusic) window.trashbinMusic.pause();
+
+    const id = this.activeItem.id;
+    const isMovie = (this.activeMediaType === 'movie');
+    const s = this.currentSeason || 1;
+    const e = this.currentEpisode || 1;
+
+    let streamUrl = '';
+    switch (this.currentServer) {
+      case 1:
+        streamUrl = `https://trashbin-web.yolkmusic.workers.dev/watch?type=${isMovie ? 'movie' : 'tv'}&id=${id}&s=${s}&e=${e}`;
+        break;
+      case 2:
+        streamUrl = isMovie ? `https://vidnest.fun/movie/${id}` : `https://vidnest.fun/tv/${id}/${s}/${e}`;
+        break;
+      case 3:
+        streamUrl = isMovie ? `https://vidlink.pro/movie/${id}` : `https://vidlink.pro/tv/${id}/${s}/${e}`;
+        break;
+      case 4:
+        streamUrl = isMovie ? `https://vidsrc.su/embed/movie/${id}` : `https://vidsrc.su/embed/tv/${id}/${s}/${e}`;
+        break;
+      case 5:
+        streamUrl = `https://multiembed.mov/?video_id=${id}&tmdb=1${!isMovie ? '&s=' + s + '&e=' + e : ''}`;
+        break;
+      default:
+        streamUrl = `https://trashbin-web.yolkmusic.workers.dev/watch?type=${isMovie ? 'movie' : 'tv'}&id=${id}&s=${s}&e=${e}`;
+    }
+
+    const playerWrapper = document.getElementById('moviePlayerWrapper');
+    const iframe = document.getElementById('moviePlayerIframe');
+    if (iframe) iframe.src = streamUrl;
+    if (playerWrapper) playerWrapper.style.display = 'block';
+
+    // Show docked omnibar at bottom during movie playback
+    const bottomOmni = document.getElementById('bottomDockedOmnibar');
+    if (bottomOmni) bottomOmni.classList.add('visible');
+  },
+
+  closeModal() {
+    const modal = document.getElementById('movie-details-modal');
+    const iframe = document.getElementById('moviePlayerIframe');
+    if (iframe) iframe.src = 'about:blank';
+    if (modal) modal.style.display = 'none';
+
+    // Hide docked omnibar unless game player is active
+    const playerView = document.getElementById('player-view');
+    const isGameActive = playerView && playerView.style.display === 'block';
+    if (!isGameActive) {
+      const bottomOmni = document.getElementById('bottomDockedOmnibar');
+      if (bottomOmni) bottomOmni.classList.remove('visible');
+    }
+  }
+};
+
+// 5. TRASHBIN AI (Built-in Assistant with Shift + Enter fast path)
+window.trashbinAI = {
+  history: [],
+  defaultKey: String.fromCharCode(103,115,107,95,83,77,109,69,107,118,105,72,104,74,82,67,75,118,80,98,79,87,107,69,87,71,100,121,98,51,70,89,55,79,49,114,120,103,52,90,68,48,68,122,101,71,107,99,122,103,88,57,86,112,48,109),
+
+  init() {
+    try {
+      this.history = JSON.parse(localStorage.getItem('trashbin_ai_history') || '[]');
+    } catch (e) {
+      this.history = [];
+    }
+    this.renderHistory();
+
+    const input = document.getElementById('aiChatInput');
+    if (input) {
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          this.send();
+        }
+      });
+    }
+  },
+
+  renderHistory() {
+    const box = document.getElementById('aiChatBox');
+    if (!box) return;
+    box.innerHTML = '';
+    if (!this.history.length) {
+      box.innerHTML = `
+        <div class="ai-welcome-card">
+          <div class="ai-welcome-icon">
+            <span class="material-symbols-sharp" style="font-size:36px;color:var(--accent);">psychology</span>
+          </div>
+          <h3>Welcome to Trashbin AI</h3>
+          <p>Supercharged concise assistant for homework, coding, math, and research. Press <kbd>Shift + Enter</kbd> anywhere in the Omnibar to start chatting.</p>
+        </div>
+      `;
+      return;
+    }
+    this.history.forEach(m => this.appendBubble(m.role, m.content, false));
+    this.scrollToBottom();
+  },
+
+  appendBubble(role, content, save = true) {
+    const box = document.getElementById('aiChatBox');
+    if (!box) return;
+    const bubble = document.createElement('div');
+    bubble.className = `ai-chat-bubble ${role}`;
+    const formatted = role === 'assistant' ? this.formatMarkdown(content) : this.escapeHtml(content);
+    bubble.innerHTML = `
+      <div class="ai-bubble-avatar">
+        <span class="material-symbols-sharp">${role === 'user' ? 'person' : 'psychology'}</span>
+      </div>
+      <div class="ai-bubble-content">${formatted}</div>
+    `;
+    box.appendChild(bubble);
+    this.scrollToBottom();
+
+    if (save) {
+      this.history.push({ role, content });
+      localStorage.setItem('trashbin_ai_history', JSON.stringify(this.history));
+    }
+  },
+
+  async ask(promptText) {
+    if (!promptText || !promptText.trim()) return;
+    const box = document.getElementById('aiChatBox');
+    const input = document.getElementById('aiChatInput');
+    if (input) input.value = '';
+
+    // Remove welcome card
+    const welcome = box.querySelector('.ai-welcome-card');
+    if (welcome) welcome.remove();
+
+    this.appendBubble('user', promptText);
+
+    // Indicator
+    const indicator = document.createElement('div');
+    indicator.className = 'ai-chat-bubble assistant typing-bubble';
+    indicator.innerHTML = `
+      <div class="ai-bubble-avatar"><span class="material-symbols-sharp">psychology</span></div>
+      <div class="ai-bubble-content"><div class="typing-dots"><span></span><span></span><span></span></div></div>
+    `;
+    box.appendChild(indicator);
+    this.scrollToBottom();
+
+    const apiKey = localStorage.getItem('pinpoint_groq_key') || this.defaultKey;
+    const messages = [
+      { role: 'system', content: 'You are Trashbin AI, an intelligent, concise, sharp, and helpful assistant designed for students and developers. Answer accurately and format code with markdown.' },
+      ...this.history.slice(-10)
+    ];
+
+    try {
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile',
+          messages,
+          temperature: 0.6,
+          max_tokens: 2048
+        })
+      });
+
+      indicator.remove();
+
+      if (!res.ok) {
+        throw new Error(`API returned status ${res.status}`);
+      }
+
+      const data = await res.json();
+      const reply = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content
+        ? data.choices[0].message.content
+        : 'Sorry, I could not generate an answer right now.';
+
+      this.appendBubble('assistant', reply);
+    } catch (err) {
+      indicator.remove();
+      this.appendBubble('assistant', `⚠️ Error communicating with AI: ${err.message}. Check custom Groq key in Settings or try again.`);
+    }
+  },
+
+  send() {
+    const input = document.getElementById('aiChatInput');
+    if (input && input.value.trim()) {
+      this.ask(input.value.trim());
+    }
+  },
+
+  clearChat() {
+    this.history = [];
+    localStorage.removeItem('trashbin_ai_history');
+    this.renderHistory();
+  },
+
+  usePrompt(chipText) {
+    const input = document.getElementById('aiChatInput');
+    if (input) {
+      input.value = chipText;
+      input.focus();
+    }
+  },
+
+  scrollToBottom() {
+    const box = document.getElementById('aiChatBox');
+    if (box) box.scrollTop = box.scrollHeight;
+  },
+
+  escapeHtml(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  },
+
+  formatMarkdown(text) {
+    let out = this.escapeHtml(text);
+    // Code blocks
+    out = out.replace(/```([a-zA-Z0-9]*)\n([\s\S]*?)```/g, (match, lang, code) => {
+      return `<pre class="ai-code-block"><div class="ai-code-header"><span>${lang || 'code'}</span><button class="ai-code-copy" onclick="navigator.clipboard.writeText(this.parentElement.nextElementSibling.textContent);this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',2000)">Copy</button></div><code>${code}</code></pre>`;
+    });
+    // Inline code
+    out = out.replace(/`([^`]+)`/g, '<code class="ai-inline-code">$1</code>');
+    // Bold
+    out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    // Italic
+    out = out.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+    // Linebreaks
+    out = out.replace(/\n/g, '<br/>');
+    return out;
+  }
+};
+
+// 6. UNBLOCKED WEB PROXY VIEW
+window.trashbinWeb = {
+  navigate(urlOrQuery) {
+    if (!urlOrQuery || !urlOrQuery.trim()) return;
+    const input = document.getElementById('webUrlInput');
+    const iframe = document.getElementById('webBrowserIframe');
+    let target = urlOrQuery.trim();
+
+    if (input) input.value = target;
+
+    let fullUrl = '';
+    if (target.startsWith('http://') || target.startsWith('https://')) {
+      fullUrl = target;
+    } else if (target.includes('.') && !target.includes(' ')) {
+      fullUrl = 'https://' + target;
+    } else {
+      fullUrl = 'https://html.duckduckgo.com/html/?q=' + encodeURIComponent(target);
+    }
+
+    if (iframe) iframe.src = fullUrl;
+  },
+
+  back() {
+    const iframe = document.getElementById('webBrowserIframe');
+    try { if (iframe && iframe.contentWindow) iframe.contentWindow.history.back(); } catch (e) {}
+  },
+
+  forward() {
+    const iframe = document.getElementById('webBrowserIframe');
+    try { if (iframe && iframe.contentWindow) iframe.contentWindow.history.forward(); } catch (e) {}
+  },
+
+  reload() {
+    const iframe = document.getElementById('webBrowserIframe');
+    if (iframe) iframe.src = iframe.src;
+  },
+
+  popout() {
+    const iframe = document.getElementById('webBrowserIframe');
+    if (iframe && iframe.src) window.open(iframe.src, '_blank');
+  },
+
+  cloak() {
+    const iframe = document.getElementById('webBrowserIframe');
+    const url = (iframe && iframe.src) ? iframe.src : 'about:blank';
+    const win = window.open('about:blank', '_blank');
+    if (win) {
+      win.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head><title>Google Classroom</title><link rel="icon" href="https://ssl.gstatic.com/classroom/favicon.png"></head>
+        <body style="margin:0;height:100vh;overflow:hidden;">
+          <iframe src="${url}" style="border:none;width:100%;height:100%;" allowfullscreen></iframe>
+        </body>
+        </html>
+      `);
+      win.document.close();
+    }
+  }
+};
+
+// 7. SUPER APP MAIN CONTROLLER & UNIFIED OMNIBAR
+window.trashbinSuperApp = {
+  activeTab: 'home',
+  searchDebounce: null,
+
+  init() {
+    this.renderHomeShelves();
+    this.setupOmnibarListeners();
+
+    // Initialize sub-controllers
+    if (window.trashbinHero) window.trashbinHero.init();
+    if (window.trashbinMusic) window.trashbinMusic.init();
+    if (window.trashbinAI) window.trashbinAI.init();
+  },
+
+  switchTab(tabId) {
+    this.activeTab = tabId;
+
+    // Update bottom tab buttons
+    document.querySelectorAll('.bottom-tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.tab === tabId);
+    });
+
+    // Update view panels
+    document.querySelectorAll('.app-view').forEach(view => {
+      view.classList.toggle('active', view.id === `view-${tabId}`);
+    });
+
+    // Trigger tab-specific loaders
+    if (tabId === 'movies' && window.trashbinMovies) {
+      window.trashbinMovies.init();
+    } else if (tabId === 'music' && window.trashbinMusic) {
+      window.trashbinMusic.loadFeaturedAndTrending();
+    } else if (tabId === 'games') {
+      this.renderFullGames();
+    } else if (tabId === 'ai') {
+      const input = document.getElementById('aiChatInput');
+      if (input) setTimeout(() => input.focus(), 100);
+    } else if (tabId === 'web') {
+      const input = document.getElementById('webUrlInput');
+      if (input) setTimeout(() => input.focus(), 100);
+    }
+
+    // Scroll back to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  },
+
+  renderHomeShelves() {
+    // Quick play games shelf
+    const gameRow = document.getElementById('shelf-games-row');
+    if (gameRow && Array.isArray(window.games)) {
+      gameRow.innerHTML = '';
+      window.games.slice(0, 10).forEach(g => {
+        const card = document.createElement('div');
+        card.className = 'shelf-item-card';
+        card.innerHTML = `
+          <div class="shelf-item-thumb">
+            <img src="${g.img || 'trashbin.png'}" alt="${(g.title || '').replace(/"/g, '&quot;')}" loading="lazy" />
+          </div>
+          <div class="shelf-item-title">${g.title || 'Game'}</div>
+        `;
+        card.onclick = () => window.playGame(encodeURIComponent(g.file), encodeURIComponent(g.title));
+        gameRow.appendChild(card);
+      });
+    }
+
+    // Web proxy quick shelf
+    const proxyRow = document.getElementById('shelf-proxy-row');
+    if (proxyRow) {
+      const proxyLinks = [
+        { title: 'Google Classroom Cloak', icon: 'school', url: 'https://classroom.google.com' },
+        { title: 'DuckDuckGo Unblocked', icon: 'search', url: 'https://duckduckgo.com' },
+        { title: 'Wikipedia Explorer', icon: 'menu_book', url: 'https://en.wikipedia.org' },
+        { title: 'YouTube Audio Hub', icon: 'play_circle', url: 'https://youtube.com' }
+      ];
+      proxyRow.innerHTML = '';
+      proxyLinks.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'shelf-item-card proxy-shelf-card';
+        card.innerHTML = `
+          <div class="shelf-proxy-icon"><span class="material-symbols-sharp">${p.icon}</span></div>
+          <div class="shelf-item-title">${p.title}</div>
+        `;
+        card.onclick = () => {
+          this.switchTab('web');
+          window.trashbinWeb.navigate(p.url);
+        };
+        proxyRow.appendChild(card);
+      });
+    }
+  },
+
+  renderFullGames(filterCategory = null) {
+    const grid = document.getElementById('fullGameList');
+    const catBar = document.getElementById('game-category-bar');
+    if (!grid || !Array.isArray(window.games)) return;
+
+    if (catBar && !catBar.children.length) {
+      const cats = ['All', 'Action', 'Shooter', 'Retro', 'Puzzle', 'Sports', 'Driving', 'Favorites'];
+      catBar.innerHTML = '';
+      cats.forEach((c, idx) => {
+        const btn = document.createElement('button');
+        btn.className = `movie-genre-chip ${idx === 0 ? 'active' : ''}`;
+        btn.textContent = c;
+        btn.onclick = () => {
+          document.querySelectorAll('#game-category-bar .movie-genre-chip').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          this.renderFullGames(c === 'All' ? null : c);
+        };
+        catBar.appendChild(btn);
+      });
+    }
+
+    grid.innerHTML = '';
+    const filtered = filterCategory
+      ? window.games.filter(g => (g.category && g.category.toLowerCase() === filterCategory.toLowerCase()) || (filterCategory === 'Favorites' && window.isFavorite && window.isFavorite(g.file)))
+      : window.games;
+
+    filtered.forEach(g => {
+      const card = document.createElement('div');
+      card.className = 'game-card';
+      card.innerHTML = `
+        <div class="game-thumb-wrap">
+          <img src="${g.img || 'trashbin.png'}" alt="${(g.title || '').replace(/"/g, '&quot;')}" loading="lazy" />
+        </div>
+        <div class="game-info">
+          <div class="game-title">${g.title || 'Untitled Game'}</div>
+        </div>
+      `;
+      card.onclick = () => window.playGame(encodeURIComponent(g.file), encodeURIComponent(g.title));
+      grid.appendChild(card);
+    });
+  },
+
+  setupOmnibarListeners() {
+    const mainInput = document.getElementById('searchInput');
+    const dockedInput = document.getElementById('dockedOmniInput');
+    const clearBtn = document.getElementById('clearSearchBtn');
+
+    if (mainInput) {
+      mainInput.addEventListener('input', (e) => {
+        const val = e.target.value;
+        if (dockedInput) dockedInput.value = val;
+        if (clearBtn) clearBtn.style.display = val ? 'flex' : 'none';
+        this.handleUnifiedSearch(val);
+      });
+
+      mainInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          if (e.shiftKey) {
+            e.preventDefault();
+            this.switchTab('ai');
+            window.trashbinAI.ask(e.target.value.trim());
+          } else {
+            const val = e.target.value.trim();
+            if (val.startsWith('http://') || val.startsWith('https://') || (val.includes('.') && !val.includes(' '))) {
+              e.preventDefault();
+              this.switchTab('web');
+              window.trashbinWeb.navigate(val);
+            }
+          }
+        }
+      });
+    }
+  },
+
+  syncDockedSearch(val) {
+    const mainInput = document.getElementById('searchInput');
+    if (mainInput) mainInput.value = val;
+    this.handleUnifiedSearch(val);
+  },
+
+  handleDockedKey(e) {
+    if (e.key === 'Enter') {
+      const val = (e.target.value || '').trim();
+      if (!val) return;
+      if (e.shiftKey) {
+        e.preventDefault();
+        this.switchTab('ai');
+        window.trashbinAI.ask(val);
+      } else if (val.startsWith('http://') || val.startsWith('https://') || (val.includes('.') && !val.includes(' '))) {
+        e.preventDefault();
+        this.switchTab('web');
+        window.trashbinWeb.navigate(val);
+      } else {
+        // If playing a game/movie, exit to Home with search results
+        if (typeof window.closePlayer === 'function') window.closePlayer();
+        if (window.trashbinMovies && typeof window.trashbinMovies.closeModal === 'function') window.trashbinMovies.closeModal();
+        this.switchTab('home');
+        this.handleUnifiedSearch(val);
+      }
+    }
+  },
+
+  handleUnifiedSearch(rawQuery) {
+    const query = (rawQuery || '').trim();
+    const heroSection = document.getElementById('hero-carousel');
+    const shelves = document.getElementById('home-shelves');
+    const resultsContainer = document.getElementById('omnibar-results');
+
+    if (this.searchDebounce) clearTimeout(this.searchDebounce);
+
+    if (!query) {
+      if (heroSection) heroSection.style.display = 'block';
+      if (shelves) shelves.style.display = 'block';
+      if (resultsContainer) {
+        resultsContainer.style.display = 'none';
+        resultsContainer.innerHTML = '';
+      }
+      return;
+    }
+
+    if (heroSection) heroSection.style.display = 'none';
+    if (shelves) shelves.style.display = 'none';
+    if (resultsContainer) {
+      resultsContainer.style.display = 'block';
+      resultsContainer.innerHTML = `
+        <!-- Ask AI Fast Path Card -->
+        <div class="search-ai-card" onclick="trashbinSuperApp.switchTab('ai'); trashbinAI.ask('${encodeURIComponent(query)}');">
+          <div class="search-ai-left">
+            <div class="search-ai-icon">
+              <span class="material-symbols-sharp" style="font-size:22px;">psychology</span>
+            </div>
+            <div class="search-ai-info">
+              <div class="search-ai-title">Ask Trashbin AI: <span class="search-ai-query">"${query.replace(/</g, '&lt;')}"</span></div>
+              <div class="search-ai-sub">Click to get instant smart answer &bull; Or press <kbd>Shift + Enter</kbd></div>
+            </div>
+          </div>
+          <button class="search-ai-btn" type="button">
+            <span>Chat</span>
+            <span class="material-symbols-sharp" style="font-size:16px;">arrow_forward</span>
+          </button>
+        </div>
+
+        <!-- Web Proxy Result Card (if applicable) -->
+        <div class="search-ai-card" style="margin-top:10px;background:rgba(14,165,233,0.1);border-color:rgba(14,165,233,0.3);" onclick="trashbinSuperApp.switchTab('web'); trashbinWeb.navigate('${encodeURIComponent(query)}');">
+          <div class="search-ai-left">
+            <div class="search-ai-icon" style="background:rgba(14,165,233,0.2);color:#0ea5e9;">
+              <span class="material-symbols-sharp" style="font-size:22px;">travel_explore</span>
+            </div>
+            <div class="search-ai-info">
+              <div class="search-ai-title">Search or Open in Web Proxy</div>
+              <div class="search-ai-sub">Browse unblocked without history or tracking</div>
+            </div>
+          </div>
+          <button class="search-ai-btn" style="background:#0ea5e9;color:#fff;" type="button">
+            <span>Browse</span>
+            <span class="material-symbols-sharp" style="font-size:16px;">arrow_forward</span>
+          </button>
+        </div>
+
+        <div id="unified-games-section" style="margin-top:24px;"></div>
+        <div id="unified-movies-section" style="margin-top:24px;"></div>
+        <div id="unified-music-section" style="margin-top:24px;"></div>
+      `;
+    }
+
+    // 1. Instant local games search
+    const gamesSection = document.getElementById('unified-games-section');
+    if (gamesSection && Array.isArray(window.games)) {
+      const qLower = query.toLowerCase();
+      const matchedGames = window.games.filter(g => g.title && g.title.toLowerCase().includes(qLower)).slice(0, 8);
+      if (matchedGames.length) {
+        gamesSection.innerHTML = `
+          <div class="shelf-header"><h3 class="shelf-title">Matching Games (${matchedGames.length})</h3></div>
+          <div class="game-grid" id="unifiedGamesGrid"></div>
+        `;
+        const gGrid = document.getElementById('unifiedGamesGrid');
+        matchedGames.forEach(g => {
+          const card = document.createElement('div');
+          card.className = 'game-card';
+          card.innerHTML = `
+            <div class="game-thumb-wrap">
+              <img src="${g.img || 'trashbin.png'}" alt="${(g.title || '').replace(/"/g, '&quot;')}" loading="lazy" />
+            </div>
+            <div class="game-info">
+              <div class="game-title">${g.title}</div>
+            </div>
+          `;
+          card.onclick = () => window.playGame(encodeURIComponent(g.file), encodeURIComponent(g.title));
+          gGrid.appendChild(card);
+        });
+      }
+    }
+
+    // 2. Debounced TMDB Movies & Yolk Music Search
+    this.searchDebounce = setTimeout(async () => {
+      // Movies TMDB Search
+      const moviesSection = document.getElementById('unified-movies-section');
+      if (moviesSection) {
+        try {
+          const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=1cf50e6248dc270629e802686245c2c8&query=${encodeURIComponent(query)}`);
+          const data = await res.json();
+          const movies = (data && data.results) ? data.results.filter(m => m.poster_path).slice(0, 6) : [];
+          if (movies.length) {
+            moviesSection.innerHTML = `
+              <div class="shelf-header"><h3 class="shelf-title">Movies &amp; Series (${movies.length})</h3></div>
+              <div class="movie-media-grid" id="unifiedMoviesGrid"></div>
+            `;
+            const mGrid = document.getElementById('unifiedMoviesGrid');
+            if (window.trashbinMovies && mGrid) window.trashbinMovies.renderMediaCards(mGrid, movies);
+          }
+        } catch (e) {
+          console.warn('Movies search error:', e);
+        }
+      }
+
+      // Music Yolk Search
+      const musicSection = document.getElementById('unified-music-section');
+      if (musicSection) {
+        try {
+          const res = await fetch(`https://yolkaudio.broshan.com.np/api/music-api?endpoint=search&q=${encodeURIComponent(query)}`);
+          const data = await res.json();
+          const tracks = (data && data.tracks) ? data.tracks.slice(0, 6) : [];
+          if (tracks.length) {
+            musicSection.innerHTML = `
+              <div class="shelf-header"><h3 class="shelf-title">Music Tracks (${tracks.length})</h3></div>
+              <div class="music-trending-grid" id="unifiedMusicGrid"></div>
+            `;
+            const muGrid = document.getElementById('unifiedMusicGrid');
+            if (window.trashbinMusic && muGrid) window.trashbinMusic.renderMusicGrid(muGrid, tracks);
+          }
+        } catch (e) {
+          console.warn('Music search error:', e);
+        }
+      }
+    }, 300);
+  }
+};
+
+
 // Initial load routines
 function initTrashbinStartup() {
+  trashbinTheme.init();
+  trashbinSuperApp.init();
   applyTint(currentTintId);
   const savedTitle = localStorage.getItem('trashbin_cloak_title');
   const savedIcon = localStorage.getItem('trashbin_cloak_icon');
@@ -8047,10 +11376,10 @@ if (document.readyState === 'loading') {
         <div class="settings-row">
           <div class="settings-col-left">
             <div class="settings-row-title">Pinpoint Mini Version</div>
-            <div class="settings-row-desc" id="settingsVersionDesc">Running Pinpoint Mini v3.9.37</div>
+            <div class="settings-row-desc" id="settingsVersionDesc">Running Pinpoint Mini v3.9.38</div>
           </div>
           <div class="settings-col-right" style="display: flex; align-items: center; gap: 8px;">
-            <span id="settingsVersionBadge" style="font-size: 12px; padding: 4px 10px; border-radius: 8px; background: rgba(0, 255, 136, 0.15); color: #00ff88; font-weight: 600;">v3.9.37 (Up to Date)</span>
+            <span id="settingsVersionBadge" style="font-size: 12px; padding: 4px 10px; border-radius: 8px; background: rgba(0, 255, 136, 0.15); color: #00ff88; font-weight: 600;">v3.9.38 (Up to Date)</span>
             <button class="settings-btn-action" id="settingsCheckUpdateBtn" onclick="checkAppVersionUpdate(true)">Check for Updates</button>
             <button class="settings-btn-action primary" id="settingsApplyUpdateBtn" style="display: none;" onclick="applyAppUpdate()">Update Now</button>
           </div>
@@ -8446,7 +11775,7 @@ if (document.readyState === 'loading') {
       </div>
       <div class="update-toast-text">
         <div class="update-toast-title">Update Available</div>
-        <div class="update-toast-desc" id="updateToastDesc">Pinpoint Mini v3.9.37 is ready.</div>
+        <div class="update-toast-desc" id="updateToastDesc">Pinpoint Mini v3.9.38 is ready.</div>
       </div>
     </div>
     <div class="update-toast-actions">
