@@ -1,0 +1,3182 @@
+
+
+  <!-- Small Top-Left Logo (reveals during search) -->
+  <a href="#" id="smallLogo" onclick="resetToCenterHome(); return false;">
+    <svg class="brand-icon" viewBox="0 0 24 24" fill="currentColor" width="22" height="22" style="display:inline-block; vertical-align: middle;">
+      <path d="M15 16h4v2h-4zm0-8h7v2h-7zm0 4h6v2h-6zM3 18c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V8H3v10zm2-8h6v8H5v-8zm5-6H6L5 5H2v2h12V5h-3z"/>
+    </svg>
+    <span>Trashbin</span>
+  </a>
+
+  <!-- Top-Right Header Status -->
+  <div class="top-header-right">
+    <div id="connectionStatus" class="header-status-squircle online" title="Status: Online">
+      <span class="dot"></span>
+    </div>
+    <div class="header-status-squircle" title="Downloaded Games">
+      <span class="material-symbols-sharp" style="font-size: 16px;">download</span>
+      <span id="downloadCountLabel">0</span>
+    </div>
+    <button id="headerTimeBtn" class="header-status-squircle header-clickable" onclick="openGameStatusMenu()" title="View System Time & Battery">
+      <span class="material-symbols-sharp" style="font-size: 16px; color: var(--text-muted);">schedule</span>
+      <span id="headerLiveTime">--:--:--</span>
+    </button>
+    <button id="settingsBtn" class="header-status-squircle header-clickable" onclick="toggleSettingsModal()" title="Trashbin Settings">
+      <span class="material-symbols-sharp" style="font-size: 18px;">settings</span>
+    </button>
+  </div>
+
+  <!-- Unified Main Content Flow (Search Block + Games Catalog grouped together) -->
+  <div id="main-content-flow">
+    <!-- Center Search Block (Yolk-style with instant push-up) -->
+    <div id="search-block">
+    <div id="large-logo-wrapper" onclick="focusSearch()">
+      <div class="logo-inner">
+        <div class="logo-row">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="38" height="38" style="display:inline-block; vertical-align: middle; margin-right: 6px;">
+            <path d="M15 16h4v2h-4zm0-8h7v2h-7zm0 4h6v2h-6zM3 18c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V8H3v10zm2-8h6v8H5v-8zm5-6H6L5 5H2v2h12V5h-3z"/>
+          </svg>
+          <h1 class="logo-title">Trashbin</h1>
+        </div>
+        <p class="logo-sub">Fast games, music & study tools</p>
+      </div>
+    </div>
+
+    <div class="search-pill-wrapper">
+      <span class="material-symbols-sharp search-pill-icon">search</span>
+      <input 
+        type="text" 
+        id="searchInput" 
+        placeholder="Search games, music, AI..." 
+        autocomplete="off" 
+        spellcheck="false"
+      />
+      <div class="search-right-actions">
+        <button id="clearSearchBtn" class="clear-search-btn" onclick="clearSearch()" style="display: none;" title="Clear search">
+          <span class="material-symbols-sharp" style="font-size: 16px;">close</span>
+        </button>
+        <button id="browseBtn" class="search-browse-btn" onclick="triggerBrowseAll()" title="Browse all games">
+          <span class="material-symbols-sharp" style="font-size: 16px;">explore</span>
+          <span>Browse</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="quick-pills">
+      <button class="pill-chip" id="chipAll" onclick="selectChip('all')">
+        <span class="material-symbols-sharp" style="font-size: 15px;">grid_view</span>
+        <span>All Games</span>
+        <span class="pill-count" id="allCountBadge">0</span>
+      </button>
+      <button class="pill-chip" id="chipDownloaded" onclick="selectChip('downloaded')">
+        <span class="material-symbols-sharp" style="font-size: 15px;">download_for_offline</span>
+        <span>Downloaded</span>
+        <span class="pill-count" id="dlCountBadge">0</span>
+      </button>
+      <button class="pill-chip" onclick="playGame('yolk/index.html', 'Yolk! - Minimalist Music')">
+        <img src="yolk/yolk-circle.png" alt="" style="width: 14px; height: 14px; border-radius: 50%; object-fit: contain;">
+        <span>Yolk!</span>
+      </button>
+      <button class="pill-chip pill-chip-moss" onclick="playGame('movies/index.html', 'Moss - Movies & Shows')">
+        <img src="data:image/png;base64,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" alt="M" style="width: 14px; height: 14px; object-fit: contain;">
+        <span>Moss</span>
+      </button>
+      <button class="pill-chip" onclick="playGame('textbooks/Soundboard.html', 'Soundboard')">
+        <span class="material-symbols-sharp" style="font-size: 15px; color: #a855f7;">volume_up</span>
+        <span>Soundboard</span>
+      </button>
+      <button class="pill-chip" onclick="playGame('ai.html', 'Trashbin AI')">
+        <span class="material-symbols-sharp" style="font-size: 15px; color: #60a5fa;">psychology</span>
+        <span>AI</span>
+      </button>
+      <button class="pill-chip" onclick="playGame('web.html', 'Trashbin Web')">
+        <span class="material-symbols-sharp" style="font-size: 15px; color: #10b981;">travel_explore</span>
+        <span>Web</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Search Results Container -->
+  <main id="results-container">
+    <div class="results-header">
+      <span class="results-title" id="resultsCategoryLabel">All Games</span>
+      <span id="resultsSummaryLabel" style="font-size: 12px; color: var(--text-dim);"></span>
+    </div>
+
+    <div id="gameList" class="game-grid"></div>
+
+    <div id="emptyState" class="empty-state" style="display: none;">
+      <span class="material-symbols-sharp" style="font-size: 40px; color: #52525b;">search_off</span>
+      <h3>No games found</h3>
+      <p id="emptyStateDesc">Try searching for another keyword.</p>
+    </div>
+  </main>
+  </div>
+
+  <!-- In-Page Player View -->
+  <div id="player-view">
+    <div class="player-header">
+      <div class="player-header-left">
+        <button class="player-btn-squircle" onclick="closePlayer()" title="Back to Games">
+          <span class="material-symbols-sharp">arrow_back</span>
+        </button>
+        <span id="currentPlayerTitle" class="player-title">Playing</span>
+      </div>
+
+      <div class="player-header-center">
+        <button id="playerTimeBtn" class="player-time-squircle" onclick="openGameStatusMenu()" title="View System Status & Battery (Closes Player)">
+          <span class="material-symbols-sharp" style="font-size: 16px; color: #a1a1aa;">schedule</span>
+          <span id="playerLiveTime">--:--:--</span>
+        </button>
+      </div>
+
+      <div class="player-header-right">
+        <!-- Retro Bowl & Retro Bowl College Save Manager -->
+        <button id="runner-save-export" class="player-btn-squircle" onclick="PinpointSaveManager.exportCurrentSave()" title="Export Save Data (.json)" style="display: none;">
+          <span class="material-symbols-sharp">save</span>
+        </button>
+        <button id="runner-save-import" class="player-btn-squircle" onclick="PinpointSaveManager.triggerImportCurrentSave()" title="Import Save Data (.json)" style="display: none;">
+          <span class="material-symbols-sharp">upload_file</span>
+        </button>
+        <input type="file" id="runner-save-file-input" accept=".json,application/json" style="display: none;" onchange="PinpointSaveManager.handleImportFile(event)">
+
+        <button id="playerDownloadBtn" class="player-btn-squircle" onclick="downloadCurrentGame()" title="Download Game for Offline">
+          <span id="playerDownloadIcon" class="material-symbols-sharp">download_for_offline</span>
+        </button>
+        <button class="player-btn-squircle" onclick="reloadPlayer()" title="Reload Game">
+          <span class="material-symbols-sharp">refresh</span>
+        </button>
+        <button id="playerFullscreenBtn" class="player-btn-squircle" onclick="toggleFullscreen()" title="Toggle Fullscreen">
+          <span id="playerFullscreenIcon" class="material-symbols-sharp">fullscreen</span>
+        </button>
+        <button class="player-btn-squircle" onclick="closePlayer()" title="Close Player">
+          <span class="material-symbols-sharp">close</span>
+        </button>
+      </div>
+    </div>
+
+    <iframe id="gameIframe" class="player-iframe" allowfullscreen="true" allow="autoplay; fullscreen; camera; microphone; clipboard-read; clipboard-write; display-capture; geolocation; encrypted-media; picture-in-picture; web-share"></iframe>
+  </div>
+
+  <!-- Device Status & Battery Fullscreen Viewer (Takes the entire person's screen) -->
+  <div id="status-modal-overlay" class="status-fullscreen-overlay" style="display: none;">
+    <button class="status-fullscreen-close-btn" onclick="closeStatusModal()" title="Close Viewer">
+      <span class="material-symbols-sharp">close</span>
+    </button>
+
+    <div class="status-fullscreen-content">
+      <!-- Fullscreen Live Clock in Seconds -->
+      <div id="modalClockTime" class="fullscreen-clock-time">--:--:-- --</div>
+      <div id="modalClockDate" class="fullscreen-clock-date">--------</div>
+
+      <!-- Device Battery Status Fullscreen Card -->
+      <div class="status-battery-card">
+        <div class="battery-top-row">
+          <div class="battery-info-left">
+            <span id="batteryIcon" class="material-symbols-sharp battery-icon">battery_std</span>
+            <div class="battery-text-col">
+              <span class="battery-label">Device Battery</span>
+              <span id="batteryStatusText" class="battery-status-sub">Checking...</span>
+            </div>
+          </div>
+          <div id="batteryPercentText" class="battery-percent-value">--%</div>
+        </div>
+        <div class="battery-bar-container">
+          <div id="batteryBarFill" class="battery-bar-fill" style="width: 0%;"></div>
+        </div>
+        <div id="batteryExtraDetails" class="battery-extra-details"></div>
+      </div>
+
+      <!-- Actions -->
+      <div class="status-fullscreen-actions">
+        <button id="resumeGameBtn" class="status-action-btn primary" style="display: none;" onclick="resumeGame()">
+          <span class="material-symbols-sharp">play_arrow</span>
+          <span>Resume Game</span>
+        </button>
+        <button class="status-action-btn" onclick="exitToTrashbin()">
+          <span class="material-symbols-sharp">arrow_back</span>
+          <span>Return to Trashbin</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+// IndexedDB + CacheStorage for Offline Games (Supports single-file & multi-part/asset games)
+const GAME_DB_NAME = 'TrashbinGamesDB';
+const GAME_DB_VERSION = 1;
+const GAME_STORE_NAME = 'games';
+const GAME_CACHE_NAME = 'trashbin-game-cache';
+const RECOMMENDED_LIMIT_BYTES = 100 * 1024 * 1024; // 100 MB
+
+const CDN_MIRRORS = [
+    'https://cdn.jsdelivr.net',
+    'https://fastly.jsdelivr.net',
+    'https://quantil.jsdelivr.net',
+    'https://testingcf.jsdelivr.net',
+    'https://originfastly.jsdelivr.net',
+    'https://gcore.jsdelivr.net'
+];
+let activeMirror = CDN_MIRRORS[0];
+
+async function autoSelectMirror() {
+    for (const mirror of CDN_MIRRORS) {
+        try {
+            const ctrl = new AbortController();
+            const to = setTimeout(() => ctrl.abort(), 3500);
+            const res = await fetch(mirror + '/gh/pinpoint-edu/assets@main/textbooks/2048.html', {
+                method: 'HEAD',
+                signal: ctrl.signal
+            });
+            clearTimeout(to);
+            if (res.ok) {
+                activeMirror = mirror;
+                console.log('[Trashbin] Connected to CDN mirror:', activeMirror);
+                return;
+            }
+        } catch (e) {}
+    }
+}
+
+const GAME_MANIFESTS = {
+    "textbooks/plants-vs-zombies/index.html": [
+        "/textbooks/plants-vs-zombies/index.html",
+        "/textbooks/plants-vs-zombies/pvz_9_15.swf",
+        "/textbooks/plants-vs-zombies/resources.swf",
+        "/textbooks/plants-vs-zombies/data.xml",
+        "/textbooks/plants-vs-zombies/properties/externalStrings.txt",
+        "/textbooks/plants-vs-zombies/music/cerebrawl.mp3",
+        "/textbooks/plants-vs-zombies/music/chooseyourseeds.mp3",
+        "/textbooks/plants-vs-zombies/music/conveyor.mp3",
+        "/textbooks/plants-vs-zombies/music/crazydave.mp3",
+        "/textbooks/plants-vs-zombies/music/grasswalk.mp3",
+        "/textbooks/plants-vs-zombies/music/loonboon.mp3",
+        "/textbooks/plants-vs-zombies/music/losemusic.mp3",
+        "/textbooks/plants-vs-zombies/music/moongrains.mp3",
+        "/textbooks/plants-vs-zombies/music/winmusic.mp3",
+        "/textbooks/plants-vs-zombies/music/zengarden.mp3",
+        "/textbooks/ruffle/ruffle.js",
+        "/textbooks/ruffle/core.ruffle.16d61072ac7fdc4d5013.js",
+        "/textbooks/ruffle/core.ruffle.994eeef0a471a88cd0e3.js",
+        "/textbooks/ruffle/172de42e6619eac8f371.wasm",
+        "/textbooks/ruffle/878d548199cddef07035.wasm"
+    ],
+    "textbooks/getaway-shootout/index.html": [
+        "/textbooks/getaway-shootout/index.html",
+        "/textbooks/getaway-shootout/Build/loader-v2.js",
+        "/textbooks/getaway-shootout/Build/frame.js",
+        "/textbooks/getaway-shootout/Build/864872d3e8c17c58e54028c101dae7a5.data.br",
+        "/textbooks/getaway-shootout/Build/c0f8b2f06ae4c7c89b1e883b3d07ca8f.wasm.wasm",
+        "/textbooks/getaway-shootout/StreamingAssets/Music.aac"
+    ],
+    "textbooks/getaway-shootout.html": [
+        "/textbooks/getaway-shootout.html",
+        "/textbooks/getaway-shootout/index.html",
+        "/textbooks/getaway-shootout/Build/loader-v2.js",
+        "/textbooks/getaway-shootout/Build/frame.js",
+        "/textbooks/getaway-shootout/Build/864872d3e8c17c58e54028c101dae7a5.data.br",
+        "/textbooks/getaway-shootout/Build/c0f8b2f06ae4c7c89b1e883b3d07ca8f.wasm.wasm",
+        "/textbooks/getaway-shootout/StreamingAssets/Music.aac"
+    ],
+    "textbooks/sprinter/index.html": [
+        "/textbooks/sprinter/index.html",
+        "/textbooks/sprinter/sprinter.swf",
+        "/textbooks/ruffle/ruffle.js",
+        "/textbooks/ruffle/core.ruffle.16d61072ac7fdc4d5013.js",
+        "/textbooks/ruffle/core.ruffle.994eeef0a471a88cd0e3.js",
+        "/textbooks/ruffle/172de42e6619eac8f371.wasm",
+        "/textbooks/ruffle/878d548199cddef07035.wasm"
+    ],
+    "textbooks/basket-random/index.html": [
+        "/textbooks/basket-random/index.html",
+        "/textbooks/basket-random/appmanifest.json",
+        "/textbooks/basket-random/box2d.wasm",
+        "/textbooks/basket-random/box2d.wasm.js",
+        "/textbooks/basket-random/data.json",
+        "/textbooks/basket-random/favicon.ico",
+        "/textbooks/basket-random/style.css",
+        "/textbooks/basket-random/images/ballline-sheet0.png",
+        "/textbooks/basket-random/images/buildingtile2-sheet0.png",
+        "/textbooks/basket-random/images/buildingtile3-sheet0.png",
+        "/textbooks/basket-random/images/buildingtile-sheet0.png",
+        "/textbooks/basket-random/images/cloudtile-sheet0.png",
+        "/textbooks/basket-random/images/fencetile-sheet0.png",
+        "/textbooks/basket-random/images/game_bg-sheet0.png",
+        "/textbooks/basket-random/images/grasslinetile-sheet0.png",
+        "/textbooks/basket-random/images/grasstile-sheet0.png",
+        "/textbooks/basket-random/images/groundtileindoor-sheet0.png",
+        "/textbooks/basket-random/images/groundtileplaj-sheet0.png",
+        "/textbooks/basket-random/images/groundtile-sheet0.png",
+        "/textbooks/basket-random/images/groundtilesnow-sheet0.png",
+        "/textbooks/basket-random/images/hair-sheet0.png",
+        "/textbooks/basket-random/images/indoorbgtile2-sheet0.png",
+        "/textbooks/basket-random/images/indoorbgtile3-sheet0.png",
+        "/textbooks/basket-random/images/indoorbgtile-sheet0.png",
+        "/textbooks/basket-random/images/potatiled-sheet0.png",
+        "/textbooks/basket-random/images/rightshoe-sheet0.png",
+        "/textbooks/basket-random/images/rightshort-sheet0.png",
+        "/textbooks/basket-random/images/seatile-sheet0.png",
+        "/textbooks/basket-random/images/shared-0-sheet0.png",
+        "/textbooks/basket-random/images/shared-0-sheet1.png",
+        "/textbooks/basket-random/images/shared-0-sheet2.png",
+        "/textbooks/basket-random/images/shared-0-sheet3.png",
+        "/textbooks/basket-random/images/shared-0-sheet4.png",
+        "/textbooks/basket-random/images/shared-1-sheet0.png",
+        "/textbooks/basket-random/images/snowtile-sheet0.png",
+        "/textbooks/basket-random/images/startile-sheet0.png",
+        "/textbooks/basket-random/images/titlebg-sheet0.png",
+        "/textbooks/basket-random/images/titlechars-sheet0.png",
+        "/textbooks/basket-random/images/tshirt-sheet0.png",
+        "/textbooks/basket-random/media/bellsoc.webm",
+        "/textbooks/basket-random/media/bup.webm",
+        "/textbooks/basket-random/media/buttonx.webm",
+        "/textbooks/basket-random/media/file.webm",
+        "/textbooks/basket-random/media/goasoc.webm",
+        "/textbooks/basket-random/media/intro-button.webm",
+        "/textbooks/basket-random/media/intro-sound.webm",
+        "/textbooks/basket-random/media/jump.webm",
+        "/textbooks/basket-random/media/menu.webm",
+        "/textbooks/basket-random/media/metal.webm",
+        "/textbooks/basket-random/media/music.webm",
+        "/textbooks/basket-random/media/press.webm",
+        "/textbooks/basket-random/media/refsoc.webm",
+        "/textbooks/basket-random/media/start.webm",
+        "/textbooks/basket-random/media/win.webm",
+        "/textbooks/basket-random/media/wrong.webm",
+        "/textbooks/basket-random/scripts/c3runtime.js",
+        "/textbooks/basket-random/scripts/dispatchworker.js",
+        "/textbooks/basket-random/scripts/jobworker.js",
+        "/textbooks/basket-random/scripts/main.js",
+        "/textbooks/basket-random/scripts/offlineclient.js",
+        "/textbooks/basket-random/scripts/opus.wasm.js",
+        "/textbooks/basket-random/scripts/opus.wasm.wasm",
+        "/textbooks/basket-random/scripts/register-sw.js",
+        "/textbooks/basket-random/scripts/supportcheck.js"
+    ],
+    "textbooks/car-soccer/": [
+        "/textbooks/car-soccer/index.html",
+        "/textbooks/car-soccer/game.js",
+        "/textbooks/car-soccer/interceptor.js",
+        "/textbooks/car-soccer/workers.js",
+        "/textbooks/car-soccer/assets-core.js",
+        "/textbooks/car-soccer/assets-map-dribble.js",
+        "/textbooks/car-soccer/assets-map-ice-1.js",
+        "/textbooks/car-soccer/assets-map-ice-2.js",
+        "/textbooks/car-soccer/images.js"
+    ],
+    "textbooks/people-playground/index.html": [
+        "/textbooks/people-playground/index.html",
+        "/textbooks/people-playground/Build/PPG.loader.js",
+        "/textbooks/people-playground/Build/PPG.framework.js",
+        "/textbooks/people-playground/Build/PPG.data.part1",
+        "/textbooks/people-playground/Build/PPG.data.part2",
+        "/textbooks/people-playground/Build/PPG.data.part3",
+        "/textbooks/people-playground/Build/PPG.data.part4",
+        "/textbooks/people-playground/Build/PPG.data.part5",
+        "/textbooks/people-playground/Build/PPG.data.part6",
+        "/textbooks/people-playground/Build/PPG.wasm.part1",
+        "/textbooks/people-playground/Build/PPG.wasm.part2",
+        "/textbooks/people-playground/Build/PPG.wasm.part3",
+        "/textbooks/people-playground/TemplateData/style.css",
+        "/textbooks/people-playground/TemplateData/favicon.ico",
+        "/textbooks/people-playground/TemplateData/fullscreen-button.png",
+        "/textbooks/people-playground/TemplateData/progress-bar-empty-dark.png",
+        "/textbooks/people-playground/TemplateData/progress-bar-full-dark.png",
+        "/textbooks/people-playground/TemplateData/unity-logo-dark.png",
+        "/textbooks/people-playground/TemplateData/webgl-logo.png"
+    ],
+    "textbooks/happy-wheels.html": [
+        "/textbooks/happy-wheels.html",
+        "/textbooks/happy-wheels.swf",
+        "/textbooks/ruffle/ruffle.js",
+        "/textbooks/ruffle/core.ruffle.16d61072ac7fdc4d5013.js",
+        "/textbooks/ruffle/core.ruffle.994eeef0a471a88cd0e3.js",
+        "/textbooks/ruffle/172de42e6619eac8f371.wasm",
+        "/textbooks/ruffle/878d548199cddef07035.wasm"
+    ],
+    "textbooks/Bloons-TD.html": [
+        "/textbooks/Bloons-TD.html",
+        "/textbooks/Bloons-TD.swf",
+        "/textbooks/ruffle/ruffle.js",
+        "/textbooks/ruffle/core.ruffle.16d61072ac7fdc4d5013.js",
+        "/textbooks/ruffle/core.ruffle.994eeef0a471a88cd0e3.js",
+        "/textbooks/ruffle/172de42e6619eac8f371.wasm",
+        "/textbooks/ruffle/878d548199cddef07035.wasm"
+    ],
+    "textbooks/bloonsTD2.html": [
+        "/textbooks/bloonsTD2.html"
+    ],
+    "textbooks/bloonsTD3.html": [
+        "/textbooks/bloonsTD3.html"
+    ],
+    "textbooks/awesometanks2.html": [
+        "/textbooks/awesometanks2.html"
+    ],
+    "textbooks/bloonsTD4.html": [
+        "/textbooks/bloonsTD4.html"
+    ],
+    "textbooks/bloxorz.html": [
+        "/textbooks/bloxorz.html"
+    ],
+    "textbooks/escape-road-3/index.html": [
+        "/textbooks/escape-road-3/index.html",
+        "/textbooks/escape-road-3/game.html",
+        "/textbooks/escape-road-3/game.css",
+        "/textbooks/escape-road-3/gmsdkv1.js",
+        "/textbooks/escape-road-3/loading.png",
+        "/textbooks/escape-road-3/logo.png",
+        "/textbooks/escape-road-3/fonts/Fredoka-Bold.woff2",
+        "/textbooks/escape-road-3/Build/escape-road-3-v26041006.loader.js",
+        "/textbooks/escape-road-3/Build/escape-road-3-v26041006.framework.js",
+        "/textbooks/escape-road-3/Build/escape-road-3-v26041006.data.part1",
+        "/textbooks/escape-road-3/Build/escape-road-3-v26041006.data.part2",
+        "/textbooks/escape-road-3/Build/escape-road-3-v26041006.data.part3",
+        "/textbooks/escape-road-3/Build/escape-road-3-v26041006.data.part4",
+        "/textbooks/escape-road-3/Build/escape-road-3-v26041006.data.part5",
+        "/textbooks/escape-road-3/Build/escape-road-3-v26041006.data.part6",
+        "/textbooks/escape-road-3/Build/escape-road-3-v26041006.data.part7",
+        "/textbooks/escape-road-3/Build/escape-road-3-v26041006.wasm.part1",
+        "/textbooks/escape-road-3/Build/escape-road-3-v26041006.wasm.part2",
+        "/textbooks/escape-road-3/Build/escape-road-3-v26041006.wasm.part3",
+        "/textbooks/escape-road-3/Build/webgl/boot.config",
+        "/textbooks/escape-road-3/Build/webgl/data.unity3d",
+        "/textbooks/escape-road-3/Build/webgl/Il2CppData/Metadata/global-metadata.dat",
+        "/textbooks/escape-road-3/Build/webgl/resources.resource",
+        "/textbooks/escape-road-3/Build/webgl/Resources/unity_default_resources",
+        "/textbooks/escape-road-3/Build/webgl/RuntimeInitializeOnLoads.json",
+        "/textbooks/escape-road-3/Build/webgl/ScriptingAssemblies.json",
+        "/textbooks/escape-road-3/Build/webgl/sharedassets1.resource",
+        "/textbooks/escape-road-3/Build/webgl/sharedassets2.resource",
+        "/textbooks/escape-road-3/Build/webgl/sharedassets4.resource",
+        "/textbooks/escape-road-3/StreamingAssets/UnityServicesProjectConfiguration.json"
+    ],
+    "textbooks/tetrominoes/index.html": [
+        "/textbooks/tetrominoes/index.html",
+        "/textbooks/tetrominoes/theme.mp3"
+    ],
+    "textbooks/crazy-pixel-apocalypse-9/index.html": [
+        "/textbooks/crazy-pixel-apocalypse-9/index.html",
+        "/textbooks/crazy-pixel-apocalypse-9/Build/puxx.data.unityweb",
+        "/textbooks/crazy-pixel-apocalypse-9/Build/puxx.framework.js.unityweb",
+        "/textbooks/crazy-pixel-apocalypse-9/Build/puxx.loader.js",
+        "/textbooks/crazy-pixel-apocalypse-9/Build/puxx.wasm.unityweb",
+        "/textbooks/crazy-pixel-apocalypse-9/fonts/fonts.css",
+        "/textbooks/crazy-pixel-apocalypse-9/fonts/heebo.woff2",
+        "/textbooks/crazy-pixel-apocalypse-9/fonts/museomoderno.woff2",
+        "/textbooks/crazy-pixel-apocalypse-9/TemplateData/favicon.ico",
+        "/textbooks/crazy-pixel-apocalypse-9/TemplateData/style.css"
+    ],
+    "textbooks/gumspin/index.html": [
+        "/textbooks/gumspin/index.html",
+        "/textbooks/gumspin/Build/UnityLoader.js",
+        "/textbooks/gumspin/Build/GunSpin%20WebGL%20FinalVersion.json",
+        "/textbooks/gumspin/Build/GunSpin WebGL FinalVersion.json",
+        "/textbooks/gumspin/Build/GunSpin%20WebGL%20FinalVersion.data.unityweb",
+        "/textbooks/gumspin/Build/GunSpin WebGL FinalVersion.data.unityweb",
+        "/textbooks/gumspin/Build/GunSpin%20WebGL%20FinalVersion.wasm.code.unityweb",
+        "/textbooks/gumspin/Build/GunSpin WebGL FinalVersion.wasm.code.unityweb",
+        "/textbooks/gumspin/Build/GunSpin%20WebGL%20FinalVersion.wasm.framework.unityweb",
+        "/textbooks/gumspin/Build/GunSpin WebGL FinalVersion.wasm.framework.unityweb",
+        "/textbooks/gumspin/manifest_1.5.18.json",
+        "/textbooks/gumspin/TemplateData/favicon.ico",
+        "/textbooks/gumspin/TemplateData/style.css",
+        "/textbooks/gumspin/TemplateData/UnityProgress.js",
+        "/textbooks/gumspin/TemplateData/progressLogo.Light.png",
+        "/textbooks/gumspin/TemplateData/progressEmpty.Light.png",
+        "/textbooks/gumspin/TemplateData/progressFull.Light.png",
+        "/textbooks/gumspin/TemplateData/progressLogo.Dark.png",
+        "/textbooks/gumspin/TemplateData/progressEmpty.Dark.png",
+        "/textbooks/gumspin/TemplateData/progressFull.Dark.png",
+        "/textbooks/gumspin/TemplateData/webgl-logo.png",
+        "/textbooks/gumspin/TemplateData/fullscreen.png"
+    ],
+    "textbooks/monspin/index.html": [
+        "/textbooks/gumspin/index.html",
+        "/textbooks/gumspin/Build/UnityLoader.js",
+        "/textbooks/gumspin/Build/GunSpin%20WebGL%20FinalVersion.json",
+        "/textbooks/gumspin/Build/GunSpin WebGL FinalVersion.json",
+        "/textbooks/gumspin/Build/GunSpin%20WebGL%20FinalVersion.data.unityweb",
+        "/textbooks/gumspin/Build/GunSpin WebGL FinalVersion.data.unityweb",
+        "/textbooks/gumspin/Build/GunSpin%20WebGL%20FinalVersion.wasm.code.unityweb",
+        "/textbooks/gumspin/Build/GunSpin WebGL FinalVersion.wasm.code.unityweb",
+        "/textbooks/gumspin/Build/GunSpin%20WebGL%20FinalVersion.wasm.framework.unityweb",
+        "/textbooks/gumspin/Build/GunSpin WebGL FinalVersion.wasm.framework.unityweb",
+        "/textbooks/gumspin/manifest_1.5.18.json",
+        "/textbooks/gumspin/TemplateData/favicon.ico",
+        "/textbooks/gumspin/TemplateData/style.css",
+        "/textbooks/gumspin/TemplateData/UnityProgress.js",
+        "/textbooks/gumspin/TemplateData/progressLogo.Light.png",
+        "/textbooks/gumspin/TemplateData/progressEmpty.Light.png",
+        "/textbooks/gumspin/TemplateData/progressFull.Light.png",
+        "/textbooks/gumspin/TemplateData/progressLogo.Dark.png",
+        "/textbooks/gumspin/TemplateData/progressEmpty.Dark.png",
+        "/textbooks/gumspin/TemplateData/progressFull.Dark.png",
+        "/textbooks/gumspin/TemplateData/webgl-logo.png",
+        "/textbooks/gumspin/TemplateData/fullscreen.png"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/1v1.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/1v1.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/1v1lol/UnityProgress.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/1v1lol/2.7.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/1v1lol/1firebase-app.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/1v1lol/1firebase-auth.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/1v1lol/1firebase-firestore.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/1v1lol/1firebase.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/1v1lol/1login.js?v=2",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/1v1lol/1firestore.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/1v1lol/style.css"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_1v1.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/1v1.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/1v1lol/UnityProgress.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/1v1lol/2.7.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/1v1lol/1firebase-app.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/1v1lol/1firebase-auth.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/1v1lol/1firebase-firestore.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/1v1lol/1firebase.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/1v1lol/1login.js?v=2",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/1v1lol/1firestore.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/1v1lol/style.css"
+    ],
+    "textbooks/superhot.html": [
+        "textbooks/superhot.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/swat/ts3.loader.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/swat/ts3.data",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/swat/ts3.framework.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/swat/ts3.wasm",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/swat/ts3.png"
+    ],
+    "textbooks_superhot.html": [
+        "textbooks/superhot.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/swat/ts3.loader.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/swat/ts3.data",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/swat/ts3.framework.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/swat/ts3.wasm",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/swat/ts3.png"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/bank.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/bank.html",
+        "https://ya.ru/games/sdk/v2",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/TemplateData/style.css",
+        "https://cdn.jsdelivr.net/BankRobbery2.data.unityweb",
+        "https://cdn.jsdelivr.net/BankRobbery2.framework.js.unityweb",
+        "https://cdn.jsdelivr.net/BankRobbery2.wasm.unityweb",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2.loader.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2.data.unityweb",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2.framework.js.unityweb",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2.wasm.unityweb",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2_part1.data.unityweb",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2_part2.data.unityweb"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_bank.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/bank.html",
+        "https://ya.ru/games/sdk/v2",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/TemplateData/style.css",
+        "https://cdn.jsdelivr.net/BankRobbery2.data.unityweb",
+        "https://cdn.jsdelivr.net/BankRobbery2.framework.js.unityweb",
+        "https://cdn.jsdelivr.net/BankRobbery2.wasm.unityweb",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2.loader.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2.data.unityweb",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2.framework.js.unityweb",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2.wasm.unityweb",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2_part1.data.unityweb",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/bankrob2/Build/BankRobbery2_part2.data.unityweb"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/baseballbros.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/baseballbros.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/baseballbros/BaseballBros.js?th=76",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/baseballbros/tag.min.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/baseballbros/firebase-app.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/baseballbros/firebase-auth.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/baseballbros/firebase-firestore.js",
+        "https://api.adinplay.com/v4/live/aip/ad-manager.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/baseballbros/favicon.png",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/baseballbros/manifest.json"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_baseballbros.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/baseballbros.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/baseballbros/BaseballBros.js?th=76",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/baseballbros/tag.min.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/baseballbros/firebase-app.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/baseballbros/firebase-auth.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/baseballbros/firebase-firestore.js",
+        "https://api.adinplay.com/v4/live/aip/ad-manager.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/baseballbros/favicon.png",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/baseballbros/manifest.json"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/basketbros.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/basketbros.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/basketballbros//BasketBros.js?th=644",
+        "https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js",
+        "https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js",
+        "https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js",
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/favicon.png",
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/manifest.json"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_assets_html_main_basketbros.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/basketbros.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/basketballbros//BasketBros.js?th=644",
+        "https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js",
+        "https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js",
+        "https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js",
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/favicon.png",
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/manifest.json"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/blockblast.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/blockblast.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/blocks/TemplateData/favicon.ico",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/blocks/TemplateData/style.css",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/blocks/manifest.webmanifest",
+        "https://cdn.jsdelivr.net/BlockBlast1.1-8.data.unityweb",
+        "https://cdn.jsdelivr.net/BlockBlast1.1-8.framework.js.unityweb",
+        "https://cdn.jsdelivr.net/BlockBlast1.1-8.wasm.unityweb"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_blockblast.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/blockblast.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/blocks/TemplateData/favicon.ico",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/blocks/TemplateData/style.css",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/blocks/manifest.webmanifest",
+        "https://cdn.jsdelivr.net/BlockBlast1.1-8.data.unityweb",
+        "https://cdn.jsdelivr.net/BlockBlast1.1-8.framework.js.unityweb",
+        "https://cdn.jsdelivr.net/BlockBlast1.1-8.wasm.unityweb"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/bowmasters.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/bowmasters.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/bow/customytgame.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/bow/game.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/bow/style/index.css"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_bowmasters.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/bowmasters.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/bow/customytgame.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/bow/game.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/bow/style/index.css"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/buckshot.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/buckshot.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/buckshot/style.css",
+        "https://cdn.jsdelivr.net/6.data.br",
+        "https://cdn.jsdelivr.net/6.framework.js",
+        "https://cdn.jsdelivr.net/6.wasm.br",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/buckshot/StreamingAssets",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/buckshot/Build/6.loader.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/buckshot/Build/6.data.br",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/buckshot/Build/6.framework.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/buckshot/Build/6.wasm.br"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_buckshot.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/buckshot.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/buckshot/style.css",
+        "https://cdn.jsdelivr.net/6.data.br",
+        "https://cdn.jsdelivr.net/6.framework.js",
+        "https://cdn.jsdelivr.net/6.wasm.br",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/buckshot/StreamingAssets",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/buckshot/Build/6.loader.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/buckshot/Build/6.data.br",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/buckshot/Build/6.framework.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/buckshot/Build/6.wasm.br"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/buildnow.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/buildnow.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/buildnow/Build/ab8dd356a41a2943639294657a0990f8.data",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/buildnow/Build/91a2bfcec140bc524100478b99a4f6d7.framework.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/buildnow/Build/7db022abd161455e3cc5f207e75d294b.wasm"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_buildnow.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/buildnow.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/buildnow/Build/ab8dd356a41a2943639294657a0990f8.data",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/buildnow/Build/91a2bfcec140bc524100478b99a4f6d7.framework.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/buildnow/Build/7db022abd161455e3cc5f207e75d294b.wasm"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/cs.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/cs.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/cs16/Build/Web%20GL.loader.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/cs16/style.css",
+        "https://cdn.jsdelivr.net/Web%20GL.data.unityweb",
+        "https://cdn.jsdelivr.net/Web%20GL.framework.js.unityweb",
+        "https://cdn.jsdelivr.net/Web%20GL.wasm.unityweb",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/cs16/Build/Web%20GL.data.unityweb",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/cs16/Build/Web%20GL.framework.js.unityweb",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/cs16/Build/Web%20GL.wasm.unityweb"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_cs.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/cs.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/cs16/Build/Web%20GL.loader.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/cs16/style.css",
+        "https://cdn.jsdelivr.net/Web%20GL.data.unityweb",
+        "https://cdn.jsdelivr.net/Web%20GL.framework.js.unityweb",
+        "https://cdn.jsdelivr.net/Web%20GL.wasm.unityweb",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/cs16/Build/Web%20GL.data.unityweb",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/cs16/Build/Web%20GL.framework.js.unityweb",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/cs16/Build/Web%20GL.wasm.unityweb"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/ccm152.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/ccm152.html"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_assets_html_main_ccm152.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/ccm152.html"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/chicken.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/chicken.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/chicken/Build/Build.loader.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/chicken/style.css",
+        "https://cdn.jsdelivr.net/Build.data.unityweb",
+        "https://cdn.jsdelivr.net/Build.framework.js.unityweb",
+        "https://cdn.jsdelivr.net/Build.wasm.unityweb",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/chicken/Build/Build.data.unityweb",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/chicken/Build/Build.framework.js.unityweb",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/chicken/Build/Build.wasm.unityweb"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_chicken.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/chicken.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/chicken/Build/Build.loader.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/chicken/style.css",
+        "https://cdn.jsdelivr.net/Build.data.unityweb",
+        "https://cdn.jsdelivr.net/Build.framework.js.unityweb",
+        "https://cdn.jsdelivr.net/Build.wasm.unityweb",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/chicken/Build/Build.data.unityweb",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/chicken/Build/Build.framework.js.unityweb",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/chicken/Build/Build.wasm.unityweb"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/chromedino.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/chromedino.html"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_chromedino.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/chromedino.html"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/clash.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/clash.html",
+        "https://cdn.jsdelivr.net/gh/ertemr33/vahvah@main/1414.js",
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/favicon.ico",
+        "https://cdn.jsdelivr.net/gh/ertemr33/vahvah@main/game.css"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_clash.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/clash.html",
+        "https://cdn.jsdelivr.net/gh/ertemr33/vahvah@main/1414.js",
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/favicon.ico",
+        "https://cdn.jsdelivr.net/gh/ertemr33/vahvah@main/game.css"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/crazycattle.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/crazycattle.html",
+        "https://cdn.jsdelivr.net/gh/kuzresema/wwwwww@main/Build/version%201.2.loader.js",
+        "https://cdn.jsdelivr.net/gh/kuzresema/wwwwww@main/Build/version%201.2.framework.js",
+        "https://cdn.jsdelivr.net/gh/kuzresema/wwwwww@main/TemplateData/favicon.ico",
+        "https://cdn.jsdelivr.net/gh/kuzresema/wwwwww@main/TemplateData/style.css",
+        "https://cdn.jsdelivr.net/version%201.2.data.gz",
+        "https://cdn.jsdelivr.net/version%201.2.framework.js"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_crazycattle.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/crazycattle.html",
+        "https://cdn.jsdelivr.net/gh/kuzresema/wwwwww@main/Build/version%201.2.loader.js",
+        "https://cdn.jsdelivr.net/gh/kuzresema/wwwwww@main/Build/version%201.2.framework.js",
+        "https://cdn.jsdelivr.net/gh/kuzresema/wwwwww@main/TemplateData/favicon.ico",
+        "https://cdn.jsdelivr.net/gh/kuzresema/wwwwww@main/TemplateData/style.css",
+        "https://cdn.jsdelivr.net/version%201.2.data.gz",
+        "https://cdn.jsdelivr.net/version%201.2.framework.js"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/cuphead.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/cuphead.html",
+        "https://cdn.jsdelivr.net/gh/web-ports/cuphead@c9ff1b6b16f9d402b78a42fc2200e1c076c0ab6e/Build/UnityLoader.js"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_cuphead.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/cuphead.html",
+        "https://cdn.jsdelivr.net/gh/web-ports/cuphead@c9ff1b6b16f9d402b78a42fc2200e1c076c0ab6e/Build/UnityLoader.js"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/russia.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/russia.html",
+        "https://cdn.jsdelivr.net/gh/karala-ar/vaydanam@main/build/RuDrift.loader.js",
+        "https://cdn.jsdelivr.net/gh/karala-ar/vaydanam@main/style.css",
+        "https://cdn.jsdelivr.net/RuDrift.framework.js.unityweb",
+        "https://cdn.jsdelivr.net/RuDrift.wasm.unityweb",
+        "https://cdn.jsdelivr.net/gh/karala-ar/vaydanam@main/build/RuDrift.framework.js.unityweb",
+        "https://cdn.jsdelivr.net/gh/karala-ar/vaydanam@main/build/RuDrift.wasm.unityweb"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_russia.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/russia.html",
+        "https://cdn.jsdelivr.net/gh/karala-ar/vaydanam@main/build/RuDrift.loader.js",
+        "https://cdn.jsdelivr.net/gh/karala-ar/vaydanam@main/style.css",
+        "https://cdn.jsdelivr.net/RuDrift.framework.js.unityweb",
+        "https://cdn.jsdelivr.net/RuDrift.wasm.unityweb",
+        "https://cdn.jsdelivr.net/gh/karala-ar/vaydanam@main/build/RuDrift.framework.js.unityweb",
+        "https://cdn.jsdelivr.net/gh/karala-ar/vaydanam@main/build/RuDrift.wasm.unityweb"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/wasm030.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/wasm030.html"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_assets_html_main_wasm030.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/wasm030.html"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/wasm112.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/wasm112.html"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_assets_html_main_wasm112.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/wasm112.html"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/js18.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/js18.html"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_assets_html_main_js18.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/js18.html"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/wasm18.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/wasm18.html"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_assets_html_main_wasm18.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/wasm18.html"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/alpha126.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/alpha126.html"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_assets_html_main_alpha126.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/alpha126.html"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/js13.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/js13.html"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_assets_html_main_js13.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/js13.html"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/js173.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/js173.html"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_assets_html_main_js173.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/js173.html"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/flyinggorilla.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/flyinggorilla.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/gorilla/TemplateData/favicon.ico",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/gorilla/TemplateData/style.css",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/gorilla/Build/vb.framework.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/gorilla/Build/vb.data",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/gorilla/Build/vb.wasm"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_flyinggorilla.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/flyinggorilla.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/gorilla/TemplateData/favicon.ico",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/gorilla/TemplateData/style.css",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/gorilla/Build/vb.framework.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/gorilla/Build/vb.data",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/gorilla/Build/vb.wasm"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/frag.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/frag.html",
+        "https://cdn.jsdelivr.net/gh/testamalame/xh677z@main/TemplateData/style.css",
+        "https://cdn.jsdelivr.net/command3VKWithoutLTO.data.br",
+        "https://cdn.jsdelivr.net/command3VKWithoutLTO.framework.js",
+        "https://cdn.jsdelivr.net/command3VKWithoutLTO.wasm.br",
+        "https://cdn.jsdelivr.net/gh/testamalame/xh677z@main/StreamingAssets",
+        "https://cdn.jsdelivr.net/gh/testamalame/xh677z@main/Build/command3VKWithoutLTO.loader.js",
+        "https://cdn.jsdelivr.net/gh/testamalame/xh677z@main/Build/command3VKWithoutLTO.data.br",
+        "https://cdn.jsdelivr.net/gh/testamalame/xh677z@main/Build/command3VKWithoutLTO.framework.js",
+        "https://cdn.jsdelivr.net/gh/testamalame/xh677z@main/Build/command3VKWithoutLTO.wasm.br"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_frag.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/frag.html",
+        "https://cdn.jsdelivr.net/gh/testamalame/xh677z@main/TemplateData/style.css",
+        "https://cdn.jsdelivr.net/command3VKWithoutLTO.data.br",
+        "https://cdn.jsdelivr.net/command3VKWithoutLTO.framework.js",
+        "https://cdn.jsdelivr.net/command3VKWithoutLTO.wasm.br",
+        "https://cdn.jsdelivr.net/gh/testamalame/xh677z@main/StreamingAssets",
+        "https://cdn.jsdelivr.net/gh/testamalame/xh677z@main/Build/command3VKWithoutLTO.loader.js",
+        "https://cdn.jsdelivr.net/gh/testamalame/xh677z@main/Build/command3VKWithoutLTO.data.br",
+        "https://cdn.jsdelivr.net/gh/testamalame/xh677z@main/Build/command3VKWithoutLTO.framework.js",
+        "https://cdn.jsdelivr.net/gh/testamalame/xh677z@main/Build/command3VKWithoutLTO.wasm.br"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/gdwebv1.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/gdwebv1.html",
+        "https://cdn.jsdelivr.net/gh/mrdavidzs/web-dashers.github.io@latest/assets/scripts/allObjects.js",
+        "https://cdn.jsdelivr.net/gh/mrdavidzs/web-dashers.github.io@latest/assets/scripts/allLevels.js",
+        "https://cdn.jsdelivr.net/gh/mrdavidzs/web-dashers.github.io@latest/assets/scripts/phaser.min.js",
+        "https://cdn.jsdelivr.net/gh/mrdavidzs/web-dashers.github.io@latest/assets/scripts/pako.min.js",
+        "https://cdn.jsdelivr.net/gh/mrdavidzs/web-dashers.github.io@latest/assets/scripts/index-game.js",
+        "https://cdn.jsdelivr.net/gh/mrdavidzs/web-dashers.github.io@latest/assets/style.css"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_gdwebv1.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/gdwebv1.html",
+        "https://cdn.jsdelivr.net/gh/mrdavidzs/web-dashers.github.io@latest/assets/scripts/allObjects.js",
+        "https://cdn.jsdelivr.net/gh/mrdavidzs/web-dashers.github.io@latest/assets/scripts/allLevels.js",
+        "https://cdn.jsdelivr.net/gh/mrdavidzs/web-dashers.github.io@latest/assets/scripts/phaser.min.js",
+        "https://cdn.jsdelivr.net/gh/mrdavidzs/web-dashers.github.io@latest/assets/scripts/pako.min.js",
+        "https://cdn.jsdelivr.net/gh/mrdavidzs/web-dashers.github.io@latest/assets/scripts/index-game.js",
+        "https://cdn.jsdelivr.net/gh/mrdavidzs/web-dashers.github.io@latest/assets/style.css"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/gdweb.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/gdweb.html",
+        "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/libs/phaser.min.js",
+        "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/libs/pako.min.js",
+        "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/game/allObjects.js?latest",
+        "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/game/allLevels.js",
+        "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/utils/cache-manager.js",
+        "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/api/GDapiWrapper.js",
+        "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/utils/config.js",
+        "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/core/triggers.js",
+        "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/core/level.js?latest",
+        "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/core/player.js",
+        "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/core/audio.js",
+        "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/core/loading-screen.js",
+        "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/core/game-scene.js?latest",
+        "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/core/main.js",
+        "https://cdn.jsdelivr.net/assets/favicon.ico",
+        "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/style.css"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_gdweb.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/gdweb.html",
+        "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/libs/phaser.min.js",
+        "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/libs/pako.min.js",
+        "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/game/allObjects.js?latest",
+        "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/game/allLevels.js",
+        "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/utils/cache-manager.js",
+        "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/api/GDapiWrapper.js",
+        "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/utils/config.js",
+        "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/core/triggers.js",
+        "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/core/level.js?latest",
+        "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/core/player.js",
+        "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/core/audio.js",
+        "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/core/loading-screen.js",
+        "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/core/game-scene.js?latest",
+        "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/scripts/core/main.js",
+        "https://cdn.jsdelivr.net/assets/favicon.ico",
+        "https://cdn.jsdelivr.net/gh/ihavenoidea212/geometry-dash@latest/assets/style.css"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/actualgd.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/actualgd.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/actualgd/gd_scramjet.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/actualgd/ref/logo.png"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_actualgd.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/actualgd.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/actualgd/gd_scramjet.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/actualgd/ref/logo.png"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/gd3d.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/gd3d.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/3d/v2.02c5b63d689c6bc2f83c.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/3d/style.css",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/3d/Build/GeometryDash.data.unityweb",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/3d/Build/GeometryDash.framework.js.unityweb",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/3d/Build/GeometryDash.wasm.unityweb"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_gd3d.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/gd3d.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/3d/v2.02c5b63d689c6bc2f83c.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/3d/style.css",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/3d/Build/GeometryDash.data.unityweb",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/3d/Build/GeometryDash.framework.js.unityweb",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/3d/Build/GeometryDash.wasm.unityweb"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/gtag.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/gtag.html",
+        "https://cdn.jsdelivr.net/gh/web-ports/gorilla-tag@latest/TemplateData/favicon.ico",
+        "https://cdn.jsdelivr.net/gh/web-ports/gorilla-tag@latest/TemplateData/style.css",
+        "https://cdn.jsdelivr.net/gtagwebR2.framework.js.unityweb",
+        "https://cdn.jsdelivr.net/gtagwebR2.wasm.unityweb"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_gtag.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/gtag.html",
+        "https://cdn.jsdelivr.net/gh/web-ports/gorilla-tag@latest/TemplateData/favicon.ico",
+        "https://cdn.jsdelivr.net/gh/web-ports/gorilla-tag@latest/TemplateData/style.css",
+        "https://cdn.jsdelivr.net/gtagwebR2.framework.js.unityweb",
+        "https://cdn.jsdelivr.net/gtagwebR2.wasm.unityweb"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/granny2.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/granny2.html",
+        "https://cdn.jsdelivr.net/gh/testamalame/sef@main/sedk.js",
+        "https://cdn.jsdelivr.net/gh/forms-docs-slides-glgl/ngng@main/Build/Granny%202.loader.js",
+        "https://cdn.jsdelivr.net/gh/forms-docs-slides-glgl/ngng@main/Build/Granny%202.frameworkx.js",
+        "https://cdn.jsdelivr.net/gh/forms-docs-slides-glgl/ngng@main/TemplateData/favicon.ico",
+        "https://cdn.jsdelivr.net/Granny%202.frameworkx.js",
+        "https://cdn.jsdelivr.net/gh/forms-docs-slides-glgl/ngng@main/Build/Granny 2_part1.data",
+        "https://cdn.jsdelivr.net/gh/forms-docs-slides-glgl/ngng@main/Build/Granny 2_part2.data",
+        "https://cdn.jsdelivr.net/gh/forms-docs-slides-glgl/ngng@main/Build/Granny 2_part3.data",
+        "https://cdn.jsdelivr.net/gh/forms-docs-slides-glgl/ngng@main/Build/Granny 2_part1.wasm",
+        "https://cdn.jsdelivr.net/gh/forms-docs-slides-glgl/ngng@main/Build/Granny 2_part2.wasm"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_granny2.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/granny2.html",
+        "https://cdn.jsdelivr.net/gh/testamalame/sef@main/sedk.js",
+        "https://cdn.jsdelivr.net/gh/forms-docs-slides-glgl/ngng@main/Build/Granny%202.loader.js",
+        "https://cdn.jsdelivr.net/gh/forms-docs-slides-glgl/ngng@main/Build/Granny%202.frameworkx.js",
+        "https://cdn.jsdelivr.net/gh/forms-docs-slides-glgl/ngng@main/TemplateData/favicon.ico",
+        "https://cdn.jsdelivr.net/Granny%202.frameworkx.js",
+        "https://cdn.jsdelivr.net/gh/forms-docs-slides-glgl/ngng@main/Build/Granny 2_part1.data",
+        "https://cdn.jsdelivr.net/gh/forms-docs-slides-glgl/ngng@main/Build/Granny 2_part2.data",
+        "https://cdn.jsdelivr.net/gh/forms-docs-slides-glgl/ngng@main/Build/Granny 2_part3.data",
+        "https://cdn.jsdelivr.net/gh/forms-docs-slides-glgl/ngng@main/Build/Granny 2_part1.wasm",
+        "https://cdn.jsdelivr.net/gh/forms-docs-slides-glgl/ngng@main/Build/Granny 2_part2.wasm"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/hollowknight.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/hollowknight.html",
+        "https://cdn.jsdelivr.net/gh/web-ports/hollow-knight@latest/TemplateData/favicon.ico",
+        "https://cdn.jsdelivr.net/gh/web-ports/hollow-knight@latest/TemplateData/style.css",
+        "https://cdn.jsdelivr.net/hk.framework.js"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_hollowknight.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/hollowknight.html",
+        "https://cdn.jsdelivr.net/gh/web-ports/hollow-knight@latest/TemplateData/favicon.ico",
+        "https://cdn.jsdelivr.net/gh/web-ports/hollow-knight@latest/TemplateData/style.css",
+        "https://cdn.jsdelivr.net/hk.framework.js"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/hollowknightsilksong.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/hollowknightsilksong.html",
+        "https://cdn.jsdelivr.net/gh/web-ports/hollow-knight-silksong@master/jszip.js",
+        "https://cdn.jsdelivr.net/gh/web-ports/hollow-knight-silksong@master/TemplateData/favicon.ico",
+        "https://cdn.jsdelivr.net/gh/web-ports/hollow-knight-silksong@master/TemplateData/style.css",
+        "https://cdn.jsdelivr.net/w-pt.data.unityweb",
+        "https://cdn.jsdelivr.net/w-pt.framework.js.unityweb",
+        "https://cdn.jsdelivr.net/w-pt.wasm.unityweb"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_hollowknightsilksong.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/hollowknightsilksong.html",
+        "https://cdn.jsdelivr.net/gh/web-ports/hollow-knight-silksong@master/jszip.js",
+        "https://cdn.jsdelivr.net/gh/web-ports/hollow-knight-silksong@master/TemplateData/favicon.ico",
+        "https://cdn.jsdelivr.net/gh/web-ports/hollow-knight-silksong@master/TemplateData/style.css",
+        "https://cdn.jsdelivr.net/w-pt.data.unityweb",
+        "https://cdn.jsdelivr.net/w-pt.framework.js.unityweb",
+        "https://cdn.jsdelivr.net/w-pt.wasm.unityweb"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/impossiblequiz.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/impossiblequiz.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/quiz/js/main.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/quiz/ruffle.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/quiz/impossiblequiz.png",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/quiz/impossiblequiz.swf"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_impossiblequiz.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/impossiblequiz.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/quiz/js/main.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/quiz/ruffle.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/quiz/impossiblequiz.png",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/quiz/impossiblequiz.swf"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/indiantruckdriving.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/indiantruckdriving.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/truck/Build/UnityLoader.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/truck/Build/indian_truck_gd_2_0_1.data.unityweb",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/truck/Build/indian_truck_gd_2_0_1.wasm.code.unityweb",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/truck/Build/indian_truck_gd_2_0_1.wasm.framework.unityweb"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_indiantruckdriving.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/indiantruckdriving.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/truck/Build/UnityLoader.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/truck/Build/indian_truck_gd_2_0_1.data.unityweb",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/truck/Build/indian_truck_gd_2_0_1.wasm.code.unityweb",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/truck/Build/indian_truck_gd_2_0_1.wasm.framework.unityweb"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/infinite.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/infinite.html"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_infinite.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/infinite.html"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/justbuild.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/justbuild.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/justbuild/adinLoader.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/justbuild/UnityLoader.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/justbuild/UnityProgress.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/justbuild/favicon.ico"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_justbuild.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/justbuild.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/justbuild/adinLoader.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/justbuild/UnityLoader.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/justbuild/UnityProgress.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/justbuild/favicon.ico"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/kindergarten.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/kindergarten.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/kindergarten/TemplateData/favicon.ico",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/kindergarten/TemplateData/style.css",
+        "https://cdn.jsdelivr.net/Build.data",
+        "https://cdn.jsdelivr.net/Build.framework.js"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_kindergarten.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/kindergarten.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/kindergarten/TemplateData/favicon.ico",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/kindergarten/TemplateData/style.css",
+        "https://cdn.jsdelivr.net/Build.data",
+        "https://cdn.jsdelivr.net/Build.framework.js"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/kindergarten2.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/kindergarten2.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/kindergarten2/TemplateData/favicon.ico",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/kindergarten2/TemplateData/style.css",
+        "https://cdn.jsdelivr.net/Build.framework.js"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_kindergarten2.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/kindergarten2.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/kindergarten2/TemplateData/favicon.ico",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/kindergarten2/TemplateData/style.css",
+        "https://cdn.jsdelivr.net/Build.framework.js"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/kindergarten3.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/kindergarten3.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/kindergarten3/TemplateData/favicon.ico",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/kindergarten3/TemplateData/style.css"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_kindergarten3.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/kindergarten3.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/kindergarten3/TemplateData/favicon.ico",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/kindergarten3/TemplateData/style.css"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/pocketediton.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/pocketediton.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/mcpe/index.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/mcpe/manifest.json"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_pocketediton.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/pocketediton.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/mcpe/index.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/mcpe/manifest.json"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/plagueinc.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/plagueinc.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/inc/Build/bb0d9ecdb05db3e84da20bd14a4f84dc.loader.js"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_plagueinc.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/plagueinc.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/inc/Build/bb0d9ecdb05db3e84da20bd14a4f84dc.loader.js"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/ragdoll.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/ragdoll.html",
+        "https://cdn.jsdelivr.net/gh/testamalame/sef@main/sedk.js",
+        "https://cdn.jsdelivr.net/gh/images-classroom-sources/ok@main/Build/v111.loader.js",
+        "https://cdn.jsdelivr.net/gh/images-classroom-sources/ok@main/style.css",
+        "https://cdn.jsdelivr.net/6697b6deba8b617c67b69c55dcd07cb1.data.unityweb",
+        "https://cdn.jsdelivr.net/0be3c3ee7115b26e1ae28e643afdf1f2.js.unityweb",
+        "https://cdn.jsdelivr.net/b3397c29f6878557c1c614cbf9e196ea.wasm.unityweb",
+        "https://cdn.jsdelivr.net/gh/images-classroom-sources/ok@main/Build/6697b6deba8b617c67b69c55dcd07cb1.data.unityweb",
+        "https://cdn.jsdelivr.net/gh/images-classroom-sources/ok@main/Build/0be3c3ee7115b26e1ae28e643afdf1f2.js.unityweb",
+        "https://cdn.jsdelivr.net/gh/images-classroom-sources/ok@main/Build/b3397c29f6878557c1c614cbf9e196ea.wasm.unityweb"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_ragdoll.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/ragdoll.html",
+        "https://cdn.jsdelivr.net/gh/testamalame/sef@main/sedk.js",
+        "https://cdn.jsdelivr.net/gh/images-classroom-sources/ok@main/Build/v111.loader.js",
+        "https://cdn.jsdelivr.net/gh/images-classroom-sources/ok@main/style.css",
+        "https://cdn.jsdelivr.net/6697b6deba8b617c67b69c55dcd07cb1.data.unityweb",
+        "https://cdn.jsdelivr.net/0be3c3ee7115b26e1ae28e643afdf1f2.js.unityweb",
+        "https://cdn.jsdelivr.net/b3397c29f6878557c1c614cbf9e196ea.wasm.unityweb",
+        "https://cdn.jsdelivr.net/gh/images-classroom-sources/ok@main/Build/6697b6deba8b617c67b69c55dcd07cb1.data.unityweb",
+        "https://cdn.jsdelivr.net/gh/images-classroom-sources/ok@main/Build/0be3c3ee7115b26e1ae28e643afdf1f2.js.unityweb",
+        "https://cdn.jsdelivr.net/gh/images-classroom-sources/ok@main/Build/b3397c29f6878557c1c614cbf9e196ea.wasm.unityweb"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/snowrider.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/snowrider.html",
+        "https://cdn.jsdelivr.net/gh/era6yera6y/00@main/TemplateData/UnityProgress.js",
+        "https://cdn.jsdelivr.net/gh/era6yera6y/00@main/Build/UnityLoader.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/UB.png",
+        "https://cdn.jsdelivr.net/gh/era6yera6y/00@main/TemplateData/style.css"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_snowrider.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/snowrider.html",
+        "https://cdn.jsdelivr.net/gh/era6yera6y/00@main/TemplateData/UnityProgress.js",
+        "https://cdn.jsdelivr.net/gh/era6yera6y/00@main/Build/UnityLoader.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/UB.png",
+        "https://cdn.jsdelivr.net/gh/era6yera6y/00@main/TemplateData/style.css"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/soccerrandom.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/soccerrandom.html"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_soccerrandom.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/soccerrandom.html"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/soccerbros.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/soccerbros.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/soccerbros/SoccerBros.js?th=102",
+        "https://hb-bluewizard.s3.us-east-2.amazonaws.com/soccerbros.gg/asc_prebid.js",
+        "https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js",
+        "https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js",
+        "https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js",
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/favicon.png",
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/manifest.json"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_assets_html_main_soccerbros.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/soccerbros.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/soccerbros/SoccerBros.js?th=102",
+        "https://hb-bluewizard.s3.us-east-2.amazonaws.com/soccerbros.gg/asc_prebid.js",
+        "https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js",
+        "https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js",
+        "https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js",
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/favicon.png",
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/manifest.json"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/spacewaves.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/spacewaves.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/space/Build/e4aa851098e3e5d328e4d879078ad6c5.data",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/space/Build/f3dc87e8bc321dd382fbd3fa53e1091f.framework.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/space/Build/9adf8a1aafea4c2333e26d66a8b36d56.wasm"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_spacewaves.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/spacewaves.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/space/Build/e4aa851098e3e5d328e4d879078ad6c5.data",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/space/Build/f3dc87e8bc321dd382fbd3fa53e1091f.framework.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@latest/space/Build/9adf8a1aafea4c2333e26d66a8b36d56.wasm"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/stickman.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/stickman.html",
+        "https://cdn.jsdelivr.net/gh/Ieoldj-hs101082/Koans@03568ae5309942037071f3e50daf892ae3539c31/logic/data.js",
+        "https://cdn.jsdelivr.net/gh/Ieoldj-hs101082/Koans@03568ae5309942037071f3e50daf892ae3539c31/logic/sd.loader.js",
+        "https://cdn.jsdelivr.net/sd.data.js",
+        "https://cdn.jsdelivr.net/sd.js",
+        "https://cdn.jsdelivr.net/sd.wasm.js",
+        "https://cdn.jsdelivr.net/gh/Ieoldj-hs101082/Koans@03568ae5309942037071f3e50daf892ae3539c31/logic/sd.data.js",
+        "https://cdn.jsdelivr.net/gh/Ieoldj-hs101082/Koans@03568ae5309942037071f3e50daf892ae3539c31/logic/sd.js",
+        "https://cdn.jsdelivr.net/gh/Ieoldj-hs101082/Koans@03568ae5309942037071f3e50daf892ae3539c31/logic/sd.wasm.js"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_stickman.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/stickman.html",
+        "https://cdn.jsdelivr.net/gh/Ieoldj-hs101082/Koans@03568ae5309942037071f3e50daf892ae3539c31/logic/data.js",
+        "https://cdn.jsdelivr.net/gh/Ieoldj-hs101082/Koans@03568ae5309942037071f3e50daf892ae3539c31/logic/sd.loader.js",
+        "https://cdn.jsdelivr.net/sd.data.js",
+        "https://cdn.jsdelivr.net/sd.js",
+        "https://cdn.jsdelivr.net/sd.wasm.js",
+        "https://cdn.jsdelivr.net/gh/Ieoldj-hs101082/Koans@03568ae5309942037071f3e50daf892ae3539c31/logic/sd.data.js",
+        "https://cdn.jsdelivr.net/gh/Ieoldj-hs101082/Koans@03568ae5309942037071f3e50daf892ae3539c31/logic/sd.js",
+        "https://cdn.jsdelivr.net/gh/Ieoldj-hs101082/Koans@03568ae5309942037071f3e50daf892ae3539c31/logic/sd.wasm.js"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/subway.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/subway.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/subway2/4399.z.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/subway2/poki-sdk-core-v2.234.2.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/subway2/master-loader.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/subway2/poki-sdk.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/subway2/unity.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/subway2/UnityLoader.2019.2.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/subway2/img/UB.png"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_subway.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/subway.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/subway2/4399.z.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/subway2/poki-sdk-core-v2.234.2.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/subway2/master-loader.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/subway2/poki-sdk.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/subway2/unity.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/subway2/UnityLoader.2019.2.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math/subway2/img/UB.png"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/hardestgame.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/hardestgame.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/quiz/js/main.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/quiz/ruffle.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/quiz/impossiblequiz.png",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/game/game.swf"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_hardestgame.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/hardestgame.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/quiz/js/main.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/quiz/ruffle.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/quiz/impossiblequiz.png",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/game/game.swf"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/ultra.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/ultra.html",
+        "https://cdn.jsdelivr.net/gh/kelsimsk/ugil@main/Build/ultrakill.loader.js",
+        "https://cdn.jsdelivr.net/gh/kelsimsk/ugil@main/Build/ultrakill.framework.js.unityweb"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_ultra.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/ultra.html",
+        "https://cdn.jsdelivr.net/gh/kelsimsk/ugil@main/Build/ultrakill.loader.js",
+        "https://cdn.jsdelivr.net/gh/kelsimsk/ugil@main/Build/ultrakill.framework.js.unityweb"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/goosegame.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/goosegame.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/goosegame/goose.png",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/goosegame/Build/Untitled%20Goose%20Game.framework.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/goosegame/Build/Untitled Goose Game.data",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/goosegame/Build/Untitled Goose Game.wasm"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_goosegame.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/goosegame.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/goosegame/goose.png",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/goosegame/Build/Untitled%20Goose%20Game.framework.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/goosegame/Build/Untitled Goose Game.data",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/goosegame/Build/Untitled Goose Game.wasm"
+    ],
+    "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/whosyourdaddy.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/whosyourdaddy.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/daddy/Build/daddyreeyuki.loader.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/daddy/Build/daddyreeyuki.framework.js"
+    ],
+    "cdn.jsdelivr.net_gh_s0n-1m-cr1n3_sc13nc3_latest_assets_html_main_whosyourdaddy.html": [
+        "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/whosyourdaddy.html",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/daddy/Build/daddyreeyuki.loader.js",
+        "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/daddy/Build/daddyreeyuki.framework.js"
+    ]
+};
+
+// Open IndexedDB
+const gameDbPromise = new Promise((resolve, reject) => {
+    const req = indexedDB.open(GAME_DB_NAME, GAME_DB_VERSION);
+    req.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains(GAME_STORE_NAME)) {
+            const store = db.createObjectStore(GAME_STORE_NAME, { keyPath: 'id' });
+            store.createIndex('title', 'title', { unique: false });
+            store.createIndex('downloadedAt', 'downloadedAt', { unique: false });
+        }
+    };
+    req.onsuccess = (e) => resolve(e.target.result);
+    req.onerror = () => reject(req.error);
+});
+
+const activeControllers = new Map();
+const activeInFlightDownloads = new Map();
+
+// Periodic storage quota check
+if (typeof navigator !== 'undefined' && navigator.storage && navigator.storage.estimate) {
+    setInterval(async () => {
+        try {
+            const est = await navigator.storage.estimate();
+            if (est.quota && est.usage && (est.quota - est.usage < 15 * 1024 * 1024)) {
+                const all = await PinpointGameStorage.getAllGames();
+                all.sort((a, b) => new Date(a.downloadedAt) - new Date(b.downloadedAt));
+                if (all.length > 0) {
+                    const item = all[0];
+                    await PinpointGameStorage.deleteGame(item.id, item.fileUrl);
+                }
+            }
+        } catch(e) {}
+    }, 20000);
+}
+
+const PinpointGameStorage = {
+    RECOMMENDED_LIMIT_BYTES,
+
+    getManifest(fileUrl) {
+        if (GAME_MANIFESTS[fileUrl]) return GAME_MANIFESTS[fileUrl];
+        const norm = fileUrl.replace(/^\/+/, '');
+        if (GAME_MANIFESTS[norm]) return GAME_MANIFESTS[norm];
+        if (norm.endsWith('/index.html') && GAME_MANIFESTS[norm.replace('/index.html', '/')]) {
+            return GAME_MANIFESTS[norm.replace('/index.html', '/')];
+        }
+        if (norm.endsWith('/') && GAME_MANIFESTS[norm + 'index.html']) {
+            return GAME_MANIFESTS[norm + 'index.html'];
+        }
+        if (!norm.endsWith('/') && !norm.endsWith('.html') && GAME_MANIFESTS[norm + '/index.html']) {
+            return GAME_MANIFESTS[norm + '/index.html'];
+        }
+        if (/^https?:\/\//i.test(fileUrl)) return [fileUrl];
+        return ['/' + norm];
+    },
+
+    async isDownloaded(id) {
+        try {
+            const db = await gameDbPromise;
+            return new Promise((resolve) => {
+                const tx = db.transaction([GAME_STORE_NAME], 'readonly');
+                const store = tx.objectStore(GAME_STORE_NAME);
+                const req = store.get(id);
+                req.onsuccess = () => resolve(!!req.result);
+                req.onerror = () => resolve(false);
+            });
+        } catch(e) { return false; }
+    },
+
+    async getGame(id) {
+        const db = await gameDbPromise;
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction([GAME_STORE_NAME], 'readonly');
+            const store = tx.objectStore(GAME_STORE_NAME);
+            const req = store.get(id);
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => reject(req.error);
+        });
+    },
+
+    async getAllGames() {
+        try {
+            const db = await gameDbPromise;
+            return new Promise((resolve) => {
+                const tx = db.transaction([GAME_STORE_NAME], 'readonly');
+                const store = tx.objectStore(GAME_STORE_NAME);
+                const req = store.getAll();
+                req.onsuccess = () => resolve(req.result || []);
+                req.onerror = () => resolve([]);
+            });
+        } catch(e) { return []; }
+    },
+
+    async downloadGame(id, title, fileUrl, onProgress) {
+        if (activeControllers.has(id)) {
+            throw new Error('Download already in progress');
+        }
+
+        const controller = new AbortController();
+        activeControllers.set(id, controller);
+        activeInFlightDownloads.set(id, fileUrl);
+
+        const assets = this.getManifest(fileUrl);
+        let cache = null;
+        if (typeof caches !== 'undefined') {
+            try {
+                cache = await caches.open(GAME_CACHE_NAME);
+            } catch(e) {
+                console.warn('CacheStorage not accessible:', e);
+            }
+        }
+
+        let totalBytes = 0;
+        let mainContent = '';
+        let completedAssets = 0;
+
+        try {
+            for (let i = 0; i < assets.length; i++) {
+                const assetUrl = assets[i];
+                if (controller.signal.aborted) {
+                    const err = new Error('Download cancelled');
+                    err.name = 'AbortError';
+                    throw err;
+                }
+
+                const clean = assetUrl.replace(/^\/+/, '');
+                // Skip directories and ad/tracker domains
+                if (!clean || clean.endsWith('/') || /google\.com|googletagmanager|google-analytics|gamedistribution|poki\.com|crazygames|gameanalytics/i.test(assetUrl)) {
+                    completedAssets++;
+                    continue;
+                }
+
+                let candidateUrls = [];
+                if (/^https?:\/\//i.test(assetUrl)) {
+                    let mirrorUrl = assetUrl;
+                    if (mirrorUrl.includes('matheveryday25/math/truck')) {
+                        mirrorUrl = mirrorUrl.replace('/math/truck', '/math@main/truck');
+                    }
+                    if (mirrorUrl.includes('jsdelivr.net')) {
+                        mirrorUrl = mirrorUrl.replace(/https?:\/\/[^/]*\.jsdelivr\.net\//i, activeMirror + '/');
+                    }
+                    candidateUrls = [mirrorUrl, assetUrl];
+                    if (assetUrl.includes('jsdelivr.net/gh/')) {
+                        const rawGh = assetUrl.replace(/https?:\/\/[^/]*\.jsdelivr\.net\/gh\/([^/@]+)\/([^/@]+)(?:@[^/]+)?\//, 'https://raw.githubusercontent.com/$1/$2/main/').replace('/math/truck', '/math/main/truck');
+                        candidateUrls.push(rawGh);
+                    }
+                } else {
+                    const isMini = clean.startsWith('yolk/') || clean.startsWith('movies/') || clean === 'ai.html' || clean === 'web.html' || clean.startsWith('pages/') || clean.includes('superhot') || clean.includes('tetrominoes') || clean.includes('tetris');
+                    const primaryRepo = isMini ? 'pinpoint-edu/pinpoint-mini@main/' : 'pinpoint-edu/assets@main/';
+                    const fallbackRepo = isMini ? 'pinpoint-edu/assets@main/' : 'pinpoint-edu/pinpoint-mini@main/';
+                    const mirrors = [activeMirror, ...CDN_MIRRORS.filter(m => m !== activeMirror)];
+                    candidateUrls = [
+                        ...mirrors.map(m => m + '/gh/' + primaryRepo + clean),
+                        'https://cdn.statically.io/gh/' + primaryRepo + clean,
+                        'https://raw.githubusercontent.com/' + primaryRepo.replace('@main/', '/main/') + clean,
+                        ...mirrors.map(m => m + '/gh/' + fallbackRepo + clean),
+                        'https://raw.githubusercontent.com/' + fallbackRepo.replace('@main/', '/main/') + clean
+                    ];
+                }
+
+                let res = null;
+                for (const url of candidateUrls) {
+                    try {
+                        const r = await fetch(url, { signal: controller.signal });
+                        if (r.ok) {
+                            const checkCl = r.headers.get('content-length');
+                            if (checkCl && parseInt(checkCl, 10) < 300 && clean.endsWith('.html')) {
+                                const previewText = await r.clone().text();
+                                if (previewText.includes('Package size exceeded') || previewText.includes('limit of 20 MB')) continue;
+                            }
+                            res = r;
+                            for (const m of CDN_MIRRORS) {
+                                if (url.startsWith(m)) {
+                                    activeMirror = m;
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                    } catch(e) {}
+                }
+
+                if (!res) {
+                    if (i === 0) {
+                        throw new Error(`Failed to download ${clean} from CDN mirrors.`);
+                    }
+                    console.warn(`Optional asset ${clean} not found, continuing download...`);
+                    completedAssets++;
+                    continue;
+                }
+
+                const contentLength = parseInt(res.headers.get('content-length') || '0', 10);
+                let assetBlob;
+
+                if (res.body && typeof res.body.getReader === 'function' && contentLength > 0) {
+                    const reader = res.body.getReader();
+                    const chunks = [];
+                    let receivedBytes = 0;
+
+                    while (true) {
+                        if (controller.signal.aborted) {
+                            reader.cancel().catch(() => {});
+                            const err = new Error('Download cancelled');
+                            err.name = 'AbortError';
+                            throw err;
+                        }
+                        const { done, value } = await reader.read();
+                        if (done) break;
+                        chunks.push(value);
+                        receivedBytes += value.length;
+                        totalBytes += value.length;
+
+                        if (typeof onProgress === 'function') {
+                            const assetPart = (receivedBytes / contentLength) / assets.length;
+                            const overallPercent = Math.min(99, Math.round(((completedAssets / assets.length) + assetPart) * 100));
+                            onProgress({
+                                percent: overallPercent,
+                                loaded: receivedBytes,
+                                total: contentLength,
+                                assetIndex: i + 1,
+                                assetTotal: assets.length
+                            });
+                        }
+                    }
+
+                    assetBlob = new Blob(chunks, { type: res.headers.get('content-type') || 'application/octet-stream' });
+                } else {
+                    assetBlob = await res.blob();
+                    totalBytes += assetBlob.size;
+                }
+
+                if (i === 0 && (clean.endsWith('.html') || clean.endsWith('/'))) {
+                    mainContent = await assetBlob.text();
+                }
+
+                if (cache) {
+                    const cacheUrls = [
+                        assetUrl,
+                        new URL(assetUrl, window.location.href).href,
+                        clean,
+                        '/' + clean
+                    ];
+                    for (const cu of cacheUrls) {
+                        try {
+                            await cache.put(cu, new Response(assetBlob.slice(), {
+                                headers: {
+                                    'Content-Type': res.headers.get('content-type') || 'application/octet-stream',
+                                    'Content-Length': assetBlob.size.toString()
+                                }
+                            }));
+                        } catch(ce) {}
+                    }
+                }
+
+                completedAssets++;
+                if (typeof onProgress === 'function') {
+                    const overallPercent = Math.min(99, Math.round((completedAssets / assets.length) * 100));
+                    onProgress({
+                        percent: overallPercent,
+                        assetIndex: completedAssets,
+                        assetTotal: assets.length
+                    });
+                }
+            }
+
+            if (typeof onProgress === 'function') {
+                onProgress({ percent: 100, assetIndex: assets.length, assetTotal: assets.length });
+            }
+
+            const db = await gameDbPromise;
+            const record = await new Promise((resolve, reject) => {
+                const tx = db.transaction([GAME_STORE_NAME], 'readwrite');
+                const store = tx.objectStore(GAME_STORE_NAME);
+                const gameRecord = {
+                    id: id,
+                    title: title,
+                    fileUrl: fileUrl,
+                    content: mainContent,
+                    assets: assets,
+                    sizeBytes: totalBytes,
+                    downloadedAt: new Date().toISOString()
+                };
+                const req = store.put(gameRecord);
+                req.onsuccess = () => resolve(gameRecord);
+                req.onerror = () => reject(req.error);
+            });
+
+            return record;
+
+        } catch (downloadErr) {
+            try {
+                await this.deleteGame(id, fileUrl);
+            } catch (cleanupErr) {
+                console.warn('Cleanup error after failed download:', cleanupErr);
+            }
+            throw downloadErr;
+        } finally {
+            activeControllers.delete(id);
+            activeInFlightDownloads.delete(id);
+        }
+    },
+
+    async deleteGame(id, fileUrl) {
+        if (typeof caches !== 'undefined') {
+            try {
+                const cache = await caches.open(GAME_CACHE_NAME);
+                const assets = fileUrl ? this.getManifest(fileUrl) : [];
+                for (const assetUrl of assets) {
+                    const delKeys = [
+                        assetUrl,
+                        new URL(assetUrl, window.location.href).href,
+                        assetUrl.replace(/^\/+/, ''),
+                        decodeURIComponent(assetUrl),
+                        encodeURI(assetUrl)
+                    ];
+                    if (assetUrl.endsWith('/index.html')) {
+                        const dirPath = assetUrl.replace(/index\.html$/, '');
+                        delKeys.push(dirPath, '/' + dirPath.replace(/^\/+/, ''));
+                    }
+                    for (const k of delKeys) {
+                        await cache.delete(k);
+                    }
+                }
+            } catch(e) {}
+        }
+
+        const db = await gameDbPromise;
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction([GAME_STORE_NAME], 'readwrite');
+            const store = tx.objectStore(GAME_STORE_NAME);
+            const req = store.delete(id);
+            req.onsuccess = () => resolve(true);
+            req.onerror = () => reject(req.error);
+        });
+    },
+
+    cancelDownload(id) {
+        if (activeControllers.has(id)) {
+            activeControllers.get(id).abort();
+            activeControllers.delete(id);
+            activeInFlightDownloads.delete(id);
+        }
+    },
+
+    isDownloading(id) {
+        return activeControllers.has(id);
+    }
+};
+
+window.PinpointGameStorage = PinpointGameStorage;
+
+// Invalidate stale cached entries for apps & textbooks so updates are applied immediately
+setTimeout(async () => {
+    try {
+        if (typeof PinpointGameStorage !== 'undefined') {
+            await PinpointGameStorage.deleteGame('soundboard', 'textbooks/Soundboard.html');
+            await PinpointGameStorage.deleteGame('moss-movies', 'movies/index.html');
+        }
+    } catch(e) {}
+}, 500);
+
+// Service Worker for offline PWA
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.protocol === 'http:')) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+    });
+}
+
+// Fallback catalog including Yolk! Music and AI Assistant
+const DEFAULT_GAMES = [
+      {
+            "title": "Yolk! - Minimalist Music",
+            "file": "yolk/index.html",
+            "img": "yolk/icon-256.png",
+            "sizeBytes": 983040,
+            "isApp": true
+      },
+      {
+            "title": "Moss - Movies & Shows",
+            "file": "movies/index.html",
+            "img": "data:image/png;base64,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",
+            "sizeBytes": 5242880,
+            "isApp": true
+      },
+      {
+            "title": "Soundboard",
+            "file": "textbooks/Soundboard.html",
+            "img": "favicons/google-classroom.png",
+            "sizeBytes": 350000,
+            "isApp": true
+      },
+      {
+            "title": "Trashbin AI",
+            "file": "ai.html",
+            "img": "favicons/google-classroom.png",
+            "sizeBytes": 125000,
+            "isApp": true
+      },
+      {
+            "title": "Trashbin Web",
+            "file": "web.html",
+            "img": "favicons/google-classroom.png",
+            "sizeBytes": 140000,
+            "isApp": true
+      },
+      {
+            "title": "2048",
+            "file": "textbooks/2048.html",
+            "sizeBytes": 46342
+      },
+      {
+            "title": "Awesome Tanks",
+            "file": "textbooks/awesome-tanks.html",
+            "sizeBytes": 9825933
+      },
+      {
+            "title": "Awesome Tanks 2",
+            "file": "textbooks/awesometanks2.html",
+            "sizeBytes": 13004415
+      },
+      {
+            "title": "Basket Random",
+            "file": "textbooks/basket-random/index.html",
+            "sizeBytes": 2548324
+      },
+      {
+            "title": "Basketball Stars",
+            "file": "textbooks/basketball-stars.html",
+            "sizeBytes": 11794098
+      },
+      {
+            "title": "Bit Planes: Remastered",
+            "file": "textbooks/bit-planes-remaster.html",
+            "sizeBytes": 1173578
+      },
+      {
+            "title": "Bloons TD",
+            "file": "textbooks/Bloons-TD.html",
+            "sizeBytes": 711100
+      },
+      {
+            "title": "Bloons TD 2",
+            "file": "textbooks/bloonsTD2.html",
+            "sizeBytes": 7852517
+      },
+      {
+            "title": "Bloons TD 3",
+            "file": "textbooks/bloonsTD3.html",
+            "sizeBytes": 8665053
+      },
+      {
+            "title": "Bloons TD 4",
+            "file": "textbooks/bloonsTD4.html",
+            "sizeBytes": 11144029
+      },
+      {
+            "title": "Bloons TD 5",
+            "file": "textbooks/bloonsTD5.html",
+            "sizeBytes": 21674453
+      },
+      {
+            "title": "Bloxorz",
+            "file": "textbooks/bloxorz.html",
+            "sizeBytes": 9824296
+      },
+      {
+            "title": "Car Soccer",
+            "file": "textbooks/car-soccer/",
+            "sizeBytes": 130837204
+      },
+      {
+            "title": "Chess",
+            "file": "textbooks/chess.html",
+            "sizeBytes": 6914845
+      },
+      {
+            "title": "Cluster Rush",
+            "file": "textbooks/cluster-rush.html",
+            "sizeBytes": 16052232
+      },
+      {
+            "title": "Cookie Clicker",
+            "file": "textbooks/cookie-clicker.html",
+            "sizeBytes": 7649267
+      },
+      {
+            "title": "Crazy Pixel Apocalypse 9",
+            "file": "textbooks/crazy-pixel-apocalypse-9/index.html",
+            "sizeBytes": 27833728
+      },
+      {
+            "title": "Crossy Road",
+            "file": "textbooks/crossy-road.html",
+            "sizeBytes": 3250987
+      },
+      {
+            "title": "Drift Boss",
+            "file": "textbooks/drift-boss.html",
+            "sizeBytes": 8990388
+      },
+      {
+            "title": "Drivemad",
+            "file": "textbooks/drivemad.html",
+            "sizeBytes": 4999548
+      },
+      {
+            "title": "Escape Road",
+            "file": "textbooks/escape-road.html",
+            "sizeBytes": 37333168
+      },
+      {
+            "title": "Escape Road 2",
+            "file": "textbooks/escape-road-2.html",
+            "sizeBytes": 33570027
+      },
+      {
+            "title": "Escape Road 3",
+            "file": "textbooks/escape-road-3/index.html",
+            "sizeBytes": 217224234
+      },
+      {
+            "title": "Football Bros",
+            "file": "textbooks/football-bros.html",
+            "sizeBytes": 17512552
+      },
+      {
+            "title": "Geometry Dash Lite",
+            "file": "textbooks/geometry-dash-lite.html",
+            "sizeBytes": 56611619
+      },
+      {
+            "title": "Getaway Shootout",
+            "file": "textbooks/getaway-shootout/index.html",
+            "sizeBytes": 24514741
+      },
+      {
+            "title": "Gladihoppers",
+            "file": "textbooks/gladihoppers.html",
+            "sizeBytes": 37178258
+      },
+      {
+            "title": "Granny",
+            "file": "textbooks/granny.html",
+            "sizeBytes": 58316198
+      },
+      {
+            "title": "Happy Wheels",
+            "file": "textbooks/happy-wheels.html",
+            "sizeBytes": 17835062
+      },
+      {
+            "title": "Highway Traffic",
+            "file": "textbooks/highway-traffic.html",
+            "sizeBytes": 36836782
+      },
+      {
+            "title": "Gumspin",
+            "file": "textbooks/gumspin/index.html",
+            "sizeBytes": 23136887
+      },
+      {
+            "title": "Moto X3M 3",
+            "file": "textbooks/moto-x3m-3.html",
+            "sizeBytes": 10594220
+      },
+      {
+            "title": "People Playground",
+            "file": "textbooks/people-playground/index.html",
+            "sizeBytes": 164247473
+      },
+      {
+            "title": "Plants vs Zombies",
+            "file": "textbooks/plants-vs-zombies/index.html",
+            "sizeBytes": 10788264
+      },
+      {
+            "title": "Polytrack",
+            "file": "textbooks/polytrack.html",
+            "sizeBytes": 7174550
+      },
+      {
+            "title": "Retro Bowl",
+            "file": "textbooks/retro-bowl.html",
+            "sizeBytes": 7254005
+      },
+      {
+            "title": "Retro Bowl College",
+            "file": "textbooks/retro-bowl-college.html",
+            "sizeBytes": 8216510
+      },
+      {
+            "title": "Sandboxels",
+            "file": "textbooks/sandboxels.html",
+            "sizeBytes": 664962
+      },
+      {
+            "title": "Slope",
+            "file": "textbooks/slope.html",
+            "sizeBytes": 25986251
+      },
+      {
+            "title": "Slope 2 Player",
+            "file": "textbooks/slope-2-player.html",
+            "sizeBytes": 10275184
+      },
+      {
+            "title": "Slow Roads",
+            "file": "textbooks/slow-roads.html",
+            "sizeBytes": 16960668
+      },
+      {
+            "title": "Sprinter",
+            "file": "textbooks/sprinter/index.html",
+            "sizeBytes": 489000
+      },
+      {
+            "title": "Superhot",
+            "file": "textbooks/superhot.html",
+            "img": "https://cdn.jsdelivr.net/gh/matheveryday25/math@main/swat/ts3.png",
+            "sizeBytes": 8890237
+      },
+      {
+            "title": "Tetris",
+            "file": "textbooks/tetrominoes/index.html",
+            "sizeBytes": 2899856
+      },
+      {
+            "title": "Vex5",
+            "file": "textbooks/vex5.html",
+            "sizeBytes": 15661734
+      },
+      {
+            "title": "Wordle Unlimited",
+            "file": "textbooks/wordle-unlimited.html",
+            "sizeBytes": 184510
+      },
+      {
+            "title": "1v1.LOL",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/1v1.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/1v1lol.png",
+            "sizeBytes": 239053
+      },
+      {
+            "title": "8 Ball Pool (Scratch)",
+            "file": "https://scratch.mit.edu/projects/1291919322/embed",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/8ballpool.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Bank Robbery 2",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/bank.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/bankrob2.png",
+            "sizeBytes": 65788337
+      },
+      {
+            "title": "Baseball Bros",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/baseballbros.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/baseballbros.png",
+            "sizeBytes": 1809479
+      },
+      {
+            "title": "Basketball Bros",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/basketbros.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/basketbros.png",
+            "sizeBytes": 677267
+      },
+      {
+            "title": "Block Blast",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/blockblast.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/blockblast.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Bow Masters",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/bowmasters.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/bowmasters.png",
+            "sizeBytes": 519270
+      },
+      {
+            "title": "Buckshot Roulette",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/buckshot.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/buckshotroullete.png",
+            "sizeBytes": 5155006
+      },
+      {
+            "title": "BuildNow.GG",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/buildnow.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/buildnowgg.png",
+            "sizeBytes": 100689
+      },
+      {
+            "title": "C.S. 1.6",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/cs.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/cs16.png",
+            "sizeBytes": 24738913
+      },
+      {
+            "title": "CCM Client 1.5.2",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/ccm152.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/img/main/client152.png",
+            "sizeBytes": 8048919
+      },
+      {
+            "title": "Chicken War",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/chicken.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/chickenwar.png",
+            "sizeBytes": 17989744
+      },
+      {
+            "title": "Chrome Dino",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/chromedino.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/chromedino.png",
+            "sizeBytes": 61444
+      },
+      {
+            "title": "Clash Royale",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/clash.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/clashroyale.png",
+            "sizeBytes": 128446
+      },
+      {
+            "title": "Crazy Cattle",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/crazycattle.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/crazycattle3d.png",
+            "sizeBytes": 92608
+      },
+      {
+            "title": "Cuphead",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/cuphead.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/cuphead.png",
+            "sizeBytes": 81582
+      },
+      {
+            "title": "Drive in Russia",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/russia.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/driveinrussia.png",
+            "sizeBytes": 8037558
+      },
+      {
+            "title": "EaglerCraft 0.3.0 (WASM)",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/wasm030.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/img/main/030.png",
+            "sizeBytes": 2793571
+      },
+      {
+            "title": "Eaglercraft 1.12 (WASM)",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/wasm112.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/img/main/112.png",
+            "sizeBytes": 15059511
+      },
+      {
+            "title": "EaglerCraft 1.8.8 (JS)",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/js18.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/img/main/188.png",
+            "sizeBytes": 13492223
+      },
+      {
+            "title": "EaglerCraft 1.8.8 (WASM)",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/wasm18.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/img/main/188.png",
+            "sizeBytes": 11330911
+      },
+      {
+            "title": "EaglerCraft Alpha 1.2.6",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/alpha126.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/img/main/126.png",
+            "sizeBytes": 5396837
+      },
+      {
+            "title": "EaglerCraft Beta 1.3_01 (JS)",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/js13.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/img/main/13.png",
+            "sizeBytes": 2343738
+      },
+      {
+            "title": "EaglerCraft Beta 1.7.3 (JS)",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/js173.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/img/main/173.png",
+            "sizeBytes": 10700447
+      },
+      {
+            "title": "Flying Gorilla",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/flyinggorilla.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/flyinggorilla.png",
+            "sizeBytes": 98003
+      },
+      {
+            "title": "Fragzone",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/frag.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/frageb.png",
+            "sizeBytes": 127934
+      },
+      {
+            "title": "GDWEB (V1)",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/gdwebv1.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/gdwebplusversion1.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "GDWEB+ (Stable)",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/gdweb.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/gdwebplus.png",
+            "sizeBytes": 517669
+      },
+      {
+            "title": "Geometry Dash (Scratch)",
+            "file": "https://scratch.mit.edu/projects/1282825077/embed",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/geometrydashscratch.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Geometry Dash (Web Port)",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/actualgd.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/actualgd.png",
+            "sizeBytes": 53332
+      },
+      {
+            "title": "Geometry Dash 3D",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/gd3d.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/3dgeometrydash.png",
+            "sizeBytes": 11455001
+      },
+      {
+            "title": "Google Snake (Scratch)",
+            "file": "https://scratch.mit.edu/projects/1283303860/embed",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/googlesnake.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Gorilla Tag",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/gtag.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/gorillatag.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Granny 2",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/granny2.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/grannychapter2.png",
+            "sizeBytes": 47178668
+      },
+      {
+            "title": "Hollow Knight",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/hollowknight.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/hollowknight.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Hollow Knight Silksong",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/hollowknightsilksong.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/hollowknightsilksong.png",
+            "sizeBytes": 95228
+      },
+      {
+            "title": "Impossible Quiz",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/impossiblequiz.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/impossiblequiz.png",
+            "sizeBytes": 8601869
+      },
+      {
+            "title": "Indian Truck Driving",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/indiantruckdriving.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/indiantruckdriving.png",
+            "sizeBytes": 87551
+      },
+      {
+            "title": "Infinite Craft",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/infinite.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/infinitecraft.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Just Build LOL",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/justbuild.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/justbuildlol.png",
+            "sizeBytes": 90943
+      },
+      {
+            "title": "Kindergarten",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/kindergarten.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/kindergarten.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Kindergarten 2",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/kindergarten2.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/kindergarten2.png",
+            "sizeBytes": 70146
+      },
+      {
+            "title": "Kindergarten 3",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/kindergarten3.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/kindergarten3.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Minecraft P.E",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/pocketediton.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/minecraftpocketedition.png",
+            "sizeBytes": 108851
+      },
+      {
+            "title": "Plague Inc",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/plagueinc.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/plagueinc.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Ragdoll Archers",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/ragdoll.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/ragdollarchers.png",
+            "sizeBytes": 7655821
+      },
+      {
+            "title": "Snow Rider 3D",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/snowrider.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/snowrider.png",
+            "sizeBytes": 98326
+      },
+      {
+            "title": "Soccer Random",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/soccerrandom.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/soccerrandom.png",
+            "sizeBytes": 1500000
+      },
+      {
+            "title": "Soccer Bros",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/html/main/soccerbros.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3/assets/img/main/soccerbros.png",
+            "sizeBytes": 870702
+      },
+      {
+            "title": "Space Waves",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/spacewaves.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/spacewaves.png",
+            "sizeBytes": 9603566
+      },
+      {
+            "title": "Stickman Duel",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/stickman.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/stickmanduel.png",
+            "sizeBytes": 15658110
+      },
+      {
+            "title": "Subway Surfers",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/subway.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/subwaysurfers.png",
+            "sizeBytes": 261298
+      },
+      {
+            "title": "The World's Hardest Game",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/hardestgame.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/theworldshardestgame.png",
+            "sizeBytes": 976034
+      },
+      {
+            "title": "Ultrakill",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/ultra.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/ultrakill.png",
+            "sizeBytes": 481623
+      },
+      {
+            "title": "Untitled Goose Game",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/goosegame.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/untitledgoosegame.png",
+            "sizeBytes": 145371
+      },
+      {
+            "title": "Who's Your Daddy",
+            "file": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/html/main/whosyourdaddy.html",
+            "img": "https://cdn.jsdelivr.net/gh/s0n-1m-cr1n3/sc13nc3@latest/assets/img/main/whosyourdaddy.png",
+            "sizeBytes": 99223
+      }
+];
+
+let games = [...DEFAULT_GAMES];
+let downloadedGameIds = new Set();
+let currentTab = 'all'; // 'all' or 'downloaded'
+let currentPlayingFile = null;
+let currentPlayingTitle = null;
+let activeProgressMap = new Map();
+let searchDebounceTimer = null;
+
+function formatBytes(bytes) {
+  if (!bytes || bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+}
+
+function getGameId(file) {
+  return file.replace(/[^a-zA-Z0-9_-]/g, '_');
+}
+
+async function syncDownloadedStatus() {
+  if (typeof PinpointGameStorage !== 'undefined') {
+    try {
+      const records = await PinpointGameStorage.getAllGames();
+      downloadedGameIds = new Set(records.map(r => r.id));
+    } catch(e) {
+      console.warn('Could not read offline games from storage:', e);
+    }
+  }
+  updateCounts();
+  if (document.body.classList.contains('is-searching')) {
+    renderGames();
+  }
+}
+
+function updateCounts() {
+  const allCount = games.length;
+  const dlCount = downloadedGameIds.size;
+
+  const bAll = document.getElementById('allCountBadge');
+  const bDl = document.getElementById('dlCountBadge');
+  const lDl = document.getElementById('downloadCountLabel');
+
+  if (bAll) bAll.textContent = allCount;
+  if (bDl) bDl.textContent = dlCount;
+  if (lDl) lDl.textContent = dlCount;
+}
+
+function selectChip(tab) {
+  currentTab = tab;
+  document.getElementById('chipAll').classList.toggle('active', tab === 'all');
+  document.getElementById('chipDownloaded').classList.toggle('active', tab === 'downloaded');
+  document.getElementById('resultsCategoryLabel').textContent = tab === 'downloaded' ? 'Downloaded Games' : 'All Games';
+  activateSearchState();
+  renderGames();
+}
+
+function focusSearch() {
+  document.getElementById('searchInput').focus();
+}
+
+function clearSearch() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('clearSearchBtn').style.display = 'none';
+  resetToCenterHome();
+}
+
+function updateResultsPosition() {
+  const sb = document.getElementById('search-block');
+  const rc = document.getElementById('results-container');
+  if (sb && rc && document.body.classList.contains('is-searching')) {
+    const bottom = sb.getBoundingClientRect().bottom;
+    rc.style.top = Math.max(134, Math.round(bottom + 12)) + 'px';
+  }
+}
+
+function activateSearchState() {
+  document.body.classList.add('is-searching');
+  setTimeout(updateResultsPosition, 40);
+  setTimeout(updateResultsPosition, 250);
+  setTimeout(updateResultsPosition, 650);
+}
+
+function resetToCenterHome() {
+  if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+  document.getElementById('searchInput').value = '';
+  document.getElementById('clearSearchBtn').style.display = 'none';
+  document.body.classList.remove('is-searching');
+  const rc = document.getElementById('results-container');
+  if (rc) rc.style.top = '';
+  currentTab = null;
+  const chipAll = document.getElementById('chipAll');
+  const chipDl = document.getElementById('chipDownloaded');
+  if (chipAll) chipAll.classList.remove('active');
+  if (chipDl) chipDl.classList.remove('active');
+  const catLabel = document.getElementById('resultsCategoryLabel');
+  if (catLabel) catLabel.textContent = 'All Games';
+}
+
+function triggerBrowseAll() {
+  if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+  const searchInput = document.getElementById('searchInput');
+  if (searchInput) searchInput.value = '';
+  document.getElementById('clearSearchBtn').style.display = 'none';
+  activateSearchState();
+  renderGames();
+}
+
+// Instant typing handler (0ms delay for seamless instant search)
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('input', () => {
+  const val = searchInput.value;
+  document.getElementById('clearSearchBtn').style.display = val ? 'flex' : 'none';
+
+  if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+
+  if (!val.trim()) {
+    resetToCenterHome();
+    return;
+  }
+
+  activateSearchState();
+  renderGames();
+});
+
+searchInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+    activateSearchState();
+    renderGames();
+  }
+});
+
+// Render results
+function renderGames() {
+  const listContainer = document.getElementById('gameList');
+  const emptyState = document.getElementById('emptyState');
+  const emptyDesc = document.getElementById('emptyStateDesc');
+  const summaryLabel = document.getElementById('resultsSummaryLabel');
+  const query = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+
+  let filtered = games.filter(g => {
+    const id = getGameId(g.file);
+    if (currentTab === 'downloaded' && !downloadedGameIds.has(id)) {
+      return false;
+    }
+    if (query && !g.title.toLowerCase().includes(query)) {
+      return false;
+    }
+    return true;
+  });
+
+  const showPinnedTop = localStorage.getItem('trashbin_show_pinned_top') !== 'false';
+  if (showPinnedTop) {
+    filtered.sort((a, b) => {
+      const aPinned = isGamePinned(a.title) ? 1 : 0;
+      const bPinned = isGamePinned(b.title) ? 1 : 0;
+      return bPinned - aPinned;
+    });
+  }
+
+  if (summaryLabel) {
+    summaryLabel.textContent = `${filtered.length} games`;
+  }
+
+  if (filtered.length === 0) {
+    listContainer.innerHTML = '';
+    emptyState.style.display = 'block';
+    if (currentTab === 'downloaded') {
+      emptyDesc.textContent = query
+        ? 'No downloaded games match your search.'
+        : 'No offline games yet. Click "Download" on any game to save it.';
+    } else {
+      emptyDesc.textContent = 'No games match your search query.';
+    }
+    return;
+  }
+
+  emptyState.style.display = 'none';
+
+  let html = '';
+  filtered.forEach(game => {
+    const id = getGameId(game.file);
+    const isDownloaded = downloadedGameIds.has(id);
+    const isDownloading = typeof PinpointGameStorage !== 'undefined' && PinpointGameStorage.isDownloading(id);
+    const progress = activeProgressMap.get(id);
+    const isPinned = isGamePinned(game.title);
+    const isMossGame = (game.file && game.file.startsWith('movies/')) || (game.title && game.title.includes('Moss'));
+
+    html += `
+      <div class="game-card" id="card-${id}" onclick="playGame('${encodeURIComponent(game.file)}', '${encodeURIComponent(game.title)}')">
+        <div class="game-left">
+          <div class="game-details">
+            <span class="game-title ${isMossGame ? 'moss-title-tag' : ''}">${game.title}</span>
+            <div class="game-meta">
+              <span>${game.isApp ? 'Web App' : formatBytes(game.sizeBytes)}</span>
+              ${isPinned ? `
+                <span class="badge-pinned">
+                  <span class="material-symbols-sharp" style="font-size: 13px;">keep</span>
+                  Pinned
+                </span>
+              ` : ''}
+              ${isDownloaded ? `
+                <span class="badge-dl">
+                  <span class="material-symbols-sharp" style="font-size: 14px;">check_circle</span>
+                  Downloaded
+                </span>
+              ` : ''}
+              ${isDownloading ? `
+                <span class="badge-progress">
+                  <span class="material-symbols-sharp" style="font-size: 14px; animation: spin 1s linear infinite;">sync</span>
+                  ${progress !== undefined ? progress + '%' : 'Downloading...'}
+                </span>
+              ` : ''}
+            </div>
+            ${isDownloading ? `
+              <div class="progress-bar-wrap">
+                <div class="progress-bar-fill" style="width: ${progress || 5}%;"></div>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+
+        <div class="game-actions">
+          <button class="btn-icon-sharp btn-pin-toggle ${isPinned ? 'pinned-active' : ''}" onclick="event.stopPropagation(); togglePinGame('${encodeURIComponent(game.title)}')" title="${isPinned ? 'Unpin game' : 'Pin to top'}">
+            <span class="material-symbols-sharp" style="font-size: 16px;">${isPinned ? 'keep' : 'keep_public'}</span>
+          </button>
+
+          <button class="btn-sharp btn-primary-sharp" onclick="event.stopPropagation(); playGame('${encodeURIComponent(game.file)}', '${encodeURIComponent(game.title)}')">
+            <span class="material-symbols-sharp">${game.isApp ? 'open_in_new' : 'play_arrow'}</span>
+            <span>${game.isApp ? 'Open' : 'Play'}</span>
+          </button>
+
+          ${isGameDownloadable(game.file, game.isApp) ? (isDownloaded ? `
+            <button class="btn-icon-sharp" onclick="event.stopPropagation(); deleteGame('${id}', '${encodeURIComponent(game.file)}', '${encodeURIComponent(game.title)}')" title="Remove">
+              <span class="material-symbols-sharp">delete</span>
+            </button>
+          ` : isDownloading ? `
+            <button class="btn-sharp" onclick="event.stopPropagation(); cancelDownload('${id}')" title="Cancel">
+              <span class="material-symbols-sharp">close</span>
+              <span>Cancel</span>
+            </button>
+          ` : `
+            <button class="btn-icon-sharp" onclick="event.stopPropagation(); startDownload('${id}', '${encodeURIComponent(game.title)}', '${encodeURIComponent(game.file)}')" title="Download for offline">
+              <span class="material-symbols-sharp">download</span>
+            </button>
+          `) : ''}
+        </div>
+      </div>
+    `;
+  });
+
+  listContainer.innerHTML = html;
+}
+
+function prepareGameHtml(html, fileUrl) {
+  let base = fileUrl.replace(/[^/]*$/, '');
+  if (!base.endsWith('/')) base += '/';
+
+  // CRITICAL: raw.githubusercontent.com serves CSS/JS as text/plain with X-Content-Type-Options: nosniff
+  // which causes browsers to block stylesheets and scripts! Always convert raw.githubusercontent.com base to CDN mirror!
+  if (base.includes('raw.githubusercontent.com/')) {
+    base = base.replace('https://raw.githubusercontent.com/', activeMirror + '/gh/').replace('/main/', '@main/');
+  }
+
+  let repoBase = base;
+  const mRepo = base.match(/^(https?:\/\/[^/]+\/(?:gh\/[^/]+\/[^/@]+@[^/]+\/|[^/]+\/[^/]+\/[^/]+\/))/i);
+  if (mRepo) {
+    repoBase = mRepo[1];
+  }
+  if (fileUrl.includes('movies/')) {
+    repoBase = base;
+  }
+
+  // Strip dead preceding HTML shell if concatenated (e.g., Minecraft PE duplicate shells)
+  const docTypeRegex = /<!DOCTYPE\s+html>/gi;
+  const matches = [...html.matchAll(docTypeRegex)];
+  if (matches.length > 1) {
+    const lastIdx = matches[matches.length - 1].index;
+    const prevText = html.substring(0, lastIdx);
+    if (/<\/html>\s*$/i.test(prevText.trim())) {
+      html = html.substring(lastIdx);
+    }
+  }
+
+  // Strip Google Gadget / Module XML wrappers if outer shell (e.g. Russia, Google Sites games)
+  if (html.includes('<module') || html.includes('<Module') || html.includes('<![CDATA[') || html.includes('[CDATA[')) {
+    const cdataMatch = html.match(/(?:<!(?:--)?\[CDATA\[|<!--\[CDATA\[)([\s\S]*?)(?:\]\](?:-->)?|\]\]&gt;|\]\]>)/i);
+    if (cdataMatch && cdataMatch[1] && cdataMatch[1].trim().length > 50) {
+      const modStart = html.search(/<module/i);
+      const modEnd = html.search(/<\/module>/i);
+      if (modStart !== -1 && modEnd !== -1) {
+        const beforeMod = html.substring(0, modStart);
+        const afterMod = html.substring(modEnd + 9);
+        html = beforeMod + cdataMatch[1] + afterMod;
+      }
+    }
+    html = html.replace(/<module[^>]*>[\s\S]*?<content[^>]*>(?:<!--|<!(?:--)?)?\[CDATA\[/gi, '')
+               .replace(/(?:\]\](?:-->)?|\]\]&gt;|\]\]>)\s*<\/content>\s*<\/moduleprefs>\s*<\/module>/gi, '')
+               .replace(/<\/?(?:module|moduleprefs|content)\b[^>]*>/gi, '');
+  }
+
+  // Strip dead blob scripts
+  html = html.replace(/<script[^>]*src=["']blob:https?:[^"']*["'][^>]*>\s*<\/script>/gi, '');
+
+  // Strip broken wrapper scripts that fail with 404 / ERR_FILE_NOT_FOUND
+  html = html.replace(/<script[^>]*src=["'][^"']*(?:all\.js|settings\/js\/index\.js)[^"']*["'][^>]*>\s*<\/script>/gi, '');
+
+  // Protect car-soccer asset matcher from throwing if map is undefined
+  html = html.replace(/function matchAsset\s*\(([^)]*)\)\s*\{/g, 'function matchAsset($1){ if(!map)return null;');
+
+  // Neutralize baseOrigin script override in Flash HTML games so they never target googleusercontent.com
+  html = html.replace(/let\s+baseOrigin\s*=\s*[^;]+;/g, 'let baseOrigin = ' + JSON.stringify(repoBase.replace(/\/+$/, '')) + ';');
+  html = html.replace(/var\s+baseOrigin\s*=\s*[^;]+;/g, 'var baseOrigin = ' + JSON.stringify(repoBase.replace(/\/+$/, '')) + ';');
+
+  // If the game already has an explicit absolute <base href="..."> (like Minecraft Pocket Edition, Gorilla Tag, Flying Gorilla)
+  // use that base URL instead of the container page URL!
+  const mBase = html.match(/(<base\b[^>]*\bhref\s*=\s*)(['"])(.*?)\2/i);
+  if (mBase) {
+    const existingHref = mBase[3];
+    if (/^https?:\/\//i.test(existingHref)) {
+      base = existingHref;
+      if (!base.endsWith('/')) base += '/';
+      repoBase = base;
+      const mR = base.match(/^(https?:\/\/[^/]+\/(?:gh\/[^/]+\/[^/@]+@[^/]+\/|[^/]+\/[^/]+\/[^/]+\/))/i);
+      if (mR) repoBase = mR[1];
+    } else {
+      let resolvedBase = base;
+      if (existingHref.startsWith('/')) {
+        resolvedBase = repoBase + existingHref.replace(/^\/+/, '');
+      } else {
+        try {
+          resolvedBase = new URL(existingHref, base).href;
+        } catch(e) {
+          resolvedBase = base + existingHref;
+        }
+      }
+      if (!resolvedBase.endsWith('/')) resolvedBase += '/';
+      base = resolvedBase;
+      html = html.replace(/(<base\b[^>]*\bhref\s*=\s*)(['"])(.*?)\2/i, (m, p1, p2) => p1 + p2 + resolvedBase + p2);
+    }
+  } else {
+    const isMoviesApp = fileUrl.includes('movies/');
+    if (!isMoviesApp) {
+      const lower = html.toLowerCase();
+      const firstScript = lower.indexOf('<script');
+      const firstHead = lower.indexOf('<head');
+      const hasRealHead = firstHead !== -1 && (firstScript === -1 || firstHead < firstScript);
+      if (hasRealHead) {
+        html = html.replace(/<head([^>]*)>/i, (m, p1) => '<head' + p1 + '><base href="' + base + '">');
+      } else {
+        html = '<base href="' + base + '">' + html;
+      }
+    }
+  }
+
+  // 2. Inject frame viewport style and runtime fetch/XHR interceptor
+  const isApp = fileUrl.includes('ai.html') || fileUrl.includes('web.html') || fileUrl.includes('yolk/') || fileUrl.includes('movies/') || fileUrl.includes('Soundboard.html') || fileUrl.includes('pages/');
+  if (isApp) {
+    // Web apps have their own modern scripts and styles; do not inject game canvas/audio monkey-patches
+    return html;
+  }
+  const frameStyle = '<style>html,body{height:100%;margin:0;padding:0;overflow:hidden;background:#000;}.webgl-content,#gameContainer,#canvas{width:100%;height:100%;}</style>';
+  
+  const innerScriptBody = [
+    'try { Object.defineProperty(window, "top", { get: function() { return window; } }); } catch(e){}',
+    'try {',
+    '  var _origPostMessage = window.postMessage;',
+    '  window.postMessage = function(msg, targetOrigin, transfer) {',
+    '    if (targetOrigin === "" || !targetOrigin) targetOrigin = "*";',
+    '    return _origPostMessage.call(this, msg, targetOrigin, transfer);',
+    '  };',
+    '} catch(e){}',
+    'window.ytgame = window.ytgame || {',
+    '  game: { firstFrameReady: function(){}, gameReady: function(){}, pause: function(){}, resume: function(){} },',
+    '  engagement: { sendScore: function(){} }',
+    '};',
+    'var ruffleBase = rb + "textbooks/ruffle/";',
+    'window.RufflePlayer = window.RufflePlayer || {};',
+    'var _rConfig = { autoplay: "on", unmuteOverlay: "hidden", letterbox: "on", warnOnUnsupportedContent: false, publicPath: ruffleBase };',
+    'try {',
+    '  Object.defineProperty(window.RufflePlayer, "config", {',
+    '    get: function() { return _rConfig; },',
+    '    set: function(val) { if(val && typeof val === "object"){ Object.assign(_rConfig, val); if(!val.publicPath) _rConfig.publicPath = ruffleBase; } },',
+    '    configurable: true',
+    '  });',
+    '} catch(e){ window.RufflePlayer.config = _rConfig; }',
+    'window._carSoccerImageBlobs = window._carSoccerImageBlobs || new Map();',
+    'window.GZ_ASSETS_MAP = window.GZ_ASSETS_MAP || {};',
+    'window.addEventListener("error", function(e) {',
+    '  if(e && e.message && (e.message.indexOf("getBoundingClientRect")!==-1 || e.message.indexOf("all.js")!==-1 || e.message.indexOf("matchAsset")!==-1)){',
+    '    e.preventDefault(); e.stopPropagation(); return true;',
+    '  }',
+    '}, true);',
+    'try {',
+    '  var origGetId = Document.prototype.getElementById;',
+    '  Document.prototype.getElementById = function(id) {',
+    '    var el = origGetId.call(this, id);',
+    '    if(!el && id === "canvas") { return document.querySelector("canvas"); }',
+    '    return el;',
+    '  };',
+    '} catch(e){}',
+    'try {',
+    '  if(window.navigator && window.navigator.serviceWorker){',
+    '    window.navigator.serviceWorker.register = function(){ return new Promise(function(){}); };',
+    '  }',
+    '} catch(e){}',
+    'try {',
+    '  var _origWrite = Document.prototype.write;',
+    '  Document.prototype.write = function(s){',
+    '    if(typeof s === "string"){',
+    '      if(s.indexOf("all.js")!==-1 || s.indexOf("settings/js")!==-1){ return; }',
+    '      var cdataM = s.match(/(?:<!(?:--)?\\[CDATA\\[|<!--\\[CDATA\\[)([\\s\\S]*?)(?:\\]\\](?:-->)?|\\]\\]&gt;|\\]\\]>)/i);',
+    '      if(cdataM && cdataM[1]){ s = cdataM[1].trim(); }',
+    '      else if(s.indexOf("<module") !== -1 || s.indexOf("<Module") !== -1){',
+    '        s = s.replace(/<module[^>]*>[\\s\\S]*?<content[^>]*>(?:<!--|<!(?:--)?)?\\[CDATA\\[/gi, "")',
+    '             .replace(/(?:\\]\\](?:-->)?|\\]\\]&gt;|\\]\\]>)\\s*<\\/content>\\s*<\\/moduleprefs>\\s*<\\/module>/gi, "")',
+    '             .replace(/<\\/?(?:module|moduleprefs|content)\\b[^>]*>/gi, "");',
+    '      }',
+    '    }',
+    '    return _origWrite.call(this, s);',
+    '  };',
+    '} catch(e){}',
+    'try {',
+    '  var _origSetAttr = Element.prototype.setAttribute;',
+    '  Element.prototype.setAttribute = function(k, v){',
+    '    if(this instanceof HTMLScriptElement && k && k.toLowerCase() === "src"){',
+    '      if(typeof v === "string" && (v.indexOf("all.js")!==-1 || v.indexOf("settings/js")!==-1)){ v = "data:application/javascript,"; }',
+    '    }',
+    '    return _origSetAttr.call(this, k, v);',
+    '  };',
+    '} catch(e){}',
+    (!isApp ? [
+      'try {',
+      '  document.addEventListener("click", function(e){',
+      '    var a = e.target && e.target.closest && e.target.closest("a");',
+      '    if(a){',
+      '      var href = a.getAttribute("href");',
+      '      if(href && href.charAt(0) === "#"){',
+      '        e.preventDefault();',
+      '        if(window.location.hash !== href){ window.location.hash = href; } else { window.dispatchEvent(new Event("hashchange")); }',
+      '      }',
+      '    }',
+      '  }, true);',
+      '} catch(e){}'
+    ].join('\n') : ''),
+    'window.__allAudioContexts = window.__allAudioContexts || [];',
+    'try {',
+    '  var OrigAC = window.AudioContext || window.webkitAudioContext;',
+    '  if(OrigAC){',
+    '    var PatchedAC = function(){ var ctx = new OrigAC(); try{ window.__allAudioContexts.push(ctx); }catch(e){} return ctx; };',
+    '    PatchedAC.prototype = OrigAC.prototype;',
+    '    window.AudioContext = PatchedAC;',
+    '    if(window.webkitAudioContext) window.webkitAudioContext = PatchedAC;',
+    '  }',
+    '} catch(e){}',
+    'try {',
+    '  var _origGetImageData = CanvasRenderingContext2D.prototype.getImageData;',
+    '  CanvasRenderingContext2D.prototype.getImageData = function(sx, sy, sw, sh, settings) {',
+    '    try {',
+    '      if(!sw || sw <= 0) sw = 1;',
+    '      if(!sh || sh <= 0) sh = 1;',
+    '      var res = _origGetImageData.call(this, sx, sy, sw, sh, settings);',
+    '      if(!res || !res.data){',
+    '        return this.createImageData(Math.max(1, Math.round(sw)), Math.max(1, Math.round(sh)));',
+    '      }',
+    '      return res;',
+    '    } catch(e){',
+    '      try {',
+    '        return this.createImageData(Math.max(1, Math.round(sw || 1)), Math.max(1, Math.round(sh || 1)));',
+    '      } catch(err){',
+    '        var w = Math.max(1, Math.round(sw || 1)), h = Math.max(1, Math.round(sh || 1));',
+    '        return { width: w, height: h, data: new Uint8ClampedArray(w * h * 4) };',
+    '      }',
+    '    }',
+    '  };',
+    '} catch(e){}',
+    'try {',
+    '  var _origGetContext = HTMLCanvasElement.prototype.getContext;',
+    '  HTMLCanvasElement.prototype.getContext = function(type, attribs) {',
+    '    if(type === "2d"){',
+    '      attribs = attribs || {};',
+    '      attribs.willReadFrequently = true;',
+    '    }',
+    '    return _origGetContext.call(this, type, attribs);',
+    '  };',
+    '} catch(e){}',
+    'var b=' + JSON.stringify(base) + ';',
+    'var rb=' + JSON.stringify(repoBase) + ';',
+    'var m=' + JSON.stringify(activeMirror) + ';',
+    'function fix(u){',
+    '  if(typeof u !== "string") return u;',
+    '  if(u.indexOf("blob:") === 0 || u.indexOf("data:") === 0) return u;',
+    '  if(u.indexOf("all.js") !== -1 || u.indexOf("settings/js") !== -1){ return "data:application/javascript,"; }',
+    '  if(u.indexOf("googleusercontent.com") !== -1 || u.indexOf("script.google.com") !== -1 || u.indexOf("localhost") !== -1 || u.indexOf("127.0.0.1") !== -1){',
+    '    var slashIdx = u.indexOf("/", 8);',
+    '    if(slashIdx !== -1) u = u.substring(slashIdx);',
+    '  }',
+    '  if(u.indexOf("yolk/") !== -1){ return m + "/gh/pinpoint-edu/pinpoint-mini@main/" + u.substring(u.indexOf("yolk/")); }',
+    '  if(u.indexOf("ai.html") !== -1){ return m + "/gh/pinpoint-edu/pinpoint-mini@main/ai.html"; }',
+    '  if(u.indexOf("web.html") !== -1){ return m + "/gh/pinpoint-edu/pinpoint-mini@main/web.html"; }',
+    '  if(u.indexOf("savedata") !== -1 || u.indexOf("optiondata.dat") !== -1){',
+    '    var cleanSave = u;',
+    '    if(cleanSave.indexOf("/textbooks/") !== -1) cleanSave = cleanSave.substring(cleanSave.indexOf("/textbooks/") + 11);',
+    '    else if(cleanSave.indexOf("textbooks/") === 0) cleanSave = cleanSave.substring(10);',
+    '    else if(cleanSave.indexOf("/") === 0) cleanSave = cleanSave.substring(1);',
+    '    return b + cleanSave;',
+    '  }',
+    '  if(u.indexOf("matheveryday25/math/truck") !== -1){ u = u.replace("/math/truck", "/math@main/truck"); }',
+    '  if(u.indexOf("matheveryday25/math@main/1v1lol/") !== -1 && u.indexOf(".unityweb") !== -1){',
+    '    return u.replace("cdn.jsdelivr.net/gh/matheveryday25/math@main/", "raw.githubusercontent.com/matheveryday25/math/main/");',
+    '  }',
+    '  if(u.indexOf("dispatchworker.js") !== -1 && u.indexOf("scripts/") === -1){',
+    '    u = u.replace("dispatchworker.js", "scripts/dispatchworker.js");',
+    '  }',
+    '  if(u.indexOf("jobworker.js") !== -1 && u.indexOf("scripts/") === -1){',
+    '    u = u.replace("jobworker.js", "scripts/jobworker.js");',
+    '  }',
+    '  if(u.indexOf("c3runtime.js") !== -1 && u.indexOf("scripts/") === -1){',
+    '    u = u.replace("c3runtime.js", "scripts/c3runtime.js");',
+    '  }',
+    '  if(u.indexOf(".swf") !== -1){',
+    '    if(u.indexOf("cdn.jsdelivr.net") === -1 && u.indexOf("githubusercontent.com") === -1){',
+    '      var fn = u.substring(u.lastIndexOf("/") + 1).split("?")[0].split("#")[0];',
+    '      return rb + "textbooks/" + fn;',
+    '    }',
+    '  }',
+    '  if(u.indexOf("172de42e6619eac8f371") !== -1 || u.indexOf("878d548199cddef07035") !== -1 || u.indexOf("f9db7455c2c80fac021b") !== -1 || u.indexOf("5db40605896b9147a8a1") !== -1 || (u.indexOf("ruffle") !== -1 && u.indexOf(".unityweb") === -1)){',
+    '    if(u.indexOf(".wasm") !== -1 || u.indexOf(".js") !== -1){',
+    '      var fn = u.substring(u.lastIndexOf("/") + 1).split("?")[0].split("#")[0];',
+    '      return rb + "textbooks/ruffle/" + fn;',
+    '    }',
+    '  }',
+    '  if(u.indexOf("/textbooks/") !== -1 || u.indexOf("textbooks/") === 0){',
+    '    if(u.indexOf("cdn.jsdelivr.net") === -1 && u.indexOf("githubusercontent.com") === -1){',
+    '      var sub = u.substring(u.indexOf("textbooks/") + 10);',
+    '      if(!sub.trim() || sub === "/" || sub.slice(-1) === "/"){ return "data:text/plain,"; }',
+    '      return rb + "textbooks/" + sub;',
+    '    }',
+    '  }',
+    '  if(b.indexOf("movies/") !== -1){',
+    '    if(u.indexOf("_app/") !== -1 || u.indexOf("/_app/") !== -1){ return b + (u.indexOf("/") === 0 ? u.slice(1) : u); }',
+    '    if(u.indexOf("assets/") !== -1 || u.indexOf("/assets/") !== -1){ return b + (u.indexOf("/") === 0 ? u.slice(1) : u); }',
+    '    if(u.indexOf("brand/") !== -1 || u.indexOf("/brand/") !== -1){ return b + (u.indexOf("/") === 0 ? u.slice(1) : u); }',
+    '    if(u.indexOf("img/") !== -1 || u.indexOf("/img/") !== -1){ return b + (u.indexOf("/") === 0 ? u.slice(1) : u); }',
+    '  }',
+    '  if(u.indexOf("/assets/") !== -1 || u.indexOf("assets/") === 0){',
+    '    if(u.indexOf("cdn.jsdelivr.net") === -1 && u.indexOf("githubusercontent.com") === -1){',
+    '      var sub = u.substring(u.indexOf("assets/") + 7);',
+    '      if(!sub.trim() || sub === "/" || sub.slice(-1) === "/"){ return "data:text/plain,"; }',
+    '      return rb + "assets/" + sub;',
+    '    }',
+    '  }',
+    '  if(u.indexOf("/") === 0) return rb + u.slice(1);',
+    '  if(u.indexOf("://") === -1) return b + u;',
+    '  return u;',
+    '}',
+    'try {',
+    '  var OrigWorker = window.Worker;',
+    '  if(OrigWorker){',
+    '    window.Worker = function(scriptURL, options){',
+    '      var raw = typeof scriptURL==="string" ? scriptURL : (scriptURL && scriptURL.href ? scriptURL.href : "");',
+    '      var resolved = fix(raw);',
+    '      if(resolved.indexOf("dispatchworker.js") !== -1 && resolved.indexOf("scripts/") === -1){',
+    '        resolved = resolved.replace("dispatchworker.js", "scripts/dispatchworker.js");',
+    '      }',
+    '      if(resolved.indexOf("jobworker.js") !== -1 && resolved.indexOf("scripts/") === -1){',
+    '        resolved = resolved.replace("jobworker.js", "scripts/jobworker.js");',
+    '      }',
+    '      if(resolved.indexOf("http://")===0 || resolved.indexOf("https://")===0){',
+    '        try {',
+    '          var blobCode = "importScripts(" + JSON.stringify(resolved) + ");";',
+    '          var blob = new Blob([blobCode], { type: "application/javascript" });',
+    '          var blobUrl = URL.createObjectURL(blob);',
+    '          return new OrigWorker(blobUrl, options);',
+    '        } catch(e){}',
+    '      }',
+    '      return new OrigWorker(resolved, options);',
+    '    };',
+    '    window.Worker.prototype = OrigWorker.prototype;',
+    '  }',
+    '} catch(e){}',
+    'try {',
+    '  var origScriptSrc = Object.getOwnPropertyDescriptor(HTMLScriptElement.prototype, "src");',
+    '  if(origScriptSrc && origScriptSrc.set){',
+    '    Object.defineProperty(HTMLScriptElement.prototype, "src", {',
+    '      set: function(v){ if(typeof v==="string"){ if(v.indexOf("all.js")!==-1 || v.indexOf("settings/js")!==-1) return origScriptSrc.set.call(this, "data:application/javascript,"); v = fix(v); } return origScriptSrc.set.call(this, v); },',
+    '      get: function(){ return origScriptSrc.get.call(this); }',
+    '    });',
+    '  }',
+    '} catch(e){}',
+    'if(typeof window.fetch!=="undefined"){',
+    '  var _f=window.fetch;',
+    '  window.fetch=function(inp,init){',
+    '    var u = typeof inp==="string" ? inp : (inp && inp.href ? inp.href : (inp && inp.url ? inp.url : ""));',
+     '    if(typeof inp!=="string" && inp && inp.href && !inp.url){ inp = u; }',
+    '    if(u.indexOf("all.js")!==-1 || u.indexOf("settings/js")!==-1){ return Promise.resolve(new Response("", {status: 200, headers: {"Content-Type": "application/javascript"}})); }',
+    '    var targetUrl=fix(u);',
+    '    if(targetUrl.endsWith("/textbooks/basket-random/") || targetUrl.endsWith("/textbooks/basket-random")){',
+    '      return Promise.resolve(new Response("<!DOCTYPE html><html></html>", {status: 200, headers: {"Content-Type": "text/html"}}));',
+    '    }',
+    '    var req = (typeof inp==="string" || !inp) ? targetUrl : new Request(targetUrl, inp);',
+    '    return _f.call(this,req,init).then(function(res){',
+    '      if(!res.ok && (res.status===403 || res.status===404) && typeof targetUrl==="string" && targetUrl.indexOf("cdn.jsdelivr.net/gh/")!==-1){',
+    '        if(!targetUrl.endsWith("/")){',
+    '          try {',
+    '            var parts = targetUrl.split("cdn.jsdelivr.net/gh/")[1].split("/");',
+    '            var user = parts[0];',
+    '            var repo = parts[1].split("@")[0];',
+    '            var rest = parts.slice(2).join("/");',
+    '            var rawUrl = "https://raw.githubusercontent.com/" + user + "/" + repo + "/main/" + rest;',
+    '            if(rawUrl!==targetUrl){',
+    '              var fbReq=(typeof inp==="string" || !inp) ? rawUrl : new Request(rawUrl, inp);',
+    '              return _f.call(window, fbReq, init);',
+    '            }',
+    '          } catch(e){}',
+    '        }',
+    '      }',
+    '      return res;',
+    '    });',
+    '  };',
+    '}',
+    'if(typeof XMLHttpRequest!=="undefined"){',
+    '  var _o=XMLHttpRequest.prototype.open;',
+    '  XMLHttpRequest.prototype.open=function(method,url,async,user,pass){',
+    '    var targetUrl=fix(url);',
+    '    return _o.call(this,method,targetUrl,async!==false,user,pass);',
+    '  };',
+    '}'
+  ].join('\n');
+
+  const interceptScript = '<scr' + 'ipt>(function(){\n' + innerScriptBody + '\n})()</scr' + 'ipt>';
+
+  const lowerHtml = html.toLowerCase();
+  const earlyScript = lowerHtml.indexOf('<script');
+  const earlyHead = lowerHtml.indexOf('<head');
+  const hasRealHeadTag = earlyHead !== -1 && (earlyScript === -1 || earlyHead < earlyScript);
+
+  if (hasRealHeadTag) {
+    html = html.replace(/<head([^>]*)>/i, (m, p1) => '<head' + p1 + '>' + interceptScript + frameStyle);
+  } else {
+    html = interceptScript + frameStyle + html;
+  }
+
+  // 3. Resolve root-relative paths in HTML attributes
+  html = html.replace(/(\s(?:src|href))=(['"])\/(?!\/)/gi, (m, p1, p2) => p1 + '=' + p2 + repoBase);
+
+  // 3b. Rewrite dynamic module imports and modulepreloads for movies
+  if (fileUrl.includes('movies/')) {
+    html = html.replace(/import\((['"])\/?_app\//g, (m, q) => 'import(' + q + repoBase + '_app/');
+    html = html.replace(/(<link[^>]*\bhref\s*=\s*)(['"])(\/?_app\/[^'"]*)\2/gi, (m, p1, q, p2) => p1 + q + repoBase + p2.replace(/^\/+/, '') + q);
+    html = html.replace(/(<link[^>]*\bhref\s*=\s*)(['"])assets\//gi, '$1$2' + repoBase + 'assets/');
+    html = html.replace(/(<script[^>]*\bsrc\s*=\s*)(['"])assets\//gi, '$1$2' + repoBase + 'assets/');
+  }
+
+  // 3c. Rewrite ruffle script tags to self-hosted pinpoint-mini bundle
+  html = html.replace(/(<script[^>]*\bsrc\s*=\s*)(['"])[^'"]*ruffle(?:\.min)?\.js\2/gi, '$1$2' + repoBase + 'textbooks/ruffle/ruffle.js$2');
+
+  // 4. Normalize jsdelivr mirror domains to current active mirror
+  html = html.replace(/https?:\/\/[^/]*\.jsdelivr\.net\//g, activeMirror + '/');
+
+  return html;
+}
+
+
+// Push the active tint into themable embedded apps (Moss, Soundboard, AI). Yolk is intentionally never themed.
+function themeCssForTint(tint) {
+  if (!tint) return "";
+  let css = `:root{--accent:${tint.color} !important;--accent-hover:${tint.light || tint.color} !important;--accent-light:${tint.light || tint.color} !important;--accent-glow:${tint.glow || tint.color + "66"} !important;--accent-subtle:${tint.subtle || tint.color + "22"} !important;--accent-badge-bg:${tint.badgeBg || tint.color + "33"} !important;--accent-border:${tint.border || tint.color + "55"} !important;--border-focus:${tint.color} !important;`;
+  if (tint.color2) {
+    const c2 = tint.color2;
+    css += `--bg-base:color-mix(in srgb, ${c2} 7%, #09090b) !important;--bg-surface:color-mix(in srgb, ${c2} 10%, #121215) !important;--bg-card:color-mix(in srgb, ${c2} 14%, #18181b) !important;--bg-card-hover:color-mix(in srgb, ${c2} 20%, #222226) !important;--border:color-mix(in srgb, ${c2} 35%, #27272a) !important;--border-subtle:color-mix(in srgb, ${c2} 35%, #27272a) !important;`;
+  }
+  return css + "}";
+}
+
+function pushThemeToFrames() {
+  const frame = document.getElementById("gameIframe");
+  if (!frame) return;
+  try {
+    const f = (typeof lastPlayingGame !== "undefined" && lastPlayingGame && lastPlayingGame.file) || "";
+    if (!(f.startsWith("movies/") || f === "ai.html" || f === "web.html" || f.includes("Soundboard.html"))) return;
+    const doc = frame.contentDocument;
+    if (!doc || !doc.head) return;
+    let st = doc.getElementById("trashbin-theme-style");
+    if (!st) { st = doc.createElement("style"); st.id = "trashbin-theme-style"; doc.head.appendChild(st); }
+    st.textContent = themeCssForTint(window.__currentTint);
+  } catch (e) {}
+}
+
+function writeGameIntoFrame(iframe, rawHtml, fileUrl) {
+  const preparedHtml = prepareGameHtml(rawHtml, fileUrl);
+  try {
+    const doc = iframe.contentDocument || iframe.contentWindow.document;
+    doc.open();
+    doc.write(preparedHtml);
+    doc.close();
+    if (/movies\/|ai\.html|web\.html|Soundboard\.html/.test(fileUrl) && !/yolk\//.test(fileUrl)) {
+      try {
+        const st = doc.createElement("style");
+        st.id = "trashbin-theme-style";
+        st.textContent = themeCssForTint(window.__currentTint);
+        (doc.head || doc.documentElement).appendChild(st);
+      } catch(e2) {}
+    }
+  } catch(e) {
+    console.warn("doc.write failed, falling back to srcdoc:", e);
+    iframe.srcdoc = preparedHtml;
+  }
+  try {
+    iframe.contentWindow.focus();
+  } catch(e) {}
+  setTimeout(checkAndApplyStretchedRes, 250);
+  setTimeout(checkAndApplyStretchedRes, 1000);
+}
+
+async function fetchGameHtml(file) {
+  if (/^https?:\/\//i.test(file)) {
+    let mirrorUrl = file;
+    if (file.includes('jsdelivr.net')) {
+      mirrorUrl = file.replace(/https?:\/\/[^/]*\.jsdelivr\.net\//i, activeMirror + '/');
+    }
+    try {
+      const res = await fetch(mirrorUrl);
+      if (res.ok) {
+        const text = await res.text();
+        if (!text.includes('Package size exceeded') && !text.includes('limit of 20 MB') && !text.includes('404: Not Found')) {
+          return { html: text, resolvedUrl: mirrorUrl };
+        }
+      }
+    } catch(e) {}
+    try {
+      const res2 = await fetch(file);
+      if (res2.ok) {
+        const text = await res2.text();
+        if (!text.includes('Package size exceeded') && !text.includes('limit of 20 MB') && !text.includes('404: Not Found')) {
+          return { html: text, resolvedUrl: file };
+        }
+      }
+    } catch(e) {}
+    if (file.includes('jsdelivr.net/gh/')) {
+      const rawUrl = file.replace(/https?:\/\/[^/]*\.jsdelivr\.net\/gh\/([^/@]+)\/([^/@]+)(?:@[^/]+)?\//i, 'https://raw.githubusercontent.com/$1/$2/main/');
+      try {
+        const res3 = await fetch(rawUrl);
+        if (res3.ok) {
+          const text = await res3.text();
+          return { html: text, resolvedUrl: rawUrl };
+        }
+      } catch(e) {}
+    }
+    throw new Error('Could not fetch game from ' + file);
+  }
+
+  const cleanPath = file.replace(/^\/+/, '');
+  let fetchFile = cleanPath;
+  if (fetchFile.endsWith('/')) {
+    fetchFile += 'index.html';
+  }
+
+  // First try direct local / relative fetch (only when running on local dev: file://, localhost, or Vercel)
+  const isLocalDev = typeof location !== 'undefined' && (location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname.endsWith('.vercel.app') || location.hostname.endsWith('.broshan.com.np'));
+  if (isLocalDev) {
+    try {
+      const localRes = await fetch(fetchFile);
+      if (localRes.ok) {
+        const text = await localRes.text();
+        if (!text.includes('Package size exceeded') && !text.includes('limit of 20 MB') && !text.includes('404: Not Found') && !text.trim().startsWith('{"status": 4')) {
+          let localResolved = fetchFile;
+          try {
+            localResolved = new URL(fetchFile, window.location.href).href;
+          } catch(e) {}
+          return { html: text, resolvedUrl: localResolved };
+        }
+      }
+    } catch(e) {}
+  }
+
+  const mirrors = [activeMirror, ...CDN_MIRRORS.filter(m => m !== activeMirror)];
+
+  // Apps live in pinpoint-mini, game textbooks live in assets
+  const isMiniRepo = fetchFile.startsWith('yolk/') || fetchFile.startsWith('movies/') || fetchFile === 'ai.html' || fetchFile === 'web.html' || fetchFile.startsWith('pages/') || fetchFile.includes('Soundboard.html') || fetchFile.includes('happy-wheels') || fetchFile.includes('superhot') || fetchFile.includes('tetrominoes') || fetchFile.includes('tetris') || fetchFile.includes('retro-bowl');
+  const primaryRepo = isMiniRepo ? 'pinpoint-edu/pinpoint-mini@main/' : 'pinpoint-edu/assets@main/';
+  const fallbackRepo = isMiniRepo ? 'pinpoint-edu/assets@main/' : 'pinpoint-edu/pinpoint-mini@main/';
+
+  const isLargeGame = fetchFile.includes('happy-wheels') || fetchFile.includes('retro-bowl') || fetchFile.includes('gladihoppers') || fetchFile.includes('highway-traffic') || fetchFile.includes('drivemad') || fetchFile.includes('bloonsTD5') || fetchFile.includes('bloonsTD4') || (typeof allGames !== 'undefined' && allGames.some(g => g.file && g.file.includes(fetchFile) && g.sizeBytes > 19000000));
+
+  const urlsToTry = (isLargeGame || isMiniRepo) ? [
+    'https://raw.githubusercontent.com/' + primaryRepo.replace(/@[^/]+\//, '/main/') + fetchFile,
+    'https://cdn.statically.io/gh/' + primaryRepo + fetchFile,
+    ...mirrors.map(m => m + '/gh/' + primaryRepo + fetchFile),
+    'https://raw.githubusercontent.com/' + fallbackRepo.replace(/@[^/]+\//, '/main/') + fetchFile,
+    'https://cdn.statically.io/gh/' + fallbackRepo + fetchFile,
+    ...mirrors.map(m => m + '/gh/' + fallbackRepo + fetchFile)
+  ] : [
+    ...mirrors.map(m => m + '/gh/' + primaryRepo + fetchFile),
+    'https://cdn.statically.io/gh/' + primaryRepo + fetchFile,
+    'https://raw.githubusercontent.com/' + primaryRepo.replace(/@[^/]+\//, '/main/') + fetchFile,
+    ...mirrors.map(m => m + '/gh/' + fallbackRepo + fetchFile),
+    'https://cdn.statically.io/gh/' + fallbackRepo + fetchFile,
+    'https://raw.githubusercontent.com/' + fallbackRepo.replace(/@[^/]+\//, '/main/') + fetchFile
+  ];
+
+  for (const url of urlsToTry) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) continue;
+      const text = await res.text();
+      if (text.includes('Package size exceeded') || text.includes('limit of 20 MB') || text.includes('404: Not Found') || text.trim().startsWith('{"status": 4')) {
+        continue;
+      }
+      for (const m of CDN_MIRRORS) {
+        if (url.startsWith(m)) {
+          activeMirror = m;
+          break;
+        }
+      }
+      return { html: text, resolvedUrl: url };
+    } catch(e) {
+      continue;
+    }
+  }
+  throw new Error('Could not fetch game from any CDN mirror.');
+}
+
+// Play Game in the In-Page Player
+async function playGame(encodedFile, encodedTitle) {
+  const file = decodeURIComponent(encodedFile);
+  const title = decodeURIComponent(encodedTitle);
+  const id = getGameId(file);
+
+  currentPlayingFile = file;
+  currentPlayingTitle = title;
+  const playerTitleEl = document.getElementById('currentPlayerTitle');
+  playerTitleEl.textContent = title;
+  if (file.startsWith('movies/') || title.includes('Moss')) {
+    playerTitleEl.classList.add('is-moss-title');
+  } else {
+    playerTitleEl.classList.remove('is-moss-title');
+  }
+  
+  const isApp = file.startsWith('yolk/') || file.startsWith('movies/') || file === 'ai.html' || file === 'web.html' || file.includes('Soundboard.html') || file.startsWith('pages/');
+  const playerView = document.getElementById('player-view');
+  if (isApp) {
+    playerView.classList.add('is-web-app');
+  } else {
+    playerView.classList.remove('is-web-app');
+  }
+  playerView.style.display = 'flex';
+
+  if (window.PinpointSaveManager) {
+    PinpointSaveManager.updateUI(file, title);
+  }
+  updatePlayerDownloadBtn();
+
+  const iframe = document.getElementById('gameIframe');
+
+  // Direct same-origin iframe navigation for web.html when hosted on custom domain / localhost
+  if (file === 'web.html' && typeof location !== 'undefined' && (location.protocol === 'https:' || location.protocol === 'http:') && location.origin !== 'null' && !location.hostname.includes('jsdelivr.net') && !location.hostname.includes('googleusercontent.com')) {
+    iframe.removeAttribute('srcdoc');
+    iframe.src = 'web.html';
+    try { iframe.contentWindow.focus(); } catch(e) {}
+    return;
+  }
+
+  // Direct iframe navigation for external embeds
+  if (file.startsWith('http') && file.includes('scratch.mit.edu')) {
+    iframe.removeAttribute('srcdoc');
+    iframe.src = file;
+    try { iframe.contentWindow.focus(); } catch(e) {}
+    return;
+  }
+
+  // 1. Check if game is saved offline in IndexedDB (apps and textbooks always load latest live code)
+  const isMiniApp = file.startsWith('yolk/') || file.startsWith('movies/') || file === 'ai.html' || file === 'web.html' || file.includes('Soundboard.html') || file.includes('happy-wheels');
+  if (!isMiniApp && typeof PinpointGameStorage !== 'undefined') {
+    try {
+      const record = await PinpointGameStorage.getGame(id);
+      if (record && record.content && record.content.length > 50) {
+        const isMiniRepo = file.startsWith('yolk/') || file.startsWith('movies/') || file === 'ai.html' || file === 'web.html' || file.startsWith('pages/') || file.includes('Soundboard.html') || file.includes('happy-wheels') || file.includes('superhot') || file.includes('tetrominoes') || file.includes('tetris');
+        const primaryRepo = isMiniRepo ? 'pinpoint-edu/pinpoint-mini@main/' : 'pinpoint-edu/assets@main/';
+        const offlineBase = (/^https?:\/\//i.test(file)) ? file : (activeMirror + '/gh/' + primaryRepo + file);
+        writeGameIntoFrame(iframe, record.content, offlineBase);
+        return;
+      }
+    } catch(e) {}
+  }
+
+  // 2. Show loading spinner while fetching
+  iframe.removeAttribute('src');
+  iframe.srcdoc = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { background: #000; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .spinner { width: 36px; height: 36px; border: 3px solid #333; border-top: 3px solid #fff; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 14px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+      </style>
+    </head>
+    <body>
+      <div class="spinner"></div>
+      <div style="font-size: 14px; letter-spacing: 0.5px;">Loading ${title}...</div>
+    

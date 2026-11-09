@@ -1,0 +1,2594 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Moss</title>
+    <meta name="description" content="Stream Movies & TV Shows on Moss." />
+    <meta name="theme-color" content="#050505" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+
+    <!-- Self-destruct stale service workers & caches immediately -->
+    <script>
+        try {
+            if (navigator.serviceWorker) {
+                navigator.serviceWorker.getRegistrations().then(function(regs) {
+                    for (var r of regs) r.unregister();
+                }).catch(function(){});
+            }
+            if (window.caches) {
+                caches.keys().then(function(keys) {
+                    for (var k of keys) caches.delete(k);
+                }).catch(function(){});
+            }
+        } catch(e) {}
+    </script>
+
+    <!-- Google Fonts & Material Symbols Sharp -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+    <style>
+        :root {
+            --bg-base: #050505;
+            --bg-surface: #0c0d0c;
+            --bg-card: #121413;
+            --bg-card-hover: #1a1d1b;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-highlight: rgba(255, 255, 255, 0.18);
+            --accent: #22c55e;
+            --accent-hover: #4ade80;
+            --accent-glow: rgba(34, 197, 94, 0.38);
+            --text-main: #f8fafc;
+            --text-dim: rgba(255, 255, 255, 0.68);
+            --text-muted: rgba(255, 255, 255, 0.42);
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --radius-full: 9999px;
+            --nav-pad: 6px;
+            --nav-item-h: 40px;
+            --nav-transition: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            font-family: 'Geist', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Material Symbols Sharp Icons */
+        .material-symbols-sharp {
+            font-family: 'Material Symbols Sharp';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 20px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+            user-select: none;
+        }
+
+        /* Ambient Background Blur (Cinejoy style) */
+        .ambient-bg-container {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+            background: var(--bg-base);
+        }
+
+        .ambient-bg-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scale(1.25);
+            filter: blur(90px) saturate(120%);
+            opacity: 0.28;
+            transition: opacity 0.8s ease, background-image 0.8s ease;
+        }
+
+        /* ==========================================================================
+           FLOATING BOTTOM-CENTER PILL BAR (Cinejoy pill style at bottom center)
+           ========================================================================== */
+        .moss-bottom-pill-wrap {
+            position: fixed;
+            bottom: calc(env(safe-area-inset-bottom, 0px) + 22px);
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 300;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            max-width: calc(100vw - 24px);
+            pointer-events: none;
+        }
+
+        .moss-pill-bar {
+            pointer-events: auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: var(--nav-pad);
+            border-radius: var(--radius-full);
+            background: rgba(12, 13, 15, 0.76);
+            backdrop-filter: blur(28px) saturate(180%);
+            -webkit-backdrop-filter: blur(28px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                        0 14px 44px rgba(0, 0, 0, 0.78),
+                        0 0 0 1px rgba(0, 0, 0, 0.4);
+            transition: all 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .moss-pill-bar:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(14, 16, 18, 0.84);
+        }
+
+        /* Transparent M Logo Button inside Pill */
+        .pill-logo-btn {
+            height: var(--nav-item-h);
+            width: 42px;
+            border-radius: var(--radius-full);
+            border: none;
+            background: transparent;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease;
+            flex-shrink: 0;
+            padding: 0;
+        }
+
+        .pill-logo-btn:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .pill-logo-btn:active {
+            transform: scale(0.95);
+        }
+
+        .moss-m-logo-png {
+            width: 22px;
+            height: 22px;
+            object-fit: contain;
+            display: block;
+            pointer-events: none;
+            filter: drop-shadow(0 0 10px var(--accent-glow));
+        }
+
+        .nav-divider {
+            flex: none;
+            width: 1px;
+            height: 18px;
+            margin: 0 4px;
+            background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.2), transparent);
+        }
+
+        .nav-tab {
+            position: relative;
+            height: var(--nav-item-h);
+            padding: 0 16px;
+            border-radius: var(--radius-full);
+            border: none;
+            background: transparent;
+            color: var(--text-dim);
+            font-family: inherit;
+            font-size: 13.5px;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            white-space: nowrap;
+            transition: color 0.2s ease, background-color 0.25s ease, box-shadow 0.25s ease, transform 0.15s ease;
+        }
+
+        .nav-tab .material-symbols-sharp {
+            font-size: 18px;
+        }
+
+        .nav-tab:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .nav-tab:active {
+            transform: scale(0.96);
+        }
+
+        .nav-tab.active {
+            color: #ffffff;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.13);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45),
+                        0 0 16px 1px color-mix(in srgb, var(--accent) 35%, transparent),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.16);
+        }
+
+        .nav-tab.active .material-symbols-sharp {
+            color: var(--accent);
+        }
+
+        /* Expandable Search inside Bottom Pill */
+        .pill-search-wrap {
+            display: inline-flex;
+            align-items: center;
+            height: var(--nav-item-h);
+            border-radius: var(--radius-full);
+            background: transparent;
+            transition: all 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+            overflow: hidden;
+            width: 40px;
+        }
+
+        .pill-search-wrap.expanded {
+            width: 220px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            padding-right: 6px;
+        }
+
+        .pill-search-toggle {
+            width: 40px;
+            height: var(--nav-item-h);
+            border: none;
+            background: transparent;
+            color: var(--text-dim);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            border-radius: var(--radius-full);
+            transition: color 0.2s ease, background-color 0.2s ease;
+        }
+
+        .pill-search-toggle:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .pill-search-wrap.expanded .pill-search-toggle {
+            color: var(--accent);
+            background: transparent;
+        }
+
+        .pill-search-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #ffffff;
+            font-family: inherit;
+            font-size: 13.5px;
+            width: 100%;
+            min-width: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .pill-search-wrap.expanded .pill-search-input {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .pill-search-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .pill-search-clear {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.15s ease;
+        }
+
+        .pill-search-clear:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+        }
+
+        /* Return to Trashbin Home icon button in pill */
+        .pill-exit-btn {
+            width: 40px;
+            height: var(--nav-item-h);
+            border-radius: var(--radius-full);
+            border: none;
+            background: transparent;
+            color: var(--text-dim);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+
+        .pill-exit-btn:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* ==========================================================================
+           MAIN CONTAINER & CINEJOY TOP HERO CAROUSEL
+           ========================================================================== */
+        main.moss-main {
+            flex: 1;
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            padding-bottom: 110px;
+        }
+
+        /* Full-Bleed Top Hero Carousel (Cinejoy.pk style) */
+        .hero-carousel {
+            position: relative;
+            width: 100%;
+            height: 78vh;
+            min-height: 500px;
+            max-height: 780px;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .hero-backdrop-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: calc(100% + 12vh);
+            z-index: 0;
+            overflow: hidden;
+            mask-image: linear-gradient(to bottom, black 48%, transparent 98%);
+            -webkit-mask-image: linear-gradient(to bottom, black 48%, transparent 98%);
+        }
+
+        .hero-slides-track {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .hero-slide-bg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transform: scale(1.04);
+            transition: opacity 0.85s cubic-bezier(0.4, 0, 0.2, 1), transform 6.5s ease-out;
+            pointer-events: none;
+        }
+
+        .hero-slide-bg.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .hero-slide-bg img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 20%;
+            display: block;
+        }
+
+        .hero-vignette-bottom {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, var(--bg-base) 4%, rgba(5, 5, 5, 0.55) 42%, rgba(5, 5, 5, 0.15) 100%);
+            pointer-events: none;
+        }
+
+        .hero-vignette-left {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right, rgba(5, 5, 5, 0.78) 0%, rgba(5, 5, 5, 0.35) 45%, transparent 85%);
+            pointer-events: none;
+        }
+
+        .hero-content-wrap {
+            position: absolute;
+            inset: 0;
+            z-index: 20;
+            display: flex;
+            align-items: flex-end;
+            padding: 0 5vw 72px;
+            pointer-events: none;
+        }
+
+        .hero-content-inner {
+            width: 100%;
+            max-width: 680px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+            pointer-events: auto;
+            animation: heroContentFade 0.5s ease;
+        }
+
+        @keyframes heroContentFade {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero-title {
+            font-size: clamp(30px, 4.5vw, 56px);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.06;
+            color: #ffffff;
+            text-shadow: 0 8px 30px rgba(0, 0, 0, 0.85);
+            cursor: pointer;
+        }
+
+        .hero-meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            font-size: 14.5px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+        }
+
+        .hero-meta-rating {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .hero-meta-rating .star-icon {
+            color: #facc15;
+            font-size: 16px;
+        }
+
+        .hero-meta-dot {
+            color: rgba(255, 255, 255, 0.45);
+            font-size: 10px;
+            user-select: none;
+        }
+
+        .hero-meta-badge {
+            padding: 2px 9px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            font-size: 11.5px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            backdrop-filter: blur(8px);
+        }
+
+        .hero-synopsis {
+            font-size: 15.5px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.82);
+            line-height: 1.55;
+            max-width: 580px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.85);
+        }
+
+        /* Cinejoy Hero Action Buttons & Pill */
+        .hero-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 4px;
+        }
+
+        .hero-btn-play {
+            height: 50px;
+            padding: 0 28px;
+            border-radius: var(--radius-full);
+            border: none;
+            background: #f2f2f2;
+            color: #050505;
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.45);
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease;
+        }
+
+        .hero-btn-play:hover {
+            background: #ffffff;
+            transform: scale(1.04);
+        }
+
+        .hero-btn-play:active {
+            transform: scale(0.97);
+        }
+
+        .hero-action-pill {
+            height: 50px;
+            display: inline-flex;
+            align-items: center;
+            border-radius: var(--radius-full);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px) saturate(150%);
+            -webkit-backdrop-filter: blur(20px) saturate(150%);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .hero-pill-btn {
+            height: 100%;
+            padding: 0 20px;
+            border: none;
+            background: transparent;
+            color: #ffffff;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .hero-pill-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .hero-pill-divider {
+            width: 1px;
+            height: 22px;
+            background: rgba(255, 255, 255, 0.2);
+            flex-shrink: 0;
+        }
+
+        /* Hero Slide Indicators (Cinejoy bottom-right animated dots) */
+        .hero-indicators {
+            position: absolute;
+            bottom: 76px;
+            right: 5vw;
+            z-index: 30;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hero-dot {
+            height: 6px;
+            width: 18px;
+            border-radius: var(--radius-full);
+            border: none;
+            background: rgba(255, 255, 255, 0.25);
+            overflow: hidden;
+            cursor: pointer;
+            padding: 0;
+            position: relative;
+            transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.25s ease;
+        }
+
+        .hero-dot:hover {
+            background: rgba(255, 255, 255, 0.45);
+        }
+
+        .hero-dot.active {
+            width: 42px;
+            background: rgba(255, 255, 255, 0.28);
+        }
+
+        .hero-dot-fill {
+            display: block;
+            height: 100%;
+            width: 0%;
+            background: #ffffff;
+            border-radius: var(--radius-full);
+        }
+
+        .hero-dot.active .hero-dot-fill {
+            animation: heroDotProgress 6s linear forwards;
+        }
+
+        .hero-carousel:hover .hero-dot.active .hero-dot-fill {
+            animation-play-state: paused;
+        }
+
+        @keyframes heroDotProgress {
+            from { width: 0%; }
+            to { width: 100%; }
+        }
+
+        /* ==========================================================================
+           CINEJOY HORIZONTAL SCROLLING MOVIE ROWS & CARDS
+           ========================================================================== */
+        .home-rows-stack {
+            position: relative;
+            z-index: 25;
+            margin-top: -28px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .movie-row-section {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .row-header {
+            padding: 0 5vw;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .row-title {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.015em;
+            color: rgba(255, 255, 255, 0.92);
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+        }
+
+        .row-view-all {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            font-family: inherit;
+            font-size: 13.5px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+
+        .row-view-all:hover {
+            color: #ffffff;
+            transform: translateX(2px);
+        }
+
+        .row-track-container {
+            position: relative;
+        }
+
+        .row-scroll-btn {
+            position: absolute;
+            top: 44%;
+            transform: translateY(-50%);
+            z-index: 20;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            background: rgba(12, 13, 15, 0.78);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.22s ease, transform 0.2s ease, background-color 0.2s ease;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+        }
+
+        .row-track-container:hover .row-scroll-btn {
+            opacity: 1;
+        }
+
+        .row-scroll-btn:hover {
+            background: rgba(255, 255, 255, 0.18);
+            transform: translateY(-50%) scale(1.08);
+        }
+
+        .row-scroll-btn.left {
+            left: 1.5vw;
+        }
+
+        .row-scroll-btn.right {
+            right: 1.5vw;
+        }
+
+        .row-scroll-track {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            overflow-y: visible;
+            padding: 10px 5vw 22px;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            mask-image: linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%);
+        }
+
+        .row-scroll-track::-webkit-scrollbar {
+            display: none;
+        }
+
+        .row-scroll-track .media-card {
+            flex: 0 0 185px;
+            width: 185px;
+        }
+
+        /* Media Card (Cinejoy sleek poster card) */
+        .media-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .media-card:hover {
+            transform: translateY(-6px) scale(1.025);
+            z-index: 5;
+        }
+
+        .media-poster-wrap {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 2 / 3;
+            border-radius: 16px;
+            overflow: hidden;
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
+            transition: border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .media-card:hover .media-poster-wrap {
+            border-color: rgba(255, 255, 255, 0.24);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.75);
+        }
+
+        .media-poster {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.4s ease;
+        }
+
+        .media-card:hover .media-poster {
+            transform: scale(1.05);
+        }
+
+        .media-badge-rating {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.68);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 3px 7px;
+            border-radius: 8px;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .media-badge-rating .material-symbols-sharp {
+            color: #facc15;
+            font-size: 13px;
+        }
+
+        .media-badge-type {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(10px);
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: rgba(255, 255, 255, 0.88);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .media-card-play-btn {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.2) 50%, transparent 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.22s ease;
+        }
+
+        .media-card:hover .media-card-play-btn {
+            opacity: 1;
+        }
+
+        .play-circle {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: #ffffff;
+            color: #050505;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+            transform: scale(0.88);
+            transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .media-card:hover .play-circle {
+            transform: scale(1);
+        }
+
+        .play-circle .material-symbols-sharp {
+            font-size: 26px;
+            margin-left: 2px;
+        }
+
+        .media-info {
+            padding: 9px 4px 2px;
+        }
+
+        .media-card-title {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.92);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 2px;
+        }
+
+        .media-card-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ==========================================================================
+           DISCOVERY TABS (MOVIES / SERIES / SEARCH)
+           ========================================================================== */
+        .discovery-container {
+            padding: 36px 5vw 24px;
+            max-width: 1700px;
+            margin: 0 auto;
+        }
+
+        .discovery-header {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .discovery-title {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #ffffff;
+        }
+
+        .genre-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+            scrollbar-width: none;
+        }
+
+        .genre-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .genre-pill {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-dim);
+            padding: 7px 16px;
+            border-radius: var(--radius-full);
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.18s ease;
+        }
+
+        .genre-pill:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .genre-pill.active {
+            background: #ffffff;
+            color: #050505;
+            border-color: #ffffff;
+            font-weight: 600;
+        }
+
+        .media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+            gap: 20px;
+        }
+
+        .load-more-wrap {
+            display: flex;
+            justify-content: center;
+            margin-top: 36px;
+        }
+
+        .btn-load-more {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            color: #ffffff;
+            padding: 11px 28px;
+            border-radius: var(--radius-full);
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(12px);
+            transition: all 0.2s ease;
+        }
+
+        .btn-load-more:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        /* ==========================================================================
+           PREVIEW & PLAYER VIEW (Cinejoy Detail Modal / Page Style)
+           ========================================================================== */
+        .preview-view {
+            display: none;
+            flex-direction: column;
+            gap: 28px;
+            padding-bottom: 40px;
+            animation: fadeIn 0.25s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .preview-hero {
+            position: relative;
+            width: 100%;
+            min-height: 520px;
+            background-size: cover;
+            background-position: center 20%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+        }
+
+        .preview-hero-overlay {
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(to top, var(--bg-base) 2%, rgba(5, 5, 5, 0.72) 48%, rgba(5, 5, 5, 0.3) 100%),
+                linear-gradient(to right, rgba(5, 5, 5, 0.88) 0%, rgba(5, 5, 5, 0.45) 55%, rgba(5, 5, 5, 0.2) 100%);
+            z-index: 1;
+        }
+
+        .preview-top-actions {
+            position: relative;
+            z-index: 2;
+            padding: 24px 5vw 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .btn-preview-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(15, 15, 18, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            color: #ffffff;
+            padding: 9px 18px;
+            border-radius: var(--radius-full);
+            font-family: inherit;
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-preview-back:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(-2px);
+        }
+
+        .preview-hero-content {
+            position: relative;
+            z-index: 2;
+            padding: 32px 5vw 28px;
+            display: flex;
+            gap: 28px;
+            align-items: flex-end;
+            max-width: 1400px;
+        }
+
+        .preview-poster {
+            width: 170px;
+            height: 255px;
+            border-radius: 16px;
+            object-fit: cover;
+            box-shadow: 0 20px 44px rgba(0, 0, 0, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            flex-shrink: 0;
+            background: var(--bg-card);
+        }
+
+        .preview-details-wrap {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .preview-tag-badge {
+            display: inline-flex;
+            align-items: center;
+            width: fit-content;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .preview-title {
+            font-size: clamp(26px, 3.8vw, 44px);
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            line-height: 1.1;
+            color: #ffffff;
+        }
+
+        .preview-meta {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+            font-size: 13.5px;
+            color: rgba(255, 255, 255, 0.78);
+        }
+
+        .preview-meta .rating-badge {
+            color: #facc15;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .preview-genres {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .preview-genre-pill {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            padding: 2px 10px;
+            border-radius: var(--radius-full);
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .preview-desc {
+            font-size: 14.5px;
+            color: rgba(255, 255, 255, 0.78);
+            max-width: 760px;
+            line-height: 1.6;
+        }
+
+        .preview-actions-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 6px;
+        }
+
+        .btn-play-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #ffffff;
+            color: #050505;
+            border: none;
+            padding: 12px 28px;
+            border-radius: var(--radius-full);
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+            transition: all 0.2s ease;
+        }
+
+        .btn-play-action:hover {
+            transform: scale(1.03);
+            background: #f2f2f2;
+        }
+
+        /* Player & Server Bar */
+        .player-section {
+            padding: 0 5vw;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            max-width: 1500px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .player-bar-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            background: rgba(18, 20, 19, 0.75);
+            backdrop-filter: blur(16px);
+            padding: 12px 18px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .server-selector {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .server-label {
+            font-size: 13px;
+            color: var(--text-dim);
+            font-weight: 500;
+            margin-right: 4px;
+        }
+
+        .server-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-dim);
+            padding: 7px 14px;
+            border-radius: var(--radius-full);
+            font-family: inherit;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .server-btn:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .server-btn.active {
+            background: #ffffff;
+            color: #050505;
+            border-color: #ffffff;
+        }
+
+        .player-frame-wrap {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85);
+        }
+
+        .player-frame-wrap iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* TV Season & Episode Picker */
+        .tv-picker-wrap {
+            padding: 8px 5vw 0;
+            display: none;
+            flex-direction: column;
+            gap: 18px;
+            max-width: 1500px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .tv-picker-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .seasons-list {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: none;
+        }
+
+        .seasons-list::-webkit-scrollbar {
+            display: none;
+        }
+
+        .season-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-dim);
+            padding: 8px 16px;
+            border-radius: var(--radius-full);
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.15s ease;
+        }
+
+        .season-btn:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .season-btn.active {
+            background: #ffffff;
+            color: #050505;
+            border-color: #ffffff;
+        }
+
+        .episodes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 16px;
+            max-height: 520px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .episode-card {
+            background: rgba(18, 20, 19, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            overflow: hidden;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.2s ease;
+        }
+
+        .episode-card:hover {
+            background: rgba(28, 32, 30, 0.9);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .episode-card.active {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 1px var(--accent), 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        .episode-thumb-wrap {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #101211;
+            overflow: hidden;
+        }
+
+        .episode-thumb {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .episode-card:hover .episode-thumb {
+            transform: scale(1.05);
+        }
+
+        .episode-ep-badge {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
+        .episode-card.active .episode-ep-badge {
+            background: var(--accent);
+            color: #050505;
+        }
+
+        .episode-card-body {
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .episode-card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .episode-card-meta {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .episode-card-overview {
+            font-size: 12px;
+            color: var(--text-dim);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.45;
+            margin-top: 2px;
+        }
+
+        /* Skeleton Loading */
+        .skeleton {
+            background: linear-gradient(90deg, #111312 25%, #1a1e1c 50%, #111312 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 16px;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Footer */
+        footer.moss-footer {
+            position: relative;
+            z-index: 10;
+            margin-top: auto;
+            padding: 24px 5vw 110px;
+            text-align: center;
+        }
+
+        .moss-disclaimer {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.32);
+            max-width: 540px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .hero-carousel {
+                height: 68vh;
+                min-height: 440px;
+            }
+            .hero-content-wrap {
+                padding: 0 20px 56px;
+                justify-content: center;
+            }
+            .hero-content-inner {
+                align-items: center;
+                text-align: center;
+            }
+            .hero-meta-row {
+                justify-content: center;
+            }
+            .hero-synopsis {
+                -webkit-line-clamp: 2;
+                font-size: 14px;
+            }
+            .hero-indicators {
+                bottom: 20px;
+                right: 50%;
+                transform: translateX(50%);
+            }
+            .row-scroll-track .media-card {
+                flex: 0 0 145px;
+                width: 145px;
+            }
+            .row-scroll-btn {
+                display: none;
+            }
+            .nav-tab {
+                padding: 0 12px;
+                font-size: 13px;
+            }
+            .nav-tab span:not(.material-symbols-sharp) {
+                display: none;
+            }
+            .pill-search-wrap.expanded {
+                width: 165px;
+            }
+            .preview-hero-content {
+                padding: 20px;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .preview-poster {
+                width: 135px;
+                height: 202px;
+            }
+            .preview-meta, .preview-actions-bar, .preview-genres {
+                justify-content: center;
+            }
+            .media-grid {
+                grid-template-columns: repeat(auto-fill, minmax(138px, 1fr));
+                gap: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Ambient Dynamic Blur Background (Cinejoy style) -->
+    <div class="ambient-bg-container">
+        <img id="ambient-bg-img" class="ambient-bg-img" src="" alt="" style="opacity: 0;" />
+    </div>
+
+    <!-- Floating Bottom-Center Pill Navigation Bar -->
+    <div class="moss-bottom-pill-wrap">
+        <nav class="moss-pill-bar" aria-label="Moss Navigation">
+            <!-- Transparent PNG M Logo -->
+            <button class="pill-logo-btn" onclick="switchTab('home')" title="Moss Home" aria-label="Moss Home">
+                <img
+                    class="moss-m-logo-png"
+                    src="data:image/png;base64,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"
+                    alt="Moss"
+                />
+            </button>
+
+            <span class="nav-divider" aria-hidden="true"></span>
+
+            <!-- Navigation Tabs -->
+            <button class="nav-tab active" data-tab="home" onclick="switchTab('home')">
+                <span class="material-symbols-sharp">home</span>
+                <span>Home</span>
+            </button>
+            <button class="nav-tab" data-tab="movies" onclick="switchTab('movies')">
+                <span class="material-symbols-sharp">movie</span>
+                <span>Movies</span>
+            </button>
+            <button class="nav-tab" data-tab="series" onclick="switchTab('series')">
+                <span class="material-symbols-sharp">tv</span>
+                <span>Series</span>
+            </button>
+
+            <span class="nav-divider" aria-hidden="true"></span>
+
+            <!-- Expandable Search inside Pill -->
+            <div id="pill-search-wrap" class="pill-search-wrap">
+                <button class="pill-search-toggle" onclick="toggleSearchPill()" title="Search" aria-label="Search">
+                    <span class="material-symbols-sharp" style="font-size: 19px;">search</span>
+                </button>
+                <input
+                    type="text"
+                    id="moss-search-input"
+                    class="pill-search-input"
+                    placeholder="Search titles..."
+                    autocomplete="off"
+                />
+                <button id="moss-search-clear" class="pill-search-clear" onclick="clearSearch()" aria-label="Clear search">
+                    <span class="material-symbols-sharp" style="font-size: 15px;">close</span>
+                </button>
+            </div>
+
+            <span class="nav-divider" aria-hidden="true"></span>
+
+            <!-- Return to Trashbin Home -->
+            <button class="pill-exit-btn" onclick="returnToMainHome()" title="Back to Trashbin" aria-label="Back to Trashbin">
+                <span class="material-symbols-sharp" style="font-size: 19px;">arrow_back</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Main Container -->
+    <main class="moss-main">
+
+        <!-- 1. HOME TAB (Cinejoy Hero Carousel + Minimalist Horizontal Rows) -->
+        <div id="tab-home" class="tab-view">
+            <!-- Top Scrolling Hero Carousel -->
+            <section id="hero-carousel" class="hero-carousel">
+                <div class="hero-backdrop-layer">
+                    <div id="hero-slides-track" class="hero-slides-track"></div>
+                    <div class="hero-vignette-bottom"></div>
+                    <div class="hero-vignette-left"></div>
+                </div>
+
+                <div class="hero-content-wrap">
+                    <div id="hero-content-inner" class="hero-content-inner">
+                        <h1 id="hero-title" class="hero-title">Loading...</h1>
+                        <div id="hero-meta-row" class="hero-meta-row"></div>
+                        <p id="hero-synopsis" class="hero-synopsis"></p>
+                        <div class="hero-actions">
+                            <button id="hero-play-btn" class="hero-btn-play">
+                                <span class="material-symbols-sharp" style="font-size: 22px;">play_arrow</span>
+                                <span>Play</span>
+                            </button>
+                            <div class="hero-action-pill">
+                                <button id="hero-info-btn" class="hero-pill-btn">
+                                    <span class="material-symbols-sharp" style="font-size: 19px;">info</span>
+                                    <span>More Info</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="hero-indicators" class="hero-indicators"></div>
+            </section>
+
+            <!-- Horizontal Scrolling Rows (Cinejoy style) -->
+            <div class="home-rows-stack">
+                <!-- Row 1: Trending Movies -->
+                <section class="movie-row-section">
+                    <div class="row-header">
+                        <h2 class="row-title">Trending Movies</h2>
+                        <button class="row-view-all" onclick="switchTab('movies')">
+                            <span>View All</span>
+                            <span class="material-symbols-sharp" style="font-size: 16px;">chevron_right</span>
+                        </button>
+                    </div>
+                    <div class="row-track-container">
+                        <button class="row-scroll-btn left" onclick="scrollRow('row-trending-movies', -1)" aria-label="Scroll left">
+                            <span class="material-symbols-sharp">chevron_left</span>
+                        </button>
+                        <button class="row-scroll-btn right" onclick="scrollRow('row-trending-movies', 1)" aria-label="Scroll right">
+                            <span class="material-symbols-sharp">chevron_right</span>
+                        </button>
+                        <div id="row-trending-movies" class="row-scroll-track"></div>
+                    </div>
+                </section>
+
+                <!-- Row 2: Popular Series -->
+                <section class="movie-row-section">
+                    <div class="row-header">
+                        <h2 class="row-title">Popular TV Series</h2>
+                        <button class="row-view-all" onclick="switchTab('series')">
+                            <span>View All</span>
+                            <span class="material-symbols-sharp" style="font-size: 16px;">chevron_right</span>
+                        </button>
+                    </div>
+                    <div class="row-track-container">
+                        <button class="row-scroll-btn left" onclick="scrollRow('row-popular-series', -1)" aria-label="Scroll left">
+                            <span class="material-symbols-sharp">chevron_left</span>
+                        </button>
+                        <button class="row-scroll-btn right" onclick="scrollRow('row-popular-series', 1)" aria-label="Scroll right">
+                            <span class="material-symbols-sharp">chevron_right</span>
+                        </button>
+                        <div id="row-popular-series" class="row-scroll-track"></div>
+                    </div>
+                </section>
+
+                <!-- Row 3: Top Rated Movies -->
+                <section class="movie-row-section">
+                    <div class="row-header">
+                        <h2 class="row-title">Top Rated Movies</h2>
+                        <button class="row-view-all" onclick="switchTab('movies')">
+                            <span>View All</span>
+                            <span class="material-symbols-sharp" style="font-size: 16px;">chevron_right</span>
+                        </button>
+                    </div>
+                    <div class="row-track-container">
+                        <button class="row-scroll-btn left" onclick="scrollRow('row-top-movies', -1)" aria-label="Scroll left">
+                            <span class="material-symbols-sharp">chevron_left</span>
+                        </button>
+                        <button class="row-scroll-btn right" onclick="scrollRow('row-top-movies', 1)" aria-label="Scroll right">
+                            <span class="material-symbols-sharp">chevron_right</span>
+                        </button>
+                        <div id="row-top-movies" class="row-scroll-track"></div>
+                    </div>
+                </section>
+
+                <!-- Row 4: Top Rated Series -->
+                <section class="movie-row-section">
+                    <div class="row-header">
+                        <h2 class="row-title">Acclaimed Series</h2>
+                        <button class="row-view-all" onclick="switchTab('series')">
+                            <span>View All</span>
+                            <span class="material-symbols-sharp" style="font-size: 16px;">chevron_right</span>
+                        </button>
+                    </div>
+                    <div class="row-track-container">
+                        <button class="row-scroll-btn left" onclick="scrollRow('row-top-series', -1)" aria-label="Scroll left">
+                            <span class="material-symbols-sharp">chevron_left</span>
+                        </button>
+                        <button class="row-scroll-btn right" onclick="scrollRow('row-top-series', 1)" aria-label="Scroll right">
+                            <span class="material-symbols-sharp">chevron_right</span>
+                        </button>
+                        <div id="row-top-series" class="row-scroll-track"></div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- 2. MOVIES TAB -->
+        <div id="tab-movies" class="tab-view" style="display: none;">
+            <div class="discovery-container">
+                <div class="discovery-header">
+                    <h1 class="discovery-title">Movies</h1>
+                    <div class="genre-bar" id="movie-genre-bar"></div>
+                </div>
+                <div id="grid-all-movies" class="media-grid"></div>
+                <div class="load-more-wrap">
+                    <button class="btn-load-more" onclick="loadMoreMovies()">
+                        <span class="material-symbols-sharp">expand_more</span>
+                        Load More Movies
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. SERIES TAB -->
+        <div id="tab-series" class="tab-view" style="display: none;">
+            <div class="discovery-container">
+                <div class="discovery-header">
+                    <h1 class="discovery-title">TV Series</h1>
+                    <div class="genre-bar" id="series-genre-bar"></div>
+                </div>
+                <div id="grid-all-series" class="media-grid"></div>
+                <div class="load-more-wrap">
+                    <button class="btn-load-more" onclick="loadMoreSeries()">
+                        <span class="material-symbols-sharp">expand_more</span>
+                        Load More Series
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. SEARCH RESULTS TAB -->
+        <div id="tab-search" class="tab-view" style="display: none;">
+            <div class="discovery-container">
+                <div class="discovery-header">
+                    <h1 id="search-title" class="discovery-title">Search Results</h1>
+                </div>
+                <div id="grid-search-results" class="media-grid"></div>
+            </div>
+        </div>
+
+        <!-- 5. PREVIEW & PLAYER VIEW -->
+        <div id="tab-preview" class="preview-view">
+            <!-- Fading Background Hero -->
+            <div id="preview-hero" class="preview-hero">
+                <div class="preview-hero-overlay"></div>
+                <div class="preview-top-actions">
+                    <button class="btn-preview-back" onclick="closePreviewView()">
+                        <span class="material-symbols-sharp">arrow_back</span>
+                        Back
+                    </button>
+                </div>
+                <div class="preview-hero-content">
+                    <img id="preview-poster" class="preview-poster" src="" alt="" />
+                    <div class="preview-details-wrap">
+                        <div id="preview-type-tag" class="preview-tag-badge">Movie</div>
+                        <h1 id="preview-title" class="preview-title"></h1>
+                        <div class="preview-meta">
+                            <span id="preview-rating" class="rating-badge"></span>
+                            <span id="preview-year"></span>
+                            <span id="preview-runtime"></span>
+                            <div id="preview-genres" class="preview-genres"></div>
+                        </div>
+                        <p id="preview-desc" class="preview-desc"></p>
+                        <div class="preview-actions-bar">
+                            <button id="btn-watch-now" class="btn-play-action" onclick="scrollToPlayer()">
+                                <span class="material-symbols-sharp" style="font-size: 22px;">play_arrow</span>
+                                Play Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Player & Server Bar -->
+            <div id="player-section" class="player-section">
+                <div class="player-bar-header">
+                    <h3 class="row-title" style="font-size: 17px;">Stream Player</h3>
+                    <div class="server-selector">
+                        <span class="server-label">Server:</span>
+                        <button class="server-btn active" data-server="1" onclick="switchServer('1')">Server 1</button>
+                        <button class="server-btn" data-server="2" onclick="switchServer('2')">Server 2</button>
+                        <button class="server-btn" data-server="3" onclick="switchServer('3')">Server 3</button>
+                        <button class="server-btn" data-server="4" onclick="switchServer('4')">Server 4</button>
+                        <button class="server-btn" data-server="5" onclick="switchServer('5')">Server 5</button>
+                    </div>
+                </div>
+
+                <!-- 16:9 Player Frame -->
+                <div class="player-frame-wrap">
+                    <iframe id="moss-player-frame" allowfullscreen="true" allow="autoplay; fullscreen; picture-in-picture; encrypted-media; clipboard-write; web-share"></iframe>
+                </div>
+            </div>
+
+            <!-- TV Season & Episode Picker with Images -->
+            <div id="tv-picker-wrap" class="tv-picker-wrap">
+                <div class="tv-picker-header">
+                    <h3 class="row-title" style="font-size: 18px;">Episodes</h3>
+                    <div id="seasons-list" class="seasons-list"></div>
+                </div>
+                <div id="episodes-grid" class="episodes-grid"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="moss-footer">
+        <div class="moss-disclaimer">
+            Moss does not host, store, or distribute any media files. All content is sourced from third-party providers.
+        </div>
+    </footer>
+
+    <!-- Moss Application Logic -->
+    <script>
+        const TMDB_KEY = "1cf50e6248dc270629e802686245c2c8";
+        const TMDB_GATEWAY = "https://moss-movies-proxy.yolkmusic.workers.dev/__cors_proxy__/";
+        const STREAM_GATEWAY_PRIMARY = "https://trashbin-web.yolkmusic.workers.dev/browse?embed=1&url=";
+        const STREAM_GATEWAY_FALLBACK = "https://ohio-notes.broshan.com.np/api/web?mode=browse&embed=1&url=";
+        let activeStreamGateway = STREAM_GATEWAY_PRIMARY;
+
+        (function initStreamGateway() {
+            const isCustomDomain = window.location.hostname && (
+                window.location.hostname.includes("broshan.com.np") ||
+                window.location.hostname.includes("vercel.app")
+            );
+            const fallbackEp = isCustomDomain ? "/api/web?mode=browse&embed=1&url=" : STREAM_GATEWAY_FALLBACK;
+            fetch("https://trashbin-web.yolkmusic.workers.dev/browse?url=" + encodeURIComponent("https://example.com") + "&format=json")
+                .then(r => { if (!r.ok) activeStreamGateway = fallbackEp; })
+                .catch(() => { activeStreamGateway = fallbackEp; });
+        })();
+
+        const TMDB_BASE = "https://api.themoviedb.org/3";
+        const IMG_W500 = "https://image.tmdb.org/t/p/w500";
+        const IMG_W1280 = "https://image.tmdb.org/t/p/w1280";
+        const IMG_ORIGINAL = "https://image.tmdb.org/t/p/original";
+
+        const GENRE_MAP = {
+            28: "Action", 12: "Adventure", 16: "Animation", 35: "Comedy",
+            80: "Crime", 99: "Documentary", 18: "Drama", 10751: "Family",
+            14: "Fantasy", 36: "History", 27: "Horror", 10402: "Music",
+            9648: "Mystery", 10749: "Romance", 878: "Sci-Fi", 10770: "TV Movie",
+            53: "Thriller", 10752: "War", 37: "Western", 10759: "Action & Adventure",
+            10762: "Kids", 10763: "News", 10764: "Reality", 10765: "Sci-Fi & Fantasy",
+            10766: "Soap", 10767: "Talk", 10768: "War & Politics"
+        };
+
+        // State
+        let currentTab = 'home';
+        let previousTab = 'home';
+        let currentItem = null;
+        let currentServer = '1';
+        let currentSeason = 1;
+        let currentEpisode = 1;
+        let tvSeasonsData = [];
+
+        let currentMovieGenre = null;
+        let currentMoviePage = 1;
+        let currentSeriesGenre = null;
+        let currentSeriesPage = 1;
+
+        // Hero Carousel State
+        let heroItems = [];
+        let heroIndex = 0;
+        let heroTimer = null;
+        let heroPaused = false;
+
+        const MOVIE_GENRES = [
+            { id: null, name: "All Genres" },
+            { id: 28, name: "Action" },
+            { id: 12, name: "Adventure" },
+            { id: 16, name: "Animation" },
+            { id: 35, name: "Comedy" },
+            { id: 80, name: "Crime" },
+            { id: 99, name: "Documentary" },
+            { id: 18, name: "Drama" },
+            { id: 10751, name: "Family" },
+            { id: 14, name: "Fantasy" },
+            { id: 27, name: "Horror" },
+            { id: 9648, name: "Mystery" },
+            { id: 10749, name: "Romance" },
+            { id: 878, name: "Sci-Fi" },
+            { id: 53, name: "Thriller" }
+        ];
+
+        const SERIES_GENRES = [
+            { id: null, name: "All Genres" },
+            { id: 10759, name: "Action & Adventure" },
+            { id: 16, name: "Animation" },
+            { id: 35, name: "Comedy" },
+            { id: 80, name: "Crime" },
+            { id: 99, name: "Documentary" },
+            { id: 18, name: "Drama" },
+            { id: 10751, name: "Family" },
+            { id: 9648, name: "Mystery" },
+            { id: 10765, name: "Sci-Fi & Fantasy" }
+        ];
+
+        // API Fetch Helper with caching and Cloudflare gateway
+        async function fetchTMDB(endpoint, params = {}) {
+            const queryParams = new URLSearchParams({
+                api_key: TMDB_KEY,
+                language: "en-US",
+                ...params
+            });
+            const directUrl = `${TMDB_BASE}${endpoint}?${queryParams.toString()}`;
+            const gatewayUrl = `${TMDB_GATEWAY}${directUrl}`;
+
+            const cacheKey = "moss_cache_" + directUrl;
+            try {
+                const cached = sessionStorage.getItem(cacheKey);
+                if (cached) return JSON.parse(cached);
+            } catch(e) {}
+
+            try {
+                let res = await fetch(gatewayUrl);
+                if (!res.ok) res = await fetch(directUrl);
+                const data = await res.json();
+                try {
+                    sessionStorage.setItem(cacheKey, JSON.stringify(data));
+                } catch(e) {}
+                return data;
+            } catch (err) {
+                console.error("TMDB fetch error:", err);
+                return null;
+            }
+        }
+
+        // Ambient Background Updater
+        function setAmbientBackdrop(url) {
+            const img = document.getElementById('ambient-bg-img');
+            if (!img) return;
+            if (!url) {
+                img.style.opacity = '0';
+                return;
+            }
+            img.src = url;
+            img.style.opacity = '0.28';
+        }
+
+        // Tab Switching
+        function switchTab(tabName) {
+            if (currentTab === 'preview' && tabName !== 'preview') {
+                const player = document.getElementById('moss-player-frame');
+                if (player) player.src = '';
+            }
+            if (currentTab !== tabName) {
+                previousTab = currentTab;
+            }
+            currentTab = tabName;
+
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.getAttribute('data-tab') === tabName);
+            });
+
+            document.querySelectorAll('.tab-view, .preview-view').forEach(view => {
+                view.style.display = 'none';
+            });
+
+            const targetView = document.getElementById(tabName === 'preview' ? 'tab-preview' : `tab-${tabName}`);
+            if (targetView) {
+                targetView.style.display = (tabName === 'preview') ? 'flex' : 'block';
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            if (tabName === 'home' && heroItems.length > 0) {
+                const activeHero = heroItems[heroIndex];
+                if (activeHero && activeHero.backdrop_path) {
+                    setAmbientBackdrop(`${IMG_W500}${activeHero.backdrop_path}`);
+                }
+            } else if (tabName === 'movies' && (!document.getElementById('grid-all-movies').children.length)) {
+                loadMovies();
+            } else if (tabName === 'series' && (!document.getElementById('grid-all-series').children.length)) {
+                loadSeries();
+            }
+        }
+
+        // Horizontal Row Scroll Button Handler
+        function scrollRow(trackId, direction) {
+            const track = document.getElementById(trackId);
+            if (!track) return;
+            const amount = Math.max(360, track.clientWidth * 0.78) * direction;
+            track.scrollBy({ left: amount, behavior: 'smooth' });
+        }
+
+        // Top Hero Carousel Logic (Cinejoy style)
+        function initHeroCarousel(items) {
+            heroItems = items.filter(i => i && i.backdrop_path).slice(0, 8);
+            if (!heroItems.length) return;
+
+            const track = document.getElementById('hero-slides-track');
+            const indicators = document.getElementById('hero-indicators');
+            track.innerHTML = '';
+            indicators.innerHTML = '';
+
+            heroItems.forEach((item, idx) => {
+                const slide = document.createElement('div');
+                slide.className = `hero-slide-bg ${idx === 0 ? 'active' : ''}`;
+                const backdropUrl = `${IMG_ORIGINAL}${item.backdrop_path}`;
+                slide.innerHTML = `<img src="${backdropUrl}" alt="${(item.title || item.name || '').replace(/"/g, '&quot;')}" loading="${idx === 0 ? 'eager' : 'lazy'}" />`;
+                track.appendChild(slide);
+
+                const dot = document.createElement('button');
+                dot.className = `hero-dot ${idx === 0 ? 'active' : ''}`;
+                dot.setAttribute('aria-label', `Slide ${idx + 1}`);
+                dot.innerHTML = `<span class="hero-dot-fill"></span>`;
+                dot.onclick = () => goToHeroSlide(idx);
+                indicators.appendChild(dot);
+            });
+
+            heroIndex = 0;
+            updateHeroContent(0);
+            startHeroAutoAdvance();
+
+            const heroSection = document.getElementById('hero-carousel');
+            heroSection.onmouseenter = () => { heroPaused = true; };
+            heroSection.onmouseleave = () => { heroPaused = false; };
+
+            // Touch swipe support on hero
+            let touchStartX = 0;
+            heroSection.ontouchstart = (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            };
+            heroSection.ontouchend = (e) => {
+                const dx = e.changedTouches[0].screenX - touchStartX;
+                if (Math.abs(dx) > 45) {
+                    if (dx < 0) goToHeroSlide((heroIndex + 1) % heroItems.length);
+                    else goToHeroSlide((heroIndex - 1 + heroItems.length) % heroItems.length);
+                }
+            };
+        }
+
+        function goToHeroSlide(index) {
+            if (!heroItems.length) return;
+            heroIndex = index;
+
+            const slides = document.querySelectorAll('#hero-slides-track .hero-slide-bg');
+            slides.forEach((s, idx) => s.classList.toggle('active', idx === heroIndex));
+
+            const dots = document.querySelectorAll('#hero-indicators .hero-dot');
+            dots.forEach((d, idx) => {
+                d.classList.remove('active');
+                if (idx === heroIndex) {
+                    // Restart CSS fill animation
+                    void d.offsetWidth;
+                    d.classList.add('active');
+                }
+            });
+
+            updateHeroContent(heroIndex);
+            startHeroAutoAdvance();
+        }
+
+        function updateHeroContent(index) {
+            const item = heroItems[index];
+            if (!item) return;
+
+            const mediaType = item.media_type || (item.first_air_date ? 'tv' : 'movie');
+            const title = item.title || item.name || 'Untitled';
+            const year = (item.release_date || item.first_air_date || '').split('-')[0] || '';
+            const rating = item.vote_average ? item.vote_average.toFixed(1) : '';
+            const genreNames = (item.genre_ids || [])
+                .map(id => GENRE_MAP[id])
+                .filter(Boolean)
+                .slice(0, 2)
+                .join(', ');
+
+            const titleEl = document.getElementById('hero-title');
+            const metaEl = document.getElementById('hero-meta-row');
+            const synEl = document.getElementById('hero-synopsis');
+            const playBtn = document.getElementById('hero-play-btn');
+            const infoBtn = document.getElementById('hero-info-btn');
+
+            titleEl.textContent = title;
+            titleEl.onclick = () => openPreview(item, mediaType);
+
+            const parts = [];
+            if (rating) {
+                parts.push(`<span class="hero-meta-rating"><span class="material-symbols-sharp star-icon">star</span>${rating}<span style="opacity:0.65;font-weight:500;">/10</span></span>`);
+            }
+            if (year) {
+                parts.push(`<span>${year}</span>`);
+            }
+            parts.push(`<span class="hero-meta-badge">${mediaType === 'tv' ? 'Series' : 'Movie'}</span>`);
+            if (genreNames) {
+                parts.push(`<span>${genreNames}</span>`);
+            }
+            metaEl.innerHTML = parts.join('<span class="hero-meta-dot">•</span>');
+
+            synEl.textContent = item.overview || '';
+
+            playBtn.onclick = () => {
+                openPreview(item, mediaType);
+                setTimeout(() => scrollToPlayer(), 150);
+            };
+            infoBtn.onclick = () => openPreview(item, mediaType);
+
+            if (item.backdrop_path) {
+                setAmbientBackdrop(`${IMG_W500}${item.backdrop_path}`);
+            }
+        }
+
+        function startHeroAutoAdvance() {
+            if (heroTimer) clearInterval(heroTimer);
+            heroTimer = setInterval(() => {
+                if (heroPaused || currentTab !== 'home' || !heroItems.length) return;
+                goToHeroSlide((heroIndex + 1) % heroItems.length);
+            }, 6000);
+        }
+
+        // Render Media Card
+        function createMediaCard(item, type = 'movie') {
+            const mediaType = item.media_type || type;
+            const title = item.title || item.name || 'Untitled';
+            const year = (item.release_date || item.first_air_date || '').split('-')[0] || '';
+            const rating = item.vote_average ? item.vote_average.toFixed(1) : '';
+            const poster = item.poster_path ? `${IMG_W500}${item.poster_path}` : 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="500" height="750" fill="%23121413"><rect width="100%" height="100%"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%2352525b" font-family="sans-serif" font-size="26">No Poster</text></svg>';
+
+            const card = document.createElement('div');
+            card.className = 'media-card';
+            card.innerHTML = `
+                <div class="media-poster-wrap">
+                    <img class="media-poster" src="${poster}" alt="${title.replace(/"/g, '&quot;')}" loading="lazy" />
+                    ${rating ? `<div class="media-badge-rating"><span class="material-symbols-sharp">star</span>${rating}</div>` : ''}
+                    <div class="media-badge-type">${mediaType === 'tv' ? 'Series' : 'Movie'}</div>
+                    <div class="media-card-play-btn">
+                        <div class="play-circle">
+                            <span class="material-symbols-sharp">play_arrow</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="media-info">
+                    <div class="media-card-title" title="${title.replace(/"/g, '&quot;')}">${title}</div>
+                    <div class="media-card-sub">
+                        <span>${year}</span>
+                    </div>
+                </div>
+            `;
+
+            card.addEventListener('click', () => openPreview(item, mediaType));
+            return card;
+        }
+
+        // Skeleton loader
+        function renderSkeletons(container, count = 8) {
+            if (!container) return;
+            container.innerHTML = '';
+            for (let i = 0; i < count; i++) {
+                const skel = document.createElement('div');
+                skel.className = 'media-card skeleton';
+                skel.style.minHeight = '270px';
+                container.appendChild(skel);
+            }
+        }
+
+        // Load Home Tab Content
+        async function loadHome() {
+            const tmRow = document.getElementById('row-trending-movies');
+            const psRow = document.getElementById('row-popular-series');
+            const topMRow = document.getElementById('row-top-movies');
+            const topSRow = document.getElementById('row-top-series');
+
+            renderSkeletons(tmRow, 8);
+            renderSkeletons(psRow, 8);
+            renderSkeletons(topMRow, 8);
+            renderSkeletons(topSRow, 8);
+
+            const [trendingAll, trendingMovies, popularSeries, topMovies, topSeries] = await Promise.all([
+                fetchTMDB('/trending/all/day'),
+                fetchTMDB('/trending/movie/day'),
+                fetchTMDB('/tv/popular'),
+                fetchTMDB('/movie/top_rated'),
+                fetchTMDB('/tv/top_rated')
+            ]);
+
+            // Populate Top Hero Carousel
+            const heroCandidates = (trendingAll && trendingAll.results && trendingAll.results.length)
+                ? trendingAll.results
+                : (trendingMovies && trendingMovies.results ? trendingMovies.results : []);
+            initHeroCarousel(heroCandidates);
+
+            // Populate Horizontal Rows
+            if (trendingMovies && trendingMovies.results) {
+                tmRow.innerHTML = '';
+                trendingMovies.results.slice(0, 18).forEach(item => {
+                    tmRow.appendChild(createMediaCard(item, 'movie'));
+                });
+            }
+
+            if (popularSeries && popularSeries.results) {
+                psRow.innerHTML = '';
+                popularSeries.results.slice(0, 18).forEach(item => {
+                    psRow.appendChild(createMediaCard(item, 'tv'));
+                });
+            }
+
+            if (topMovies && topMovies.results) {
+                topMRow.innerHTML = '';
+                topMovies.results.slice(0, 18).forEach(item => {
+                    topMRow.appendChild(createMediaCard(item, 'movie'));
+                });
+            }
+
+            if (topSeries && topSeries.results) {
+                topSRow.innerHTML = '';
+                topSeries.results.slice(0, 18).forEach(item => {
+                    topSRow.appendChild(createMediaCard(item, 'tv'));
+                });
+            }
+        }
+
+        // Load Movies Tab
+        async function loadMovies(page = 1, append = false) {
+            const grid = document.getElementById('grid-all-movies');
+            if (!append) renderSkeletons(grid, 12);
+
+            const params = { page };
+            if (currentMovieGenre) params.with_genres = currentMovieGenre;
+
+            const data = await fetchTMDB('/discover/movie', params);
+            if (!append) grid.innerHTML = '';
+
+            if (data && data.results) {
+                data.results.forEach(item => {
+                    grid.appendChild(createMediaCard(item, 'movie'));
+                });
+            }
+        }
+
+        function loadMoreMovies() {
+            currentMoviePage++;
+            loadMovies(currentMoviePage, true);
+        }
+
+        // Load Series Tab
+        async function loadSeries(page = 1, append = false) {
+            const grid = document.getElementById('grid-all-series');
+            if (!append) renderSkeletons(grid, 12);
+
+            const params = { page };
+            if (currentSeriesGenre) params.with_genres = currentSeriesGenre;
+
+            const data = await fetchTMDB('/discover/tv', params);
+            if (!append) grid.innerHTML = '';
+
+            if (data && data.results) {
+                data.results.forEach(item => {
+                    grid.appendChild(createMediaCard(item, 'tv'));
+                });
+            }
+        }
+
+        function loadMoreSeries() {
+            currentSeriesPage++;
+            loadSeries(currentSeriesPage, true);
+        }
+
+        // Setup Genre Bars
+        function initGenreBars() {
+            const mgBar = document.getElementById('movie-genre-bar');
+            mgBar.innerHTML = '';
+            MOVIE_GENRES.forEach(g => {
+                const pill = document.createElement('button');
+                pill.className = `genre-pill ${g.id === currentMovieGenre ? 'active' : ''}`;
+                pill.textContent = g.name;
+                pill.onclick = () => {
+                    currentMovieGenre = g.id;
+                    currentMoviePage = 1;
+                    initGenreBars();
+                    loadMovies(1);
+                };
+                mgBar.appendChild(pill);
+            });
+
+            const sgBar = document.getElementById('series-genre-bar');
+            sgBar.innerHTML = '';
+            SERIES_GENRES.forEach(g => {
+                const pill = document.createElement('button');
+                pill.className = `genre-pill ${g.id === currentSeriesGenre ? 'active' : ''}`;
+                pill.textContent = g.name;
+                pill.onclick = () => {
+                    currentSeriesGenre = g.id;
+                    currentSeriesPage = 1;
+                    initGenreBars();
+                    loadSeries(1);
+                };
+                sgBar.appendChild(pill);
+            });
+        }
+
+        // Bottom Pill Search Handlers
+        let searchDebounce = null;
+        const searchWrap = document.getElementById('pill-search-wrap');
+        const searchInput = document.getElementById('moss-search-input');
+        const searchClear = document.getElementById('moss-search-clear');
+
+        function toggleSearchPill() {
+            const isExpanded = searchWrap.classList.contains('expanded');
+            if (!isExpanded) {
+                searchWrap.classList.add('expanded');
+                setTimeout(() => searchInput.focus(), 50);
+            } else if (!searchInput.value.trim()) {
+                searchWrap.classList.remove('expanded');
+            } else {
+                searchInput.focus();
+            }
+        }
+
+        searchInput.addEventListener('blur', () => {
+            if (!searchInput.value.trim()) {
+                searchWrap.classList.remove('expanded');
+            }
+        });
+
+        searchInput.addEventListener('input', (e) => {
+            const q = e.target.value.trim();
+            searchClear.style.display = q ? 'inline-flex' : 'none';
+
+            clearTimeout(searchDebounce);
+            if (!q) {
+                if (currentTab === 'search') switchTab(previousTab === 'search' ? 'home' : previousTab);
+                return;
+            }
+
+            searchDebounce = setTimeout(() => {
+                executeSearch(q);
+            }, 280);
+        });
+
+        function clearSearch() {
+            searchInput.value = '';
+            searchClear.style.display = 'none';
+            searchWrap.classList.remove('expanded');
+            if (currentTab === 'search') switchTab(previousTab === 'search' ? 'home' : previousTab);
+        }
+
+        async function executeSearch(query) {
+            switchTab('search');
+            document.getElementById('search-title').textContent = `Results for "${query}"`;
+            const grid = document.getElementById('grid-search-results');
+            renderSkeletons(grid, 8);
+
+            const data = await fetchTMDB('/search/multi', { query });
+            grid.innerHTML = '';
+
+            if (data && data.results && data.results.length) {
+                data.results
+                    .filter(i => (i.media_type === 'movie' || i.media_type === 'tv') && i.poster_path)
+                    .forEach(item => {
+                        grid.appendChild(createMediaCard(item, item.media_type));
+                    });
+            } else {
+                grid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 48px;">No titles found. Try another query.</div>`;
+            }
+        }
+
+        function returnToMainHome() {
+            if (window.parent && window.parent !== window && typeof window.parent.closePlayer === 'function') {
+                window.parent.closePlayer();
+            } else {
+                window.location.href = '../index.html';
+            }
+        }
+
+        // Watch View & Player Server URLs (All English-first & routed through Web gateway)
+        // Servers 1-2 use the built-in native player (no third-party embed, works inside sandboxed frames).
+        const NATIVE_PLAYER = "https://trashbin-web.yolkmusic.workers.dev/watch";
+        function getPlayerUrl(serverNum, tmdbId, type, season = 1, episode = 1) {
+            const isMovie = (type === 'movie');
+            const nativeQs = `type=${isMovie ? 'movie' : 'tv'}&id=${tmdbId}&s=${season}&e=${episode}`;
+            switch (String(serverNum)) {
+                case '1':
+                    // Server 1: Built-in player (source A, English original audio)
+                    return { native: true, url: `${NATIVE_PLAYER}?${nativeQs}&p=a` };
+                case '2':
+                    // Server 2: Built-in player (source B first)
+                    return { native: true, url: `${NATIVE_PLAYER}?${nativeQs}&p=b` };
+                case '3':
+                    // Server 3: VidNest (English)
+                    return isMovie
+                        ? `https://vidnest.fun/movie/${tmdbId}`
+                        : `https://vidnest.fun/tv/${tmdbId}/${season}/${episode}`;
+                case '4':
+                    // Server 4: VidLink Pro (English)
+                    return isMovie
+                        ? `https://vidlink.pro/movie/${tmdbId}?primaryColor=22c55e&autoplay=true`
+                        : `https://vidlink.pro/tv/${tmdbId}/${season}/${episode}?primaryColor=22c55e&autoplay=true`;
+                case '5':
+                    // Server 5: VidSrc SU (English Multi-Server)
+                    return isMovie
+                        ? `https://vidsrc.su/embed/movie/${tmdbId}`
+                        : `https://vidsrc.su/embed/tv/${tmdbId}/${season}/${episode}`;
+                default:
+                    return { native: true, url: `${NATIVE_PLAYER}?${nativeQs}&p=a` };
+            }
+        }
+
+        function wrapStreamUrl(rawUrl) {
+            if (!rawUrl) return '';
+            if (typeof rawUrl === 'object' && rawUrl.native) return rawUrl.url;
+            return `${activeStreamGateway}${encodeURIComponent(rawUrl)}`;
+        }
+
+        function switchServer(serverNum) {
+            currentServer = String(serverNum);
+            document.querySelectorAll('.server-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-server') === currentServer);
+            });
+            if (currentItem) {
+                updatePlayerSource();
+            }
+        }
+
+        function updatePlayerSource() {
+            const player = document.getElementById('moss-player-frame');
+            const type = currentItem.media_type || (currentItem.first_air_date ? 'tv' : 'movie');
+            const rawUrl = getPlayerUrl(currentServer, currentItem.id, type, currentSeason, currentEpisode);
+            player.src = wrapStreamUrl(rawUrl);
+        }
+
+        function scrollToPlayer() {
+            updatePlayerSource();
+            const playerSection = document.getElementById('player-section');
+            if (playerSection) {
+                playerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        // Open Movie / Show Preview
+        async function openPreview(item, type = 'movie') {
+            currentItem = item;
+            currentItem.media_type = type;
+            currentSeason = 1;
+            currentEpisode = 1;
+
+            switchTab('preview');
+
+            const title = item.title || item.name || 'Untitled';
+            const year = (item.release_date || item.first_air_date || '').split('-')[0];
+            const rating = item.vote_average ? item.vote_average.toFixed(1) : '';
+            const poster = item.poster_path ? `${IMG_W500}${item.poster_path}` : '';
+            const backdrop = item.backdrop_path ? `${IMG_ORIGINAL}${item.backdrop_path}` : (item.poster_path ? `${IMG_ORIGINAL}${item.poster_path}` : '');
+
+            if (item.backdrop_path) {
+                setAmbientBackdrop(`${IMG_W500}${item.backdrop_path}`);
+            }
+
+            // Set fading backdrop hero
+            const heroEl = document.getElementById('preview-hero');
+            heroEl.style.backgroundImage = backdrop ? `url(${backdrop})` : 'none';
+
+            document.getElementById('preview-poster').src = poster;
+            document.getElementById('preview-title').textContent = title;
+            document.getElementById('preview-type-tag').textContent = (type === 'tv') ? 'Series' : 'Movie';
+            document.getElementById('preview-rating').innerHTML = rating ? `<span class="material-symbols-sharp" style="font-size: 15px;">star</span>${rating}` : '';
+            document.getElementById('preview-year').textContent = year;
+            document.getElementById('preview-desc').textContent = item.overview || 'No overview available.';
+            document.getElementById('preview-runtime').textContent = '';
+            document.getElementById('preview-genres').innerHTML = '';
+
+            updatePlayerSource();
+
+            const tvPicker = document.getElementById('tv-picker-wrap');
+            if (type === 'tv') {
+                tvPicker.style.display = 'flex';
+                loadTvSeasons(item.id);
+            } else {
+                tvPicker.style.display = 'none';
+            }
+
+            // Fetch detailed metadata for duration, seasons, genres
+            fetchTMDB(`/${type}/${item.id}`).then(fullInfo => {
+                if (!fullInfo) return;
+                const runtime = fullInfo.runtime ? `${fullInfo.runtime} mins` : (fullInfo.number_of_seasons ? `${fullInfo.number_of_seasons} Season${fullInfo.number_of_seasons > 1 ? 's' : ''}` : '');
+                document.getElementById('preview-runtime').textContent = runtime;
+
+                const genresContainer = document.getElementById('preview-genres');
+                genresContainer.innerHTML = '';
+                if (fullInfo.genres) {
+                    fullInfo.genres.forEach(g => {
+                        const pill = document.createElement('span');
+                        pill.className = 'preview-genre-pill';
+                        pill.textContent = g.name;
+                        genresContainer.appendChild(pill);
+                    });
+                }
+            });
+        }
+
+        async function loadTvSeasons(tvId) {
+            const data = await fetchTMDB(`/tv/${tvId}`);
+            if (!data || !data.seasons) return;
+
+            tvSeasonsData = data.seasons.filter(s => s.season_number > 0);
+            const seasonsList = document.getElementById('seasons-list');
+            seasonsList.innerHTML = '';
+
+            tvSeasonsData.forEach((s) => {
+                const sBtn = document.createElement('button');
+                sBtn.className = `season-btn ${s.season_number === currentSeason ? 'active' : ''}`;
+                sBtn.textContent = s.name || `Season ${s.season_number}`;
+                sBtn.onclick = () => {
+                    currentSeason = s.season_number;
+                    currentEpisode = 1;
+                    document.querySelectorAll('.season-btn').forEach(b => b.classList.remove('active'));
+                    sBtn.classList.add('active');
+                    loadTvEpisodes(tvId, currentSeason);
+                    updatePlayerSource();
+                };
+                seasonsList.appendChild(sBtn);
+            });
+
+            if (tvSeasonsData.length) {
+                currentSeason = tvSeasonsData[0].season_number;
+                loadTvEpisodes(tvId, currentSeason);
+            }
+        }
+
+        // Load Episodes with Thumbnails and Metadata
+        async function loadTvEpisodes(tvId, seasonNum) {
+            const epGrid = document.getElementById('episodes-grid');
+            epGrid.innerHTML = '<div style="color: var(--text-muted); padding: 16px;">Loading episodes...</div>';
+
+            const data = await fetchTMDB(`/tv/${tvId}/season/${seasonNum}`);
+            epGrid.innerHTML = '';
+
+            if (data && data.episodes && data.episodes.length) {
+                data.episodes.forEach(ep => {
+                    const epCard = document.createElement('div');
+                    epCard.className = `episode-card ${ep.episode_number === currentEpisode ? 'active' : ''}`;
+
+                    const thumbUrl = ep.still_path
+                        ? `${IMG_W500}${ep.still_path}`
+                        : (currentItem && currentItem.backdrop_path ? `${IMG_W500}${currentItem.backdrop_path}` : '');
+
+                    epCard.innerHTML = `
+                        <div class="episode-thumb-wrap">
+                            ${thumbUrl ? `<img class="episode-thumb" src="${thumbUrl}" alt="${(ep.name || '').replace(/"/g, '&quot;')}" loading="lazy" />` : '<div style="width:100%;height:100%;background:#18181b;"></div>'}
+                            <div class="episode-ep-badge">EP ${ep.episode_number}</div>
+                        </div>
+                        <div class="episode-card-body">
+                            <div class="episode-card-title">${ep.name || `Episode ${ep.episode_number}`}</div>
+                            <div class="episode-card-meta">
+                                <span>${ep.air_date ? ep.air_date.split('-')[0] : ''}</span>
+                                <span>${ep.runtime ? ep.runtime + 'm' : ''}</span>
+                            </div>
+                            <div class="episode-card-overview">${ep.overview || ''}</div>
+                        </div>
+                    `;
+
+                    epCard.onclick = () => {
+                        currentEpisode = ep.episode_number;
+                        document.querySelectorAll('.episode-card').forEach(c => c.classList.remove('active'));
+                        epCard.classList.add('active');
+                        updatePlayerSource();
+                        scrollToPlayer();
+                    };
+
+                    epGrid.appendChild(epCard);
+                });
+            } else {
+                epGrid.innerHTML = '<div style="color: var(--text-muted); padding: 16px;">No episodes available for this season.</div>';
+            }
+        }
+
+        function closePreviewView() {
+            switchTab(previousTab === 'preview' ? 'home' : previousTab);
+        }
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            initGenreBars();
+            loadHome();
+        });
+    </script>
+</body>
+</html>

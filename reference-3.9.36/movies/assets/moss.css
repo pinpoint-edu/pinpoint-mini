@@ -1,0 +1,599 @@
+/* ==========================================================================
+   Moss — Complete UI Redesign & Brand Architecture
+   Fonts: 'Geist' for main text, 'IBM Plex Sans Thai Looped' (wght:600) for title
+   Icons: Google Material Symbols Sharp (Local + Google CDN)
+   ========================================================================== */
+
+/* ─── Local Font Face Declarations (Instant 0ms render) ───────────────── */
+@font-face {
+  font-family: 'IBM Plex Sans Thai Looped';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('./IBMPlexSansThaiLooped-600.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Material Symbols Sharp';
+  font-style: normal;
+  font-weight: 100 700;
+  font-display: block;
+  src: url('./MaterialSymbolsSharp.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Material Symbols Sharp';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('./MaterialSymbolsSharp.woff2') format('woff2');
+}
+
+/* Local Geist Font (Latin & Latin-ext) */
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('./Geist-Latin.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./Geist-Latin.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('./Geist-Latin.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('./Geist-Latin.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Geist';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./Geist-Latin.woff2') format('woff2');
+}
+
+/* Local Geist Mono Font */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url('./GeistMono-Latin.woff2') format('woff2');
+}
+
+/* ─── Themes System: Deep Multi-Color Adaptability ────────────────────── */
+:root,
+html,
+html[data-theme="moss"],
+html[data-theme="default"] {
+  --moss-primary: #22c55e;
+  --moss-primary-hover: #4ade80;
+  --moss-primary-glow: rgba(34, 197, 94, 0.35);
+  --moss-bg: #080b08;
+  --moss-card: #0e1410;
+  --moss-card-hover: #131c15;
+  --moss-glass: rgba(12, 18, 13, 0.85);
+  --moss-border: rgba(34, 197, 94, 0.16);
+  --moss-text: #f3f4f6;
+  --moss-text-muted: #9ca3af;
+  --moss-wave-1: rgba(34, 197, 94, 0.08);
+  --moss-wave-2: rgba(22, 163, 74, 0.06);
+  --moss-wave-accent: rgba(34, 197, 94, 0.05);
+  --theme-global-accentA: #22c55e !important;
+  --theme-global-accentB: #16a34a !important;
+  --theme-root-bg: #080b08 !important;
+  --theme-color: #22c55e !important;
+}
+
+/* 1. Simple Dark (Pure Monochrome Obsidian) */
+html[data-theme="dark"] {
+  --moss-primary: #f4f4f5;
+  --moss-primary-hover: #ffffff;
+  --moss-primary-glow: rgba(255, 255, 255, 0.2);
+  --moss-bg: #09090b;
+  --moss-card: #121215;
+  --moss-card-hover: #18181c;
+  --moss-glass: rgba(18, 18, 22, 0.85);
+  --moss-border: rgba(255, 255, 255, 0.1);
+  --moss-text: #f4f4f5;
+  --moss-text-muted: #a1a1aa;
+  --moss-wave-1: rgba(255, 255, 255, 0.04);
+  --moss-wave-2: rgba(212, 212, 216, 0.03);
+  --moss-wave-accent: rgba(255, 255, 255, 0.03);
+  --theme-global-accentA: #f4f4f5 !important;
+  --theme-global-accentB: #d4d4d8 !important;
+  --theme-root-bg: #09090b !important;
+  --theme-color: #f4f4f5 !important;
+}
+
+/* 2. Simple Light (Clean Porcelain Mode) */
+html[data-theme="light"] {
+  --moss-primary: #0f172a;
+  --moss-primary-hover: #1e293b;
+  --moss-primary-glow: rgba(15, 23, 42, 0.15);
+  --moss-bg: #f8fafc;
+  --moss-card: #ffffff;
+  --moss-card-hover: #f1f5f9;
+  --moss-glass: rgba(255, 255, 255, 0.92);
+  --moss-border: rgba(0, 0, 0, 0.08);
+  --moss-text: #0f172a;
+  --moss-text-muted: #64748b;
+  --moss-wave-1: rgba(15, 23, 42, 0.03);
+  --moss-wave-2: rgba(51, 65, 85, 0.02);
+  --moss-wave-accent: rgba(15, 23, 42, 0.02);
+  --theme-global-accentA: #0f172a !important;
+  --theme-global-accentB: #334155 !important;
+  --theme-root-bg: #f8fafc !important;
+  --theme-color: #0f172a !important;
+}
+
+html[data-theme="light"],
+html[data-theme="light"] body {
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] .glass-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+/* 3. Ruby Crimson (Single Color Deep Dark) */
+html[data-theme="crimson"] {
+  --moss-primary: #f43f5e;
+  --moss-primary-hover: #fb7185;
+  --moss-primary-glow: rgba(244, 63, 94, 0.35);
+  --moss-bg: #0d0608;
+  --moss-card: #180c10;
+  --moss-card-hover: #221217;
+  --moss-glass: rgba(24, 12, 16, 0.85);
+  --moss-border: rgba(244, 63, 94, 0.16);
+  --moss-text: #fff1f2;
+  --moss-text-muted: #fda4af;
+  --moss-wave-1: rgba(244, 63, 94, 0.08);
+  --moss-wave-2: rgba(225, 29, 72, 0.06);
+  --moss-wave-accent: rgba(244, 63, 94, 0.05);
+  --theme-global-accentA: #f43f5e !important;
+  --theme-global-accentB: #e11d48 !important;
+  --theme-root-bg: #0d0608 !important;
+  --theme-color: #f43f5e !important;
+}
+
+/* 4. Amethyst Violet (Single Color Deep Dark) */
+html[data-theme="violet"] {
+  --moss-primary: #a855f7;
+  --moss-primary-hover: #c084fc;
+  --moss-primary-glow: rgba(168, 85, 247, 0.35);
+  --moss-bg: #0b0712;
+  --moss-card: #140d20;
+  --moss-card-hover: #1c132c;
+  --moss-glass: rgba(20, 13, 32, 0.85);
+  --moss-border: rgba(168, 85, 247, 0.16);
+  --moss-text: #faf5ff;
+  --moss-text-muted: #d8b4fe;
+  --moss-wave-1: rgba(168, 85, 247, 0.08);
+  --moss-wave-2: rgba(147, 51, 234, 0.06);
+  --moss-wave-accent: rgba(168, 85, 247, 0.05);
+  --theme-global-accentA: #a855f7 !important;
+  --theme-global-accentB: #9333ea !important;
+  --theme-root-bg: #0b0712 !important;
+  --theme-color: #a855f7 !important;
+}
+
+/* 5. Gold Amber (Single Color Deep Dark) */
+html[data-theme="amber"] {
+  --moss-primary: #f59e0b;
+  --moss-primary-hover: #fbbf24;
+  --moss-primary-glow: rgba(245, 158, 11, 0.35);
+  --moss-bg: #0d0a04;
+  --moss-card: #181308;
+  --moss-card-hover: #221c0c;
+  --moss-glass: rgba(24, 19, 8, 0.85);
+  --moss-border: rgba(245, 158, 11, 0.16);
+  --moss-text: #fffbeb;
+  --moss-text-muted: #fcd34d;
+  --moss-wave-1: rgba(245, 158, 11, 0.08);
+  --moss-wave-2: rgba(217, 119, 6, 0.06);
+  --moss-wave-accent: rgba(245, 158, 11, 0.05);
+  --theme-global-accentA: #f59e0b !important;
+  --theme-global-accentB: #d97706 !important;
+  --theme-root-bg: #0d0a04 !important;
+  --theme-color: #f59e0b !important;
+}
+
+/* 6. Sunset Ember (Reddish-Orange Double Tint) */
+html[data-theme="sunset"] {
+  --moss-primary: #ff5722;
+  --moss-primary-hover: #ff7043;
+  --moss-primary-glow: rgba(255, 87, 34, 0.35);
+  --moss-bg: #0d0705;
+  --moss-card: #180e0a;
+  --moss-card-hover: #22150f;
+  --moss-glass: rgba(24, 14, 10, 0.85);
+  --moss-border: rgba(255, 87, 34, 0.18);
+  --moss-text: #fff7ed;
+  --moss-text-muted: #fdba74;
+  --moss-wave-1: rgba(255, 87, 34, 0.09);
+  --moss-wave-2: rgba(249, 115, 22, 0.07);
+  --moss-wave-accent: rgba(239, 68, 68, 0.06);
+  --theme-global-accentA: #ff5722 !important;
+  --theme-global-accentB: #f97316 !important;
+  --theme-root-bg: #0d0705 !important;
+  --theme-color: #ff5722 !important;
+}
+
+/* 7. Ocean Azure (Sky Blue Double Tint) */
+html[data-theme="sky-blue"] {
+  --moss-primary: #0ea5e9;
+  --moss-primary-hover: #38bdf8;
+  --moss-primary-glow: rgba(14, 165, 233, 0.35);
+  --moss-bg: #050a0e;
+  --moss-card: #09131a;
+  --moss-card-hover: #0e1c26;
+  --moss-glass: rgba(9, 19, 26, 0.85);
+  --moss-border: rgba(14, 165, 233, 0.18);
+  --moss-text: #f0f9ff;
+  --moss-text-muted: #7dd3fc;
+  --moss-wave-1: rgba(14, 165, 233, 0.09);
+  --moss-wave-2: rgba(6, 182, 212, 0.07);
+  --moss-wave-accent: rgba(56, 189, 248, 0.06);
+  --theme-global-accentA: #0ea5e9 !important;
+  --theme-global-accentB: #06b6d4 !important;
+  --theme-root-bg: #050a0e !important;
+  --theme-color: #0ea5e9 !important;
+}
+
+/* ─── Universal Typography Enforcement (No Times New Roman Anywhere) ──── */
+*,
+*::before,
+*::after {
+  font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+}
+
+html,
+body,
+button,
+input,
+select,
+textarea,
+optgroup,
+p, h1, h2, h3, h4, h5, h6,
+a, span, div, li, ul, ol, label, nav, header, footer, section, article, main, aside,
+[class*="svelte-"] {
+  font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+}
+
+html, body {
+  background-color: var(--moss-bg) !important;
+  color: var(--moss-text, #f3f4f6) !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  text-rendering: optimizeLegibility !important;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+::selection {
+  background: var(--moss-primary-glow) !important;
+  color: #ffffff !important;
+}
+
+/* ─── Top Bar: Home Tab (Styled identically to normal Movies & Series tabs) ─── */
+.moss-home-tab,
+.moss-nav-tab,
+.header-row a[href="/"],
+.desktop-nav a[href="/"],
+a.brand-mark {
+  font-family: 'Geist', var(--font-sans), sans-serif !important;
+  font-weight: 500 !important;
+  font-size: 14px !important;
+  line-height: normal !important;
+  letter-spacing: -0.01em !important;
+  text-decoration: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 16px !important;
+  height: var(--nav-item-h, 40px) !important;
+  border-radius: 9999px !important;
+  color: rgba(255, 255, 255, 0.72) !important;
+  background: transparent !important;
+  user-select: none !important;
+  transition: color 0.2s ease, background-color 0.2s ease !important;
+  transform: none !important;
+}
+
+.moss-home-tab:hover,
+.header-row a[href="/"]:hover,
+.desktop-nav a[href="/"]:hover {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  transform: none !important;
+}
+
+.moss-home-tab.active,
+.moss-home-tab.is-active,
+.header-row a[href="/"].active,
+.header-row a[href="/"].is-active {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+.moss-tab-text {
+  font-family: 'Geist', var(--font-sans), sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: inherit !important;
+  letter-spacing: -0.01em !important;
+}
+
+/* Hide old graphic logo images / SVGs */
+.brand-mark svg,
+.brand-mark img,
+.header-row a[href="/"] > svg,
+.header-row a[href="/"] > img,
+.desktop-nav a[href="/"] > svg,
+.desktop-nav a[href="/"] > img {
+  display: none !important;
+}
+
+/* ─── Google Material Symbols Sharp Icons ─────────────────────────────── */
+.material-symbols-sharp {
+  font-family: 'Material Symbols Sharp' !important;
+  font-weight: normal !important;
+  font-style: normal !important;
+  font-size: 20px !important;
+  line-height: 1 !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+  word-wrap: normal !important;
+  direction: ltr !important;
+  -webkit-font-feature-settings: 'liga' 1 !important;
+  font-feature-settings: 'liga' 1 !important;
+  -webkit-font-smoothing: antialiased !important;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
+  vertical-align: middle !important;
+  user-select: none !important;
+  pointer-events: none !important;
+  flex-shrink: 0 !important;
+}
+
+/* Adaptive icon sizes matching utility classes */
+.material-symbols-sharp.size-3, .material-symbols-sharp.w-3 { font-size: 12px !important; width: 12px; height: 12px; }
+.material-symbols-sharp.size-4, .material-symbols-sharp.w-4 { font-size: 16px !important; width: 16px; height: 16px; }
+.material-symbols-sharp.size-5, .material-symbols-sharp.w-5 { font-size: 20px !important; width: 20px; height: 20px; }
+.material-symbols-sharp.size-6, .material-symbols-sharp.w-6 { font-size: 24px !important; width: 24px; height: 24px; }
+.material-symbols-sharp.size-7, .material-symbols-sharp.w-7 { font-size: 28px !important; width: 28px; height: 28px; }
+.material-symbols-sharp.size-8, .material-symbols-sharp.w-8 { font-size: 32px !important; width: 32px; height: 32px; }
+
+/* ─── Slow Ambient Background Waves (Replaces Liquid-BG) ──────────────── */
+.liquid-bg canvas,
+.galaxy-bg canvas,
+.aero-bg canvas,
+canvas[class*="liquid"],
+canvas[class*="galaxy"],
+canvas[class*="aero"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+.liquid-bg,
+.galaxy-bg,
+.aero-bg,
+.moss-ambient-waves {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+  background-color: var(--moss-bg) !important;
+  transition: background-color 0.4s ease;
+}
+
+.liquid-bg::before,
+.galaxy-bg::before,
+.aero-bg::before,
+.moss-ambient-waves::before {
+  content: "" !important;
+  position: absolute !important;
+  width: 250% !important;
+  height: 250% !important;
+  top: -75% !important;
+  left: -75% !important;
+  background: radial-gradient(ellipse 65% 45% at 50% 50%, var(--moss-wave-1), transparent 60%),
+              radial-gradient(ellipse 55% 40% at 75% 35%, var(--moss-wave-2), transparent 55%),
+              radial-gradient(ellipse 60% 50% at 25% 65%, var(--moss-wave-accent), transparent 55%) !important;
+  animation: mossSlowWaves 26s ease-in-out infinite alternate !important;
+  will-change: transform;
+}
+
+.liquid-bg::after,
+.galaxy-bg::after,
+.aero-bg::after,
+.moss-ambient-waves::after {
+  content: "" !important;
+  position: absolute !important;
+  width: 220% !important;
+  height: 220% !important;
+  top: -60% !important;
+  left: -60% !important;
+  background: radial-gradient(circle at 45% 45%, var(--moss-wave-accent), transparent 50%),
+              radial-gradient(ellipse 70% 35% at 55% 65%, var(--moss-wave-2), transparent 60%) !important;
+  animation: mossSlowWaves2 34s ease-in-out infinite alternate-reverse !important;
+  will-change: transform;
+}
+
+@keyframes mossSlowWaves {
+  0% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); }
+  50% { transform: translate3d(3%, 2%, 0) rotate(2deg) scale(1.03); }
+  100% { transform: translate3d(-2%, 3%, 0) rotate(-2deg) scale(1.05); }
+}
+
+@keyframes mossSlowWaves2 {
+  0% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); }
+  50% { transform: translate3d(-3%, -2%, 0) rotate(-3deg) scale(1.04); }
+  100% { transform: translate3d(2.5%, -1.5%, 0) rotate(2deg) scale(1.02); }
+}
+
+/* ─── Remove Sharing Options ──────────────────────────────────────────── */
+button[aria-label*="share" i],
+button[title*="share" i],
+a[href*="share" i],
+[class*="share-panel"],
+[class*="share-btn"],
+[class*="share-badge"],
+.share-panel,
+.share-badge,
+a[href*="twitter.com/intent"],
+a[href*="facebook.com/sharer"],
+a[href*="api.whatsapp.com"],
+a[href*="t.me/share"] {
+  display: none !important;
+}
+
+/* ─── Remove Login Features & Shorts ──────────────────────────────────── */
+a[href="/shorts"],
+a[href*="/shorts"],
+[data-nav*="shorts"],
+li:has(a[href*="/shorts"]),
+.nav-item:has(a[href*="/shorts"]),
+a[href="/login"],
+a[href*="/login"],
+a[href*="/auth"],
+button[aria-label*="Login" i],
+button[aria-label*="login" i],
+button[aria-label*="Profile" i],
+button[aria-label*="profile" i],
+button[aria-label*="Account" i],
+.mobile-profile-menu,
+[class*="profile-menu"],
+[class*="login-btn"],
+[class*="account-btn"] {
+  display: none !important;
+}
+
+/* ─── Remove Ads Completely and Ads Section in Settings ───────────────── */
+[class*="ad-banner"],
+[class*="adblock"],
+[class*="ad-dialog"],
+[class*="ad-container"],
+.ad-dialog-panel,
+.turnstile-wrap,
+.turnstile-slot,
+.captcha-slot,
+iframe[src*="cloudflare"],
+iframe[src*="turnstile"],
+iframe[src*="challenges"],
+iframe[src*="llvpn"],
+[data-section*="ad" i] {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  pointer-events: none !important;
+}
+
+/* ─── Footer: Remove logo, Cinejoy title & email; Keep disclaimer only ─── */
+footer img,
+footer svg,
+footer a[href^="mailto:"],
+footer a[href*="contact" i],
+footer [class*="contact" i],
+footer [class*="social" i],
+footer [class*="logo" i],
+footer [class*="brand" i],
+footer .brand-mark {
+  display: none !important;
+}
+
+/* Clean styling for disclaimer */
+footer p,
+footer [class*="disclaimer" i],
+[class*="disclaimer" i] {
+  font-family: 'Geist', -apple-system, sans-serif !important;
+  font-size: 13px !important;
+  line-height: 1.6 !important;
+  color: var(--moss-text-muted, #6b7280) !important;
+  text-align: center !important;
+  max-width: 720px !important;
+  margin: 0 auto !important;
+}
+
+/* ─── Smooth UI Optimization & Card Styling ───────────────────────────── */
+.glass-header,
+.desktop-nav,
+.media-card,
+[class*="MediaCard"] {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.glass-header {
+  background: var(--moss-glass) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border-bottom: 1px solid var(--moss-border) !important;
+}
+
+.desktop-nav {
+  border: 1px solid var(--moss-border) !important;
+  background: var(--moss-glass) !important;
+}
+
+.glass-card,
+.media-card,
+[class*="MediaCard"],
+[class*="glass-panel"],
+.list-card {
+  background-color: var(--moss-card) !important;
+  border-color: var(--moss-border) !important;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease !important;
+}
+
+[class*="MediaCard"]:hover,
+.media-card:hover {
+  transform: translateY(-3px) scale(1.015) !important;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.7), 0 0 20px var(--moss-primary-glow) !important;
+}
+
+/* Minimalist Scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: var(--moss-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--moss-border);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--moss-primary);
+}
+
+/* Monospace text */
+code, pre, kbd, samp, .font-mono {
+  font-family: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+}

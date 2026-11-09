@@ -2110,10 +2110,11 @@
 
   
     /* ==========================================================================
-   TRASHBIN SUPER APP: FULL-BLEED CAROUSEL, OMNIBAR, & FLOATING PILL BAR
+   UNIFIED REMIX: SHARED UI BASE FOR GAMES, MOVIES, MUSIC, AND AI
+   Shared .media-card system, Cinejoy carousel, and 3.9.36 search bar
    ========================================================================== */
 
-    /* Super App Viewport: 0 padding top for full-bleed top carousel */
+    /* Super App Viewport */
     .super-app-viewport {
       position: relative;
       width: 100%;
@@ -2121,7 +2122,7 @@
       overflow-y: auto;
       overflow-x: hidden;
       padding-top: 0 !important;
-      padding-bottom: 96px;
+      padding-bottom: 100px;
       box-sizing: border-box;
       scroll-behavior: smooth;
       scrollbar-width: thin;
@@ -2154,7 +2155,7 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Full-Bleed Hero Carousel (Cinejoy / Moss Movies style) */
+    /* Full-Bleed Hero Carousel (Cinejoy / Moss style) */
     .hero-carousel {
       position: relative;
       width: 100%;
@@ -2287,13 +2288,6 @@
       color: #e4e4e7;
     }
 
-    .hero-meta-rating {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      color: #facc15;
-    }
-
     .hero-synopsis {
       font-size: 14px;
       line-height: 1.6;
@@ -2388,66 +2382,102 @@
     }
 
     /* =========================================================================
-       CENTERED OMNIBAR (Yolk aesthetic, NO browse button)
+       3.9.36 SEARCH BAR LAYOUT (Remixed without browse button, Shift+Enter for AI)
        ========================================================================= */
-    .home-omnibar-wrap {
-      position: relative;
+    #search-block {
       width: 100%;
       max-width: 680px;
-      margin: -42px auto 40px auto;
+      margin: -36px auto 40px auto;
       padding: 0 20px;
       box-sizing: border-box;
       z-index: 35;
+      position: relative;
     }
 
-    .omnibar-pill {
+    #large-logo-wrapper {
+      text-align: center;
+      margin-bottom: 16px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .logo-row {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .logo-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.02em;
+      margin: 0;
+    }
+
+    .logo-sub {
+      font-size: 13px;
+      color: var(--text-dim);
+      margin: 4px 0 0 0;
+    }
+
+    .search-pill-wrapper {
       position: relative;
+      width: 100%;
       display: flex;
       align-items: center;
+    }
+
+    .search-pill-icon {
+      position: absolute;
+      left: 18px;
+      font-size: 22px;
+      color: var(--accent);
+      pointer-events: none;
+      transition: color 0.2s ease;
+      z-index: 2;
+    }
+
+    #searchInput {
       width: 100%;
       height: 56px;
-      background: rgba(18, 19, 24, 0.86);
+      background: rgba(18, 19, 24, 0.88);
       backdrop-filter: blur(28px) saturate(180%);
       -webkit-backdrop-filter: blur(28px) saturate(180%);
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 9999px;
-      padding: 0 14px 0 20px;
-      box-shadow: 0 14px 44px rgba(0, 0, 0, 0.72), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-      transition: all 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+      padding: 0 110px 0 54px;
+      color: var(--text-main);
+      font-size: 15px;
+      font-weight: 500;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.25s var(--parabola-ease);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
       box-sizing: border-box;
     }
 
-    .omnibar-pill:focus-within {
+    #searchInput:focus {
+      background: rgba(22, 23, 30, 0.96);
       border-color: var(--accent);
-      box-shadow: 0 0 28px var(--accent-glow), 0 20px 52px rgba(0, 0, 0, 0.8);
-      background: rgba(22, 23, 30, 0.95);
-      transform: translateY(-2px);
+      box-shadow: 0 0 0 2px var(--accent-glow), 0 16px 48px rgba(0, 0, 0, 0.8);
     }
 
-    .omnibar-pill .search-icon {
-      color: var(--accent);
-      font-size: 22px;
-      margin-right: 12px;
-      flex-shrink: 0;
+    #searchInput::placeholder {
+      color: var(--text-dim);
     }
 
-    .omnibar-pill input {
-      flex: 1;
-      height: 100%;
-      background: transparent;
-      border: none;
-      outline: none;
-      color: #ffffff;
-      font-family: inherit;
-      font-size: 15px;
-      font-weight: 500;
+    .search-right-actions {
+      position: absolute;
+      right: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 2;
     }
 
-    .omnibar-pill input::placeholder {
-      color: #71717a;
-    }
-
-    .omnibar-clear-btn {
+    .clear-search-btn {
       width: 28px;
       height: 28px;
       border-radius: 50%;
@@ -2458,18 +2488,18 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      margin-right: 8px;
       transition: all 0.2s ease;
     }
 
-    .omnibar-clear-btn:hover {
+    .clear-search-btn:hover {
       background: rgba(255, 255, 255, 0.2);
       color: #ffffff;
     }
 
-    .omnibar-badge-hint {
+    .search-ai-shortcut-badge {
       display: inline-flex;
       align-items: center;
+      gap: 4px;
       padding: 5px 12px;
       border-radius: 9999px;
       font-size: 11px;
@@ -2477,27 +2507,197 @@
       color: var(--accent);
       background: var(--accent-subtle);
       border: 1px solid var(--accent-border);
-      user-select: none;
-      flex-shrink: 0;
       cursor: pointer;
+      user-select: none;
       transition: all 0.2s ease;
     }
 
-    .omnibar-badge-hint:hover {
-      background: var(--accent-hover);
+    .search-ai-shortcut-badge:hover {
+      background: var(--accent);
       color: #ffffff;
       box-shadow: 0 0 12px var(--accent-glow);
     }
 
-    .omnibar-results-container {
-      width: 100%;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 24px;
-      box-sizing: border-box;
+    /* =========================================================================
+       SHARED .media-card BASE FOR GAMES, MOVIES, AND MUSIC
+       Exact Moss Cinejoy styling adapted across all media types
+       ========================================================================= */
+    .media-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 20px;
     }
 
-    /* Shelves on Home Screen */
+    .media-row-scroll {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      scrollbar-width: none;
+    }
+
+    .media-row-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .media-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+      user-select: none;
+    }
+
+    .media-row-scroll .media-card {
+      flex: 0 0 180px;
+      width: 180px;
+    }
+
+    .media-card:hover {
+      transform: translateY(-6px) scale(1.025);
+      z-index: 5;
+    }
+
+    .media-poster-wrap {
+      position: relative;
+      width: 100%;
+      border-radius: 16px;
+      overflow: hidden;
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
+      transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    /* Aspect ratios: 2/3 for movies, 1/1 for music, 16/10 for games */
+    .media-card.movie-card .media-poster-wrap {
+      aspect-ratio: 2 / 3;
+    }
+
+    .media-card.music-card .media-poster-wrap {
+      aspect-ratio: 1 / 1;
+    }
+
+    .media-card.game-card .media-poster-wrap {
+      aspect-ratio: 16 / 10;
+    }
+
+    .media-card:hover .media-poster-wrap {
+      border-color: rgba(255, 255, 255, 0.25);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.75);
+    }
+
+    .media-poster {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+
+    .media-card:hover .media-poster {
+      transform: scale(1.05);
+    }
+
+    .media-badge-rating {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      padding: 3px 8px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #facc15;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .media-badge-type {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: #ffffff;
+      text-transform: uppercase;
+    }
+
+    .media-card-play-btn {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.2) 50%, transparent 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.22s ease;
+    }
+
+    .media-card:hover .media-card-play-btn {
+      opacity: 1;
+    }
+
+    .play-circle {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6);
+      transition: transform 0.2s ease;
+    }
+
+    .media-card:hover .play-circle {
+      transform: scale(1.08);
+    }
+
+    .play-circle .material-symbols-sharp {
+      color: #000000;
+      font-size: 24px;
+      margin-left: 2px;
+    }
+
+    .media-info {
+      padding: 9px 4px 2px;
+    }
+
+    .media-card-title {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.92);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 2px;
+    }
+
+    .media-card-sub {
+      font-size: 12px;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Shelves & Headers */
     .home-shelves-wrap {
       width: 100%;
       max-width: 1300px;
@@ -2509,16 +2709,11 @@
       box-sizing: border-box;
     }
 
-    .home-shelf {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
     .shelf-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      margin-bottom: 14px;
     }
 
     .shelf-title {
@@ -2535,91 +2730,26 @@
       background: none;
       border: none;
       cursor: pointer;
-      transition: opacity 0.2s ease;
     }
 
     .shelf-see-all:hover {
-      opacity: 0.8;
       text-decoration: underline;
     }
 
-    .shelf-row-scroll {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      overflow-x: auto;
-      padding-bottom: 8px;
-      scrollbar-width: none;
-    }
-
-    .shelf-row-scroll::-webkit-scrollbar {
-      display: none;
-    }
-
-    /* Cards */
-    .shelf-item-card {
-      flex: 0 0 180px;
-      background: rgba(24, 24, 27, 0.7);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
-    }
-
-    .shelf-item-card:hover {
-      transform: translateY(-4px) scale(1.02);
-      border-color: var(--accent);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
-    }
-
-    .shelf-item-thumb {
+    /* Results layout */
+    .omnibar-results-container {
       width: 100%;
-      height: 110px;
-      background: #18181b;
-      overflow: hidden;
-    }
-
-    .shelf-item-thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .shelf-item-title {
-      padding: 10px 12px;
-      font-size: 13px;
-      font-weight: 600;
-      color: #ffffff;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .proxy-shelf-card {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 0 24px 60px 24px;
+      box-sizing: border-box;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 110px;
-      padding: 16px;
-      text-align: center;
-      gap: 8px;
-    }
-
-    .shelf-proxy-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      background: var(--accent-subtle);
-      color: var(--accent);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      gap: 32px;
     }
 
     /* =========================================================================
-       FLOATING BOTTOM PILL BAR (Moss style: sleek, glass-morphic, floating capsule)
+       FLOATING BOTTOM PILL BAR (MOSS CAPSULE)
        ========================================================================= */
     .floating-bottom-bar-wrap {
       position: fixed;
@@ -2798,7 +2928,7 @@
       font-size: 18px;
     }
 
-    /* Docked omnibar inside floating pill */
+    /* Docked omnibar input */
     .pill-docked-input-wrap {
       display: none;
       align-items: center;
@@ -2835,24 +2965,7 @@
       box-shadow: 0 0 14px var(--accent-glow);
     }
 
-    /* Media Views (Movies, Music, AI, Web) */
-    .view-container-inner {
-      width: 100%;
-      max-width: 1300px;
-      margin: 0 auto;
-      padding: 72px 24px 60px 24px;
-      box-sizing: border-box;
-    }
-
-    .view-title-header {
-      font-size: 28px;
-      font-weight: 800;
-      color: #ffffff;
-      margin-bottom: 24px;
-      letter-spacing: -0.02em;
-    }
-
-    /* Movie details modal */
+    /* Details modal */
     .movie-details-modal {
       position: fixed;
       inset: 0;
@@ -2962,259 +3075,6 @@
       box-shadow: 0 0 14px var(--accent-glow);
     }
 
-    .movie-media-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 20px;
-    }
-
-    .movie-media-card {
-      background: rgba(24, 24, 27, 0.7);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
-    }
-
-    .movie-media-card:hover {
-      transform: translateY(-4px) scale(1.02);
-      border-color: var(--accent);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
-    }
-
-    .movie-card-poster-wrap {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 2 / 3;
-      background: #18181b;
-      overflow: hidden;
-    }
-
-    .movie-card-poster-wrap img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .movie-card-badge {
-      position: absolute;
-      top: 8px;
-      left: 8px;
-      padding: 2px 8px;
-      border-radius: 6px;
-      background: rgba(0, 0, 0, 0.75);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      font-size: 10px;
-      font-weight: 700;
-      color: #fff;
-    }
-
-    .movie-card-hover-play {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0, 0, 0, 0.5);
-      opacity: 0;
-      transition: opacity 0.2s ease;
-      border: none;
-      color: #fff;
-      cursor: pointer;
-    }
-
-    .movie-media-card:hover .movie-card-hover-play {
-      opacity: 1;
-    }
-
-    .movie-card-title {
-      padding: 10px 12px 4px 12px;
-      font-size: 14px;
-      font-weight: 600;
-      color: #fff;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .movie-card-meta {
-      padding: 0 12px 10px 12px;
-      font-size: 12px;
-      color: #a1a1aa;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    /* Music Grid */
-    .music-trending-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 20px;
-    }
-
-    .music-track-card {
-      background: rgba(24, 24, 27, 0.7);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
-      padding: 10px;
-    }
-
-    .music-track-card:hover {
-      transform: translateY(-4px) scale(1.02);
-      border-color: var(--accent);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
-    }
-
-    .music-card-art-wrap {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      border-radius: 10px;
-      overflow: hidden;
-      background: #18181b;
-    }
-
-    .music-card-art-wrap img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .music-card-play-overlay {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0, 0, 0, 0.5);
-      opacity: 0;
-      transition: opacity 0.2s ease;
-      border: none;
-      color: #fff;
-      cursor: pointer;
-    }
-
-    .music-track-card:hover .music-card-play-overlay {
-      opacity: 1;
-    }
-
-    .music-card-title {
-      margin-top: 10px;
-      font-size: 13px;
-      font-weight: 600;
-      color: #fff;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .music-card-artist {
-      font-size: 12px;
-      color: #a1a1aa;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    /* AI Chat */
-    .ai-chat-box {
-      width: 100%;
-      height: 520px;
-      overflow-y: auto;
-      background: rgba(18, 18, 22, 0.6);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      box-sizing: border-box;
-    }
-
-    .ai-chat-bubble {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      max-width: 85%;
-    }
-
-    .ai-chat-bubble.user {
-      align-self: flex-end;
-      flex-direction: row-reverse;
-    }
-
-    .ai-bubble-avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: var(--accent-subtle);
-      color: var(--accent);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .ai-bubble-content {
-      padding: 12px 18px;
-      border-radius: 14px;
-      font-size: 14px;
-      line-height: 1.6;
-      background: rgba(28, 28, 35, 0.8);
-      border: 1px solid var(--border);
-      color: #ffffff;
-    }
-
-    .ai-chat-bubble.user .ai-bubble-content {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #ffffff;
-    }
-
-    .ai-code-block {
-      background: #09090b;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-      padding: 12px;
-      overflow-x: auto;
-      margin: 8px 0;
-    }
-
-    .ai-code-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      color: #a1a1aa;
-      font-size: 11px;
-      margin-bottom: 8px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      padding-bottom: 4px;
-    }
-
-    .ai-code-copy {
-      background: rgba(255, 255, 255, 0.1);
-      border: none;
-      color: #fff;
-      padding: 2px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 11px;
-    }
-
-    /* Web Proxy Browser */
-    .web-browser-iframe {
-      width: 100%;
-      height: 720px;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      background: #fff;
-    }
-
     @media (max-width: 768px) {
       .pill-tab-item .pill-tab-label {
         display: none;
@@ -3272,7 +3132,7 @@
        ========================================================================= -->
   <div id="super-app-viewport" class="super-app-viewport">
 
-    <!-- VIEW 1: HOME (Full-Bleed Multi-Content Hero Carousel + Clean Omnibar + Shelves) -->
+    <!-- VIEW 1: HOME (Hero Carousel + 3.9.36 Centered Search + Shelves) -->
     <section id="view-home" class="app-view active">
       <!-- Full-Bleed Top Hero Carousel (Games, Music & Movies combined) -->
       <div id="hero-carousel" class="hero-carousel">
@@ -3303,48 +3163,71 @@
         <div class="hero-indicators" id="hero-indicators"></div>
       </div>
 
-      <!-- Centered Omnibar (NO browse button) -->
-      <div class="home-omnibar-wrap">
-        <div class="omnibar-pill" id="omnibarPill">
-          <span class="material-symbols-sharp search-icon">search</span>
+      <!-- 3.9.36 Centered Search Block (Logo + Search Pill + Shift+Enter AI badge) -->
+      <div id="search-block">
+        <div id="large-logo-wrapper" onclick="document.getElementById('searchInput').focus()">
+          <div class="logo-inner">
+            <div class="logo-row">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="34" height="34" style="display:inline-block; vertical-align: middle; color: var(--accent);">
+                <path d="M15 16h4v2h-4zm0-8h7v2h-7zm0 4h6v2h-6zM3 18c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V8H3v10zm2-8h6v8H5v-8zm5-6H6L5 5H2v2h12V5h-3z"/>
+              </svg>
+              <h1 class="logo-title">Trashbin</h1>
+            </div>
+            <p class="logo-sub">Games, cinema, music &amp; AI assistant</p>
+          </div>
+        </div>
+
+        <div class="search-pill-wrapper">
+          <span class="material-symbols-sharp search-pill-icon">search</span>
           <input 
             type="text" 
             id="searchInput" 
-            placeholder="Search games, movies, music, AI, or enter URL..." 
+            placeholder="Search games, movies, music, AI... (Shift + Enter for AI)" 
             autocomplete="off" 
             spellcheck="false"
           />
-          <button id="clearSearchBtn" class="omnibar-clear-btn" onclick="trashbinSuperApp.clearSearch()" style="display:none;" title="Clear Search">
-            <span class="material-symbols-sharp">close</span>
-          </button>
-          <div class="omnibar-badge-hint" onclick="trashbinSuperApp.switchTab('ai')" title="Press Shift + Enter anywhere in the search bar to chat with AI">
-            <span class="material-symbols-sharp" style="font-size:14px;margin-right:4px;">psychology</span>
-            <span>Shift + ↵ AI</span>
+          <div class="search-right-actions">
+            <button id="clearSearchBtn" class="clear-search-btn" onclick="trashbinSuperApp.clearSearch()" style="display: none;" title="Clear search">
+              <span class="material-symbols-sharp" style="font-size: 16px;">close</span>
+            </button>
+            <div class="search-ai-shortcut-badge" onclick="trashbinSuperApp.switchTab('ai')" title="Press Shift + Enter to ask AI">
+              <span class="material-symbols-sharp" style="font-size: 14px;">psychology</span>
+              <span>Shift+↵ AI</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Live Omnibar Multi-Category Results -->
-      <div id="omnibar-results" class="omnibar-results-container" style="display: none;"></div>
+      <!-- Live Omnibar Search Results: GAMES ARE FIRST, then MOVIES, then MUSIC, then AI -->
+      <div id="omnibar-results" class="omnibar-results-container" style="display: none;">
+        <!-- Games First -->
+        <div id="unified-games-section"></div>
+        <!-- Movies Second -->
+        <div id="unified-movies-section"></div>
+        <!-- Music Third -->
+        <div id="unified-music-section"></div>
+        <!-- AI Card Fourth -->
+        <div id="unified-ai-section"></div>
+      </div>
 
-      <!-- Curated Shelves (Games, Movies, Music, Web) -->
+      <!-- Curated Shelves (Using identical shared .media-card system) -->
       <div id="home-shelves" class="home-shelves-wrap">
         <!-- Shelf 1: Popular Games -->
         <div class="home-shelf">
           <div class="shelf-header">
             <h3 class="shelf-title">Popular Games</h3>
-            <button class="shelf-see-all" onclick="trashbinSuperApp.switchTab('games')">View All &rarr;</button>
+            <button class="shelf-see-all" onclick="trashbinSuperApp.switchTab('games')">View All Games &rarr;</button>
           </div>
-          <div class="shelf-row-scroll" id="shelf-games-row"></div>
+          <div class="media-row-scroll" id="shelf-games-row"></div>
         </div>
 
         <!-- Shelf 2: Trending Movies & Series -->
         <div class="home-shelf">
           <div class="shelf-header">
-            <h3 class="shelf-title">Trending Cinema &amp; Series</h3>
+            <h3 class="shelf-title">Trending Movies &amp; Series</h3>
             <button class="shelf-see-all" onclick="trashbinSuperApp.switchTab('movies')">Explore Movies &rarr;</button>
           </div>
-          <div class="shelf-row-scroll" id="shelf-movies-row"></div>
+          <div class="media-row-scroll" id="shelf-movies-row"></div>
         </div>
 
         <!-- Shelf 3: Yolk Music Hits -->
@@ -3353,43 +3236,34 @@
             <h3 class="shelf-title">Yolk Music Hits</h3>
             <button class="shelf-see-all" onclick="trashbinSuperApp.switchTab('music')">Open Music &rarr;</button>
           </div>
-          <div class="shelf-row-scroll" id="shelf-music-grid"></div>
-        </div>
-
-        <!-- Shelf 4: Web Quick Links -->
-        <div class="home-shelf">
-          <div class="shelf-header">
-            <h3 class="shelf-title">Unblocked Web Tools</h3>
-            <button class="shelf-see-all" onclick="trashbinSuperApp.switchTab('web')">Open Browser &rarr;</button>
-          </div>
-          <div class="shelf-row-scroll" id="shelf-proxy-row"></div>
+          <div class="media-row-scroll" id="shelf-music-grid"></div>
         </div>
       </div>
     </section>
 
     <!-- VIEW 2: GAMES LIBRARY -->
     <section id="view-games" class="app-view">
-      <div class="view-container-inner">
-        <h2 class="view-title-header">Games Catalog</h2>
+      <div class="view-container-inner" style="max-width:1300px;margin:0 auto;padding:72px 24px 60px;">
+        <h2 style="font-size:28px;font-weight:800;color:#fff;margin-bottom:20px;">Games Library</h2>
         <div id="game-category-bar" style="display: flex; gap: 8px; margin-bottom: 24px; overflow-x: auto; padding-bottom: 4px;"></div>
-        <div id="fullGameList" class="game-grid"></div>
+        <div id="fullGameList" class="media-grid"></div>
       </div>
     </section>
 
-    <!-- VIEW 3: MOVIES & SERIES (Moss Cinejoy) -->
+    <!-- VIEW 3: MOVIES & SERIES -->
     <section id="view-movies" class="app-view">
-      <div class="view-container-inner">
-        <h2 class="view-title-header">Cinema &amp; Series</h2>
+      <div class="view-container-inner" style="max-width:1300px;margin:0 auto;padding:72px 24px 60px;">
+        <h2 style="font-size:28px;font-weight:800;color:#fff;margin-bottom:20px;">Cinema &amp; Series</h2>
         <div id="movie-genre-bar" style="display: flex; gap: 8px; margin-bottom: 24px; overflow-x: auto; padding-bottom: 4px;"></div>
-        <div id="movie-media-grid" class="movie-media-grid"></div>
+        <div id="movie-media-grid" class="media-grid"></div>
       </div>
     </section>
 
     <!-- VIEW 4: YOLK MUSIC PLAYER -->
     <section id="view-music" class="app-view">
-      <div class="view-container-inner">
-        <h2 class="view-title-header">Yolk Music Hub</h2>
-        <!-- Hero Music Player Card -->
+      <div class="view-container-inner" style="max-width:1300px;margin:0 auto;padding:72px 24px 60px;">
+        <h2 style="font-size:28px;font-weight:800;color:#fff;margin-bottom:20px;">Yolk Music Hub</h2>
+        <!-- Featured Music Card -->
         <div style="background: rgba(24, 24, 27, 0.7); border: 1px solid var(--border); border-radius: 18px; padding: 24px; display: flex; gap: 24px; align-items: center; margin-bottom: 32px; flex-wrap: wrap;">
           <img id="musicHeroArt" src="yolk/icon-256.png" style="width: 140px; height: 140px; border-radius: 14px; object-fit: cover;" alt="Artwork" />
           <div style="flex: 1; min-width: 240px;">
@@ -3408,15 +3282,15 @@
             </div>
           </div>
         </div>
-        <h3 style="font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 16px;">Top Charting Tracks</h3>
-        <div id="musicTrendingGrid" class="music-trending-grid"></div>
+        <h3 style="font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 16px;">Top Hits</h3>
+        <div id="musicTrendingGrid" class="media-grid"></div>
       </div>
     </section>
 
     <!-- VIEW 5: TRASHBIN AI -->
     <section id="view-ai" class="app-view">
-      <div class="view-container-inner" style="max-width: 900px;">
-        <h2 class="view-title-header">Trashbin AI Assistant</h2>
+      <div class="view-container-inner" style="max-width: 900px;margin:0 auto;padding:72px 24px 60px;">
+        <h2 style="font-size:28px;font-weight:800;color:#fff;margin-bottom:20px;">Trashbin AI Assistant</h2>
         <div class="ai-chat-box" id="aiChatBox"></div>
         <div style="margin-top: 16px; display: flex; gap: 10px;">
           <textarea 
@@ -3435,8 +3309,8 @@
 
     <!-- VIEW 6: UNBLOCKED WEB PROXY -->
     <section id="view-web" class="app-view">
-      <div class="view-container-inner">
-        <h2 class="view-title-header">Unblocked Web Proxy</h2>
+      <div class="view-container-inner" style="max-width:1300px;margin:0 auto;padding:72px 24px 60px;">
+        <h2 style="font-size:28px;font-weight:800;color:#fff;margin-bottom:20px;">Unblocked Web Proxy</h2>
         <div style="display: flex; gap: 10px; margin-bottom: 16px; align-items: center;">
           <input 
             type="text" 
@@ -3455,7 +3329,7 @@
 
   </div>
 
-  <!-- FLOATING BOTTOM PILL BAR (Moss style floating capsule) -->
+  <!-- FLOATING BOTTOM PILL BAR (Moss Floating Capsule) -->
   <div class="floating-bottom-bar-wrap" id="bottomFloatingWrap">
     <nav class="floating-bottom-bar" id="floatingBottomBar" aria-label="Trashbin Navigation">
       <!-- Brand Logo Button -->
@@ -3493,7 +3367,7 @@
         </button>
       </div>
 
-      <!-- Mini Music Capsule inside floating pill -->
+      <!-- Mini Music Capsule -->
       <div class="pill-divider" id="pillMusicDivider" style="display:none;"></div>
       <div id="pillMiniMusic" class="pill-music-capsule" style="display:none;" onclick="trashbinSuperApp.switchTab('music')" title="Now Playing">
         <img id="pillMiniArt" src="yolk/icon-256.png" class="pill-music-disc" alt="Art" />
@@ -3505,14 +3379,14 @@
         </button>
       </div>
 
-      <!-- Docked Omnibar Input (visible during gameplay/movie playback) -->
+      <!-- Docked Omnibar Input -->
       <div class="pill-divider" id="pillDockedDivider" style="display:none;"></div>
       <div id="pillDockedSearch" class="pill-docked-input-wrap">
         <span class="material-symbols-sharp" style="font-size:16px;color:var(--accent);">search</span>
         <input 
           type="text" 
           id="dockedOmniInput" 
-          placeholder="Search games, music, movies..." 
+          placeholder="Search games, movies, music..." 
           oninput="trashbinSuperApp.syncDockedSearch(this.value)" 
           onkeydown="trashbinSuperApp.handleDockedKey(event)" 
         />
@@ -3532,20 +3406,11 @@
         <div id="movieModalMeta" style="display:flex;gap:12px;font-size:13px;color:#a1a1aa;align-items:center;"></div>
         <p id="movieModalOverview" style="font-size:14px;color:#d4d4d8;line-height:1.6;margin:0;"></p>
         
-        <!-- Multi-Server Watch Bar -->
         <div style="margin-top:12px;">
           <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px;">STREAMING SERVERS</div>
           <div id="movieServerBar" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
         </div>
 
-        <!-- TV Seasons & Episodes (if series) -->
-        <div id="movieSeasonsSection" style="display:none;margin-top:12px;">
-          <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px;">SEASONS</div>
-          <div id="movieSeasonsBar" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;"></div>
-          <div id="movieEpisodesGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;"></div>
-        </div>
-
-        <!-- Video Player Frame -->
         <div id="moviePlayerWrapper" style="display:none;margin-top:16px;">
           <iframe id="moviePlayerIframe" class="movie-player-iframe" allow="autoplay; fullscreen; encrypted-media; picture-in-picture;" allowfullscreen></iframe>
         </div>
@@ -5768,7 +5633,7 @@ function updateCounts() {
   if (lDl) lDl.textContent = dlCount;
 }
 
-const CURRENT_APP_VERSION = '3.9.39';
+const CURRENT_APP_VERSION = '3.9.40';
 let latestDetectedAppVersion = CURRENT_APP_VERSION;
 
 const FILTER_MODES = [
@@ -9248,10 +9113,61 @@ window.closeSettingsModal = function(e) {
 
 
 /* =========================================================================
-   TRASHBIN SUPER APP CONTROLLERS (REVAMPED)
-   Full-Bleed Multi-Content Hero (Games, Music & Movies),
-   Floating Bottom Capsule Bar, and Synced Background Play
+   TRASHBIN SUPER APP CONTROLLERS (SHARED UI BASE)
+   Unified .media-card generator for Games, Movies, and Music.
+   Search Order: Games FIRST, then Movies, then Music, then AI.
+   Shift + Enter asks AI immediately.
    ========================================================================= */
+
+// SHARED MEDIA CARD BUILDER
+window.renderSharedMediaCard = function(item, type) {
+  const card = document.createElement('div');
+  card.className = `media-card ${type}-card`;
+
+  let posterUrl = '';
+  let title = item.title || item.name || 'Untitled';
+  let badgeText = '';
+  let subText = '';
+  let ratingText = '';
+
+  if (type === 'game') {
+    posterUrl = item.img || 'trashbin.png';
+    badgeText = 'GAME';
+    subText = item.category || 'Arcade';
+    card.onclick = () => window.playGame(encodeURIComponent(item.file), encodeURIComponent(item.title));
+  } else if (type === 'movie') {
+    posterUrl = item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : 'trashbin.png';
+    badgeText = (item.media_type || (item.first_air_date ? 'tv' : 'movie')).toUpperCase();
+    const year = (item.release_date || item.first_air_date || '').split('-')[0] || '';
+    ratingText = item.vote_average ? item.vote_average.toFixed(1) : '';
+    subText = year ? `${year} • Cinema` : 'Feature Film';
+    card.onclick = () => window.trashbinMovies.openMovie(item, false);
+  } else if (type === 'music') {
+    posterUrl = item.artwork_url || item.cover || 'yolk/icon-256.png';
+    badgeText = 'MUSIC';
+    subText = item.artist_name || 'Unknown Artist';
+    card.onclick = () => window.trashbinMusic.play(item);
+  }
+
+  card.innerHTML = `
+    <div class="media-poster-wrap">
+      <img class="media-poster" src="${posterUrl}" alt="${title.replace(/"/g, '&quot;')}" loading="lazy" />
+      <div class="media-badge-type">${badgeText}</div>
+      ${ratingText ? `<div class="media-badge-rating"><span class="material-symbols-sharp" style="font-size:12px;">star</span>${ratingText}</div>` : ''}
+      <div class="media-card-play-btn">
+        <div class="play-circle">
+          <span class="material-symbols-sharp">play_arrow</span>
+        </div>
+      </div>
+    </div>
+    <div class="media-info">
+      <div class="media-card-title">${title}</div>
+      <div class="media-card-sub">${subText}</div>
+    </div>
+  `;
+
+  return card;
+};
 
 // 1. THEME TINT MANAGER
 window.trashbinTheme = {
@@ -9274,7 +9190,7 @@ window.trashbinTheme = {
   }
 };
 
-// 2. MULTI-CONTENT HERO CAROUSEL (Games, Music & Movies Combined)
+// 2. MULTI-CONTENT HERO CAROUSEL
 window.trashbinHero = {
   items: [
     {
@@ -9345,7 +9261,6 @@ window.trashbinHero = {
   isPaused: false,
 
   async init() {
-    // Fetch live TMDB trending movies and interleave with Games and Music
     try {
       const res = await fetch('https://api.themoviedb.org/3/trending/all/day?api_key=1cf50e6248dc270629e802686245c2c8');
       const data = await res.json();
@@ -9366,13 +9281,10 @@ window.trashbinHero = {
             actionText: 'Watch Movie',
             data: m
           };
-          // Interleave movie into items
           this.items.splice(i * 2, 0, movieItem);
         });
       }
-    } catch (e) {
-      console.warn('Hero TMDB load error:', e);
-    }
+    } catch (e) {}
 
     this.renderSlides();
     this.goToSlide(0);
@@ -9483,9 +9395,6 @@ window.trashbinMusic = {
       audio.addEventListener('play', () => this.setPlayState(true));
       audio.addEventListener('pause', () => this.setPlayState(false));
       audio.addEventListener('ended', () => this.next());
-      audio.addEventListener('error', (e) => {
-        console.warn('Audio playback error, trying next track:', e);
-      });
     }
     this.loadHits();
   },
@@ -9499,41 +9408,22 @@ window.trashbinMusic = {
       const tracks = (data && data.tracks) ? data.tracks.slice(0, 10) : [];
       if (tracks.length) {
         this.queue = tracks;
-        if (shelf) this.renderMusicGrid(shelf, tracks.slice(0, 6));
-        if (viewGrid) this.renderMusicGrid(viewGrid, tracks);
+        if (shelf) {
+          shelf.innerHTML = '';
+          tracks.slice(0, 8).forEach(t => shelf.appendChild(window.renderSharedMediaCard(t, 'music')));
+        }
+        if (viewGrid) {
+          viewGrid.innerHTML = '';
+          tracks.forEach(t => viewGrid.appendChild(window.renderSharedMediaCard(t, 'music')));
+        }
       }
-    } catch (e) {
-      console.warn('Failed to load Yolk hits:', e);
-    }
-  },
-
-  renderMusicGrid(container, tracks) {
-    if (!container) return;
-    container.innerHTML = '';
-    tracks.forEach(t => {
-      const card = document.createElement('div');
-      card.className = 'music-track-card';
-      const art = t.artwork_url || t.cover || 'yolk/icon-256.png';
-      card.innerHTML = `
-        <div class="music-card-art-wrap">
-          <img src="${art}" alt="${(t.title || '').replace(/"/g, '&quot;')}" loading="lazy" />
-          <button class="music-card-play-overlay" title="Play">
-            <span class="material-symbols-sharp">play_arrow</span>
-          </button>
-        </div>
-        <div class="music-card-title">${t.title || 'Untitled'}</div>
-        <div class="music-card-artist">${t.artist_name || 'Unknown Artist'}</div>
-      `;
-      card.onclick = () => this.play(t);
-      container.appendChild(card);
-    });
+    } catch (e) {}
   },
 
   async play(track) {
     if (!track) return;
     this.currentTrack = track;
 
-    // Show mini music capsule in floating bottom bar
     const capsule = document.getElementById('pillMiniMusic');
     const divider = document.getElementById('pillMusicDivider');
     const art = document.getElementById('pillMiniArt');
@@ -9544,7 +9434,6 @@ window.trashbinMusic = {
     if (art) art.src = track.artwork_url || track.cover || 'yolk/icon-256.png';
     if (title) title.textContent = track.title || 'Untitled';
 
-    // Update music view hero if open
     const hArt = document.getElementById('musicHeroArt');
     const hTitle = document.getElementById('musicHeroTitle');
     const hArtist = document.getElementById('musicHeroArtist');
@@ -9572,9 +9461,7 @@ window.trashbinMusic = {
         audio.src = streamUrl;
         await audio.play();
         this.setPlayState(true);
-      } catch (err) {
-        console.warn('Native stream error:', err);
-      }
+      } catch (err) {}
     }
   },
 
@@ -9635,42 +9522,15 @@ window.trashbinMovies = {
       const res = await fetch('https://api.themoviedb.org/3/trending/all/week?api_key=1cf50e6248dc270629e802686245c2c8');
       const data = await res.json();
       const items = (data && data.results) ? data.results : [];
-      if (shelf) this.renderCards(shelf, items.slice(0, 10));
-      if (grid) this.renderCards(grid, items);
-    } catch (e) {
-      console.warn('Failed to load movies:', e);
-    }
-  },
-
-  renderCards(container, items) {
-    if (!container) return;
-    container.innerHTML = '';
-    items.forEach(item => {
-      if (!item.poster_path) return;
-      const card = document.createElement('div');
-      card.className = 'movie-media-card';
-      const title = item.title || item.name || 'Untitled';
-      const year = (item.release_date || item.first_air_date || '').split('-')[0] || '';
-      const rating = item.vote_average ? item.vote_average.toFixed(1) : '';
-      const posterUrl = `https://image.tmdb.org/t/p/w500${item.poster_path}`;
-
-      card.innerHTML = `
-        <div class="movie-card-poster-wrap">
-          <img src="${posterUrl}" alt="${title.replace(/"/g, '&quot;')}" loading="lazy" />
-          <div class="movie-card-badge">${(item.media_type || (item.first_air_date ? 'tv' : 'movie')).toUpperCase()}</div>
-          <button class="movie-card-hover-play" title="Watch Now">
-            <span class="material-symbols-sharp">play_arrow</span>
-          </button>
-        </div>
-        <div class="movie-card-title">${title}</div>
-        <div class="movie-card-meta">
-          <span>${year}</span>
-          ${rating ? `<span style="color:var(--accent);display:inline-flex;align-items:center;gap:3px;"><span class="material-symbols-sharp" style="font-size:12px;">star</span>${rating}</span>` : ''}
-        </div>
-      `;
-      card.onclick = () => this.openMovie(item, false);
-      container.appendChild(card);
-    });
+      if (shelf) {
+        shelf.innerHTML = '';
+        items.slice(0, 10).forEach(m => shelf.appendChild(window.renderSharedMediaCard(m, 'movie')));
+      }
+      if (grid) {
+        grid.innerHTML = '';
+        items.forEach(m => grid.appendChild(window.renderSharedMediaCard(m, 'movie')));
+      }
+    } catch (e) {}
   },
 
   openMovie(item, autoPlay = false) {
@@ -9700,7 +9560,7 @@ window.trashbinMovies = {
         ${rating ? `<span style="color:var(--accent);font-weight:700;">★ ${rating}/10</span>` : ''}
       `;
     }
-    if (overviewEl) overviewEl.textContent = item.overview || 'No description available.';
+    if (overviewEl) overviewEl.textContent = item.overview || 'No synopsis available.';
 
     this.renderServerBar();
     if (modal) modal.style.display = 'flex';
@@ -9760,12 +9620,11 @@ window.trashbinMovies = {
         break;
     }
 
-    const playerWrapper = document.getElementById('moviePlayerWrapper');
+    const wrap = document.getElementById('moviePlayerWrapper');
     const iframe = document.getElementById('moviePlayerIframe');
     if (iframe) iframe.src = streamUrl;
-    if (playerWrapper) playerWrapper.style.display = 'block';
+    if (wrap) wrap.style.display = 'block';
 
-    // Show docked omnibar in floating bottom bar
     window.trashbinSuperApp.showDockedSearch(true);
   },
 
@@ -9783,7 +9642,7 @@ window.trashbinMovies = {
   }
 };
 
-// 5. TRASHBIN AI (Fixed: handleKey + Free Instant Pollinations AI Fallback with Zero 404s)
+// 5. TRASHBIN AI
 window.trashbinAI = {
   history: [],
 
@@ -9854,7 +9713,6 @@ window.trashbinAI = {
 
     this.appendBubble('user', promptText);
 
-    // Indicator
     const indicator = document.createElement('div');
     indicator.className = 'ai-chat-bubble assistant';
     indicator.innerHTML = `
@@ -9867,7 +9725,6 @@ window.trashbinAI = {
     let reply = '';
     const customKey = localStorage.getItem('pinpoint_groq_key');
 
-    // Strategy 1: User's custom Groq key if provided
     if (customKey && customKey.trim()) {
       try {
         const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -9879,7 +9736,7 @@ window.trashbinAI = {
           body: JSON.stringify({
             model: 'llama-3.1-8b-instant',
             messages: [
-              { role: 'system', content: 'You are Trashbin AI, an intelligent, concise, sharp assistant. Format code cleanly.' },
+              { role: 'system', content: 'You are Trashbin AI, an intelligent, concise assistant. Format code cleanly.' },
               ...this.history.slice(-8)
             ],
             temperature: 0.6,
@@ -9893,7 +9750,6 @@ window.trashbinAI = {
       } catch (e) {}
     }
 
-    // Strategy 2: Free Instant Pollinations AI (Zero Key, Unblocked, High Quality)
     if (!reply) {
       try {
         const res = await fetch(`https://text.pollinations.ai/${encodeURIComponent(promptText)}?model=openai`);
@@ -9903,7 +9759,6 @@ window.trashbinAI = {
       } catch (e) {}
     }
 
-    // Strategy 3: Local helper
     if (!reply) {
       reply = "I'm currently unable to connect to the AI service. Please verify your internet connection or add a custom Groq key in Settings.";
     }
@@ -10034,43 +9889,12 @@ window.trashbinSuperApp = {
   },
 
   renderHomeShelves() {
+    // Shelf 1: Popular Games
     const gameRow = document.getElementById('shelf-games-row');
     if (gameRow && Array.isArray(window.games)) {
       gameRow.innerHTML = '';
       window.games.slice(0, 10).forEach(g => {
-        const card = document.createElement('div');
-        card.className = 'shelf-item-card';
-        card.innerHTML = `
-          <div class="shelf-item-thumb">
-            <img src="${g.img || 'trashbin.png'}" alt="${(g.title || '').replace(/"/g, '&quot;')}" loading="lazy" />
-          </div>
-          <div class="shelf-item-title">${g.title || 'Game'}</div>
-        `;
-        card.onclick = () => window.playGame(encodeURIComponent(g.file), encodeURIComponent(g.title));
-        gameRow.appendChild(card);
-      });
-    }
-
-    const proxyRow = document.getElementById('shelf-proxy-row');
-    if (proxyRow) {
-      const proxyLinks = [
-        { title: 'Google Classroom Cloak', icon: 'school', url: 'https://classroom.google.com' },
-        { title: 'Brave Search Unblocked', icon: 'search', url: 'https://search.brave.com' },
-        { title: 'Wikipedia Explorer', icon: 'menu_book', url: 'https://en.wikipedia.org' }
-      ];
-      proxyRow.innerHTML = '';
-      proxyLinks.forEach(p => {
-        const card = document.createElement('div');
-        card.className = 'shelf-item-card proxy-shelf-card';
-        card.innerHTML = `
-          <div class="shelf-proxy-icon"><span class="material-symbols-sharp">${p.icon}</span></div>
-          <div class="shelf-item-title">${p.title}</div>
-        `;
-        card.onclick = () => {
-          this.switchTab('web');
-          window.trashbinWeb.navigate(p.url);
-        };
-        proxyRow.appendChild(card);
+        gameRow.appendChild(window.renderSharedMediaCard(g, 'game'));
       });
     }
   },
@@ -10102,18 +9926,7 @@ window.trashbinSuperApp = {
       : window.games;
 
     filtered.forEach(g => {
-      const card = document.createElement('div');
-      card.className = 'game-card';
-      card.innerHTML = `
-        <div class="game-thumb-wrap">
-          <img src="${g.img || 'trashbin.png'}" alt="${(g.title || '').replace(/"/g, '&quot;')}" loading="lazy" />
-        </div>
-        <div class="game-info">
-          <div class="game-title">${g.title || 'Untitled Game'}</div>
-        </div>
-      `;
-      card.onclick = () => window.playGame(encodeURIComponent(g.file), encodeURIComponent(g.title));
-      grid.appendChild(card);
+      grid.appendChild(window.renderSharedMediaCard(g, 'game'));
     });
   },
 
@@ -10173,6 +9986,7 @@ window.trashbinSuperApp = {
     }
   },
 
+  // SEARCH RESULTS: GAMES FIRST, THEN MOVIES, THEN MUSIC, THEN AI
   handleSearch(rawQuery) {
     const query = (rawQuery || '').trim();
     const shelves = document.getElementById('home-shelves');
@@ -10191,84 +10005,84 @@ window.trashbinSuperApp = {
 
     if (shelves) shelves.style.display = 'none';
     if (results) {
-      results.style.display = 'block';
+      results.style.display = 'flex';
       results.innerHTML = `
-        <div class="search-ai-card" onclick="trashbinSuperApp.switchTab('ai'); trashbinAI.ask('${encodeURIComponent(query)}');">
-          <div class="search-ai-left">
-            <div class="search-ai-icon"><span class="material-symbols-sharp" style="font-size:22px;">psychology</span></div>
-            <div class="search-ai-info">
-              <div class="search-ai-title">Ask Trashbin AI: <span class="search-ai-query">"${query.replace(/</g, '&lt;')}"</span></div>
-              <div class="search-ai-sub">Click to get instant smart answer &bull; Or press <kbd>Shift + Enter</kbd></div>
+        <!-- 1. GAMES FIRST -->
+        <div id="unified-games-section"></div>
+
+        <!-- 2. MOVIES SECOND -->
+        <div id="unified-movies-section"></div>
+
+        <!-- 3. MUSIC THIRD -->
+        <div id="unified-music-section"></div>
+
+        <!-- 4. ASK AI FOURTH -->
+        <div id="unified-ai-section">
+          <div class="search-ai-card" onclick="trashbinSuperApp.switchTab('ai'); trashbinAI.ask('${encodeURIComponent(query)}');">
+            <div class="search-ai-left">
+              <div class="search-ai-icon"><span class="material-symbols-sharp" style="font-size:22px;">psychology</span></div>
+              <div class="search-ai-info">
+                <div class="search-ai-title">Ask Trashbin AI: <span class="search-ai-query">"${query.replace(/</g, '&lt;')}"</span></div>
+                <div class="search-ai-sub">Click to generate instant answer &bull; Or press <kbd>Shift + Enter</kbd></div>
+              </div>
             </div>
+            <button class="search-ai-btn" type="button"><span>Chat</span><span class="material-symbols-sharp" style="font-size:16px;">arrow_forward</span></button>
           </div>
-          <button class="search-ai-btn" type="button"><span>Chat</span><span class="material-symbols-sharp" style="font-size:16px;">arrow_forward</span></button>
         </div>
-        <div id="unified-games-section" style="margin-top:20px;"></div>
-        <div id="unified-movies-section" style="margin-top:20px;"></div>
-        <div id="unified-music-section" style="margin-top:20px;"></div>
       `;
     }
 
-    // Instant local games search
+    // 1. Instant Games Search (Rendered FIRST)
     const gamesSection = document.getElementById('unified-games-section');
     if (gamesSection && Array.isArray(window.games)) {
       const qLower = query.toLowerCase();
-      const matched = window.games.filter(g => g.title && g.title.toLowerCase().includes(qLower)).slice(0, 8);
+      const matched = window.games.filter(g => g.title && g.title.toLowerCase().includes(qLower)).slice(0, 10);
       if (matched.length) {
         gamesSection.innerHTML = `
-          <div class="shelf-header" style="margin-bottom:12px;"><h3 class="shelf-title">Matching Games (${matched.length})</h3></div>
-          <div class="game-grid" id="matchedGamesGrid"></div>
+          <div class="shelf-header"><h3 class="shelf-title">Games (${matched.length})</h3></div>
+          <div class="media-grid" id="matchedGamesGrid"></div>
         `;
         const gGrid = document.getElementById('matchedGamesGrid');
         matched.forEach(g => {
-          const card = document.createElement('div');
-          card.className = 'game-card';
-          card.innerHTML = `
-            <div class="game-thumb-wrap">
-              <img src="${g.img || 'trashbin.png'}" alt="${(g.title || '').replace(/"/g, '&quot;')}" loading="lazy" />
-            </div>
-            <div class="game-info">
-              <div class="game-title">${g.title}</div>
-            </div>
-          `;
-          card.onclick = () => window.playGame(encodeURIComponent(g.file), encodeURIComponent(g.title));
-          gGrid.appendChild(card);
+          gGrid.appendChild(window.renderSharedMediaCard(g, 'game'));
         });
       }
     }
 
-    // Debounced TMDB & Yolk Search
+    // 2 & 3: Debounced TMDB Movies & Yolk Music Search (Rendered AFTER Games)
     this.searchDebounce = setTimeout(async () => {
+      // 2. Movies
       const moviesSection = document.getElementById('unified-movies-section');
       if (moviesSection) {
         try {
           const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=1cf50e6248dc270629e802686245c2c8&query=${encodeURIComponent(query)}`);
           const data = await res.json();
-          const movies = (data && data.results) ? data.results.filter(m => m.poster_path).slice(0, 6) : [];
+          const movies = (data && data.results) ? data.results.filter(m => m.poster_path).slice(0, 8) : [];
           if (movies.length) {
             moviesSection.innerHTML = `
-              <div class="shelf-header" style="margin-bottom:12px;"><h3 class="shelf-title">Movies &amp; Series (${movies.length})</h3></div>
-              <div class="movie-media-grid" id="matchedMoviesGrid"></div>
+              <div class="shelf-header"><h3 class="shelf-title">Movies &amp; Series (${movies.length})</h3></div>
+              <div class="media-grid" id="matchedMoviesGrid"></div>
             `;
             const mGrid = document.getElementById('matchedMoviesGrid');
-            if (window.trashbinMovies && mGrid) window.trashbinMovies.renderCards(mGrid, movies);
+            movies.forEach(m => mGrid.appendChild(window.renderSharedMediaCard(m, 'movie')));
           }
         } catch (e) {}
       }
 
+      // 3. Music
       const musicSection = document.getElementById('unified-music-section');
       if (musicSection) {
         try {
           const res = await fetch(`https://yolkaudio.broshan.com.np/api/music-api?endpoint=search&q=${encodeURIComponent(query)}`);
           const data = await res.json();
-          const tracks = (data && data.tracks) ? data.tracks.slice(0, 6) : [];
+          const tracks = (data && data.tracks) ? data.tracks.slice(0, 8) : [];
           if (tracks.length) {
             musicSection.innerHTML = `
-              <div class="shelf-header" style="margin-bottom:12px;"><h3 class="shelf-title">Music Tracks (${tracks.length})</h3></div>
-              <div class="music-trending-grid" id="matchedMusicGrid"></div>
+              <div class="shelf-header"><h3 class="shelf-title">Music Tracks (${tracks.length})</h3></div>
+              <div class="media-grid" id="matchedMusicGrid"></div>
             `;
             const muGrid = document.getElementById('matchedMusicGrid');
-            if (window.trashbinMusic && muGrid) window.trashbinMusic.renderMusicGrid(muGrid, tracks);
+            tracks.forEach(t => muGrid.appendChild(window.renderSharedMediaCard(t, 'music')));
           }
         } catch (e) {}
       }
@@ -10443,10 +10257,10 @@ if (document.readyState === 'loading') {
         <div class="settings-row">
           <div class="settings-col-left">
             <div class="settings-row-title">Pinpoint Mini Version</div>
-            <div class="settings-row-desc" id="settingsVersionDesc">Running Pinpoint Mini v3.9.39</div>
+            <div class="settings-row-desc" id="settingsVersionDesc">Running Pinpoint Mini v3.9.40</div>
           </div>
           <div class="settings-col-right" style="display: flex; align-items: center; gap: 8px;">
-            <span id="settingsVersionBadge" style="font-size: 12px; padding: 4px 10px; border-radius: 8px; background: rgba(0, 255, 136, 0.15); color: #00ff88; font-weight: 600;">v3.9.39 (Up to Date)</span>
+            <span id="settingsVersionBadge" style="font-size: 12px; padding: 4px 10px; border-radius: 8px; background: rgba(0, 255, 136, 0.15); color: #00ff88; font-weight: 600;">v3.9.40 (Up to Date)</span>
             <button class="settings-btn-action" id="settingsCheckUpdateBtn" onclick="checkAppVersionUpdate(true)">Check for Updates</button>
             <button class="settings-btn-action primary" id="settingsApplyUpdateBtn" style="display: none;" onclick="applyAppUpdate()">Update Now</button>
           </div>
@@ -10842,7 +10656,7 @@ if (document.readyState === 'loading') {
       </div>
       <div class="update-toast-text">
         <div class="update-toast-title">Update Available</div>
-        <div class="update-toast-desc" id="updateToastDesc">Pinpoint Mini v3.9.39 is ready.</div>
+        <div class="update-toast-desc" id="updateToastDesc">Pinpoint Mini v3.9.40 is ready.</div>
       </div>
     </div>
     <div class="update-toast-actions">
