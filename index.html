@@ -100,8 +100,8 @@
       cursor: pointer;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.35s var(--parabola-ease), transform 0.35s var(--parabola-ease);
-      transform: translateY(-4px);
+      transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: translateY(-16px);
       z-index: 50;
       text-decoration: none;
     }
@@ -261,7 +261,9 @@
     #large-logo-wrapper {
       opacity: 1;
       height: 120px;
-      transition: opacity 0.35s ease-out, height 0.35s ease-out, margin 0.35s ease-out;
+      max-height: 140px;
+      transform: translateY(0);
+      transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), height 0.35s cubic-bezier(0.16, 1, 0.3, 1), max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), margin 0.35s cubic-bezier(0.16, 1, 0.3, 1);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -272,7 +274,9 @@
 
     body.is-searching #large-logo-wrapper {
       opacity: 0;
+      transform: translateY(-20px);
       height: 0;
+      max-height: 0;
       margin-bottom: 0 !important;
       overflow: hidden;
       pointer-events: none;
@@ -501,17 +505,20 @@
       min-height: 0;
       opacity: 0;
       pointer-events: none;
-      display: none;
+      visibility: hidden;
+      transform: translateY(20px);
+      display: flex;
       flex-direction: column;
       box-sizing: border-box;
       z-index: 30;
-      transition: opacity 0.25s ease-out;
+      transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.35s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     body.is-searching #results-container {
-      display: flex;
       opacity: 1;
       pointer-events: auto;
+      visibility: visible;
+      transform: translateY(0);
     }
 
     .results-header {
@@ -2964,6 +2971,410 @@
       display: block;
     }
 
+    /* =========================================================================
+       EMBEDDED NATIVE MUSIC VIEW (Yolk Audio Engine)
+       ========================================================================= */
+    .music-view-body {
+      flex: 1;
+      display: flex;
+      gap: 24px;
+      overflow: hidden;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px 20px;
+      box-sizing: border-box;
+    }
+
+    .music-now-playing-pane {
+      flex: 1.1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      padding: 32px 28px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+      text-align: center;
+    }
+
+    .music-art-large {
+      width: 250px;
+      height: 250px;
+      border-radius: 20px;
+      object-fit: cover;
+      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      margin-bottom: 22px;
+      background: #18181b;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .music-art-large.playing {
+      transform: scale(1.02);
+      box-shadow: 0 20px 48px rgba(234, 179, 8, 0.25);
+    }
+
+    .music-track-title {
+      font-family: 'Libre Baskerville', Georgia, serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 6px;
+      max-width: 440px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .music-track-artist {
+      font-size: 14px;
+      color: var(--text-dim);
+      margin-bottom: 24px;
+      max-width: 400px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .music-progress-wrap {
+      width: 100%;
+      max-width: 440px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .music-time-label {
+      font-size: 11px;
+      font-family: monospace;
+      color: var(--text-dim);
+      width: 40px;
+    }
+
+    .music-seek-bar {
+      flex: 1;
+      height: 6px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 9999px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .music-seek-bar::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #eab308;
+      box-shadow: 0 0 10px rgba(234, 179, 8, 0.6);
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+
+    .music-seek-bar::-webkit-slider-thumb:hover {
+      transform: scale(1.25);
+    }
+
+    .music-controls-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .music-btn-ctrl {
+      background: transparent;
+      border: none;
+      color: #e4e4e7;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      padding: 8px;
+      border-radius: 50%;
+    }
+
+    .music-btn-ctrl:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+      transform: scale(1.1);
+    }
+
+    .music-btn-play {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: #eab308;
+      border: none;
+      color: #0b0e14;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(234, 179, 8, 0.4);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .music-btn-play:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 28px rgba(234, 179, 8, 0.6);
+    }
+
+    .music-queue-pane {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      padding: 20px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+      overflow: hidden;
+    }
+
+    .music-queue-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .music-queue-search {
+      width: 100%;
+      height: 38px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 0 14px;
+      color: #ffffff;
+      font-size: 13px;
+      outline: none;
+      margin-bottom: 12px;
+      box-sizing: border-box;
+      transition: border-color 0.2s ease;
+    }
+
+    .music-queue-search:focus {
+      border-color: #eab308;
+    }
+
+    .music-queue-list {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding-right: 4px;
+    }
+
+    /* Floating Mini Player */
+    .music-mini-player {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      height: 52px;
+      background: rgba(18, 19, 24, 0.94);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 16px;
+      padding: 0 14px 0 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7);
+      z-index: 4500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      animation: miniPlayerSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .music-mini-player:hover {
+      transform: translateY(-2px);
+      border-color: #eab308;
+    }
+
+    @keyframes miniPlayerSlideIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .music-mini-art {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      object-fit: cover;
+      background: #18181b;
+    }
+
+    .music-mini-info {
+      max-width: 180px;
+      min-width: 80px;
+    }
+
+    .music-mini-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .music-mini-artist {
+      font-size: 10.5px;
+      color: var(--text-dim);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .music-mini-btn {
+      background: transparent;
+      border: none;
+      color: #e4e4e7;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+      border-radius: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .music-mini-btn:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* =========================================================================
+       EMBEDDED NATIVE MOVIE VIEW (Moss Cinema)
+       ========================================================================= */
+    .movie-view-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-y: auto;
+      padding: 16px 20px 40px;
+      box-sizing: border-box;
+      gap: 16px;
+    }
+
+    .movie-player-container {
+      width: 100%;
+      max-width: 1080px;
+      aspect-ratio: 16 / 9;
+      background: #000000;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+      position: relative;
+    }
+
+    .movie-player-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    .movie-details-card {
+      width: 100%;
+      max-width: 1080px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      padding: 20px 24px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .movie-server-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .movie-server-btn {
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #e4e4e7;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .movie-server-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
+
+    .movie-server-btn.active {
+      background: #ef4444;
+      border-color: #ef4444;
+      color: #ffffff;
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+    }
+
+    .movie-tv-controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: -4px;
+    }
+
+    .movie-select {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      color: #ffffff;
+      padding: 4px 8px;
+      font-size: 12px;
+      outline: none;
+      cursor: pointer;
+    }
+    .movie-select option {
+      background: #18181b;
+      color: #ffffff;
+    }
+
+    @media (max-width: 900px) {
+      .music-view-body {
+        flex-direction: column;
+        overflow-y: auto;
+      }
+      .music-now-playing-pane, .music-queue-pane {
+        flex: none;
+        width: 100%;
+      }
+      .movie-server-bar {
+        display: none;
+      }
+    }
+
 </style>
 </head>
 <body>
@@ -3015,7 +3426,7 @@
       <input 
         type="text" 
         id="searchInput" 
-        placeholder="Search games, movies, music, AI... (Shift+↵ AI, Ctrl+↵ Proxy)" 
+        placeholder="Search games, movies, music, AI..." 
         autocomplete="off" 
         spellcheck="false"
       />
@@ -3136,7 +3547,7 @@
   </div>
 
   <script>
-// HTML Escaping Utility
+// HTML & JS Escaping Utilities
 function escapeHtml(str) {
   if (str == null) return '';
   return String(str)
@@ -3147,6 +3558,17 @@ function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 window.escapeHtml = escapeHtml;
+
+function escapeJs(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/"/g, '&quot;')
+    .replace(/\n/g, ' ')
+    .replace(/\r/g, '');
+}
+window.escapeJs = escapeJs;
 
 // IndexedDB + CacheStorage for Offline Games (Supports single-file & multi-part/asset games)
 const GAME_DB_NAME = 'TrashbinGamesDB';
@@ -5432,22 +5854,6 @@ function renderMultiSearchResults(query) {
 
   container.innerHTML = `
     <div class="multi-search-wrapper">
-      <!-- Shortcut Action Strip -->
-      <div class="search-action-strip">
-        <button class="search-action-chip" onclick="launchTopSearchResult()">
-          <kbd>↵ Enter</kbd>
-          <span>Launch Top Result</span>
-        </button>
-        <button class="search-action-chip" onclick="window.__actionAskAi && window.__actionAskAi()">
-          <kbd>Shift + ↵</kbd>
-          <span>Ask AI: "${escapeHtml(query)}"</span>
-        </button>
-        <button class="search-action-chip" onclick="window.__actionProxy && window.__actionProxy()">
-          <kbd>Ctrl + ↵</kbd>
-          <span>Proxy Lookup</span>
-        </button>
-      </div>
-
       <!-- 3-Pane Split Grid (auto-expands media when no games match) -->
       <div class="multi-search-grid ${hasGames ? 'has-games' : 'no-games'}">
         <!-- 1. LEFT PANE: Games (Long independent vertical scroll, hidden if 0 games) -->
@@ -5531,15 +5937,15 @@ function renderMultiSearchResults(query) {
           mScroll.innerHTML = tracks.map(t => {
             const vid = t.videoId || t.youtube_id || (t.id && t.id.replace('ytm-', '')) || '';
             const art = t.artwork_url || t.cover || 'yolk/icon-256.png';
-            const deepLink = `yolk/index.html#song=${encodeURIComponent(vid)}&t=${encodeURIComponent(t.title || '')}&a=${encodeURIComponent(t.artist_name || '')}`;
+            const trackObjJson = JSON.stringify({ videoId: vid, title: t.title || 'Untitled', artist: t.artist_name || 'Unknown', cover: art }).replace(/"/g, '&quot;');
             return `
-              <div class="search-music-item" onclick="playGame('${encodeURIComponent(deepLink)}', 'Yolk! - Minimalist Music')">
+              <div class="search-music-item" onclick="openEmbeddedMusic(${trackObjJson})">
                 <img class="search-music-art" src="${art}" alt="" loading="lazy" />
                 <div class="search-music-info">
                   <div class="search-music-title">${escapeHtml(t.title || 'Untitled')}</div>
                   <div class="search-music-artist">${escapeHtml(t.artist_name || 'Unknown')}</div>
                 </div>
-                <div class="search-music-badge">PLAY IN YOLK</div>
+                <div class="search-music-badge">PLAY SONG</div>
               </div>
             `;
           }).join('');
@@ -5548,7 +5954,7 @@ function renderMultiSearchResults(query) {
           if (matchedGames.length === 0 && tracks.length > 0) {
             const topT = tracks[0];
             const topVid = topT.videoId || topT.youtube_id || (topT.id && topT.id.replace('ytm-', '')) || '';
-            window.__topSearchResultAction = () => playGame(`yolk/index.html#song=${encodeURIComponent(topVid)}&t=${encodeURIComponent(topT.title || '')}&a=${encodeURIComponent(topT.artist_name || '')}`, 'Yolk! - Minimalist Music');
+            window.__topSearchResultAction = () => openEmbeddedMusic({ videoId: topVid, title: topT.title || '', artist: topT.artist_name || '', cover: topT.artwork_url || topT.cover || 'yolk/icon-256.png' });
           }
         }
       }
@@ -5573,9 +5979,9 @@ function renderMultiSearchResults(query) {
                 const title = m.title || m.name || 'Untitled';
                 const poster = `https://image.tmdb.org/t/p/w500${m.poster_path}`;
                 const mType = m.media_type || (m.first_air_date ? 'tv' : 'movie');
-                const deepLink = `movies/index.html?id=${encodeURIComponent(m.id)}&type=${encodeURIComponent(mType)}`;
+                const movieObjJson = JSON.stringify({ id: m.id, title, type: mType, poster, overview: m.overview || '', year: m.release_date || m.first_air_date || '', rating: m.vote_average ? m.vote_average.toFixed(1) : '' }).replace(/"/g, '&quot;');
                 return `
-                  <div class="search-movie-card" onclick="playGame('${encodeURIComponent(deepLink)}', '${encodeURIComponent('Moss - ' + title)}')">
+                  <div class="search-movie-card" onclick="openEmbeddedMovie(${movieObjJson})">
                     <img class="search-movie-poster" src="${poster}" alt="${escapeHtml(title)}" loading="lazy" />
                     <div class="search-movie-title">${escapeHtml(title)}</div>
                   </div>
@@ -5588,7 +5994,7 @@ function renderMultiSearchResults(query) {
           if (matchedGames.length === 0 && (!tracks || !tracks.length) && movies.length > 0) {
             const topM = movies[0];
             const mType = topM.media_type || (topM.first_air_date ? 'tv' : 'movie');
-            window.__topSearchResultAction = () => playGame(`movies/index.html?id=${encodeURIComponent(topM.id)}&type=${encodeURIComponent(mType)}`, 'Moss - ' + (topM.title || topM.name));
+            window.__topSearchResultAction = () => openEmbeddedMovie({ id: topM.id, title: topM.title || topM.name || '', type: mType, poster: `https://image.tmdb.org/t/p/w500${topM.poster_path}`, overview: topM.overview || '', year: topM.release_date || topM.first_air_date || '', rating: topM.vote_average ? topM.vote_average.toFixed(1) : '' });
           }
         }
       }
@@ -6335,6 +6741,26 @@ async function playGame(encodedFile, encodedTitle) {
     openEmbeddedProxy(uVal);
     return;
   }
+  if (file.startsWith('yolk/') || file.startsWith('yolk')) {
+    const sMatch = file.match(/[#?&]song=([^&]+)/);
+    const tMatch = file.match(/[#?&]t=([^&]+)/);
+    const aMatch = file.match(/[#?&]a=([^&]+)/);
+    const cMatch = file.match(/[#?&]c=([^&]+)/);
+    const songId = sMatch ? decodeURIComponent(sMatch[1]) : '';
+    const sTitle = tMatch ? decodeURIComponent(tMatch[1]) : '';
+    const sArtist = aMatch ? decodeURIComponent(aMatch[1]) : '';
+    const sCover = cMatch ? decodeURIComponent(cMatch[1]) : '';
+    openEmbeddedMusic(songId ? { videoId: songId, title: sTitle, artist: sArtist, cover: sCover } : null);
+    return;
+  }
+  if (file.startsWith('movies/') || file.startsWith('movies')) {
+    const idMatch = file.match(/[#?&]id=([^&]+)/) || file.match(/[#?&]movie=([^&]+)/);
+    const typeMatch = file.match(/[#?&]type=([^&]+)/);
+    const mId = idMatch ? decodeURIComponent(idMatch[1]) : '';
+    const mType = typeMatch ? decodeURIComponent(typeMatch[1]) : 'movie';
+    openEmbeddedMovie(mId ? { id: mId, type: mType, title: title.replace(/^Moss\s*-\s*/, '') } : null);
+    return;
+  }
   const id = getGameId(file);
 
   currentPlayingFile = file;
@@ -6409,21 +6835,7 @@ async function playGame(encodedFile, encodedTitle) {
     <body>
       <div class="spinner"></div>
       <div style="font-size: 14px; letter-spacing: 0.5px;">Loading ${title}...</div>
-    
-  <!-- Bottom-Right Update Toast Notification -->
-  <div id="update-toast-banner" class="update-toast-banner">
-    <div class="update-toast-header">
-      <span class="material-symbols-sharp update-toast-icon">rocket_launch</span>
-      <div class="update-toast-title">Update Available</div>
-    </div>
-    <div class="update-toast-desc" id="update-toast-desc">A newer version of Trashbin is ready to install.</div>
-    <div class="update-toast-actions">
-      <button class="update-toast-btn ghost" onclick="dismissUpdateToast()">Later</button>
-      <button class="update-toast-btn primary" onclick="applyAppUpdate()">Update Now</button>
-    </div>
-  </div>
-
-</body>
+    </body>
     </html>
   `;
 
@@ -6444,21 +6856,7 @@ async function playGame(encodedFile, encodedTitle) {
       <body>
         <h3 style="margin-bottom: 8px;">Failed to Load Game</h3>
         <p style="color: #888; font-size: 14px;">${err.message}</p>
-      
-  <!-- Bottom-Right Update Toast Notification -->
-  <div id="update-toast-banner" class="update-toast-banner">
-    <div class="update-toast-header">
-      <span class="material-symbols-sharp update-toast-icon">rocket_launch</span>
-      <div class="update-toast-title">Update Available</div>
-    </div>
-    <div class="update-toast-desc" id="update-toast-desc">A newer version of Trashbin is ready to install.</div>
-    <div class="update-toast-actions">
-      <button class="update-toast-btn ghost" onclick="dismissUpdateToast()">Later</button>
-      <button class="update-toast-btn primary" onclick="applyAppUpdate()">Update Now</button>
-    </div>
-  </div>
-
-</body>
+      </body>
       </html>
     `;
   }
@@ -7892,7 +8290,7 @@ window.downloadOfflineHtml = function() {
 
 
 // ==== TRASHBIN APP VERSION & AUTO-UPDATES ====
-const CURRENT_APP_VERSION = '3.9.44';
+const CURRENT_APP_VERSION = '3.9.45';
 
 // =========================================================================
 // EMBEDDED NATIVE AI & PROXY ENGINES
@@ -8242,6 +8640,470 @@ window.reloadEmbeddedProxy = function() {
     navigateEmbeddedProxy(input.value, false);
   }
 };
+
+/* =========================================================================
+   EMBEDDED NATIVE MUSIC PLAYER ENGINE (Yolk Minimalist Audio)
+   ========================================================================= */
+const trashbinNativeAudio = new Audio();
+trashbinNativeAudio.preload = 'auto';
+trashbinNativeAudio.crossOrigin = 'anonymous';
+
+let currentMusicTrack = null;
+let musicQueue = [];
+let musicQueueIndex = 0;
+
+function formatMusicTime(seconds) {
+  if (isNaN(seconds) || seconds < 0) return '0:00';
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s < 10 ? '0' : ''}${s}`;
+}
+
+function updateMusicPlayButtonState(isPlaying) {
+  const icon = document.getElementById('musicPlayIcon');
+  const miniIcon = document.getElementById('musicMiniPlayIcon');
+  const art = document.getElementById('musicCoverArt');
+  if (icon) icon.textContent = isPlaying ? 'pause' : 'play_arrow';
+  if (miniIcon) miniIcon.textContent = isPlaying ? 'pause' : 'play_arrow';
+  if (art) {
+    if (isPlaying) art.classList.add('playing');
+    else art.classList.remove('playing');
+  }
+}
+
+trashbinNativeAudio.addEventListener('timeupdate', () => {
+  const cur = trashbinNativeAudio.currentTime;
+  const dur = trashbinNativeAudio.duration || 0;
+  const curEl = document.getElementById('musicTimeCurrent');
+  const bar = document.getElementById('musicSeekBar');
+  if (curEl) curEl.textContent = formatMusicTime(cur);
+  if (bar && dur > 0) {
+    bar.value = (cur / dur) * 100;
+  }
+});
+
+trashbinNativeAudio.addEventListener('loadedmetadata', () => {
+  const dur = trashbinNativeAudio.duration || 0;
+  const durEl = document.getElementById('musicTimeDuration');
+  if (durEl) durEl.textContent = formatMusicTime(dur);
+});
+
+trashbinNativeAudio.addEventListener('durationchange', () => {
+  const dur = trashbinNativeAudio.duration || 0;
+  const durEl = document.getElementById('musicTimeDuration');
+  if (durEl) durEl.textContent = formatMusicTime(dur);
+});
+
+trashbinNativeAudio.addEventListener('play', () => updateMusicPlayButtonState(true));
+trashbinNativeAudio.addEventListener('pause', () => updateMusicPlayButtonState(false));
+
+trashbinNativeAudio.addEventListener('ended', () => {
+  nextEmbeddedMusicTrack();
+});
+
+trashbinNativeAudio.addEventListener('error', (e) => {
+  console.warn('Audio playback error, attempting fallback...', e);
+  if (currentMusicTrack && currentMusicTrack.videoId) {
+    // Fallback format
+    trashbinNativeAudio.src = `https://yolkaudio.broshan.com.np/api/music-api?endpoint=stream&id=${encodeURIComponent(currentMusicTrack.videoId)}&format=m4a&v=2`;
+    trashbinNativeAudio.play().catch(() => {});
+  }
+});
+
+window.openEmbeddedMusic = function(track = null) {
+  const musicView = document.getElementById('music-view');
+  const playerView = document.getElementById('player-view');
+  const aiView = document.getElementById('ai-view');
+  const proxyView = document.getElementById('proxy-view');
+  const movieView = document.getElementById('movie-view');
+  if (playerView) playerView.style.display = 'none';
+  if (aiView) aiView.style.display = 'none';
+  if (proxyView) proxyView.style.display = 'none';
+  if (movieView) movieView.style.display = 'none';
+  const mini = document.getElementById('musicMiniPlayer');
+  if (mini) mini.style.display = 'none';
+
+  if (musicView) {
+    musicView.style.display = 'flex';
+  }
+
+  if (track && (track.videoId || track.id)) {
+    playEmbeddedMusicTrack(track);
+  }
+};
+
+window.minimizeEmbeddedMusic = function() {
+  const musicView = document.getElementById('music-view');
+  if (musicView) musicView.style.display = 'none';
+  if (currentMusicTrack && !trashbinNativeAudio.paused) {
+    const mini = document.getElementById('musicMiniPlayer');
+    if (mini) mini.style.display = 'flex';
+  }
+};
+
+window.closeEmbeddedMusic = function(stopAudio = false) {
+  const musicView = document.getElementById('music-view');
+  if (musicView) musicView.style.display = 'none';
+  if (stopAudio) {
+    trashbinNativeAudio.pause();
+    trashbinNativeAudio.src = '';
+    currentMusicTrack = null;
+    const mini = document.getElementById('musicMiniPlayer');
+    if (mini) mini.style.display = 'none';
+  } else if (currentMusicTrack && !trashbinNativeAudio.paused) {
+    const mini = document.getElementById('musicMiniPlayer');
+    if (mini) mini.style.display = 'flex';
+  }
+};
+
+window.toggleEmbeddedMusicPlay = function() {
+  if (!trashbinNativeAudio.src) return;
+  if (trashbinNativeAudio.paused) {
+    trashbinNativeAudio.play().catch(() => {});
+  } else {
+    trashbinNativeAudio.pause();
+  }
+};
+
+window.seekEmbeddedMusic = function(pct) {
+  const dur = trashbinNativeAudio.duration || 0;
+  if (dur > 0) {
+    trashbinNativeAudio.currentTime = (pct / 100) * dur;
+  }
+};
+
+window.prevEmbeddedMusicTrack = function() {
+  if (musicQueueIndex > 0) {
+    musicQueueIndex--;
+    playEmbeddedMusicTrack(musicQueue[musicQueueIndex]);
+  } else {
+    trashbinNativeAudio.currentTime = 0;
+  }
+};
+
+window.nextEmbeddedMusicTrack = function() {
+  if (musicQueueIndex < musicQueue.length - 1) {
+    musicQueueIndex++;
+    playEmbeddedMusicTrack(musicQueue[musicQueueIndex]);
+  }
+};
+
+window.playEmbeddedMusicTrack = function(track) {
+  if (!track) return;
+  const vid = track.videoId || track.youtube_id || (track.id && track.id.replace('ytm-', '')) || '';
+  if (!vid) return;
+
+  currentMusicTrack = {
+    videoId: vid,
+    title: track.title || 'Untitled Track',
+    artist: track.artist || track.artist_name || 'Unknown Artist',
+    cover: track.cover || track.artwork_url || 'yolk/icon-256.png'
+  };
+
+  const titleEl = document.getElementById('musicTrackTitle');
+  const artistEl = document.getElementById('musicTrackArtist');
+  const coverEl = document.getElementById('musicCoverArt');
+  const miniTitle = document.getElementById('musicMiniTitle');
+  const miniArtist = document.getElementById('musicMiniArtist');
+  const miniArt = document.getElementById('musicMiniArt');
+
+  if (titleEl) titleEl.textContent = currentMusicTrack.title;
+  if (artistEl) artistEl.textContent = currentMusicTrack.artist;
+  if (coverEl) coverEl.src = currentMusicTrack.cover;
+  if (miniTitle) miniTitle.textContent = currentMusicTrack.title;
+  if (miniArtist) miniArtist.textContent = currentMusicTrack.artist;
+  if (miniArt) miniArt.src = currentMusicTrack.cover;
+
+  const streamUrl = `https://yolkaudio.broshan.com.np/api/music-api?endpoint=stream&id=${encodeURIComponent(vid)}&format=mp3&v=2`;
+  trashbinNativeAudio.src = streamUrl;
+  trashbinNativeAudio.play().catch(e => console.log('Audio autoplay prevented:', e));
+
+  updateMusicPlayButtonState(true);
+  fetchRelatedMusic(vid);
+
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: currentMusicTrack.title,
+      artist: currentMusicTrack.artist,
+      album: 'Trashbin Music',
+      artwork: [{ src: currentMusicTrack.cover, sizes: '512x512', type: 'image/png' }]
+    });
+  }
+};
+
+async function fetchRelatedMusic(vid) {
+  try {
+    const res = await fetch(`https://yolkaudio.broshan.com.np/api/music-api?endpoint=related&id=${encodeURIComponent(vid)}`);
+    const data = await res.json();
+    const tracks = (data && data.tracks) ? data.tracks : [];
+    if (tracks && tracks.length > 0) {
+      musicQueue = tracks.map(t => ({
+        videoId: t.videoId || t.youtube_id || (t.id && t.id.replace('ytm-', '')) || '',
+        title: t.title || 'Untitled',
+        artist: t.artist_name || 'Unknown',
+        cover: t.artwork_url || t.cover || 'yolk/icon-256.png'
+      })).filter(t => t.videoId);
+      musicQueueIndex = 0;
+      renderMusicQueue(musicQueue);
+    }
+  } catch(e) {}
+}
+
+async function searchMoreMusic(q) {
+  if (!q || !q.trim()) return;
+  const list = document.getElementById('musicQueueList');
+  if (list) list.innerHTML = '<div style="color:var(--text-dim);padding:14px;font-size:12px;text-align:center;">Searching...</div>';
+  try {
+    const res = await fetch(`https://yolkaudio.broshan.com.np/api/music-api?endpoint=search&q=${encodeURIComponent(q.trim())}`);
+    const data = await res.json();
+    const tracks = (data && data.tracks) ? data.tracks : [];
+    musicQueue = tracks.map(t => ({
+      videoId: t.videoId || t.youtube_id || (t.id && t.id.replace('ytm-', '')) || '',
+      title: t.title || 'Untitled',
+      artist: t.artist_name || 'Unknown',
+      cover: t.artwork_url || t.cover || 'yolk/icon-256.png'
+    })).filter(t => t.videoId);
+    musicQueueIndex = 0;
+    renderMusicQueue(musicQueue);
+  } catch(e) {
+    if (list) list.innerHTML = '<div style="color:var(--text-dim);padding:14px;font-size:12px;text-align:center;">Failed to search music.</div>';
+  }
+}
+
+function renderMusicQueue(items) {
+  const list = document.getElementById('musicQueueList');
+  const countEl = document.getElementById('musicQueueCount');
+  if (countEl) countEl.textContent = `${items.length} tracks`;
+  if (!list) return;
+
+  if (!items.length) {
+    list.innerHTML = '<div style="color:var(--text-dim); font-size:12px; padding:12px; text-align:center;">No tracks found.</div>';
+    return;
+  }
+
+  list.innerHTML = items.map((t, idx) => {
+    const trackJson = JSON.stringify(t).replace(/"/g, '&quot;');
+    return `
+      <div class="search-music-item" style="margin-bottom:4px;" onclick="musicQueueIndex = ${idx}; playEmbeddedMusicTrack(${trackJson})">
+        <img class="search-music-art" src="${escapeHtml(t.cover)}" alt="" loading="lazy" />
+        <div class="search-music-info">
+          <div class="search-music-title">${escapeHtml(t.title)}</div>
+          <div class="search-music-artist">${escapeHtml(t.artist)}</div>
+        </div>
+        <span class="material-symbols-sharp" style="color:var(--text-dim);font-size:16px;">play_arrow</span>
+      </div>
+    `;
+  }).join('');
+}
+
+/* =========================================================================
+   EMBEDDED NATIVE MOVIE PLAYER ENGINE (Moss Cinema)
+   ========================================================================= */
+let currentMovieState = {
+  id: null,
+  title: '',
+  type: 'movie',
+  server: '1',
+  season: 1,
+  episode: 1
+};
+
+function getMossPlayerUrl(serverNum, tmdbId, type, season = 1, episode = 1) {
+  const isMovie = (type === 'movie');
+  const nativeQs = `type=${isMovie ? 'movie' : 'tv'}&id=${tmdbId}&s=${season}&e=${episode}`;
+  const NATIVE_PLAYER = "https://trashbin-web.yolkmusic.workers.dev/watch";
+  const GATEWAY = "https://trashbin-web.yolkmusic.workers.dev/browse?embed=1&url=";
+
+  switch (String(serverNum)) {
+    case '1':
+      return `${NATIVE_PLAYER}?${nativeQs}&p=a`;
+    case '2':
+      return `${NATIVE_PLAYER}?${nativeQs}&p=b`;
+    case '3':
+      const u3 = isMovie ? `https://vidnest.fun/movie/${tmdbId}` : `https://vidnest.fun/tv/${tmdbId}/${season}/${episode}`;
+      return `${GATEWAY}${encodeURIComponent(u3)}`;
+    case '4':
+      const u4 = isMovie ? `https://vidlink.pro/movie/${tmdbId}?primaryColor=22c55e&autoplay=true` : `https://vidlink.pro/tv/${tmdbId}/${season}/${episode}?primaryColor=22c55e&autoplay=true`;
+      return `${GATEWAY}${encodeURIComponent(u4)}`;
+    default:
+      return `${NATIVE_PLAYER}?${nativeQs}&p=a`;
+  }
+}
+
+window.openEmbeddedMovie = function(movie = null) {
+  const movieView = document.getElementById('movie-view');
+  const playerView = document.getElementById('player-view');
+  const aiView = document.getElementById('ai-view');
+  const proxyView = document.getElementById('proxy-view');
+  const musicView = document.getElementById('music-view');
+  if (playerView) playerView.style.display = 'none';
+  if (aiView) aiView.style.display = 'none';
+  if (proxyView) proxyView.style.display = 'none';
+  if (musicView) musicView.style.display = 'none';
+
+  if (movieView) {
+    movieView.style.display = 'flex';
+  }
+
+  if (movie && (movie.id || movie.tmdbId)) {
+    loadEmbeddedMovie(movie);
+  }
+};
+
+window.closeEmbeddedMovie = function() {
+  const movieView = document.getElementById('movie-view');
+  if (movieView) movieView.style.display = 'none';
+  const frame = document.getElementById('embeddedMovieFrame');
+  if (frame) frame.src = 'about:blank';
+};
+
+window.toggleMovieFullscreen = function() {
+  const container = document.getElementById('moviePlayerContainer');
+  if (!container) return;
+  if (!document.fullscreenElement) {
+    container.requestFullscreen().catch(() => {});
+  } else {
+    document.exitFullscreen().catch(() => {});
+  }
+};
+
+window.switchEmbeddedMovieServer = function(serverNum) {
+  currentMovieState.server = String(serverNum);
+  document.querySelectorAll('.movie-server-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-server') === currentMovieState.server);
+  });
+  if (currentMovieState.id) {
+    const frame = document.getElementById('embeddedMovieFrame');
+    if (frame) {
+      frame.src = getMossPlayerUrl(currentMovieState.server, currentMovieState.id, currentMovieState.type, currentMovieState.season, currentMovieState.episode);
+    }
+  }
+};
+
+window.onMovieSeasonChange = function(seasonNum) {
+  currentMovieState.season = parseInt(seasonNum, 10) || 1;
+  currentMovieState.episode = 1;
+  const epSelect = document.getElementById('movieEpisodeSelect');
+  if (epSelect) {
+    epSelect.innerHTML = Array.from({ length: 24 }, (_, i) => `<option value="${i + 1}">Episode ${i + 1}</option>`).join('');
+    epSelect.value = '1';
+  }
+  const frame = document.getElementById('embeddedMovieFrame');
+  if (frame) {
+    frame.src = getMossPlayerUrl(currentMovieState.server, currentMovieState.id, currentMovieState.type, currentMovieState.season, currentMovieState.episode);
+  }
+};
+
+window.onMovieEpisodeChange = function(epNum) {
+  currentMovieState.episode = parseInt(epNum, 10) || 1;
+  const frame = document.getElementById('embeddedMovieFrame');
+  if (frame) {
+    frame.src = getMossPlayerUrl(currentMovieState.server, currentMovieState.id, currentMovieState.type, currentMovieState.season, currentMovieState.episode);
+  }
+};
+
+window.loadEmbeddedMovie = function(movie) {
+  const tmdbId = movie.id || movie.tmdbId;
+  const mType = movie.type || (movie.first_air_date ? 'tv' : 'movie');
+  const title = movie.title || movie.name || 'Untitled';
+
+  currentMovieState = {
+    id: tmdbId,
+    title: title,
+    type: mType,
+    server: '1',
+    season: 1,
+    episode: 1
+  };
+
+  const hTitle = document.getElementById('movieHeaderTitle');
+  const dTitle = document.getElementById('movieDetailTitle');
+  const dYear = document.getElementById('movieDetailYear');
+  const dRating = document.getElementById('movieDetailRating');
+  const dType = document.getElementById('movieDetailType');
+  const dOverview = document.getElementById('movieDetailOverview');
+  const tvControls = document.getElementById('movieTvControls');
+  const frame = document.getElementById('embeddedMovieFrame');
+
+  if (hTitle) hTitle.textContent = title;
+  if (dTitle) dTitle.textContent = title;
+  if (dYear) dYear.textContent = (movie.year || movie.release_date || movie.first_air_date || '').slice(0, 4) || '2026';
+  if (dRating) dRating.textContent = movie.rating ? `★ ${movie.rating}` : '★ 8.2';
+  if (dType) dType.textContent = mType.toUpperCase();
+  if (dOverview) dOverview.textContent = movie.overview || 'No synopsis available.';
+
+  if (mType === 'tv') {
+    if (tvControls) tvControls.style.display = 'flex';
+    const sSelect = document.getElementById('movieSeasonSelect');
+    const eSelect = document.getElementById('movieEpisodeSelect');
+    if (sSelect) {
+      sSelect.innerHTML = Array.from({ length: 12 }, (_, i) => `<option value="${i + 1}">Season ${i + 1}</option>`).join('');
+      sSelect.value = '1';
+    }
+    if (eSelect) {
+      eSelect.innerHTML = Array.from({ length: 24 }, (_, i) => `<option value="${i + 1}">Episode ${i + 1}</option>`).join('');
+      eSelect.value = '1';
+    }
+  } else {
+    if (tvControls) tvControls.style.display = 'none';
+  }
+
+  // Set active server 1
+  switchEmbeddedMovieServer('1');
+
+  if (frame) {
+    frame.src = getMossPlayerUrl('1', tmdbId, mType, 1, 1);
+  }
+};
+
+/* =========================================================================
+   HOTLINK DEEP-LINKING ROUTER (Zero Iframes for Music, Movies, AI, Proxy)
+   ========================================================================= */
+window.handleTrashbinHotlinks = function() {
+  const hash = window.location.hash || '';
+  const search = window.location.search || '';
+  const params = new URLSearchParams(search.startsWith('?') ? search.slice(1) : search);
+  const hashParams = new URLSearchParams(hash.startsWith('#') ? hash.slice(1) : hash);
+
+  // 1. Music Hotlink: #song=... or ?song=...
+  const songId = hashParams.get('song') || params.get('song');
+  if (songId) {
+    const title = hashParams.get('t') || params.get('t') || 'Unknown Track';
+    const artist = hashParams.get('a') || params.get('a') || 'Unknown Artist';
+    const cover = hashParams.get('c') || params.get('c') || 'yolk/icon-256.png';
+    openEmbeddedMusic({ videoId: songId, title, artist, cover });
+    return;
+  }
+
+  // 2. Movie Hotlink: #movie=... or ?movie=... or #id=... or ?id=...
+  const movieId = hashParams.get('movie') || params.get('movie') || hashParams.get('id') || params.get('id');
+  if (movieId && !movieId.includes('.')) {
+    const type = hashParams.get('type') || params.get('type') || 'movie';
+    const title = hashParams.get('title') || params.get('title') || 'Movie';
+    openEmbeddedMovie({ id: movieId, type, title });
+    return;
+  }
+
+  // 3. AI Hotlink: #ai=... or ?ai=...
+  const aiPrompt = hashParams.get('ai') || params.get('ai');
+  if (aiPrompt) {
+    openEmbeddedAI(aiPrompt);
+    return;
+  }
+
+  // 4. Proxy Hotlink: #proxy=... or ?proxy=...
+  const proxyUrl = hashParams.get('proxy') || params.get('proxy');
+  if (proxyUrl) {
+    openEmbeddedProxy(proxyUrl);
+    return;
+  }
+};
+
+window.addEventListener('hashchange', () => {
+  if (typeof window.handleTrashbinHotlinks === 'function') {
+    window.handleTrashbinHotlinks();
+  }
+});
 
 
 function compareSemVer(v1, v2) {
@@ -8880,13 +9742,13 @@ function __setSnow(id, parent, want, visibleCheck) {
   if (cv) return;
   cv = document.createElement('canvas');
   cv.id = id;
-  cv.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:0;';
-  parent.insertBefore(cv, parent.firstChild);
+  cv.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:2;';
+  parent.appendChild(cv);
   __snowInstances[id] = __startSnow(cv, visibleCheck);
 }
 
 function updateSnowfall() {
-  const wantSnow = currentTintId === 'winter' && !document.body.classList.contains('perf-mode');
+  const wantSnow = currentTintId === 'winter';
   const wavesOn = localStorage.getItem('trashbin_bg_waves') !== 'false';
   const modal = document.getElementById('status-modal-overlay');
 
@@ -9021,6 +9883,8 @@ function initTrashbinStartup() {
     activeMirror = savedMirror;
   }
   initStartupAndPerformance();
+  if (typeof updateSnowfall === 'function') updateSnowfall();
+  if (typeof handleTrashbinHotlinks === 'function') handleTrashbinHotlinks();
 }
 
 if (document.readyState === 'loading') {
@@ -9172,7 +10036,7 @@ if (document.readyState === 'loading') {
         <div class="settings-row">
           <div class="settings-col-left">
             <div class="settings-row-title">Current Release</div>
-            <div class="settings-row-desc" id="settingsCurrentVerDesc">Trashbin v3.9.44 • 3-Pane Multi-Platform Search &amp; Hotlinks</div>
+            <div class="settings-row-desc" id="settingsCurrentVerDesc">Trashbin v3.9.45 • Winter Snowfall, Logo &amp; Catalog Animations, Embedded Music &amp; Movies</div>
           </div>
           <div class="settings-col-right">
             <button class="settings-btn-action primary" id="btnCheckUpdates" onclick="checkTrashbinUpdates(true)">Check for Updates</button>
@@ -9360,7 +10224,7 @@ if (document.readyState === 'loading') {
           </div>
           <div class="settings-col-right">
             <label class="settings-switch">
-              <input type="checkbox" id="settingPerfMode" onchange="localStorage.setItem('trashbin_perf_mode', this.checked); document.body.classList.toggle('perf-mode', this.checked);">
+              <input type="checkbox" id="settingPerfMode" onchange="localStorage.setItem('trashbin_perf_mode', this.checked); document.body.classList.toggle('perf-mode', this.checked); if (typeof updateSnowfall === 'function') updateSnowfall();">
               <span class="settings-slider"></span>
             </label>
           </div>
@@ -9638,6 +10502,158 @@ if (document.readyState === 'loading') {
     <!-- Viewport -->
     <div class="proxy-viewport-wrap">
       <iframe id="embeddedProxyFrame" class="proxy-iframe" allow="autoplay; fullscreen; camera; microphone; clipboard-read; clipboard-write; display-capture; geolocation; encrypted-media; picture-in-picture; web-share"></iframe>
+    </div>
+  </div>
+
+  <!-- Embedded Native Trashbin Music (Yolk) View -->
+  <div id="music-view" class="embedded-app-view" style="display: none;">
+    <div class="embedded-app-header">
+      <div class="embedded-app-header-left">
+        <button class="embedded-back-btn" onclick="closeEmbeddedMusic()" title="Return to Trashbin">
+          <span class="material-symbols-sharp" style="font-size: 18px;">arrow_back</span>
+          <span>Back</span>
+        </button>
+        <div class="embedded-title-group">
+          <span class="material-symbols-sharp" style="color: #eab308; font-size: 20px;">queue_music</span>
+          <span class="embedded-title-text">Trashbin Music</span>
+          <span class="embedded-status-pill" style="color:#eab308; border-color:rgba(234,179,8,0.3); background:rgba(234,179,8,0.12);" id="musicStatusPill">Yolk Audio Engine</span>
+        </div>
+      </div>
+
+      <div class="embedded-app-header-right">
+        <button class="embedded-btn-squircle" onclick="minimizeEmbeddedMusic()" title="Keep playing and browse games">
+          <span class="material-symbols-sharp" style="font-size: 16px;">expand_more</span>
+          <span>Minimize</span>
+        </button>
+        <button class="embedded-btn-squircle" onclick="closeEmbeddedMusic(true)" title="Close Music Player">
+          <span class="material-symbols-sharp" style="font-size: 18px;">close</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Music View Body -->
+    <div class="music-view-body" id="musicViewBody">
+      <!-- Left: Now Playing Showcase -->
+      <div class="music-now-playing-pane">
+        <img id="musicCoverArt" class="music-art-large" src="yolk/icon-256.png" alt="Album Cover" />
+        <div id="musicTrackTitle" class="music-track-title">Select a song to play</div>
+        <div id="musicTrackArtist" class="music-track-artist">Yolk Minimalist Music</div>
+
+        <div class="music-progress-wrap">
+          <span id="musicTimeCurrent" class="music-time-label">0:00</span>
+          <input type="range" id="musicSeekBar" class="music-seek-bar" min="0" max="100" value="0" oninput="seekEmbeddedMusic(this.value)" />
+          <span id="musicTimeDuration" class="music-time-label">0:00</span>
+        </div>
+
+        <div class="music-controls-row">
+          <button class="music-btn-ctrl" onclick="prevEmbeddedMusicTrack()" title="Previous Track">
+            <span class="material-symbols-sharp" style="font-size: 24px;">skip_previous</span>
+          </button>
+          <button id="musicPlayBtn" class="music-btn-play" onclick="toggleEmbeddedMusicPlay()" title="Play / Pause">
+            <span class="material-symbols-sharp" id="musicPlayIcon" style="font-size: 32px;">play_arrow</span>
+          </button>
+          <button class="music-btn-ctrl" onclick="nextEmbeddedMusicTrack()" title="Next Track">
+            <span class="material-symbols-sharp" style="font-size: 24px;">skip_next</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Right: Queue & Search -->
+      <div class="music-queue-pane">
+        <div class="music-queue-header">
+          <div style="font-weight:700; font-size:14px; color:#ffffff; display:flex; align-items:center; gap:6px;">
+            <span class="material-symbols-sharp" style="font-size:18px; color:#eab308;">playlist_play</span>
+            <span>Up Next &amp; Search</span>
+          </div>
+          <span id="musicQueueCount" style="font-size:11px; color:var(--text-dim);">0 tracks</span>
+        </div>
+        <input type="text" id="musicQueueSearchInput" class="music-queue-search" placeholder="Search other songs or artists..." onkeydown="if(event.key==='Enter') searchMoreMusic(this.value)" />
+        <div id="musicQueueList" class="music-queue-list">
+          <div style="color:var(--text-dim); font-size:12px; padding:12px; text-align:center;">Queue empty</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Persistent Bottom Floating Mini Music Player -->
+  <div id="musicMiniPlayer" class="music-mini-player" style="display: none;" onclick="openEmbeddedMusic()">
+    <img id="musicMiniArt" src="yolk/icon-256.png" class="music-mini-art" alt="" />
+    <div class="music-mini-info">
+      <div id="musicMiniTitle" class="music-mini-title">Playing Track</div>
+      <div id="musicMiniArtist" class="music-mini-artist">Artist</div>
+    </div>
+    <button class="music-mini-btn" onclick="event.stopPropagation(); toggleEmbeddedMusicPlay();" title="Play/Pause">
+      <span class="material-symbols-sharp" id="musicMiniPlayIcon" style="font-size: 22px;">pause</span>
+    </button>
+    <button class="music-mini-btn" onclick="event.stopPropagation(); closeEmbeddedMusic(true);" title="Stop and Close">
+      <span class="material-symbols-sharp" style="font-size: 18px;">close</span>
+    </button>
+  </div>
+
+  <!-- Embedded Native Trashbin Movies (Moss) View -->
+  <div id="movie-view" class="embedded-app-view" style="display: none;">
+    <div class="embedded-app-header">
+      <div class="embedded-app-header-left">
+        <button class="embedded-back-btn" onclick="closeEmbeddedMovie()" title="Return to Trashbin">
+          <span class="material-symbols-sharp" style="font-size: 18px;">arrow_back</span>
+          <span>Back</span>
+        </button>
+        <div class="embedded-title-group">
+          <span class="material-symbols-sharp" style="color: #ef4444; font-size: 20px;">movie</span>
+          <span class="embedded-title-text" id="movieHeaderTitle">Trashbin Movies</span>
+          <span class="embedded-status-pill" style="color:#ef4444; border-color:rgba(239,68,68,0.3); background:rgba(239,68,68,0.12);" id="movieTypePill">Moss Cinema</span>
+        </div>
+      </div>
+
+      <div class="embedded-app-header-right">
+        <div class="movie-server-bar" id="movieServerBar">
+          <button class="movie-server-btn active" data-server="1" onclick="switchEmbeddedMovieServer('1')">Server 1 (Native)</button>
+          <button class="movie-server-btn" data-server="2" onclick="switchEmbeddedMovieServer('2')">Server 2 (Native B)</button>
+          <button class="movie-server-btn" data-server="3" onclick="switchEmbeddedMovieServer('3')">Server 3 (VidNest)</button>
+          <button class="movie-server-btn" data-server="4" onclick="switchEmbeddedMovieServer('4')">Server 4 (VidLink)</button>
+        </div>
+        <button class="embedded-btn-squircle" onclick="toggleMovieFullscreen()" title="Fullscreen">
+          <span class="material-symbols-sharp" style="font-size: 16px;">fullscreen</span>
+        </button>
+        <button class="embedded-btn-squircle" onclick="closeEmbeddedMovie()" title="Close Movie Player">
+          <span class="material-symbols-sharp" style="font-size: 18px;">close</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Movie View Body -->
+    <div class="movie-view-body" id="movieViewBody">
+      <!-- Player screen container -->
+      <div class="movie-player-container" id="moviePlayerContainer">
+        <iframe id="embeddedMovieFrame" class="movie-player-frame" allow="autoplay; fullscreen; encrypted-media; picture-in-picture; web-share" sandbox="allow-same-origin allow-scripts allow-forms allow-presentation allow-downloads"></iframe>
+      </div>
+
+      <!-- TV Controls (Season & Episode) -->
+      <div id="movieTvControls" class="movie-tv-controls" style="display: none;">
+        <label style="font-size:12px; color:var(--text-dim); display:flex; align-items:center; gap:6px;">
+          <span>Season:</span>
+          <select id="movieSeasonSelect" class="movie-select" onchange="onMovieSeasonChange(this.value)"></select>
+        </label>
+        <label style="font-size:12px; color:var(--text-dim); display:flex; align-items:center; gap:6px;">
+          <span>Episode:</span>
+          <select id="movieEpisodeSelect" class="movie-select" onchange="onMovieEpisodeChange(this.value)"></select>
+        </label>
+      </div>
+
+      <!-- Details Card -->
+      <div class="movie-details-card">
+        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:16px;">
+          <div>
+            <h2 id="movieDetailTitle" style="font-family:'Libre Baskerville',Georgia,serif; font-size:20px; color:#ffffff; margin:0 0 6px;">Movie Title</h2>
+            <div style="display:flex; align-items:center; gap:12px; font-size:12px; color:var(--text-dim);">
+              <span id="movieDetailYear">2026</span>
+              <span id="movieDetailRating" style="color:#eab308; font-weight:700;">★ 8.2</span>
+              <span id="movieDetailType" style="text-transform:uppercase;">MOVIE</span>
+            </div>
+          </div>
+        </div>
+        <p id="movieDetailOverview" style="font-size:13.5px; color:#d4d4d8; line-height:1.6; margin:0;">Overview plot description...</p>
+      </div>
     </div>
   </div>
 
