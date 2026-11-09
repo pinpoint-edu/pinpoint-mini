@@ -10463,9 +10463,10 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Check if opened directly via a shared #song=, #album=, or #artist= deep link
-    const initialRawHash = window.location.hash.replace('#', '');
-    if (initialRawHash.startsWith('song=') || initialRawHash.startsWith('album=') || initialRawHash.startsWith('artist=')) {
-        setTimeout(() => window.handleYolkDeepLink(initialRawHash), 150);
+    const initialRawHash = (window.location.hash || window.location.search || window.__initialQuery || '').replace(/^[#?]/, '');
+    if (initialRawHash.includes('song=') || initialRawHash.includes('album=') || initialRawHash.includes('artist=')) {
+        const songPart = initialRawHash.slice(initialRawHash.search(/(song=|album=|artist=)/));
+        setTimeout(() => window.handleYolkDeepLink(songPart), 150);
     }
 
     // Initialize saved theme mode on startup

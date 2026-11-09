@@ -587,7 +587,16 @@
     // Relay web reader requests from the tab to Google Apps Script UrlFetchApp
     window.addEventListener("message", (event) => {
       const data = event.data;
-      if (!data || data.type !== "TB_WEB_FETCH" || !data.reqId || !data.url) return;
+      if (!data) return;
+
+      if (data.type === "updateVersion") {
+        if (typeof applyLatestVersion === "function") {
+          applyLatestVersion();
+        }
+        return;
+      }
+
+      if (data.type !== "TB_WEB_FETCH" || !data.reqId || !data.url) return;
       const reply = (payload) => {
         try {
           if (event.source) {

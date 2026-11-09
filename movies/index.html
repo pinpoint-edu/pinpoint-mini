@@ -2588,6 +2588,21 @@
         document.addEventListener('DOMContentLoaded', () => {
             initGenreBars();
             loadHome();
+
+            // Check deep link via hash or search params
+            const rawHash = window.location.hash.replace(/^#/, '');
+            const rawSearch = window.location.search.replace(/^\?/, '') || (window.__initialQuery ? window.__initialQuery.replace(/^[#?]/, '') : '');
+            const combinedQuery = rawHash + '&' + rawSearch;
+            const params = new URLSearchParams(combinedQuery);
+            const targetId = params.get('id') || (combinedQuery.match(/id=([0-9]+)/) || [])[1];
+            const targetType = params.get('type') || (combinedQuery.match(/type=(movie|tv)/) || [])[1] || 'movie';
+            if (targetId) {
+                fetchTMDB('/' + targetType + '/' + targetId).then(item => {
+                    if (item && !item.status_message) {
+                        openPreview(item, targetType);
+                    }
+                }).catch(() => {});
+            }
         });
     </script>
 </body>

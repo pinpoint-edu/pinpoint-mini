@@ -252,10 +252,6 @@
       margin-bottom: 12px;
     }
 
-    body.is-searching .quick-pills {
-      margin-top: 10px;
-    }
-
     /* Large Logo above Search Bar */
     #large-logo-wrapper {
       opacity: 1;
@@ -380,11 +376,18 @@
       transform: scale(1.05);
     }
 
-    .search-browse-btn {
+    .search-filter-wheel-wrapper {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      user-select: none;
+    }
+
+    .search-filter-wheel-btn {
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      padding: 0 12px;
+      padding: 0 8px 0 10px;
       height: 32px;
       background: var(--accent-subtle);
       border: 1px solid var(--accent-border);
@@ -397,9 +400,11 @@
       transition: all 0.15s ease;
       outline: none;
       white-space: nowrap;
+      overflow: hidden;
+      position: relative;
     }
 
-    .search-browse-btn:hover {
+    .search-filter-wheel-btn:hover {
       background: var(--accent);
       color: #000000;
       border-color: var(--accent);
@@ -407,90 +412,373 @@
       box-shadow: 0 4px 14px var(--accent-glow);
     }
 
-    .search-browse-btn:active {
+    .search-filter-wheel-btn:hover .filter-wheel-item span,
+    .search-filter-wheel-btn:hover .filter-scroll-chevrons span {
+      color: #000000 !important;
+    }
+
+    .search-filter-wheel-btn:active {
       transform: scale(0.96);
     }
 
-    /* Quick Filter Chips (Squircles) */
-    .quick-pills {
+    .filter-wheel-viewport {
+      height: 32px;
+      overflow: hidden;
+      position: relative;
+      min-width: 68px;
+      display: flex;
+      align-items: center;
+    }
+
+    .filter-wheel-track {
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      width: 100%;
+    }
+
+    .filter-wheel-item {
+      height: 32px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+      box-sizing: border-box;
+    }
+
+    .filter-wheel-item .material-symbols-sharp {
+      font-size: 16px;
+      color: var(--accent);
+      transition: color 0.15s ease;
+    }
+
+    .filter-wheel-item span:last-child {
+      color: inherit;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .filter-scroll-chevrons {
+      display: flex;
+      align-items: center;
+      opacity: 0.7;
+      transition: opacity 0.15s ease;
+      margin-left: -2px;
+    }
+
+    .filter-scroll-chevrons .material-symbols-sharp {
+      font-size: 16px;
+      color: var(--accent-light);
+    }
+
+    /* AI Card in Search Results */
+    .search-ai-card {
+      background: linear-gradient(135deg, rgba(96, 165, 250, 0.12) 0%, rgba(168, 85, 247, 0.12) 100%);
+      border: 1px solid rgba(147, 197, 253, 0.3);
+      border-radius: 14px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      margin-bottom: 6px;
+      flex-shrink: 0;
+    }
+
+    .search-ai-card:hover {
+      background: linear-gradient(135deg, rgba(96, 165, 250, 0.22) 0%, rgba(168, 85, 247, 0.22) 100%);
+      border-color: #60a5fa;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(96, 165, 250, 0.25);
+    }
+
+    .search-ai-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .search-ai-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(96, 165, 250, 0.2);
+      color: #60a5fa;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      margin-top: 18px;
-      flex-wrap: wrap;
+      flex-shrink: 0;
     }
 
-    .pill-chip {
+    .search-ai-info {
+      min-width: 0;
+    }
+
+    .search-ai-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .search-ai-query {
+      color: #93c5fd;
+    }
+
+    .search-ai-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .search-ai-sub kbd {
+      background: #27272a;
+      border: 1px solid #3f3f46;
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-size: 10px;
+      color: #e4e4e7;
+      font-family: inherit;
+    }
+
+    .search-ai-btn {
       display: inline-flex;
       align-items: center;
-      gap: 7px;
-      padding: 7px 14px;
-      background: var(--accent-subtle);
-      border: 1px solid var(--accent-border);
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 9px;
+      background: #2563eb;
+      border: none;
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+    }
+
+    .search-ai-btn:hover {
+      background: #1d4ed8;
+      transform: scale(1.03);
+    }
+
+    /* Category Section Headers & Grids in Unified Search */
+    .search-section-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      margin-top: 14px;
+      margin-bottom: 6px;
+      padding-left: 2px;
+      flex-shrink: 0;
+    }
+
+    .search-section-header .material-symbols-sharp {
+      font-size: 16px;
+      color: var(--accent);
+    }
+
+    .search-media-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 10px;
+      margin-bottom: 6px;
+      flex-shrink: 0;
+    }
+
+    .search-media-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
       border-radius: 12px;
-      color: var(--accent-light);
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .search-media-card:hover {
+      background: var(--bg-card);
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4), 0 0 12px var(--accent-glow);
+    }
+
+    .search-media-thumb {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: #1f1f23;
+    }
+
+    .movie-poster-thumb {
+      width: 38px;
+      height: 52px;
+      border-radius: 6px;
+    }
+
+    .search-media-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .search-media-title {
       font-size: 13px;
       font-weight: 600;
-      font-family: inherit;
-      cursor: pointer;
-      transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
-      outline: none;
-      user-select: none;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .pill-chip span {
-      color: var(--accent-light);
-      transition: color 0.2s ease;
-    }
-
-    .pill-chip .material-symbols-sharp {
-      color: var(--accent);
-      transition: color 0.2s ease;
-    }
-
-    .pill-chip:hover {
-      background: var(--accent-badge-bg);
-      border-color: var(--accent);
-      color: #ffffff;
-      transform: translateY(-2px) scale(1.05);
-      box-shadow: 0 6px 20px var(--accent-glow);
-    }
-
-    .pill-chip:hover span, .pill-chip:hover .material-symbols-sharp {
-      color: #ffffff;
-    }
-
-    .pill-chip:active {
-      transform: translateY(0) scale(0.96);
-    }
-
-    .pill-chip.active {
-      background: var(--accent) !important;
-      border-color: var(--accent) !important;
-      color: #000000 !important;
-      box-shadow: 0 0 20px var(--accent-glow) !important;
-    }
-
-    .pill-chip.active span, .pill-chip.active .material-symbols-sharp {
-      color: #000000 !important;
-    }
-
-    .pill-chip.active .pill-count {
-      background: rgba(0, 0, 0, 0.25) !important;
-      border-color: rgba(0, 0, 0, 0.3) !important;
-      color: #000000 !important;
-    }
-
-    .pill-count {
+    .search-media-meta {
       font-size: 11px;
-      padding: 2px 7px;
-      background: var(--accent-badge-bg);
+      color: var(--text-dim);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .search-media-play-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--accent-subtle);
       border: 1px solid var(--accent-border);
-      border-radius: 8px;
       color: var(--accent-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+    }
+
+    .search-media-card:hover .search-media-play-btn {
+      background: var(--accent);
+      color: #000000;
+      transform: scale(1.08);
+    }
+
+    /* Update Toast (Bottom Right) */
+    .update-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 999999;
+      background: rgba(18, 18, 21, 0.95);
+      border: 1px solid var(--accent-border);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 14px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6), 0 0 20px var(--accent-glow);
+      animation: slideInToast 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      max-width: 400px;
+    }
+
+    @keyframes slideInToast {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .update-toast-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .update-toast-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--accent-subtle);
+      border: 1px solid var(--accent-border);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .update-toast-text {
+      min-width: 0;
+    }
+
+    .update-toast-title {
+      font-size: 13px;
       font-weight: 700;
-      transition: all 0.2s ease;
+      color: #ffffff;
+    }
+
+    .update-toast-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .update-toast-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .update-toast-btn {
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .update-toast-btn.primary {
+      background: var(--accent);
+      color: #000000;
+    }
+
+    .update-toast-btn.primary:hover {
+      box-shadow: 0 2px 10px var(--accent-glow);
+      transform: translateY(-1px);
+    }
+
+    .update-toast-close {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: color 0.15s ease;
+    }
+
+    .update-toast-close:hover {
+      color: #ffffff;
     }
 
     /* Results Container: Grouped below Search Block, moves with it in unison */
@@ -1879,44 +2167,17 @@
         <button id="clearSearchBtn" class="clear-search-btn" onclick="clearSearch()" style="display: none;" title="Clear search">
           <span class="material-symbols-sharp" style="font-size: 16px;">close</span>
         </button>
-        <button id="browseBtn" class="search-browse-btn" onclick="triggerBrowseAll()" title="Browse all games">
-          <span class="material-symbols-sharp" style="font-size: 16px;">explore</span>
-          <span>Browse</span>
-        </button>
+        <div class="search-filter-wheel-wrapper" id="filterWheelWrapper" title="Hover &amp; scroll mouse wheel to switch apps">
+          <button id="filterWheelBtn" class="search-filter-wheel-btn" onclick="cycleFilterMode(1)" type="button">
+            <div class="filter-wheel-viewport">
+              <div class="filter-wheel-track" id="filterWheelTrack"></div>
+            </div>
+            <div class="filter-scroll-chevrons">
+              <span class="material-symbols-sharp">unfold_more</span>
+            </div>
+          </button>
+        </div>
       </div>
-    </div>
-
-    <div class="quick-pills">
-      <button class="pill-chip" id="chipAll" onclick="selectChip('all')">
-        <span class="material-symbols-sharp" style="font-size: 15px;">grid_view</span>
-        <span>All Games</span>
-        <span class="pill-count" id="allCountBadge">0</span>
-      </button>
-      <button class="pill-chip" id="chipDownloaded" onclick="selectChip('downloaded')">
-        <span class="material-symbols-sharp" style="font-size: 15px;">download_for_offline</span>
-        <span>Downloaded</span>
-        <span class="pill-count" id="dlCountBadge">0</span>
-      </button>
-      <button class="pill-chip" onclick="playGame('yolk/index.html', 'Yolk! - Minimalist Music')">
-        <img src="yolk/yolk-circle.png" alt="" style="width: 14px; height: 14px; border-radius: 50%; object-fit: contain;">
-        <span>Yolk!</span>
-      </button>
-      <button class="pill-chip pill-chip-moss" onclick="playGame('movies/index.html', 'Moss - Movies & Shows')">
-        <img src="data:image/png;base64,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" alt="M" style="width: 14px; height: 14px; object-fit: contain;">
-        <span>Moss</span>
-      </button>
-      <button class="pill-chip" onclick="playGame('textbooks/Soundboard.html', 'Soundboard')">
-        <span class="material-symbols-sharp" style="font-size: 15px; color: #a855f7;">volume_up</span>
-        <span>Soundboard</span>
-      </button>
-      <button class="pill-chip" onclick="playGame('ai.html', 'Trashbin AI')">
-        <span class="material-symbols-sharp" style="font-size: 15px; color: #60a5fa;">psychology</span>
-        <span>AI</span>
-      </button>
-      <button class="pill-chip" onclick="playGame('web.html', 'Trashbin Web')">
-        <span class="material-symbols-sharp" style="font-size: 15px; color: #10b981;">travel_explore</span>
-        <span>Web</span>
-      </button>
     </div>
   </div>
 
@@ -4149,11 +4410,83 @@ function updateCounts() {
   if (lDl) lDl.textContent = dlCount;
 }
 
+const CURRENT_APP_VERSION = '3.9.37';
+let latestDetectedAppVersion = CURRENT_APP_VERSION;
+
+const FILTER_MODES = [
+  { id: 'games', name: 'Games', icon: 'sports_esports', title: 'Games' },
+  { id: 'music', name: 'Music', icon: 'queue_music', title: 'Yolk! Music' },
+  { id: 'movies', name: 'Movies', icon: 'movie', title: 'Moss Movies & Shows' },
+  { id: 'ai', name: 'AI Chat', icon: 'psychology', title: 'Trashbin AI' },
+  { id: 'all', name: 'All', icon: 'grid_view', title: 'All Categories' },
+  { id: 'downloaded', name: 'Saved', icon: 'download_for_offline', title: 'Downloaded Games' }
+];
+let currentFilterIndex = 0;
+let lastMediaSearchQuery = '';
+let musicSearchResults = [];
+let movieSearchResults = [];
+let isFetchingMedia = false;
+let mediaFetchDebounceTimer = null;
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function initFilterWheel() {
+  const track = document.getElementById('filterWheelTrack');
+  if (track) {
+    track.innerHTML = FILTER_MODES.map(m => `
+      <div class="filter-wheel-item" data-mode="${m.id}">
+        <span class="material-symbols-sharp">${m.icon}</span>
+        <span>${m.name}</span>
+      </div>
+    `).join('');
+    updateFilterWheelUI();
+  }
+
+  const wrapper = document.getElementById('filterWheelWrapper') || document.getElementById('filterWheelBtn');
+  if (wrapper) {
+    let wheelCooldown = false;
+    wrapper.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (wheelCooldown) return;
+      wheelCooldown = true;
+      setTimeout(() => { wheelCooldown = false; }, 160);
+      const step = e.deltaY > 0 ? 1 : -1;
+      cycleFilterMode(step);
+    }, { passive: false });
+  }
+}
+
+function updateFilterWheelUI() {
+  const track = document.getElementById('filterWheelTrack');
+  if (track) {
+    track.style.transform = `translateY(${-currentFilterIndex * 32}px)`;
+  }
+  const mode = FILTER_MODES[currentFilterIndex];
+  const catLabel = document.getElementById('resultsCategoryLabel');
+  if (catLabel) {
+    catLabel.textContent = mode.title;
+  }
+}
+
+function cycleFilterMode(step = 1) {
+  currentFilterIndex = (currentFilterIndex + step + FILTER_MODES.length) % FILTER_MODES.length;
+  updateFilterWheelUI();
+  const searchInput = document.getElementById('searchInput');
+  const val = searchInput ? searchInput.value.trim() : '';
+  activateSearchState();
+  renderGames();
+}
+
 function selectChip(tab) {
-  currentTab = tab;
-  document.getElementById('chipAll').classList.toggle('active', tab === 'all');
-  document.getElementById('chipDownloaded').classList.toggle('active', tab === 'downloaded');
-  document.getElementById('resultsCategoryLabel').textContent = tab === 'downloaded' ? 'Downloaded Games' : 'All Games';
+  const idx = FILTER_MODES.findIndex(m => m.id === tab);
+  if (idx !== -1) {
+    currentFilterIndex = idx;
+    updateFilterWheelUI();
+  }
   activateSearchState();
   renderGames();
 }
@@ -4192,16 +4525,14 @@ function resetToCenterHome() {
   const rc = document.getElementById('results-container');
   if (rc) rc.style.top = '';
   currentTab = null;
-  const chipAll = document.getElementById('chipAll');
-  const chipDl = document.getElementById('chipDownloaded');
-  if (chipAll) chipAll.classList.remove('active');
-  if (chipDl) chipDl.classList.remove('active');
   const catLabel = document.getElementById('resultsCategoryLabel');
-  if (catLabel) catLabel.textContent = 'All Games';
+  if (catLabel) catLabel.textContent = FILTER_MODES[currentFilterIndex].title;
 }
 
 function triggerBrowseAll() {
   if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+  currentFilterIndex = 0;
+  updateFilterWheelUI();
   const searchInput = document.getElementById('searchInput');
   if (searchInput) searchInput.value = '';
   document.getElementById('clearSearchBtn').style.display = 'none';
@@ -4209,7 +4540,7 @@ function triggerBrowseAll() {
   renderGames();
 }
 
-// Instant typing handler (0ms delay for seamless instant search)
+// Instant typing handler
 const searchInput = document.getElementById('searchInput');
 searchInput.addEventListener('input', () => {
   const val = searchInput.value;
@@ -4228,61 +4559,42 @@ searchInput.addEventListener('input', () => {
 
 searchInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') {
+    if (e.shiftKey) {
+      e.preventDefault();
+      const val = (searchInput.value || '').trim();
+      if (val) {
+        playGame('ai.html?q=' + encodeURIComponent(val), 'Trashbin AI');
+      }
+      return;
+    }
     if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
     activateSearchState();
     renderGames();
   }
 });
 
-// Render results
-function renderGames() {
-  const listContainer = document.getElementById('gameList');
-  const emptyState = document.getElementById('emptyState');
-  const emptyDesc = document.getElementById('emptyStateDesc');
-  const summaryLabel = document.getElementById('resultsSummaryLabel');
-  const query = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+function renderAiCard(query) {
+  return `
+    <div class="search-ai-card" onclick="playGame('ai.html?q=' + encodeURIComponent('${encodeURIComponent(query)}'), 'Trashbin AI')">
+      <div class="search-ai-left">
+        <div class="search-ai-icon">
+          <span class="material-symbols-sharp" style="font-size: 20px;">psychology</span>
+        </div>
+        <div class="search-ai-info">
+          <div class="search-ai-title">Ask Trashbin AI: <span class="search-ai-query">"${escapeHtml(query)}"</span></div>
+          <div class="search-ai-sub">Click to generate answer &bull; Or press <kbd>Shift + Enter</kbd> to chat directly</div>
+        </div>
+      </div>
+      <button class="search-ai-btn" type="button">
+        <span>Chat</span>
+        <span class="material-symbols-sharp" style="font-size: 16px;">arrow_forward</span>
+      </button>
+    </div>
+  `;
+}
 
-  let filtered = games.filter(g => {
-    const id = getGameId(g.file);
-    if (currentTab === 'downloaded' && !downloadedGameIds.has(id)) {
-      return false;
-    }
-    if (query && !g.title.toLowerCase().includes(query)) {
-      return false;
-    }
-    return true;
-  });
-
-  const showPinnedTop = localStorage.getItem('trashbin_show_pinned_top') !== 'false';
-  if (showPinnedTop) {
-    filtered.sort((a, b) => {
-      const aPinned = isGamePinned(a.title) ? 1 : 0;
-      const bPinned = isGamePinned(b.title) ? 1 : 0;
-      return bPinned - aPinned;
-    });
-  }
-
-  if (summaryLabel) {
-    summaryLabel.textContent = `${filtered.length} games`;
-  }
-
-  if (filtered.length === 0) {
-    listContainer.innerHTML = '';
-    emptyState.style.display = 'block';
-    if (currentTab === 'downloaded') {
-      emptyDesc.textContent = query
-        ? 'No downloaded games match your search.'
-        : 'No offline games yet. Click "Download" on any game to save it.';
-    } else {
-      emptyDesc.textContent = 'No games match your search query.';
-    }
-    return;
-  }
-
-  emptyState.style.display = 'none';
-
-  let html = '';
-  filtered.forEach(game => {
+function renderGameCardList(gameList) {
+  return gameList.map(game => {
     const id = getGameId(game.file);
     const isDownloaded = downloadedGameIds.has(id);
     const isDownloading = typeof PinpointGameStorage !== 'undefined' && PinpointGameStorage.isDownloading(id);
@@ -4290,7 +4602,7 @@ function renderGames() {
     const isPinned = isGamePinned(game.title);
     const isMossGame = (game.file && game.file.startsWith('movies/')) || (game.title && game.title.includes('Moss'));
 
-    html += `
+    return `
       <div class="game-card" id="card-${id}" onclick="playGame('${encodeURIComponent(game.file)}', '${encodeURIComponent(game.title)}')">
         <div class="game-left">
           <div class="game-details">
@@ -4351,9 +4663,342 @@ function renderGames() {
         </div>
       </div>
     `;
+  }).join('');
+}
+
+function triggerMediaSearch(q) {
+  if (mediaFetchDebounceTimer) clearTimeout(mediaFetchDebounceTimer);
+  mediaFetchDebounceTimer = setTimeout(async () => {
+    isFetchingMedia = true;
+    const fetchQ = q.trim();
+    if (!fetchQ) {
+      musicSearchResults = [];
+      movieSearchResults = [];
+      isFetchingMedia = false;
+      return;
+    }
+
+    try {
+      const musicPromise = fetch(`https://yolkaudio.broshan.com.np/api/music-api?endpoint=search&q=${encodeURIComponent(fetchQ)}&limit=6`)
+        .then(r => r.json())
+        .then(data => {
+          if (fetchQ === lastMediaSearchQuery && data && data.tracks) {
+            musicSearchResults = data.tracks;
+          }
+        }).catch(() => {});
+
+      const moviesPromise = fetch(`https://api.themoviedb.org/3/search/multi?api_key=1cf50e6248dc270629e802686245c2c8&language=en-US&query=${encodeURIComponent(fetchQ)}&page=1&include_adult=false`)
+        .then(r => r.json())
+        .then(data => {
+          if (fetchQ === lastMediaSearchQuery && data && data.results) {
+            movieSearchResults = data.results.filter(r => r.media_type === 'movie' || r.media_type === 'tv');
+          }
+        }).catch(() => {});
+
+      await Promise.all([musicPromise, moviesPromise]);
+    } catch(e) {}
+    isFetchingMedia = false;
+
+    const currentQ = (document.getElementById('searchInput').value || '').trim();
+    if (currentQ === fetchQ && document.body.classList.contains('is-searching')) {
+      renderGames();
+    }
+  }, 120);
+}
+
+// Render results
+function renderGames() {
+  const listContainer = document.getElementById('gameList');
+  const emptyState = document.getElementById('emptyState');
+  const emptyDesc = document.getElementById('emptyStateDesc');
+  const summaryLabel = document.getElementById('resultsSummaryLabel');
+  const query = (document.getElementById('searchInput').value || '').trim();
+  const lowerQuery = query.toLowerCase();
+  const activeMode = FILTER_MODES[currentFilterIndex].id;
+
+  // Empty Search Query: Show Catalog for Active Mode
+  if (!lowerQuery) {
+    if (activeMode === 'music') {
+      if (summaryLabel) summaryLabel.textContent = 'Yolk! Minimalist Music';
+      listContainer.innerHTML = `
+        <div class="search-ai-card" style="background: linear-gradient(135deg, rgba(234, 179, 8, 0.12) 0%, rgba(249, 115, 22, 0.12) 100%); border-color: rgba(234, 179, 8, 0.35);" onclick="playGame('yolk/index.html', 'Yolk! - Minimalist Music')">
+          <div class="search-ai-left">
+            <div class="search-ai-icon" style="background: rgba(234, 179, 8, 0.2); color: #eab308;">
+              <span class="material-symbols-sharp" style="font-size: 20px;">queue_music</span>
+            </div>
+            <div class="search-ai-info">
+              <div class="search-ai-title">Open Yolk! Minimalist Music App</div>
+              <div class="search-ai-sub">Stream unlimited ad-free music, create playlists, and listen in the background</div>
+            </div>
+          </div>
+          <button class="search-ai-btn" style="background: #eab308; color: #000;">
+            <span>Open Yolk!</span>
+            <span class="material-symbols-sharp" style="font-size: 16px;">arrow_forward</span>
+          </button>
+        </div>
+      `;
+      if (emptyState) emptyState.style.display = 'none';
+      return;
+    }
+
+    if (activeMode === 'movies') {
+      if (summaryLabel) summaryLabel.textContent = 'Moss Movies & Shows';
+      listContainer.innerHTML = `
+        <div class="search-ai-card" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(217, 70, 239, 0.12) 100%); border-color: rgba(239, 68, 68, 0.35);" onclick="playGame('movies/index.html', 'Moss - Movies & Shows')">
+          <div class="search-ai-left">
+            <div class="search-ai-icon" style="background: rgba(239, 68, 68, 0.2); color: #ef4444;">
+              <span class="material-symbols-sharp" style="font-size: 20px;">movie</span>
+            </div>
+            <div class="search-ai-info">
+              <div class="search-ai-title">Open Moss - Movies & TV Shows</div>
+              <div class="search-ai-sub">Stream thousands of movies and full series with multi-source server playback</div>
+            </div>
+          </div>
+          <button class="search-ai-btn" style="background: #ef4444; color: #fff;">
+            <span>Open Moss</span>
+            <span class="material-symbols-sharp" style="font-size: 16px;">arrow_forward</span>
+          </button>
+        </div>
+      `;
+      if (emptyState) emptyState.style.display = 'none';
+      return;
+    }
+
+    if (activeMode === 'ai') {
+      if (summaryLabel) summaryLabel.textContent = 'Trashbin AI';
+      listContainer.innerHTML = `
+        <div class="search-ai-card" onclick="playGame('ai.html', 'Trashbin AI')">
+          <div class="search-ai-left">
+            <div class="search-ai-icon">
+              <span class="material-symbols-sharp" style="font-size: 20px;">psychology</span>
+            </div>
+            <div class="search-ai-info">
+              <div class="search-ai-title">Open Trashbin AI Chat</div>
+              <div class="search-ai-sub">Chat, ask study questions, brainstorm, or solve homework problems</div>
+            </div>
+          </div>
+          <button class="search-ai-btn">
+            <span>Open Chat</span>
+            <span class="material-symbols-sharp" style="font-size: 16px;">arrow_forward</span>
+          </button>
+        </div>
+      `;
+      if (emptyState) emptyState.style.display = 'none';
+      return;
+    }
+
+    let filtered = games.filter(g => {
+      const id = getGameId(g.file);
+      if (activeMode === 'downloaded' && !downloadedGameIds.has(id)) return false;
+      return true;
+    });
+
+    const showPinnedTop = localStorage.getItem('trashbin_show_pinned_top') !== 'false';
+    if (showPinnedTop) {
+      filtered.sort((a, b) => {
+        const aPinned = isGamePinned(a.title) ? 1 : 0;
+        const bPinned = isGamePinned(b.title) ? 1 : 0;
+        return bPinned - aPinned;
+      });
+    }
+
+    if (summaryLabel) summaryLabel.textContent = `${filtered.length} games`;
+
+    if (filtered.length === 0) {
+      listContainer.innerHTML = '';
+      if (emptyState) emptyState.style.display = 'block';
+      if (emptyDesc) {
+        emptyDesc.textContent = activeMode === 'downloaded'
+          ? 'No offline games yet. Click "Download" on any game to save it.'
+          : 'No games available.';
+      }
+      return;
+    }
+
+    if (emptyState) emptyState.style.display = 'none';
+    listContainer.innerHTML = renderGameCardList(filtered);
+    return;
+  }
+
+  // Active Query Present
+  if (query !== lastMediaSearchQuery) {
+    lastMediaSearchQuery = query;
+    triggerMediaSearch(query);
+  }
+
+  if (activeMode === 'ai') {
+    if (emptyState) emptyState.style.display = 'none';
+    if (summaryLabel) summaryLabel.textContent = 'AI Chat';
+    listContainer.innerHTML = renderAiCard(query);
+    return;
+  }
+
+  if (activeMode === 'music') {
+    if (emptyState) emptyState.style.display = 'none';
+    if (summaryLabel) summaryLabel.textContent = `${musicSearchResults.length} songs`;
+    if (musicSearchResults.length === 0) {
+      listContainer.innerHTML = isFetchingMedia
+        ? `<div style="padding: 24px; text-align: center; color: var(--text-dim);">Searching Yolk! Music...</div>`
+        : `<div style="padding: 24px; text-align: center; color: var(--text-dim);">No music tracks found for "${escapeHtml(query)}"</div>`;
+    } else {
+      listContainer.innerHTML = `
+        <div class="search-media-grid">
+          ${musicSearchResults.map(track => `
+            <div class="search-media-card" onclick="playGame('yolk/index.html#song=${track.youtube_id || track.id}&t=${encodeURIComponent(track.title || 'Song')}&a=${encodeURIComponent(track.artist_name || 'Artist')}', '${encodeURIComponent(track.title || 'Song')} - Yolk!')">
+              <img class="search-media-thumb" src="${track.artwork_url || 'yolk/yolk-circle.png'}" onerror="this.src='yolk/yolk-circle.png'" alt="">
+              <div class="search-media-info">
+                <div class="search-media-title">${escapeHtml(track.title || 'Song')}</div>
+                <div class="search-media-meta">${escapeHtml(track.artist_name || 'Artist')}</div>
+              </div>
+              <button class="search-media-play-btn" title="Play on Yolk!">
+                <span class="material-symbols-sharp" style="font-size: 16px;">play_arrow</span>
+              </button>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+    return;
+  }
+
+  if (activeMode === 'movies') {
+    if (emptyState) emptyState.style.display = 'none';
+    if (summaryLabel) summaryLabel.textContent = `${movieSearchResults.length} titles`;
+    if (movieSearchResults.length === 0) {
+      listContainer.innerHTML = isFetchingMedia
+        ? `<div style="padding: 24px; text-align: center; color: var(--text-dim);">Searching Moss Movies...</div>`
+        : `<div style="padding: 24px; text-align: center; color: var(--text-dim);">No movies or shows found for "${escapeHtml(query)}"</div>`;
+    } else {
+      listContainer.innerHTML = `
+        <div class="search-media-grid">
+          ${movieSearchResults.map(item => {
+            const title = item.title || item.name || 'Untitled';
+            const type = item.media_type || 'movie';
+            const year = (item.release_date || item.first_air_date || '').slice(0, 4);
+            const rating = item.vote_average ? `★ ${item.vote_average.toFixed(1)}` : '';
+            const poster = item.poster_path ? `https://image.tmdb.org/t/p/w200${item.poster_path}` : '';
+            return `
+              <div class="search-media-card" onclick="playGame('movies/index.html#id=${item.id}&type=${type}', '${encodeURIComponent(title)} - Moss')">
+                ${poster ? `<img class="search-media-thumb movie-poster-thumb" src="${poster}" alt="">` : `<div class="search-media-thumb movie-poster-thumb" style="display:flex;align-items:center;justify-content:center;background:#27272a;"><span class="material-symbols-sharp" style="font-size:18px;color:#71717a;">movie</span></div>`}
+                <div class="search-media-info">
+                  <div class="search-media-title">${escapeHtml(title)}</div>
+                  <div class="search-media-meta">${year ? year + ' &bull; ' : ''}${type === 'tv' ? 'Series' : 'Movie'} ${rating ? '&bull; ' + rating : ''}</div>
+                </div>
+                <button class="search-media-play-btn" title="Watch on Moss">
+                  <span class="material-symbols-sharp" style="font-size: 16px;">play_arrow</span>
+                </button>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+    return;
+  }
+
+  // Unified Multi-Category Search (Default)
+  const matchingGames = games.filter(g => {
+    const id = getGameId(g.file);
+    if (activeMode === 'downloaded' && !downloadedGameIds.has(id)) return false;
+    return g.title.toLowerCase().includes(lowerQuery);
   });
 
-  listContainer.innerHTML = html;
+  const showPinnedTop = localStorage.getItem('trashbin_show_pinned_top') !== 'false';
+  if (showPinnedTop) {
+    matchingGames.sort((a, b) => {
+      const aPinned = isGamePinned(a.title) ? 1 : 0;
+      const bPinned = isGamePinned(b.title) ? 1 : 0;
+      return bPinned - aPinned;
+    });
+  }
+
+  let totalCount = matchingGames.length + musicSearchResults.length + movieSearchResults.length + 1;
+  if (summaryLabel) summaryLabel.textContent = `${totalCount} results`;
+  if (emptyState) emptyState.style.display = 'none';
+
+  let sectionsHtml = '';
+
+  // 1. AI Interactive Card (Always Top)
+  sectionsHtml += renderAiCard(query);
+
+  // 2. Games Section
+  if (matchingGames.length > 0) {
+    sectionsHtml += `
+      <div class="search-section-header">
+        <span class="material-symbols-sharp">sports_esports</span>
+        <span>Games (${matchingGames.length})</span>
+      </div>
+    `;
+    sectionsHtml += renderGameCardList(matchingGames);
+  }
+
+  // 3. Music Section
+  if (musicSearchResults.length > 0) {
+    sectionsHtml += `
+      <div class="search-section-header">
+        <span class="material-symbols-sharp">queue_music</span>
+        <span>Music (Yolk!)</span>
+      </div>
+      <div class="search-media-grid">
+        ${musicSearchResults.slice(0, 6).map(track => `
+          <div class="search-media-card" onclick="playGame('yolk/index.html#song=${track.youtube_id || track.id}&t=${encodeURIComponent(track.title || 'Song')}&a=${encodeURIComponent(track.artist_name || 'Artist')}', '${encodeURIComponent(track.title || 'Song')} - Yolk!')">
+            <img class="search-media-thumb" src="${track.artwork_url || 'yolk/yolk-circle.png'}" onerror="this.src='yolk/yolk-circle.png'" alt="">
+            <div class="search-media-info">
+              <div class="search-media-title">${escapeHtml(track.title || 'Song')}</div>
+              <div class="search-media-meta">${escapeHtml(track.artist_name || 'Artist')}</div>
+            </div>
+            <button class="search-media-play-btn" title="Play on Yolk!">
+              <span class="material-symbols-sharp" style="font-size: 16px;">play_arrow</span>
+            </button>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  // 4. Movies Section
+  if (movieSearchResults.length > 0) {
+    sectionsHtml += `
+      <div class="search-section-header">
+        <span class="material-symbols-sharp">movie</span>
+        <span>Movies & Shows (Moss)</span>
+      </div>
+      <div class="search-media-grid">
+        ${movieSearchResults.slice(0, 6).map(item => {
+          const title = item.title || item.name || 'Untitled';
+          const type = item.media_type || 'movie';
+          const year = (item.release_date || item.first_air_date || '').slice(0, 4);
+          const rating = item.vote_average ? `★ ${item.vote_average.toFixed(1)}` : '';
+          const poster = item.poster_path ? `https://image.tmdb.org/t/p/w200${item.poster_path}` : '';
+          return `
+            <div class="search-media-card" onclick="playGame('movies/index.html#id=${item.id}&type=${type}', '${encodeURIComponent(title)} - Moss')">
+              ${poster ? `<img class="search-media-thumb movie-poster-thumb" src="${poster}" alt="">` : `<div class="search-media-thumb movie-poster-thumb" style="display:flex;align-items:center;justify-content:center;background:#27272a;"><span class="material-symbols-sharp" style="font-size:18px;color:#71717a;">movie</span></div>`}
+              <div class="search-media-info">
+                <div class="search-media-title">${escapeHtml(title)}</div>
+                <div class="search-media-meta">${year ? year + ' &bull; ' : ''}${type === 'tv' ? 'Series' : 'Movie'} ${rating ? '&bull; ' + rating : ''}</div>
+              </div>
+              <button class="search-media-play-btn" title="Watch on Moss">
+                <span class="material-symbols-sharp" style="font-size: 16px;">play_arrow</span>
+              </button>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }
+
+  if (matchingGames.length === 0 && musicSearchResults.length === 0 && movieSearchResults.length === 0) {
+    if (isFetchingMedia) {
+      sectionsHtml += `
+        <div style="display: flex; align-items: center; justify-content: center; gap: 10px; padding: 24px; color: var(--text-dim); font-size: 13px;">
+          <span class="material-symbols-sharp" style="animation: spin 1s linear infinite; font-size: 18px;">sync</span>
+          Searching library, music and movies...
+        </div>
+      `;
+    }
+  }
+
+  listContainer.innerHTML = sectionsHtml;
 }
 
 function prepareGameHtml(html, fileUrl) {
@@ -4792,7 +5437,17 @@ function pushThemeToFrames() {
 }
 
 function writeGameIntoFrame(iframe, rawHtml, fileUrl) {
-  const preparedHtml = prepareGameHtml(rawHtml, fileUrl);
+  const hashIdx = fileUrl.indexOf('#');
+  const searchIdx = fileUrl.indexOf('?');
+  const hashStr = hashIdx !== -1 ? fileUrl.slice(hashIdx) : '';
+  const searchStr = searchIdx !== -1 ? (hashIdx !== -1 ? fileUrl.slice(searchIdx, hashIdx) : fileUrl.slice(searchIdx)) : '';
+
+  let preparedHtml = prepareGameHtml(rawHtml, fileUrl);
+  if (hashStr || searchStr) {
+    const inlineScript = '<script>\n      try {\n        if ("' + hashStr + '") window.location.hash = "' + hashStr + '";\n        if ("' + searchStr + '") {\n          window.__initialQuery = "' + searchStr + '";\n          try { history.replaceState({}, "", "' + searchStr + hashStr + '"); } catch(e){}\n        }\n      } catch(e) {}\n    <' + '/script>';
+    preparedHtml = preparedHtml.replace(/<head[^>]*>/i, '$&' + inlineScript);
+  }
+
   try {
     const doc = iframe.contentDocument || iframe.contentWindow.document;
     doc.open();
@@ -4817,8 +5472,118 @@ function writeGameIntoFrame(iframe, rawHtml, fileUrl) {
   setTimeout(checkAndApplyStretchedRes, 1000);
 }
 
+function parseSemVer(v) {
+  if (!v) return [0, 0, 0];
+  const clean = String(v).replace(/^[^0-9]*/, '');
+  const parts = clean.split('.').map(n => parseInt(n, 10) || 0);
+  while (parts.length < 3) parts.push(0);
+  return parts;
+}
+
+function compareSemVer(v1, v2) {
+  const [a1, b1, c1] = parseSemVer(v1);
+  const [a2, b2, c2] = parseSemVer(v2);
+  if (a1 !== a2) return a1 - a2;
+  if (b1 !== b2) return b1 - b2;
+  return c1 - c2;
+}
+
+async function checkAppVersionUpdate(manual = false) {
+  const urls = [
+    './version.json?t=' + Date.now(),
+    'https://raw.githubusercontent.com/pinpoint-edu/pinpoint-mini/main/version.json?t=' + Date.now(),
+    'https://cdn.jsdelivr.net/gh/pinpoint-edu/pinpoint-mini@main/version.json?t=' + Date.now()
+  ];
+  let remoteData = null;
+  for (const url of urls) {
+    try {
+      const res = await fetch(url, { cache: 'no-store' });
+      if (res.ok) {
+        remoteData = await res.json();
+        if (remoteData && remoteData.version) break;
+      }
+    } catch(e) {}
+  }
+  if (!remoteData || !remoteData.version) {
+    if (manual) alert('Could not reach update server. Please check your internet connection.');
+    return;
+  }
+  latestDetectedAppVersion = remoteData.version;
+  const isNewer = compareSemVer(latestDetectedAppVersion, CURRENT_APP_VERSION) > 0;
+
+  const toast = document.getElementById('updateToast');
+  const toastDesc = document.getElementById('updateToastDesc');
+  const badge = document.getElementById('settingsVersionBadge');
+  const applyBtn = document.getElementById('settingsApplyUpdateBtn');
+
+  if (isNewer) {
+    if (toast && toastDesc) {
+      toastDesc.textContent = `Pinpoint Mini v${latestDetectedAppVersion} is now available!`;
+      toast.style.display = 'flex';
+    }
+    if (badge) {
+      badge.textContent = `v${latestDetectedAppVersion} Available`;
+      badge.style.background = 'rgba(234, 179, 8, 0.2)';
+      badge.style.color = '#eab308';
+    }
+    if (applyBtn) {
+      applyBtn.style.display = 'inline-block';
+      applyBtn.textContent = `Update to v${latestDetectedAppVersion}`;
+    }
+  } else {
+    if (badge) {
+      badge.textContent = `v${CURRENT_APP_VERSION} (Up to Date)`;
+      badge.style.background = 'rgba(0, 255, 136, 0.15)';
+      badge.style.color = '#00ff88';
+    }
+    if (applyBtn) applyBtn.style.display = 'none';
+    if (manual) {
+      alert(`Pinpoint Mini is up to date (v${CURRENT_APP_VERSION}).`);
+    }
+  }
+}
+
+function dismissUpdateToast() {
+  const toast = document.getElementById('updateToast');
+  if (toast) toast.style.display = 'none';
+}
+
+async function applyAppUpdate() {
+  try {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ type: 'updateVersion', version: latestDetectedAppVersion }, '*');
+    }
+  } catch(e) {}
+
+  if ('caches' in window) {
+    try {
+      const keys = await caches.keys();
+      for (const k of keys) await caches.delete(k);
+    } catch(e) {}
+  }
+  if ('serviceWorker' in navigator) {
+    try {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      for (const r of regs) await r.unregister();
+    } catch(e) {}
+  }
+
+  const u = new URL(window.location.href);
+  u.searchParams.set('v', latestDetectedAppVersion);
+  u.searchParams.set('t', Date.now());
+  window.location.href = u.href;
+}
+
 async function fetchGameHtml(file) {
-  if (/^https?:\/\//i.test(file)) {
+  let urlHashOrSearch = '';
+  let cleanFile = file;
+  const hashIdx = cleanFile.search(/[#?]/);
+  if (hashIdx !== -1) {
+    urlHashOrSearch = cleanFile.slice(hashIdx);
+    cleanFile = cleanFile.slice(0, hashIdx);
+  }
+
+  if (/^https?:\/\//i.test(cleanFile)) {
     let mirrorUrl = file;
     if (file.includes('jsdelivr.net')) {
       mirrorUrl = file.replace(/https?:\/\/[^/]*\.jsdelivr\.net\//i, activeMirror + '/');
@@ -4872,7 +5637,7 @@ async function fetchGameHtml(file) {
           try {
             localResolved = new URL(fetchFile, window.location.href).href;
           } catch(e) {}
-          return { html: text, resolvedUrl: localResolved };
+          return { html: text, resolvedUrl: localResolved + urlHashOrSearch };
         }
       }
     } catch(e) {}
@@ -4917,7 +5682,7 @@ async function fetchGameHtml(file) {
           break;
         }
       }
-      return { html: text, resolvedUrl: url };
+      return { html: text, resolvedUrl: url + urlHashOrSearch };
     } catch(e) {
       continue;
     }
@@ -7104,7 +7869,7 @@ window.toggleSettingsModal = function() {
   if (!modal) return;
   const isHidden = modal.style.display === "none" || !modal.style.display;
   modal.style.display = isHidden ? "flex" : "none";
-  if (isHidden) initSettingsUI();
+  if (isHidden) initSettingsUI(); initFilterWheel(); setTimeout(() => checkAppVersionUpdate(false), 2000);
 };
 
 document.addEventListener('keydown', (e) => {
@@ -7278,6 +8043,19 @@ if (document.readyState === 'loading') {
 
       <!-- TAB 2: CORE INFRASTRUCTURE & DEPLOYMENT -->
       <div class="settings-tab-pane" id="tab-core">
+        <div class="settings-section-head">App Updates & Version</div>
+        <div class="settings-row">
+          <div class="settings-col-left">
+            <div class="settings-row-title">Pinpoint Mini Version</div>
+            <div class="settings-row-desc" id="settingsVersionDesc">Running Pinpoint Mini v3.9.37</div>
+          </div>
+          <div class="settings-col-right" style="display: flex; align-items: center; gap: 8px;">
+            <span id="settingsVersionBadge" style="font-size: 12px; padding: 4px 10px; border-radius: 8px; background: rgba(0, 255, 136, 0.15); color: #00ff88; font-weight: 600;">v3.9.37 (Up to Date)</span>
+            <button class="settings-btn-action" id="settingsCheckUpdateBtn" onclick="checkAppVersionUpdate(true)">Check for Updates</button>
+            <button class="settings-btn-action primary" id="settingsApplyUpdateBtn" style="display: none;" onclick="applyAppUpdate()">Update Now</button>
+          </div>
+        </div>
+
         <div class="settings-section-head">Launcher Options (Bypass URL Filters)</div>
         <div class="settings-row">
           <div class="settings-col-left">
@@ -7657,6 +8435,23 @@ if (document.readyState === 'loading') {
       <div class="resuming-spinner"></div>
       <div class="resuming-text">Resuming Game...</div>
       <div class="resuming-sub">Restoring active session</div>
+    </div>
+  </div>
+
+  <!-- Update Notification Toast -->
+  <div id="updateToast" class="update-toast" style="display: none;">
+    <div class="update-toast-content">
+      <div class="update-toast-icon">
+        <span class="material-symbols-sharp" style="font-size: 20px;">system_update</span>
+      </div>
+      <div class="update-toast-text">
+        <div class="update-toast-title">Update Available</div>
+        <div class="update-toast-desc" id="updateToastDesc">Pinpoint Mini v3.9.37 is ready.</div>
+      </div>
+    </div>
+    <div class="update-toast-actions">
+      <button class="update-toast-btn primary" onclick="applyAppUpdate()">Update Now</button>
+      <button class="update-toast-close" onclick="dismissUpdateToast()" title="Dismiss">&times;</button>
     </div>
   </div>
 </body>

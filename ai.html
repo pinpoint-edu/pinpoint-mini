@@ -706,6 +706,18 @@
     });
 
     chatInput.focus();
+
+    // Auto-prompt if query passed in search, hash, or window.__initialQuery
+    try {
+      const rawAiSearch = window.location.search || (window.__initialQuery || '');
+      const rawAiHash = window.location.hash || '';
+      const combinedParams = new URLSearchParams(rawAiSearch.replace(/^\?/, '') + '&' + rawAiHash.replace(/^#/, ''));
+      const qVal = combinedParams.get('q');
+      if (qVal) {
+        chatInput.value = decodeURIComponent(qVal);
+        setTimeout(() => sendMessage(), 150);
+      }
+    } catch(e) {}
   </script>
 </body>
 </html>
