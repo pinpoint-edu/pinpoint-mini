@@ -2029,7 +2029,7 @@
       </div>
     </div>
 
-    <iframe id="gameIframe" class="player-iframe" allowfullscreen="true" allow="autoplay; fullscreen; camera; microphone; clipboard-read; clipboard-write; display-capture; geolocation; encrypted-media; picture-in-picture; web-share"></iframe>
+    <iframe id="gameIframe" class="player-iframe" allow="autoplay; fullscreen; camera; microphone; clipboard-read; clipboard-write; display-capture; geolocation; encrypted-media; picture-in-picture; web-share"></iframe>
   </div>
 
   <!-- Device Status & Battery Fullscreen Viewer (Takes the entire person's screen) -->
@@ -2076,6 +2076,18 @@
   </div>
 
   <script>
+// HTML Escaping Utility
+function escapeHtml(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+window.escapeHtml = escapeHtml;
+
 // IndexedDB + CacheStorage for Offline Games (Supports single-file & multi-part/asset games)
 const GAME_DB_NAME = 'TrashbinGamesDB';
 const GAME_DB_VERSION = 1;
@@ -4353,6 +4365,9 @@ function renderMultiSearchResults(query) {
     window.__topSearchResultAction = () => playGame('ai.html?q=' + encodeURIComponent(query), 'Trashbin AI');
   }
 
+  window.__actionAskAi = () => playGame('ai.html?q=' + encodeURIComponent(query), 'Trashbin AI');
+  window.__actionProxy = () => playGame('web.html?url=' + encodeURIComponent(query), 'Web Proxy');
+
   container.innerHTML = `
     <div class="multi-search-wrapper">
       <!-- Shortcut Action Strip -->
@@ -4361,11 +4376,11 @@ function renderMultiSearchResults(query) {
           <kbd>↵ Enter</kbd>
           <span>Launch Top Result</span>
         </button>
-        <button class="search-action-chip" onclick="playGame('ai.html?q=' + encodeURIComponent('${encodeURIComponent(query)}'), 'Trashbin AI')">
+        <button class="search-action-chip" onclick="window.__actionAskAi && window.__actionAskAi()">
           <kbd>Shift + ↵</kbd>
           <span>Ask AI: "${escapeHtml(query)}"</span>
         </button>
-        <button class="search-action-chip" onclick="playGame('web.html?url=' + encodeURIComponent('${encodeURIComponent(query)}'), 'Web Proxy')">
+        <button class="search-action-chip" onclick="window.__actionProxy && window.__actionProxy()">
           <kbd>Ctrl + ↵</kbd>
           <span>Proxy Lookup</span>
         </button>
@@ -4495,7 +4510,7 @@ function renderMultiSearchResults(query) {
                 const mType = m.media_type || (m.first_air_date ? 'tv' : 'movie');
                 const deepLink = `movies/index.html?id=${encodeURIComponent(m.id)}&type=${encodeURIComponent(mType)}`;
                 return `
-                  <div class="search-movie-card" onclick="playGame('${encodeURIComponent(deepLink)}', 'Moss - ${escapeHtml(title)}')">
+                  <div class="search-movie-card" onclick="playGame('${encodeURIComponent(deepLink)}', '${encodeURIComponent('Moss - ' + title)}')">
                     <img class="search-movie-poster" src="${poster}" alt="${escapeHtml(title)}" loading="lazy" />
                     <div class="search-movie-title">${escapeHtml(title)}</div>
                   </div>
@@ -7188,7 +7203,7 @@ window.launchInAboutBlank = function() {
 </style>
     </head>
     <body>
-      <iframe src="${window.location.href}" allowfullscreen="true" allow="autoplay; fullscreen; clipboard-read; clipboard-write; web-share"></iframe>
+      <iframe src="${window.location.href}" allow="autoplay; fullscreen; clipboard-read; clipboard-write; web-share"></iframe>
     
   <!-- Bottom-Right Update Toast Notification -->
   <div id="update-toast-banner" class="update-toast-banner">
@@ -7233,7 +7248,7 @@ window.downloadOfflineHtml = function() {
 
 
 // ==== TRASHBIN APP VERSION & AUTO-UPDATES ====
-const CURRENT_APP_VERSION = '3.9.41';
+const CURRENT_APP_VERSION = '3.9.42';
 
 function compareSemVer(v1, v2) {
   if (!v1 || !v2) return 0;
@@ -7507,62 +7522,67 @@ window.searchAndRenderPinOptions = function(query) {
 // ==== STARTUP & PERFORMANCE ====
 let __chimePlayed = false;
 function playStartupChime() {
-  // Calm, gentle chime: soft sine bells (pentatonic), slow attack, long decay, low-passed with a soft echo
   if (__chimePlayed) return;
-  try {
-    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    if (!AudioCtx) return;
-    const ctx = new AudioCtx();
-    const start = () => {
-      if (__chimePlayed) return;
-      __chimePlayed = true;
-      const t0 = ctx.currentTime + 0.01;
-      const master = ctx.createGain();
-      master.gain.value = 0.38;
-      const lp = ctx.createBiquadFilter();
-      lp.type = 'lowpass';
-      lp.frequency.value = 1800;
-      const delay = ctx.createDelay(1.0);
-      delay.delayTime.value = 0.22;
-      const fb = ctx.createGain();
-      fb.gain.value = 0.28;
-      const wet = ctx.createGain();
-      wet.gain.value = 0.35;
-      master.connect(lp);
-      lp.connect(ctx.destination);
-      lp.connect(delay);
-      delay.connect(fb);
-      fb.connect(delay);
-      delay.connect(wet);
-      wet.connect(ctx.destination);
-      const notes = [392.00, 587.33];
-      notes.forEach((freq, idx) => {
-        const t = t0 + idx * 0.11;
-        [[1, 0.09], [2, 0.015]].forEach(([mult, vol]) => {
-          const osc = ctx.createOscillator();
-          const g = ctx.createGain();
-          osc.type = 'sine';
-          osc.frequency.value = freq * mult;
-          g.gain.setValueAtTime(0.0001, t);
-          g.gain.linearRampToValueAtTime(vol, t + 0.035);
-          g.gain.exponentialRampToValueAtTime(0.0001, t + 1.5);
-          osc.connect(g);
-          g.connect(master);
-          osc.start(t);
-          osc.stop(t + 1.6);
+  const doChime = () => {
+    if (__chimePlayed) return;
+    __chimePlayed = true;
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const start = () => {
+        const t0 = ctx.currentTime + 0.01;
+        const master = ctx.createGain();
+        master.gain.value = 0.38;
+        const lp = ctx.createBiquadFilter();
+        lp.type = 'lowpass';
+        lp.frequency.value = 1800;
+        const delay = ctx.createDelay(1.0);
+        delay.delayTime.value = 0.22;
+        const fb = ctx.createGain();
+        fb.gain.value = 0.28;
+        const wet = ctx.createGain();
+        wet.gain.value = 0.35;
+        master.connect(lp);
+        lp.connect(ctx.destination);
+        lp.connect(delay);
+        delay.connect(fb);
+        fb.connect(delay);
+        delay.connect(wet);
+        wet.connect(ctx.destination);
+        const notes = [392.00, 587.33];
+        notes.forEach((freq, idx) => {
+          const t = t0 + idx * 0.11;
+          [[1, 0.09], [2, 0.015]].forEach(([mult, vol]) => {
+            const osc = ctx.createOscillator();
+            const g = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = freq * mult;
+            g.gain.setValueAtTime(0.0001, t);
+            g.gain.linearRampToValueAtTime(vol, t + 0.035);
+            g.gain.exponentialRampToValueAtTime(0.0001, t + 1.5);
+            osc.connect(g);
+            g.connect(master);
+            osc.start(t);
+            osc.stop(t + 1.6);
+          });
         });
-      });
-      setTimeout(() => { try { ctx.close(); } catch(e) {} }, 5000);
-    };
-    if (ctx.state === 'running') start();
-    else {
-      ctx.resume().then(() => { if (ctx.state === 'running') start(); }).catch(() => {});
-      const unlock = () => {
-        ctx.resume().then(start).catch(() => {});
+        setTimeout(() => { try { ctx.close(); } catch(e) {} }, 5000);
       };
-      ['pointerdown', 'click', 'keydown', 'touchstart'].forEach(ev => window.addEventListener(ev, unlock, { once: true }));
-    }
-  } catch(e) {}
+      if (ctx.state === 'running') start();
+      else ctx.resume().then(start).catch(() => {});
+    } catch(e) {}
+  };
+
+  if (navigator.userActivation && navigator.userActivation.hasBeenActive) {
+    doChime();
+  } else {
+    const onGesture = () => {
+      ['pointerdown', 'click', 'keydown', 'touchstart'].forEach(ev => window.removeEventListener(ev, onGesture, true));
+      doChime();
+    };
+    ['pointerdown', 'click', 'keydown', 'touchstart'].forEach(ev => window.addEventListener(ev, onGesture, { capture: true, once: true }));
+  }
 }
 
 function initStartupAndPerformance() {
@@ -8158,7 +8178,7 @@ if (document.readyState === 'loading') {
         <div class="settings-row">
           <div class="settings-col-left">
             <div class="settings-row-title">Current Release</div>
-            <div class="settings-row-desc" id="settingsCurrentVerDesc">Trashbin v3.9.41 • 3-Pane Multi-Platform Search &amp; Hotlinks</div>
+            <div class="settings-row-desc" id="settingsCurrentVerDesc">Trashbin v3.9.42 • 3-Pane Multi-Platform Search &amp; Hotlinks</div>
           </div>
           <div class="settings-col-right">
             <button class="settings-btn-action primary" id="btnCheckUpdates" onclick="checkTrashbinUpdates(true)">Check for Updates</button>
