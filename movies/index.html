@@ -2584,24 +2584,55 @@
             switchTab(previousTab === 'preview' ? 'home' : previousTab);
         }
 
-        // Initialize App
-        document.addEventListener('DOMContentLoaded', () => {
-            initGenreBars();
-            loadHome();
-
-            // Check deep link via hash or search params
-            const rawHash = window.location.hash.replace(/^#/, '');
-            const rawSearch = window.location.search.replace(/^\?/, '') || (window.__initialQuery ? window.__initialQuery.replace(/^[#?]/, '') : '');
+        // Robust Hotlink / Deep Link Handler
+        function handleMossHotlink() {
+            const rawHash = (window.location.hash || '').replace(/^#/, '');
+            const rawSearch = (window.location.search || '').replace(/^\?/, '') ||
+                              (window.__initialQuery ? window.__initialQuery.replace(/^[#?]/, '') : '') ||
+                              (window.__HOTLINK_URL__ ? (window.__HOTLINK_URL__.match(/[?#](.*)/) || [])[1] : '');
             const combinedQuery = rawHash + '&' + rawSearch;
             const params = new URLSearchParams(combinedQuery);
             const targetId = params.get('id') || (combinedQuery.match(/id=([0-9]+)/) || [])[1];
             const targetType = params.get('type') || (combinedQuery.match(/type=(movie|tv)/) || [])[1] || 'movie';
+
             if (targetId) {
+                console.log('[Moss] Executing hotlink for id:', targetId, targetType);
                 fetchTMDB('/' + targetType + '/' + targetId).then(item => {
                     if (item && !item.status_message) {
                         openPreview(item, targetType);
                     }
-                }).catch(() => {});
+                }).catch(err => console.error('[Moss] Hotlink fetch failed:', err));
+            }
+        }
+
+        function initMossApp() {
+            initGenreBars();
+            loadHome();
+            handleMossHotlink();
+            setTimeout(handleMossHotlink, 200);
+            setTimeout(handleMossHotlink, 600);
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initMossApp);
+        } else {
+            initMossApp();
+        }
+
+        window.addEventListener('hashchange', handleMossHotlink);
+        window.addEventListener('message', (e) => {
+            if (e.data && (e.data.type === 'MOSS_HOTLINK' || e.data.type === 'TRASHBIN_HOTLINK')) {
+                const q = e.data.query || (e.data.url && (e.data.url.match(/[?#](.*)/) || [])[1]) || '';
+                if (q) {
+                    const p = new URLSearchParams(q.replace(/^[#?]/, ''));
+                    const tid = p.get('id') || e.data.id;
+                    const mType = p.get('type') || e.data.mediaType || 'movie';
+                    if (tid) {
+                        fetchTMDB('/' + mType + '/' + tid).then(item => {
+                            if (item && !item.status_message) openPreview(item, mType);
+                        }).catch(() => {});
+                    }
+                }
             }
         });
     </script>

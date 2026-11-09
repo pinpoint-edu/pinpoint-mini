@@ -232,10 +232,11 @@
     }
 
     body.is-searching #main-content-flow {
-      top: 20px;
+      top: 14px;
       transform: translate(-50%, 0);
-      max-width: 900px;
-      height: calc(100vh - 36px);
+      width: calc(100vw - 36px);
+      max-width: 1600px;
+      height: calc(100vh - 24px);
       align-items: stretch;
     }
 
@@ -2041,12 +2042,13 @@
        ========================================================================= */
     .multi-search-wrapper {
       width: 100%;
-      max-width: 1240px;
-      margin: 0 auto;
+      max-width: 100%;
+      margin: 0;
       display: flex;
       flex-direction: column;
       gap: 12px;
       box-sizing: border-box;
+      flex: 1;
     }
 
     /* Action bar for shortcuts */
@@ -2090,13 +2092,111 @@
 
     .multi-search-grid {
       display: grid;
-      grid-template-columns: 1.3fr 1fr;
-      gap: 20px;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 16px;
       width: 100%;
-      height: calc(100vh - 170px);
+      height: calc(100vh - 120px);
       min-height: 480px;
-      max-height: 760px;
+      max-height: none;
       box-sizing: border-box;
+      transition: grid-template-columns 0.3s ease;
+    }
+
+    .multi-search-grid.no-games {
+      grid-template-columns: 1fr;
+    }
+
+    .multi-search-grid.no-games .search-col-games {
+      display: none !important;
+    }
+
+    .multi-search-grid.no-games .search-col-media {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      height: 100%;
+    }
+
+    /* Sleek Game List Rows (No image placeholders) */
+    .search-games-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 4px;
+    }
+
+    .search-game-list-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    .search-game-list-row:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.18);
+      transform: translateX(3px);
+    }
+
+    .search-game-list-row.top-result {
+      border-color: var(--accent);
+      background: rgba(0, 255, 204, 0.05);
+      box-shadow: 0 0 14px var(--accent-glow);
+    }
+
+    .search-game-row-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .search-game-icon {
+      font-size: 18px;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .search-game-row-title {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .top-result-badge {
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: var(--accent);
+      color: #0b0e14;
+      flex-shrink: 0;
+    }
+
+    .search-game-play-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      color: var(--accent);
+      opacity: 0.8;
+      transition: opacity 0.15s ease;
+    }
+
+    .search-game-list-row:hover .search-game-play-btn {
+      opacity: 1;
     }
 
     @media (max-width: 900px) {
@@ -2104,6 +2204,9 @@
         grid-template-columns: 1fr;
         height: auto;
         max-height: none;
+      }
+      .multi-search-grid.no-games .search-col-media {
+        grid-template-columns: 1fr;
       }
     }
 
@@ -5325,6 +5428,8 @@ function renderMultiSearchResults(query) {
   window.__actionAskAi = () => openEmbeddedAI(query);
   window.__actionProxy = () => openEmbeddedProxy(query);
 
+  const hasGames = matchedGames.length > 0;
+
   container.innerHTML = `
     <div class="multi-search-wrapper">
       <!-- Shortcut Action Strip -->
@@ -5343,10 +5448,10 @@ function renderMultiSearchResults(query) {
         </button>
       </div>
 
-      <!-- 3-Pane Split Grid -->
-      <div class="multi-search-grid">
-        <!-- 1. LEFT PANE: Games (Long independent vertical scroll) -->
-        <div class="search-col-games">
+      <!-- 3-Pane Split Grid (auto-expands media when no games match) -->
+      <div class="multi-search-grid ${hasGames ? 'has-games' : 'no-games'}">
+        <!-- 1. LEFT PANE: Games (Long independent vertical scroll, hidden if 0 games) -->
+        <div class="search-col-games" style="${hasGames ? '' : 'display:none;'}">
           <div class="search-pane-header">
             <div class="search-pane-title-group">
               <span class="material-symbols-sharp" style="color:var(--accent);">sports_esports</span>
@@ -5355,21 +5460,24 @@ function renderMultiSearchResults(query) {
             <span class="search-pane-count">${matchedGames.length}</span>
           </div>
           <div class="search-pane-scroll" id="multiGamesScroll">
-            ${matchedGames.length === 0 
-              ? '<div style="color:var(--text-dim);padding:24px;text-align:center;">No matching games found.</div>' 
-              : `<div class="search-games-grid">
-                  ${matchedGames.map((g, idx) => `
-                    <div class="search-game-card ${idx === 0 ? 'top-result' : ''}" onclick="playGame('${encodeURIComponent(g.file)}', '${encodeURIComponent(g.title)}')">
-                      <img class="search-game-thumb" src="${g.img || 'trashbin.png'}" alt="${escapeHtml(g.title)}" loading="lazy" />
-                      <div class="search-game-title">${escapeHtml(g.title)}</div>
-                    </div>
-                  `).join('')}
-                </div>`
-            }
+            <div class="search-games-list">
+              ${matchedGames.map((g, idx) => `
+                <div class="search-game-list-row ${idx === 0 ? 'top-result' : ''}" onclick="playGame('${encodeURIComponent(g.file)}', '${encodeURIComponent(g.title)}')">
+                  <div class="search-game-row-left">
+                    <span class="material-symbols-sharp search-game-icon">sports_esports</span>
+                    <div class="search-game-row-title">${escapeHtml(g.title)}</div>
+                    ${idx === 0 ? '<span class="top-result-badge">TOP RESULT</span>' : ''}
+                  </div>
+                  <div class="search-game-row-right">
+                    <span class="search-game-play-btn">PLAY <span class="material-symbols-sharp" style="font-size:14px;">play_arrow</span></span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
           </div>
         </div>
 
-        <!-- 2. RIGHT COLUMN: 2 Stacked Panes (Music Top, Movies Bottom) -->
+        <!-- 2. RIGHT COLUMN: 2 Stacked Panes (Music Top, Movies Bottom, or side-by-side if no games) -->
         <div class="search-col-media">
           <!-- Top Right: Music -->
           <div class="search-pane-music">
@@ -5612,7 +5720,9 @@ function renderGames() {
 }
 
 function prepareGameHtml(html, fileUrl) {
-  let base = fileUrl.replace(/[^/]*$/, '');
+  const cleanUrl = fileUrl.split(/[?#]/)[0];
+  const hotlinkQuery = fileUrl.substring(cleanUrl.length);
+  let base = cleanUrl.replace(/[^/]*$/, '');
   if (!base.endsWith('/')) base += '/';
 
   // CRITICAL: raw.githubusercontent.com serves CSS/JS as text/plain with X-Content-Type-Options: nosniff
@@ -6017,6 +6127,16 @@ function prepareGameHtml(html, fileUrl) {
   // 4. Normalize jsdelivr mirror domains to current active mirror
   html = html.replace(/https?:\/\/[^/]*\.jsdelivr\.net\//g, activeMirror + '/');
 
+  if (hotlinkQuery) {
+    const hotlinkScript = '<scr' + 'ipt>window.__initialQuery = ' + JSON.stringify(hotlinkQuery) + '; window.__HOTLINK_URL__ = ' + JSON.stringify(fileUrl) + ';</scr' + 'ipt>';
+    if (html.includes('<head>')) {
+      html = html.replace('<head>', '<head>' + hotlinkScript);
+    } else if (html.includes('<head ')) {
+      html = html.replace(/<head([^>]*)>/i, '<head$1>' + hotlinkScript);
+    } else {
+      html = hotlinkScript + html;
+    }
+  }
   return html;
 }
 
@@ -6047,6 +6167,8 @@ function pushThemeToFrames() {
 }
 
 function writeGameIntoFrame(iframe, rawHtml, fileUrl) {
+  const cleanUrl = fileUrl.split(/[?#]/)[0];
+  const hotlinkQuery = fileUrl.substring(cleanUrl.length);
   const preparedHtml = prepareGameHtml(rawHtml, fileUrl);
   try {
     const doc = iframe.contentDocument || iframe.contentWindow.document;
@@ -6066,14 +6188,29 @@ function writeGameIntoFrame(iframe, rawHtml, fileUrl) {
     iframe.srcdoc = preparedHtml;
   }
   try {
-    iframe.contentWindow.focus();
+    const win = iframe.contentWindow;
+    if (win) {
+      win.__initialQuery = hotlinkQuery;
+      win.__HOTLINK_URL__ = fileUrl;
+      try { win.history.replaceState(null, '', cleanUrl + hotlinkQuery); } catch(e) {}
+      if (hotlinkQuery.includes('#')) {
+        try { win.location.hash = hotlinkQuery.substring(hotlinkQuery.indexOf('#')); } catch(e) {}
+      }
+      setTimeout(() => {
+        try {
+          win.postMessage({ type: 'TRASHBIN_HOTLINK', query: hotlinkQuery, url: fileUrl }, '*');
+        } catch(e) {}
+      }, 80);
+      win.focus();
+    }
   } catch(e) {}
   setTimeout(checkAndApplyStretchedRes, 250);
   setTimeout(checkAndApplyStretchedRes, 1000);
 }
 
 async function fetchGameHtml(file) {
-  if (/^https?:\/\//i.test(file)) {
+  const cleanFile = file.split(/[?#]/)[0];
+  if (/^https?:\/\//i.test(cleanFile)) {
     let mirrorUrl = file;
     if (file.includes('jsdelivr.net')) {
       mirrorUrl = file.replace(/https?:\/\/[^/]*\.jsdelivr\.net\//i, activeMirror + '/');
@@ -6109,7 +6246,7 @@ async function fetchGameHtml(file) {
     throw new Error('Could not fetch game from ' + file);
   }
 
-  const cleanPath = file.replace(/^\/+/, '');
+  const cleanPath = cleanFile.replace(/^\/+/, '');
   let fetchFile = cleanPath;
   if (fetchFile.endsWith('/')) {
     fetchFile += 'index.html';
@@ -7755,7 +7892,7 @@ window.downloadOfflineHtml = function() {
 
 
 // ==== TRASHBIN APP VERSION & AUTO-UPDATES ====
-const CURRENT_APP_VERSION = '3.9.43';
+const CURRENT_APP_VERSION = '3.9.44';
 
 // =========================================================================
 // EMBEDDED NATIVE AI & PROXY ENGINES
@@ -9035,7 +9172,7 @@ if (document.readyState === 'loading') {
         <div class="settings-row">
           <div class="settings-col-left">
             <div class="settings-row-title">Current Release</div>
-            <div class="settings-row-desc" id="settingsCurrentVerDesc">Trashbin v3.9.43 • 3-Pane Multi-Platform Search &amp; Hotlinks</div>
+            <div class="settings-row-desc" id="settingsCurrentVerDesc">Trashbin v3.9.44 • 3-Pane Multi-Platform Search &amp; Hotlinks</div>
           </div>
           <div class="settings-col-right">
             <button class="settings-btn-action primary" id="btnCheckUpdates" onclick="checkTrashbinUpdates(true)">Check for Updates</button>

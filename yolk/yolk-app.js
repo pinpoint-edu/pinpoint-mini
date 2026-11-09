@@ -10426,41 +10426,58 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(runVisualizerAndPipFrame);
     window.handleYolkDeepLink = async function (rawHash) {
         if (!rawHash) return;
-        if (rawHash.startsWith('artist=')) {
-            const artistName = decodeURIComponent(rawHash.replace('artist=', '').split('&')[0]);
-            if (artistName) {
-                loadArtistView(artistName);
-            }
+        const cleanStr = rawHash.replace(/^[#?]/, '');
+        if (cleanStr.startsWith('artist=')) {
+            const artistName = decodeURIComponent(cleanStr.replace('artist=', '').split('&')[0]);
+            if (artistName) loadArtistView(artistName);
             return;
         }
-        if (rawHash.startsWith('album=')) {
-            const albumId = decodeURIComponent(rawHash.replace('album=', '').split('&')[0]);
-            if (albumId) {
-                loadAlbumView(albumId);
-            }
+        if (cleanStr.startsWith('album=')) {
+            const albumId = decodeURIComponent(cleanStr.replace('album=', '').split('&')[0]);
+            if (albumId) loadAlbumView(albumId);
             return;
         }
-        if (rawHash.startsWith('song=')) {
-            const params = new URLSearchParams(rawHash);
-            const songId = params.get('song') || '';
-            const title = params.get('t') || 'Shared Song';
-            const artist = params.get('a') || 'Artist';
-            window.location.hash = '#now-playing';
+        if (cleanStr.includes('song=')) {
+            const songPart = cleanStr.substring(cleanStr.indexOf('song='));
+            const params = new URLSearchParams(songPart);
+            const songId = params.get('song') || (songPart.match(/song=([^&]+)/) || [])[1] || '';
+            const title = decodeURIComponent(params.get('t') || params.get('title') || 'Shared Song');
+            const artist = decodeURIComponent(params.get('a') || params.get('artist') || 'Artist');
+            const cover = params.get('cover') || params.get('art') || `https://i.ytimg.com/vi/${songId}/hqdefault.jpg`;
+
             if (songId) {
+                const cleanVid = songId.replace(/^ytm-/, '');
                 const trackObj = {
-                    id: `ytm-${songId}`,
-                    youtube_id: songId,
-                    videoId: songId,
+                    id: `ytm-${cleanVid}`,
+                    youtube_id: cleanVid,
+                    videoId: cleanVid,
                     title,
                     artist_name: artist,
-                    artwork_url: `https://i.ytimg.com/vi/${songId}/hqdefault.jpg`
+                    artwork_url: decodeURIComponent(cover)
                 };
                 currentQueue = [trackObj];
                 currentQueueIndex = 0;
-                playTrack(trackObj);
+                if (typeof playTrack === 'function') {
+                    playTrack(trackObj);
+                }
+                setTimeout(() => {
+                    window.location.hash = '#now-playing';
+                    if (typeof window._yolkNavigate === 'function') {
+                        window._yolkNavigate();
+                    }
+                }, 100);
             }
         }
     };
+
+    window.addEventListener('message', (e) => {
+        if (e.data && (e.data.type === 'TRASHBIN_HOTLINK' || e.data.type === 'YOLK_HOTLINK')) {
+            const q = e.data.query || (e.data.url && (e.data.url.match(/[?#](.*)/) || [])[1]) || '';
+            if (q && q.includes('song=')) {
+                window.handleYolkDeepLink(q.substring(q.indexOf('song=')));
+            }
+        }
+    });
 
     // Check if opened directly via a shared #song=, #album=, or #artist= deep link
     const initialRawHash = (window.location.hash || window.location.search || window.__initialQuery || '').replace(/^[#?]/, '');

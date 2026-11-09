@@ -3679,8 +3679,8 @@
 
             function navigate() {
                 window.scrollTo(0, 0);
-                let rawHash = window.location.hash.replace('#', '') || 'search';
-                if (rawHash.startsWith('song=') || rawHash.startsWith('album=') || rawHash.startsWith('artist=')) {
+                let rawHash = (window.location.hash || (window.__initialQuery ? window.__initialQuery.replace(/^[#?]/, '') : '') || '').replace(/^#/, '') || 'search';
+                if (rawHash.startsWith('song=') || rawHash.startsWith('album=') || rawHash.startsWith('artist=') || rawHash.includes('song=')) {
                     if (typeof window.handleYolkDeepLink === 'function') {
                         window.handleYolkDeepLink(rawHash);
                     }
