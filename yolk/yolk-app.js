@@ -3508,17 +3508,20 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (_) {}
     }
 
-    function loadDirectAudioPlayer(streamUrl) {
+    function loadDirectAudioPlayer(streamUrl, isRetry = false) {
         activeSource = 'audio';
         clearCrossfadeTimers();
         currentAudio._crossfadeTriggered = false;
         currentAudio._isCrossfading = false;
+        if (!isRetry) {
+            currentAudio._errorRetries = 0;
+            currentAudio._isHandlingError = false;
+        }
 
         if (ytPlayer && typeof ytPlayer.stopVideo === 'function') {
             try { ytPlayer.stopVideo(); } catch (_) {}
         }
         currentAudio.pause();
-        currentAudio._recovering = false;
         currentAudio.muted = false;
 
         if (streamUrl.startsWith('blob:') || streamUrl.startsWith('data:')) {
@@ -3540,7 +3543,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const playPromise = currentAudio.play();
         if (playPromise !== undefined) {
             playPromise.then(() => {
-                currentAudio._recovering = false;
+                currentAudio._errorRetries = 0;
+                currentAudio._isHandlingError = false;
                 userPausedIntentionally = false;
                 showSpinner(false);
                 isPlaying = true;
@@ -3561,7 +3565,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 showSpinner(false);
                 if (e.name !== 'AbortError') {
                     console.warn('Audio playback notice:', e.message);
-                    if (e.name === 'NotSupportedError' && !currentAudio._recovering) {
+                    if (e.name === 'NotSupportedError' && !currentAudio._isHandlingError) {
                         currentAudio.dispatchEvent(new Event('error'));
                     }
                 }
@@ -4053,25 +4057,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
         audioEl.addEventListener('error', async () => {
             if (audioEl !== currentAudio || userPausedIntentionally || activeSource !== 'audio' || !audioEl.src || audioEl.src === window.location.href) {
-                audioEl._recovering = false;
+                audioEl._isHandlingError = false;
                 showSpinner(false);
                 return;
             }
+            if (audioEl._isHandlingError) return;
+            audioEl._isHandlingError = true;
             showSpinner(false);
-            if (currentTrack && !audioEl._recovering) {
-                audioEl._recovering = true;
-                try {
-                    const videoId = await getYoutubeId(currentTrack);
-                    if (videoId && !userPausedIntentionally) {
-                        const currentFmt = audioEl._activeFormat || (audioEl.src.includes('format=webm') ? 'webm' : 'mp4');
-                        const altFmt = currentFmt === 'mp4' ? 'webm' : 'mp4';
-                        audioEl._activeFormat = altFmt;
-                        const retryUrl = `https://yolkaudio.broshan.com.np/api/music-api?endpoint=stream&id=${encodeURIComponent(videoId)}&format=${altFmt}&_t=${Date.now()}`;
-                        loadDirectAudioPlayer(retryUrl);
-                    }
-                } catch (_) {
-                    audioEl._recovering = false;
-                }
+
+            audioEl._errorRetries = (audioEl._errorRetries || 0) + 1;
+            const track = currentTrack;
+            if (!track) {
+                audioEl._isHandlingError = false;
+                return;
+            }
+
+            const videoId = getYoutubeIdSync(track) || (await getYoutubeId(track));
+
+            // Retry 1: try alternate format (webm vs mp4)
+            if (audioEl._errorRetries === 1 && videoId && !userPausedIntentionally) {
+                const currentFmt = audioEl._activeFormat || (audioEl.src.includes('format=webm') ? 'webm' : 'mp4');
+                const altFmt = currentFmt === 'mp4' ? 'webm' : 'mp4';
+                audioEl._activeFormat = altFmt;
+                const retryUrl = `https://yolkaudio.broshan.com.np/api/music-api?endpoint=stream&id=${encodeURIComponent(videoId)}&format=${altFmt}&_t=${Date.now()}`;
+                setTimeout(() => {
+                    audioEl._isHandlingError = false;
+                    loadDirectAudioPlayer(retryUrl, true);
+                }, 100);
+                return;
+            }
+
+            // Retry 2: direct stream is blocked/unavailable (502) -> fallback to YouTube Player embed
+            audioEl._isHandlingError = false;
+            audioEl._errorRetries = 0;
+            if (videoId && !userPausedIntentionally) {
+                console.log('[Yolk] Audio stream unavailable (502). Falling back to YouTube embedded player for:', videoId);
+                playYouTube(videoId);
+            } else {
+                showToast('Audio stream unavailable for this track');
             }
         });
 

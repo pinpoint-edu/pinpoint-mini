@@ -385,6 +385,90 @@
       transform: scale(1.05);
     }
 
+    .search-hint-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 9px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      user-select: none;
+    }
+    .search-hint-pill kbd {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 1px 4px;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: var(--text-muted);
+    }
+    .search-hint-pill.proxy-pill:hover {
+      border-color: #10b981;
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.15);
+    }
+    .search-hint-pill.ai-pill:hover {
+      border-color: #60a5fa;
+      color: #93c5fd;
+      background: rgba(96, 165, 250, 0.15);
+    }
+
+    .search-shortcuts-banner {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .search-shortcut-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 9999px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .search-shortcut-chip:hover {
+      border-color: var(--accent);
+      color: var(--text-main);
+      background: var(--bg-card);
+    }
+    .search-shortcut-chip.ai-chip:hover {
+      border-color: #60a5fa;
+      color: #93c5fd;
+    }
+    .search-shortcut-chip.proxy-chip:hover {
+      border-color: #10b981;
+      color: #34d399;
+    }
+    .search-shortcut-chip kbd {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 11px;
+      color: var(--accent-light);
+    }
+    .search-shortcuts-banner .search-shortcut-note {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-left: auto;
+    }
+
     .search-browse-btn {
       display: inline-flex;
       align-items: center;
@@ -2008,8 +2092,13 @@
 
     .settings-tab-btn.active {
       background: var(--accent) !important;
-      color: #ffffff !important;
+      color: var(--settings-tab-active-text, #ffffff) !important;
       box-shadow: 0 2px 14px var(--accent-glow) !important;
+    }
+
+    body.theme-white .settings-tab-btn.active {
+      color: #000000 !important;
+      background: #ffffff !important;
     }
 
     .settings-panel {
@@ -3030,15 +3119,22 @@
       <input 
         type="text" 
         id="searchInput" 
-        placeholder="Search games, movies, music, AI..." 
+        placeholder="Search games, music, movies... (↵ AI • Shift+↵ Proxy)" 
         autocomplete="off" 
         spellcheck="false"
       />
       <div class="search-right-actions">
+        <button id="searchAiHintBtn" class="search-hint-pill ai-pill" onclick="openEmbeddedAI(document.getElementById('searchInput').value); return false;" title="Ask AI (Enter)">
+          <kbd>↵</kbd>
+          <span>AI</span>
+        </button>
+        <button id="searchProxyHintBtn" class="search-hint-pill proxy-pill" onclick="openEmbeddedProxy(document.getElementById('searchInput').value); return false;" title="Open in Web Proxy (Shift + Enter)">
+          <kbd>Shift+↵</kbd>
+          <span>Proxy</span>
+        </button>
         <button id="clearSearchBtn" class="clear-search-btn" onclick="clearSearch()" style="display: none;" title="Clear search">
           <span class="material-symbols-sharp" style="font-size: 16px;">close</span>
         </button>
-        
       </div>
     </div>
 
@@ -4643,29 +4739,8 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
     });
 }
 
-// Fallback catalog including Yolk! Music and AI Assistant
+// Fallback catalog including AI Assistant and Web Proxy
 const DEFAULT_GAMES = [
-      {
-            "title": "Yolk! - Minimalist Music",
-            "file": "yolk/index.html",
-            "img": "yolk/icon-256.png",
-            "sizeBytes": 983040,
-            "isApp": true
-      },
-      {
-            "title": "Moss - Movies & Shows",
-            "file": "movies/index.html",
-            "img": "data:image/png;base64,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",
-            "sizeBytes": 5242880,
-            "isApp": true
-      },
-      {
-            "title": "Soundboard",
-            "file": "textbooks/Soundboard.html",
-            "img": "favicons/google-classroom.png",
-            "sizeBytes": 350000,
-            "isApp": true
-      },
       {
             "title": "Trashbin AI",
             "file": "ai.html",
@@ -5402,27 +5477,21 @@ searchInput.addEventListener('keydown', (e) => {
     return;
   }
 
-  const aiKeybind = localStorage.getItem('trashbin_keybind_ai') || 'Shift+Enter';
-  const proxyKeybind = localStorage.getItem('trashbin_keybind_proxy') || 'Control+Enter';
+  const aiKeybind = localStorage.getItem('trashbin_keybind_ai') || 'Enter';
+  const proxyKeybind = localStorage.getItem('trashbin_keybind_proxy') || 'Shift+Enter';
 
-  // AI shortcut
-  if (matchesKeybind(e, aiKeybind)) {
-    e.preventDefault();
-    openEmbeddedAI(val);
-    return;
-  }
-
-  // Proxy shortcut
-  if (matchesKeybind(e, proxyKeybind)) {
+  // Proxy shortcut (Shift + Enter or custom proxy keybind)
+  if (matchesKeybind(e, proxyKeybind) || (e.key === 'Enter' && (e.shiftKey || e.ctrlKey || e.metaKey))) {
     e.preventDefault();
     openEmbeddedProxy(val);
     return;
   }
 
-  // Enter -> Launch Top Result
-  if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey) {
+  // AI shortcut (Enter or custom AI keybind)
+  if (matchesKeybind(e, aiKeybind) || (e.key === 'Enter' && !e.altKey)) {
     e.preventDefault();
-    launchTopSearchResult();
+    openEmbeddedAI(val);
+    return;
   }
 });
 
@@ -5476,6 +5545,17 @@ function renderMultiSearchResults(query) {
 
   container.innerHTML = `
     <div class="multi-search-wrapper">
+      <div class="search-shortcuts-banner">
+        <button class="search-shortcut-chip ai-chip" onclick="openEmbeddedAI(document.getElementById('searchInput').value); return false;">
+          <kbd>↵</kbd>
+          <span>Ask AI</span>
+        </button>
+        <button class="search-shortcut-chip proxy-chip" onclick="openEmbeddedProxy(document.getElementById('searchInput').value); return false;">
+          <kbd>Shift + ↵</kbd>
+          <span>Web Proxy</span>
+        </button>
+        <span class="search-shortcut-note">Press <kbd>↵</kbd> for AI &bull; <kbd>Shift+↵</kbd> for Proxy</span>
+      </div>
       <!-- 3-Pane Split Grid (auto-expands media when no games match) -->
       <div class="multi-search-grid ${hasGames ? 'has-games' : 'no-games'}">
         <!-- 1. LEFT PANE: Games (Long independent vertical scroll, hidden if 0 games) -->
@@ -6365,6 +6445,9 @@ async function fetchGameHtml(file) {
 
 // Play Game in the In-Page Player
 async function playGame(encodedFile, encodedTitle) {
+  if (typeof checkTrashbinUpdates === 'function') {
+    checkTrashbinUpdates(false);
+  }
   const file = decodeURIComponent(encodedFile);
   const title = decodeURIComponent(encodedTitle);
 
@@ -6861,6 +6944,9 @@ function unmuteGameFrame() {
 }
 
 function closePlayer() {
+  if (typeof checkTrashbinUpdates === 'function') {
+    checkTrashbinUpdates(false);
+  }
   isGamePausedInViewer = false;
   const iframe = document.getElementById('gameIframe');
   iframe.removeAttribute('srcdoc');
@@ -7599,6 +7685,90 @@ const TRASHBIN_TINTS = [
     badgeBg: "rgba(34, 197, 94, 0.24)",
     border: "rgba(34, 197, 94, 0.35)",
     glow: "rgba(34, 197, 94, 0.45)"
+  },
+  {
+    id: "ruby",
+    label: "Ruby",
+    color: "#e11d48",
+    light: "#fda4af",
+    subtle: "rgba(225, 29, 72, 0.14)",
+    badgeBg: "rgba(225, 29, 72, 0.24)",
+    border: "rgba(225, 29, 72, 0.35)",
+    glow: "rgba(225, 29, 72, 0.45)"
+  },
+  {
+    id: "sapphire",
+    label: "Sapphire",
+    color: "#2563eb",
+    light: "#bfdbfe",
+    subtle: "rgba(37, 99, 235, 0.14)",
+    badgeBg: "rgba(37, 99, 235, 0.24)",
+    border: "rgba(37, 99, 235, 0.35)",
+    glow: "rgba(37, 99, 235, 0.45)"
+  },
+  {
+    id: "honey",
+    label: "Honey",
+    color: "#d97706",
+    light: "#fde68a",
+    subtle: "rgba(217, 119, 6, 0.14)",
+    badgeBg: "rgba(217, 119, 6, 0.24)",
+    border: "rgba(217, 119, 6, 0.35)",
+    glow: "rgba(217, 119, 6, 0.45)"
+  },
+  {
+    id: "slate",
+    label: "Slate",
+    color: "#64748b",
+    light: "#cbd5e1",
+    subtle: "rgba(100, 116, 139, 0.14)",
+    badgeBg: "rgba(100, 116, 139, 0.24)",
+    border: "rgba(100, 116, 139, 0.35)",
+    glow: "rgba(100, 116, 139, 0.45)"
+  },
+  {
+    id: "miami",
+    label: "Neon Miami",
+    color: "#06b6d4",
+    color2: "#ec4899",
+    light: "#a5f3fc",
+    subtle: "rgba(6, 182, 212, 0.14)",
+    badgeBg: "rgba(6, 182, 212, 0.24)",
+    border: "rgba(6, 182, 212, 0.35)",
+    glow: "rgba(6, 182, 212, 0.45)"
+  },
+  {
+    id: "solar",
+    label: "Solar Flare",
+    color: "#f97316",
+    color2: "#dc2626",
+    light: "#fed7aa",
+    subtle: "rgba(249, 115, 22, 0.14)",
+    badgeBg: "rgba(249, 115, 22, 0.24)",
+    border: "rgba(249, 115, 22, 0.35)",
+    glow: "rgba(249, 115, 22, 0.45)"
+  },
+  {
+    id: "lavender",
+    label: "Lavender Sky",
+    color: "#a855f7",
+    color2: "#38bdf8",
+    light: "#e9d5ff",
+    subtle: "rgba(168, 85, 247, 0.14)",
+    badgeBg: "rgba(168, 85, 247, 0.24)",
+    border: "rgba(168, 85, 247, 0.35)",
+    glow: "rgba(168, 85, 247, 0.45)"
+  },
+  {
+    id: "galactic",
+    label: "Galactic Aurora",
+    color: "#10b981",
+    color2: "#6366f1",
+    light: "#a7f3d0",
+    subtle: "rgba(16, 185, 129, 0.14)",
+    badgeBg: "rgba(16, 185, 129, 0.24)",
+    border: "rgba(16, 185, 129, 0.35)",
+    glow: "rgba(16, 185, 129, 0.45)"
   }
 ];
 
@@ -7641,11 +7811,15 @@ function applyTint(tintId) {
   if (typeof pushThemeToFrames === "function") pushThemeToFrames();
   if (typeof updateSnowfall === "function") updateSnowfall();
 
-  // Toggle knob turns black in white theme so active switches are crisp and visible
+  // Active theme settings adjustments: white theme gets black active tab text and slider knob
   if (tint.id === "white") {
     root.setProperty("--slider-knob", "#000000");
+    root.setProperty("--settings-tab-active-text", "#000000");
+    if (document.body) document.body.classList.add("theme-white");
   } else {
     root.setProperty("--slider-knob", "#ffffff");
+    root.setProperty("--settings-tab-active-text", "#ffffff");
+    if (document.body) document.body.classList.remove("theme-white");
   }
 
   try {
@@ -7925,7 +8099,7 @@ window.downloadOfflineHtml = function() {
 
 
 // ==== TRASHBIN APP VERSION & AUTO-UPDATES ====
-const CURRENT_APP_VERSION = '3.9.46';
+const CURRENT_APP_VERSION = '3.9.47';
 
 // =========================================================================
 // EMBEDDED NATIVE AI & PROXY ENGINES
@@ -7961,6 +8135,9 @@ function formatAiMarkdown(text) {
 }
 
 window.openEmbeddedAI = function(initialQuery = '') {
+  if (typeof checkTrashbinUpdates === 'function') {
+    checkTrashbinUpdates(false);
+  }
   const aiView = document.getElementById('ai-view');
   const playerView = document.getElementById('player-view');
   const proxyView = document.getElementById('proxy-view');
@@ -7979,6 +8156,9 @@ window.openEmbeddedAI = function(initialQuery = '') {
 };
 
 window.closeEmbeddedAI = function() {
+  if (typeof checkTrashbinUpdates === 'function') {
+    checkTrashbinUpdates(false);
+  }
   const aiView = document.getElementById('ai-view');
   if (aiView) aiView.style.display = 'none';
 };
@@ -8035,6 +8215,20 @@ window.sendEmbeddedAiMessage = async function() {
   if (welcome && welcome.parentNode) {
     welcome.remove();
   }
+
+  // Update dynamic context (live date, time, timezone)
+  try {
+    const now = new Date();
+    const dateStr = now.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const timeStr = now.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+    const sysPrompt = `You are Trashbin AI, an intelligent, concise, sharp, and helpful assistant designed for students and developers. Answer accurately and format code with markdown.\nCurrent Date: ${dateStr}\nCurrent Time: ${timeStr} (${timeZone})`;
+    if (embeddedAiMessages.length === 0 || embeddedAiMessages[0].role !== 'system') {
+      embeddedAiMessages.unshift({ role: "system", content: sysPrompt });
+    } else {
+      embeddedAiMessages[0].content = sysPrompt;
+    }
+  } catch(e) {}
 
   // 1. Append User Message
   const userRow = document.createElement('div');
@@ -8196,6 +8390,9 @@ function normalizeProxyUrl(raw) {
 }
 
 window.openEmbeddedProxy = function(initialTarget = '') {
+  if (typeof checkTrashbinUpdates === 'function') {
+    checkTrashbinUpdates(false);
+  }
   const proxyView = document.getElementById('proxy-view');
   const playerView = document.getElementById('player-view');
   const aiView = document.getElementById('ai-view');
@@ -8213,6 +8410,9 @@ window.openEmbeddedProxy = function(initialTarget = '') {
 };
 
 window.closeEmbeddedProxy = function() {
+  if (typeof checkTrashbinUpdates === 'function') {
+    checkTrashbinUpdates(false);
+  }
   const proxyView = document.getElementById('proxy-view');
   if (proxyView) {
     proxyView.style.display = 'none';
@@ -9087,13 +9287,13 @@ window.closeSettingsModal = function(e) {
 
 // Initial load routines
 function initTrashbinStartup() {
-  const savedAiKey = localStorage.getItem('trashbin_keybind_ai');
+  const savedAiKey = localStorage.getItem('trashbin_keybind_ai') || 'Enter';
   const selAi = document.getElementById('settingKeybindAi');
-  if (selAi && savedAiKey) selAi.value = savedAiKey;
+  if (selAi) selAi.value = savedAiKey;
 
-  const savedProxyKey = localStorage.getItem('trashbin_keybind_proxy');
+  const savedProxyKey = localStorage.getItem('trashbin_keybind_proxy') || 'Shift+Enter';
   const selProxy = document.getElementById('settingKeybindProxy');
-  if (selProxy && savedProxyKey) selProxy.value = savedProxyKey;
+  if (selProxy) selProxy.value = savedProxyKey;
   applyTint(currentTintId);
   const savedTitle = localStorage.getItem('trashbin_cloak_title');
   const savedIcon = localStorage.getItem('trashbin_cloak_icon');
@@ -9258,7 +9458,7 @@ if (document.readyState === 'loading') {
         <div class="settings-row">
           <div class="settings-col-left">
             <div class="settings-row-title">Current Release</div>
-            <div class="settings-row-desc" id="settingsCurrentVerDesc">Trashbin v3.9.46 • Centered Search Return, Full Original UI Yolk &amp; Moss Hotlinks</div>
+            <div class="settings-row-desc" id="settingsCurrentVerDesc">Trashbin v3.9.47 • Yolk Stream Fallback, Live AI Date/Time, 8 New Tints &amp; Keybind Updates</div>
           </div>
           <div class="settings-col-right">
             <button class="settings-btn-action primary" id="btnCheckUpdates" onclick="checkTrashbinUpdates(true)">Check for Updates</button>
@@ -9273,10 +9473,10 @@ if (document.readyState === 'loading') {
           </div>
           <div class="settings-col-right">
             <select id="settingKeybindAi" class="settings-select" onchange="localStorage.setItem('trashbin_keybind_ai', this.value)">
-              <option value="Shift+Enter">Shift + Enter (Default)</option>
+              <option value="Enter">Enter (Default)</option>
+              <option value="Shift+Enter">Shift + Enter</option>
               <option value="Control+Enter">Ctrl + Enter</option>
               <option value="Alt+Enter">Alt + Enter</option>
-              <option value="Control+Shift+Enter">Ctrl + Shift + Enter</option>
             </select>
           </div>
         </div>
@@ -9287,10 +9487,10 @@ if (document.readyState === 'loading') {
           </div>
           <div class="settings-col-right">
             <select id="settingKeybindProxy" class="settings-select" onchange="localStorage.setItem('trashbin_keybind_proxy', this.value)">
-              <option value="Control+Enter">Ctrl + Enter (Default)</option>
-              <option value="Shift+Enter">Shift + Enter</option>
+              <option value="Shift+Enter">Shift + Enter (Default)</option>
+              <option value="Control+Enter">Ctrl + Enter</option>
               <option value="Alt+Enter">Alt + Enter</option>
-              <option value="Control+Shift+Enter">Ctrl + Shift + Enter</option>
+              <option value="Enter">Enter</option>
             </select>
           </div>
         </div>
