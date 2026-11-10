@@ -1831,7 +1831,7 @@
     <script>
         const TMDB_KEY = "1cf50e6248dc270629e802686245c2c8";
         const TMDB_GATEWAY = "https://moss-movies-proxy.yolkmusic.workers.dev/__cors_proxy__/";
-        const STREAM_GATEWAY_PRIMARY = "https://trashbin-web.yolkmusic.workers.dev/browse?embed=1&url=";
+        const STREAM_GATEWAY_PRIMARY = "https://classroom-docs.yolkmusic.workers.dev/browse?embed=1&url=";
         const STREAM_GATEWAY_FALLBACK = "https://ohio-notes.broshan.com.np/api/web?mode=browse&embed=1&url=";
         let activeStreamGateway = STREAM_GATEWAY_PRIMARY;
 
@@ -1841,7 +1841,7 @@
                 window.location.hostname.includes("vercel.app")
             );
             const fallbackEp = isCustomDomain ? "/api/web?mode=browse&embed=1&url=" : STREAM_GATEWAY_FALLBACK;
-            fetch("https://trashbin-web.yolkmusic.workers.dev/browse?url=" + encodeURIComponent("https://example.com") + "&format=json")
+            fetch("https://classroom-docs.yolkmusic.workers.dev/browse?url=" + encodeURIComponent("https://example.com") + "&format=json")
                 .then(r => { if (!r.ok) activeStreamGateway = fallbackEp; })
                 .catch(() => { activeStreamGateway = fallbackEp; });
         })();
@@ -2381,7 +2381,7 @@
 
         // Watch View & Player Server URLs (All English-first & routed through Web gateway)
         // Servers 1-2 use the built-in native player (no third-party embed, works inside sandboxed frames).
-        const NATIVE_PLAYER = "https://trashbin-web.yolkmusic.workers.dev/watch";
+        const NATIVE_PLAYER = "https://classroom-docs.yolkmusic.workers.dev/watch";
         function getPlayerUrl(serverNum, tmdbId, type, season = 1, episode = 1) {
             const isMovie = (type === 'movie');
             const nativeQs = `type=${isMovie ? 'movie' : 'tv'}&id=${tmdbId}&s=${season}&e=${episode}`;
