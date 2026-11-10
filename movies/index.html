@@ -1830,23 +1830,9 @@
     <!-- Moss Application Logic -->
     <script>
         const TMDB_KEY = "1cf50e6248dc270629e802686245c2c8";
-        const TMDB_GATEWAY = "https://moss-movies-proxy.googleus-cloud1.workers.dev/__cors_proxy__/";
-        const STREAM_GATEWAY_PRIMARY = "https://classroom-docs.googleus-cloud1.workers.dev/browse?embed=1&url=";
-        const STREAM_GATEWAY_FALLBACK = "https://ohio-notes.broshan.com.np/api/web?mode=browse&embed=1&url=";
-        let activeStreamGateway = STREAM_GATEWAY_PRIMARY;
-
-        (function initStreamGateway() {
-            const isCustomDomain = window.location.hostname && (
-                window.location.hostname.includes("broshan.com.np") ||
-                window.location.hostname.includes("vercel.app")
-            );
-            const fallbackEp = isCustomDomain ? "/api/web?mode=browse&embed=1&url=" : STREAM_GATEWAY_FALLBACK;
-            fetch("https://classroom-docs.googleus-cloud1.workers.dev/browse?url=" + encodeURIComponent("https://example.com") + "&format=json")
-                .then(r => { if (!r.ok) activeStreamGateway = fallbackEp; })
-                .catch(() => { activeStreamGateway = fallbackEp; });
-        })();
-
         const TMDB_BASE = "https://api.themoviedb.org/3";
+        const OHIO_GATEWAY = "https://ohio-notes.broshan.com.np/api/web?mode=browse&embed=1&url=";
+
         const IMG_W500 = "https://image.tmdb.org/t/p/w500";
         const IMG_W1280 = "https://image.tmdb.org/t/p/w1280";
         const IMG_ORIGINAL = "https://image.tmdb.org/t/p/original";
@@ -1912,7 +1898,7 @@
             { id: 10765, name: "Sci-Fi & Fantasy" }
         ];
 
-        // API Fetch Helper with caching and Cloudflare gateway
+        // API Fetch Helper with caching and high-speed direct TMDB connection
         async function fetchTMDB(endpoint, params = {}) {
             const queryParams = new URLSearchParams({
                 api_key: TMDB_KEY,
@@ -1920,7 +1906,6 @@
                 ...params
             });
             const directUrl = `${TMDB_BASE}${endpoint}?${queryParams.toString()}`;
-            const gatewayUrl = `${TMDB_GATEWAY}${directUrl}`;
 
             const cacheKey = "moss_cache_" + directUrl;
             try {
@@ -1929,8 +1914,10 @@
             } catch(e) {}
 
             try {
-                let res = await fetch(gatewayUrl);
-                if (!res.ok) res = await fetch(directUrl);
+                let res = await fetch(directUrl);
+                if (!res.ok) {
+                    res = await fetch("https://ohio-notes.broshan.com.np/api/web?mode=browse&url=" + encodeURIComponent(directUrl));
+                }
                 const data = await res.json();
                 try {
                     sessionStorage.setItem(cacheKey, JSON.stringify(data));
@@ -2379,43 +2366,46 @@
             }
         }
 
-        // Watch View & Player Server URLs (All English-first & routed through Web gateway)
-        // Servers 1-2 use the built-in native player (no third-party embed, works inside sandboxed frames).
-        const NATIVE_PLAYER = "https://classroom-docs.googleus-cloud1.workers.dev/watch";
+        // Watch View & Player Server URLs (High-speed multi-server streaming with zero worker dependencies)
         function getPlayerUrl(serverNum, tmdbId, type, season = 1, episode = 1) {
             const isMovie = (type === 'movie');
-            const nativeQs = `type=${isMovie ? 'movie' : 'tv'}&id=${tmdbId}&s=${season}&e=${episode}`;
             switch (String(serverNum)) {
                 case '1':
-                    // Server 1: Built-in player (source A, English original audio)
-                    return { native: true, url: `${NATIVE_PLAYER}?${nativeQs}&p=a` };
-                case '2':
-                    // Server 2: Built-in player (source B first)
-                    return { native: true, url: `${NATIVE_PLAYER}?${nativeQs}&p=b` };
-                case '3':
-                    // Server 3: VidNest (English)
-                    return isMovie
-                        ? `https://vidnest.fun/movie/${tmdbId}`
-                        : `https://vidnest.fun/tv/${tmdbId}/${season}/${episode}`;
-                case '4':
-                    // Server 4: VidLink Pro (English)
+                    // Server 1: VidLink Pro (Fastest, High-Speed, English audio)
                     return isMovie
                         ? `https://vidlink.pro/movie/${tmdbId}?primaryColor=22c55e&autoplay=true`
                         : `https://vidlink.pro/tv/${tmdbId}/${season}/${episode}?primaryColor=22c55e&autoplay=true`;
-                case '5':
-                    // Server 5: VidSrc SU (English Multi-Server)
+                case '2':
+                    // Server 2: VidNest (Multi-Source fallback)
+                    return isMovie
+                        ? `https://vidnest.fun/movie/${tmdbId}`
+                        : `https://vidnest.fun/tv/${tmdbId}/${season}/${episode}`;
+                case '3':
+                    // Server 3: VidSrc SU (English Multi-Server)
                     return isMovie
                         ? `https://vidsrc.su/embed/movie/${tmdbId}`
                         : `https://vidsrc.su/embed/tv/${tmdbId}/${season}/${episode}`;
+                case '4':
+                    // Server 4: Embed.su (Multi-host)
+                    return isMovie
+                        ? `https://embed.su/embed/movie/${tmdbId}`
+                        : `https://embed.su/embed/tv/${tmdbId}/${season}/${episode}`;
+                case '5':
+                    // Server 5: 2Embed
+                    return isMovie
+                        ? `https://www.2embed.cc/embed/${tmdbId}`
+                        : `https://www.2embed.cc/embedtv/${tmdbId}&s=${season}&e=${episode}`;
                 default:
-                    return { native: true, url: `${NATIVE_PLAYER}?${nativeQs}&p=a` };
+                    return isMovie
+                        ? `https://vidlink.pro/movie/${tmdbId}?primaryColor=22c55e&autoplay=true`
+                        : `https://vidlink.pro/tv/${tmdbId}/${season}/${episode}?primaryColor=22c55e&autoplay=true`;
             }
         }
 
         function wrapStreamUrl(rawUrl) {
             if (!rawUrl) return '';
-            if (typeof rawUrl === 'object' && rawUrl.native) return rawUrl.url;
-            return `${activeStreamGateway}${encodeURIComponent(rawUrl)}`;
+            if (typeof rawUrl === 'object' && rawUrl.url) return rawUrl.url;
+            return typeof rawUrl === 'string' ? rawUrl : '';
         }
 
         function switchServer(serverNum) {

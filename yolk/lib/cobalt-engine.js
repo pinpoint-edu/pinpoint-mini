@@ -1,4 +1,4 @@
-const WORKER_BASE = process.env.CF_WORKER_URL || 'https://yolk-yt-proxy.googleus-cloud1.workers.dev';
+const WORKER_BASE = process.env.CF_WORKER_URL || 'https://yolkaudio.broshan.com.np';
 
 async function extractCobaltMedia(urlOrId) {
   let str = String(urlOrId || '').trim();

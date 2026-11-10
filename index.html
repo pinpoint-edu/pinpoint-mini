@@ -61,6 +61,16 @@
       position: relative;
     }
 
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: var(--site-ambient-glow, radial-gradient(ellipse 90% 55% at 50% -10%, rgba(239, 68, 68, 0.14), transparent 75%));
+      pointer-events: none;
+      z-index: 0;
+      transition: background 0.4s ease;
+    }
+
     /* Headings and Big Text use Libre Baskerville */
     h1, h2, h3, h4, .logo-title, .brand-name, .player-title, .results-title, #smallLogo span {
       font-family: 'Libre Baskerville', Georgia, serif;
@@ -216,11 +226,15 @@
     #main-content-flow {
       position: fixed;
       left: 50%;
-      top: 48%;
+      top: 50%;
       transform: translate(-50%, -50%);
       width: 100%;
-      max-width: 620px;
-      padding: 0 20px;
+      max-width: 1040px;
+      max-height: 90vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: none;
+      padding: 10px 20px 30px 20px;
       z-index: 40;
       box-sizing: border-box;
       display: flex;
@@ -228,7 +242,11 @@
       align-items: center;
       transition: top 0.45s cubic-bezier(0.16, 1, 0.3, 1), 
                   transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-                  max-width 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+                  max-width 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                  max-height 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #main-content-flow::-webkit-scrollbar {
+      display: none;
     }
 
     body.is-searching #main-content-flow {
@@ -237,16 +255,326 @@
       width: calc(100vw - 36px);
       max-width: 1600px;
       height: calc(100vh - 24px);
+      max-height: calc(100vh - 24px);
       align-items: stretch;
+      overflow: hidden;
+      padding: 0;
     }
 
     #search-block {
       width: 100%;
-      max-width: 620px;
+      max-width: 660px;
       margin: 0 auto;
       flex-shrink: 0;
       box-sizing: border-box;
       transition: margin 0.35s ease;
+    }
+
+    /* =========================================================================
+       TRASHBIN v4.0 - MINIMAL COMMAND HUB & BENTO ENTERTAINMENT DECK
+       ========================================================================= */
+    .home-nav-pills {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      z-index: 5;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    body.is-searching .home-nav-pills {
+      display: none !important;
+    }
+
+    .nav-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 16px;
+      border-radius: 9999px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+      backdrop-filter: blur(14px);
+    }
+
+    .nav-pill:hover {
+      background: var(--bg-card);
+      color: #ffffff;
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .nav-pill.active {
+      background: var(--accent) !important;
+      color: var(--settings-tab-active-text, #000000) !important;
+      border-color: var(--accent) !important;
+      box-shadow: 0 2px 14px var(--accent-glow) !important;
+    }
+
+    .home-featured-deck {
+      width: 100%;
+      max-width: 980px;
+      margin-top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      z-index: 5;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    body.is-searching .home-featured-deck {
+      display: none !important;
+    }
+
+    .featured-shelf {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 18px 20px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      transition: border-color 0.25s ease;
+    }
+
+    .featured-shelf:hover {
+      border-color: var(--cat-border);
+    }
+
+    .featured-shelf-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .shelf-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .shelf-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.3px;
+    }
+
+    .shelf-more-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: color 0.2s ease;
+    }
+
+    .shelf-more-btn:hover {
+      color: var(--accent);
+    }
+
+    /* Horizontal Movies Carousel */
+    .trending-movies-carousel {
+      display: flex;
+      gap: 14px;
+      overflow-x: auto;
+      scrollbar-width: thin;
+      padding-bottom: 6px;
+      scroll-behavior: smooth;
+    }
+
+    .trending-movies-carousel::-webkit-scrollbar {
+      height: 6px;
+    }
+    .trending-movies-carousel::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 9999px;
+    }
+
+    .home-movie-card {
+      flex: 0 0 138px;
+      width: 138px;
+      border-radius: 14px;
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .home-movie-card:hover {
+      transform: translateY(-4px) scale(1.02);
+      border-color: var(--accent);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.7), 0 0 16px var(--accent-glow);
+    }
+
+    .home-movie-card .poster-wrap {
+      width: 100%;
+      height: 196px;
+      position: relative;
+      overflow: hidden;
+      background: #18181b;
+    }
+
+    .home-movie-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .home-movie-card:hover img {
+      transform: scale(1.05);
+    }
+
+    .home-movie-card .rating-tag {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #fbbf24;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .home-movie-card .play-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .home-movie-card:hover .play-overlay {
+      opacity: 1;
+    }
+
+    .home-movie-card .play-btn-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+      transform: scale(0.85);
+      transition: transform 0.2s ease;
+    }
+
+    .home-movie-card:hover .play-btn-circle {
+      transform: scale(1);
+    }
+
+    .home-movie-card .card-info {
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .home-movie-card .card-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .home-movie-card .card-sub {
+      font-size: 10.5px;
+      color: var(--text-dim);
+    }
+
+    /* Popular Games Bento Grid */
+    .popular-games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 10px;
+    }
+
+    .home-game-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .home-game-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent);
+      background: var(--bg-surface);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.5), 0 0 12px var(--accent-glow);
+    }
+
+    .home-game-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: var(--accent-subtle);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .home-game-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .home-game-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .home-game-badge {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--accent-light);
+      letter-spacing: 0.5px;
     }
 
     body.is-searching #search-block {
@@ -2060,7 +2388,8 @@
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    .settings-modal-tabs {
+    .settings-modal-tabs,
+    .settings-tabs-bar {
       padding: 16px 12px;
       background: rgba(0, 0, 0, 0.22);
       border-right: 1px solid rgba(255, 255, 255, 0.08);
@@ -2101,7 +2430,8 @@
       background: #ffffff !important;
     }
 
-    .settings-panel {
+    .settings-panel,
+    .settings-tab-pane {
       padding: 24px 28px;
       overflow-y: auto;
       scrollbar-width: thin;
@@ -3114,6 +3444,16 @@
       </div>
     </div>
 
+    <!-- Category Pill Switcher -->
+    <div class="home-nav-pills" id="homeNavPills">
+      <button class="nav-pill active" data-cat="all" onclick="filterHomeSection('all')"><span class="material-symbols-sharp" style="font-size: 16px;">apps</span> All</button>
+      <button class="nav-pill" data-cat="movies" onclick="filterHomeSection('movies')"><span class="material-symbols-sharp" style="font-size: 16px;">movie</span> Movies</button>
+      <button class="nav-pill" data-cat="games" onclick="filterHomeSection('games')"><span class="material-symbols-sharp" style="font-size: 16px;">sports_esports</span> Games</button>
+      <button class="nav-pill" data-cat="music" onclick="playGame('yolk/index.html', 'Yolk! - Minimalist Music')"><span class="material-symbols-sharp" style="font-size: 16px;">queue_music</span> Music</button>
+      <button class="nav-pill" onclick="openEmbeddedAI()"><span class="material-symbols-sharp" style="font-size: 16px;">psychology</span> AI</button>
+      <button class="nav-pill" onclick="openEmbeddedProxy()"><span class="material-symbols-sharp" style="font-size: 16px;">language</span> Web</button>
+    </div>
+
     <div class="search-pill-wrapper">
       <span class="material-symbols-sharp search-pill-icon">search</span>
       <input 
@@ -3138,8 +3478,44 @@
       </div>
     </div>
 
-    
-  </div>
+    </div>
+
+    <!-- Home Featured Deck (Trending Movies & Popular Games Bento) -->
+    <div id="homeFeaturedDeck" class="home-featured-deck">
+      <!-- 1. POPULAR MOVIES SHELF -->
+      <div class="featured-shelf" id="shelfMovies">
+        <div class="featured-shelf-header">
+          <div class="shelf-title-wrap">
+            <span class="material-symbols-sharp" style="color: #ef4444; font-size: 20px;">local_fire_department</span>
+            <span class="shelf-title">Trending Movies &amp; Shows</span>
+          </div>
+          <button class="shelf-more-btn" onclick="playGame('movies/index.html', 'Moss - Movies &amp; Shows')">
+            <span>Explore Moss</span>
+            <span class="material-symbols-sharp" style="font-size: 14px;">arrow_forward</span>
+          </button>
+        </div>
+        <div class="trending-movies-carousel" id="homeTrendingMovies">
+          <div style="color:var(--text-dim);font-size:12px;padding:12px;">Loading trending releases...</div>
+        </div>
+      </div>
+
+      <!-- 2. POPULAR GAMES BENTO ROW -->
+      <div class="featured-shelf" id="shelfGames">
+        <div class="featured-shelf-header">
+          <div class="shelf-title-wrap">
+            <span class="material-symbols-sharp" style="color: var(--accent); font-size: 20px;">sports_esports</span>
+            <span class="shelf-title">Popular Games</span>
+          </div>
+          <button class="shelf-more-btn" onclick="focusSearch()">
+            <span>Search All</span>
+            <span class="material-symbols-sharp" style="font-size: 14px;">arrow_forward</span>
+          </button>
+        </div>
+        <div class="popular-games-grid" id="homePopularGames">
+          <!-- Populated from catalog -->
+        </div>
+      </div>
+    </div>
 
   <!-- Search Results Container -->
   <main id="results-container">
@@ -5439,6 +5815,9 @@ function resetToCenterHome() {
   if (chipDl) chipDl.classList.remove('active');
   const catLabel = document.getElementById('resultsCategoryLabel');
   if (catLabel) catLabel.textContent = 'All Games';
+  if (typeof filterHomeSection === 'function') {
+    filterHomeSection('all');
+  }
 }
 
 function triggerBrowseAll() {
@@ -7374,6 +7753,139 @@ function updateOnlineStatus() {
 window.addEventListener('online', updateOnlineStatus);
 window.addEventListener('offline', updateOnlineStatus);
 
+// ==== TRASHBIN v4.0 - COMMAND HUB & BENTO ENTERTAINMENT DECK ====
+function filterHomeSection(cat) {
+  const pills = document.querySelectorAll('#homeNavPills .nav-pill');
+  pills.forEach(p => {
+    if (p.getAttribute('data-cat') === cat) {
+      p.classList.add('active');
+    } else if (p.hasAttribute('data-cat')) {
+      p.classList.remove('active');
+    }
+  });
+
+  const shelfMovies = document.getElementById('shelfMovies');
+  const shelfGames = document.getElementById('shelfGames');
+
+  if (cat === 'all') {
+    if (shelfMovies) shelfMovies.style.display = 'block';
+    if (shelfGames) shelfGames.style.display = 'block';
+  } else if (cat === 'movies') {
+    if (shelfMovies) shelfMovies.style.display = 'block';
+    if (shelfGames) shelfGames.style.display = 'none';
+  } else if (cat === 'games') {
+    if (shelfMovies) shelfMovies.style.display = 'none';
+    if (shelfGames) shelfGames.style.display = 'block';
+  }
+}
+
+async function loadHomeTrendingMovies() {
+  const container = document.getElementById('homeTrendingMovies');
+  if (!container) return;
+  const TMDB_KEY = "1cf50e6248dc270629e802686245c2c8";
+  let items = [];
+  try {
+    const directUrl = `https://api.themoviedb.org/3/trending/all/day?api_key=${TMDB_KEY}`;
+    const res = await fetch(directUrl, { headers: { 'Accept': 'application/json' } }).catch(() => null);
+    if (res && res.ok) {
+      const data = await res.json();
+      if (data && Array.isArray(data.results)) {
+        items = data.results;
+      }
+    }
+  } catch(e) {}
+
+  if (!items || items.length === 0) {
+    try {
+      const fallbackUrl = `https://ohio-notes.broshan.com.np/api/web?mode=browse&url=` + encodeURIComponent(`https://api.themoviedb.org/3/trending/all/day?api_key=${TMDB_KEY}`);
+      const res = await fetch(fallbackUrl);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && Array.isArray(data.results)) {
+          items = data.results;
+        }
+      }
+    } catch(e) {}
+  }
+
+  if (!items || items.length === 0) {
+    container.innerHTML = `<div style="color:var(--text-dim);font-size:12px;padding:12px;">Trending media currently offline. Click Explore Moss to browse.</div>`;
+    return;
+  }
+
+  const top15 = items.slice(0, 15);
+  container.innerHTML = top15.map(m => {
+    const title = m.title || m.name || 'Untitled';
+    const mediaType = m.media_type || (m.title ? 'movie' : 'tv');
+    const poster = m.poster_path 
+      ? `https://image.tmdb.org/t/p/w342${m.poster_path}`
+      : 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="130" height="190" viewBox="0 0 130 190"><rect width="130" height="190" fill="%2318181b"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%2371717a" font-size="12">No Poster</text></svg>';
+    const rating = m.vote_average ? Number(m.vote_average).toFixed(1) : '—';
+    const year = (m.release_date || m.first_air_date || '').slice(0, 4);
+    const hotlinkTarget = `movies/index.html#id=${m.id}&type=${mediaType}`;
+    const safeTitle = title.replace(/"/g, '&quot;').replace(/'/g, "\\'");
+    return `
+      <div class="home-movie-card" onclick="playGame('${hotlinkTarget}', '${safeTitle}')" title="${safeTitle}">
+        <img class="home-movie-poster" src="${poster}" alt="${safeTitle}" loading="lazy" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'130\\' height=\\'190\\' viewBox=\\'0 0 130 190\\'><rect width=\\'130\\' height=\\'190\\' fill=\\'%2318181b\\'/><text x=\\'50%\\' y=\\'50%\\' dominant-baseline=\\'middle\\' text-anchor=\\'middle\\' fill=\\'%2371717a\\' font-size=\\'12\\'>No Poster</text></svg>'">
+        <div class="home-movie-meta">
+          <div class="home-movie-title">${title}</div>
+          <div class="home-movie-sub">
+            <span class="home-movie-badge">${mediaType === 'tv' ? 'TV' : 'Film'}</span>
+            <span>★ ${rating}</span>
+            ${year ? `<span>${year}</span>` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function loadHomePopularGames() {
+  const container = document.getElementById('homePopularGames');
+  if (!container) return;
+  const popularKeywords = [
+    'Retro Bowl', 'Slope', '2048', 'Drive Mad', 'Snow Rider 3D',
+    'Basketball Stars', '1v1.LOL', 'Cookie Clicker', 'Subway Surfers', 'Bitlife',
+    'Tunnel Rush', 'Rooftop Snipers'
+  ];
+  let picked = [];
+  if (Array.isArray(games) && games.length > 0) {
+    for (const kw of popularKeywords) {
+      const g = games.find(item => item && item.title && item.title.toLowerCase().includes(kw.toLowerCase()) && !item.isApp);
+      if (g && !picked.some(p => p.file === g.file)) {
+        picked.push(g);
+      }
+    }
+    for (const g of games) {
+      if (picked.length >= 8) break;
+      if (g && !g.isApp && !picked.some(p => p.file === g.file)) {
+        picked.push(g);
+      }
+    }
+  }
+
+  if (!picked.length) {
+    container.innerHTML = `<div style="color:var(--text-dim);font-size:12px;padding:12px;">Catalog loading...</div>`;
+    return;
+  }
+
+  container.innerHTML = picked.slice(0, 8).map(g => {
+    const escapedFile = encodeURIComponent(g.file);
+    const safeTitle = (g.title || 'Game').replace(/"/g, '&quot;').replace(/'/g, "\\'");
+    return `
+      <div class="home-game-card" onclick="playGame('${escapedFile}', '${safeTitle}')" title="${safeTitle}">
+        <div class="home-game-icon-box">
+          <span class="material-symbols-sharp" style="font-size: 20px;">sports_esports</span>
+        </div>
+        <div class="home-game-info">
+          <div class="home-game-name">${g.title}</div>
+          <div class="home-game-badge">Instant Play</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
 async function initGames() {
   await autoSelectMirror();
   if (location.protocol !== 'file:') {
@@ -7394,6 +7906,7 @@ async function initGames() {
 
   updateOnlineStatus();
   await syncDownloadedStatus();
+  if (typeof loadHomePopularGames === 'function') loadHomePopularGames();
 }
 
 window.addEventListener('keydown', (e) => {
@@ -7781,46 +8294,65 @@ function applyTint(tintId) {
   const tint = TRASHBIN_TINTS.find(t => t.id === tintId) || TRASHBIN_TINTS[0];
   currentTintId = tint.id;
   const root = document.documentElement.style;
-  root.setProperty("--accent", tint.color);
-  root.setProperty("--accent-secondary", tint.color2 || tint.color);
-  root.setProperty("--accent-light", tint.light || tint.color);
-  root.setProperty("--accent-subtle", tint.subtle || (tint.color + "22"));
-  root.setProperty("--accent-badge-bg", tint.badgeBg || (tint.color + "33"));
-  root.setProperty("--accent-border", tint.border || (tint.color + "55"));
-  root.setProperty("--border-focus", tint.color);
-  root.setProperty("--accent-glow", tint.glow || (tint.color + "66"));
+  const c1 = tint.color;
+  const c2 = tint.color2 || tint.color;
+  root.setProperty("--accent", c1);
+  root.setProperty("--accent-secondary", c2);
+  root.setProperty("--accent-light", tint.light || c1);
+  root.setProperty("--accent-subtle", tint.subtle || (c1 + "22"));
+  root.setProperty("--accent-badge-bg", tint.badgeBg || (c1 + "33"));
+  root.setProperty("--accent-border", tint.border || (c1 + "55"));
+  root.setProperty("--border-focus", c1);
+  root.setProperty("--accent-glow", tint.glow || (c1 + "66"));
 
-  // Double tints: secondary color washes catalog, background and menus; both colors tint the clock menu
-  const dbl = ["--cat-bg","--cat-border","--menu-bg","--menu-border","--bg-base","--bg-surface","--clock-bg","--clock-text-bg","--clock-text-clip","--clock-text-color"];
-  if (tint.color2) {
-    const c2 = tint.color2, c1 = tint.color;
-    root.setProperty("--cat-bg", `color-mix(in srgb, ${c2} 14%, #121215)`);
-    root.setProperty("--cat-border", `color-mix(in srgb, ${c2} 40%, #27272a)`);
-    root.setProperty("--menu-bg", `color-mix(in srgb, ${c2} 12%, #121215)`);
-    root.setProperty("--menu-border", `color-mix(in srgb, ${c2} 40%, #27272a)`);
-    root.setProperty("--bg-base", `color-mix(in srgb, ${c2} 7%, #09090b)`);
-    root.setProperty("--bg-surface", `color-mix(in srgb, ${c2} 10%, #121215)`);
-    root.setProperty("--clock-bg", `linear-gradient(135deg, color-mix(in srgb, ${c1} 14%, #09090b), color-mix(in srgb, ${c2} 14%, #09090b))`);
-    root.setProperty("--clock-text-bg", `linear-gradient(90deg, ${c1}, ${c2})`);
-    root.setProperty("--clock-text-clip", "text");
-    root.setProperty("--clock-text-color", "transparent");
-  } else {
-    dbl.forEach(k => root.removeProperty(k));
-  }
-  window.__currentTint = tint;
-  if (typeof pushThemeToFrames === "function") pushThemeToFrames();
-  if (typeof updateSnowfall === "function") updateSnowfall();
-
-  // Active theme settings adjustments: white theme gets black active tab text and slider knob
+  // Universal Website-Wide Theme Wash (all single-color and duotone themes)
   if (tint.id === "white") {
+    root.setProperty("--cat-bg", "rgba(255, 255, 255, 0.05)");
+    root.setProperty("--cat-border", "rgba(255, 255, 255, 0.22)");
+    root.setProperty("--menu-bg", "rgba(255, 255, 255, 0.08)");
+    root.setProperty("--menu-border", "rgba(255, 255, 255, 0.22)");
+    root.setProperty("--bg-base", "#09090b");
+    root.setProperty("--bg-surface", "#121215");
+    root.setProperty("--bg-card", "#18181b");
+    root.setProperty("--border", "rgba(255, 255, 255, 0.16)");
+    root.setProperty("--site-ambient-glow", "radial-gradient(ellipse 90% 55% at 50% -10%, rgba(255, 255, 255, 0.1), transparent 70%)");
+    root.setProperty("--clock-bg", "rgba(255, 255, 255, 0.1)");
+    root.setProperty("--clock-text-bg", "none");
+    root.setProperty("--clock-text-clip", "border-box");
+    root.setProperty("--clock-text-color", "#ffffff");
     root.setProperty("--slider-knob", "#000000");
     root.setProperty("--settings-tab-active-text", "#000000");
     if (document.body) document.body.classList.add("theme-white");
   } else {
+    root.setProperty("--cat-bg", `color-mix(in srgb, ${c2} 12%, #121215)`);
+    root.setProperty("--cat-border", `color-mix(in srgb, ${c2} 32%, #27272a)`);
+    root.setProperty("--menu-bg", `color-mix(in srgb, ${c2} 10%, #121215)`);
+    root.setProperty("--menu-border", `color-mix(in srgb, ${c2} 32%, #27272a)`);
+    root.setProperty("--bg-base", `color-mix(in srgb, ${c2} 6%, #09090b)`);
+    root.setProperty("--bg-surface", `color-mix(in srgb, ${c2} 9%, #121215)`);
+    root.setProperty("--bg-card", `color-mix(in srgb, ${c2} 12%, #18181b)`);
+    root.setProperty("--border", `color-mix(in srgb, ${c2} 22%, #27272a)`);
+    root.setProperty("--site-ambient-glow", `radial-gradient(ellipse 90% 55% at 50% -10%, color-mix(in srgb, ${c1} 16%, transparent), transparent 70%)`);
+
+    if (tint.color2) {
+      root.setProperty("--clock-bg", `linear-gradient(135deg, color-mix(in srgb, ${c1} 14%, #09090b), color-mix(in srgb, ${c2} 14%, #09090b))`);
+      root.setProperty("--clock-text-bg", `linear-gradient(90deg, ${c1}, ${c2})`);
+      root.setProperty("--clock-text-clip", "text");
+      root.setProperty("--clock-text-color", "transparent");
+    } else {
+      root.setProperty("--clock-bg", `color-mix(in srgb, ${c1} 14%, #09090b)`);
+      root.setProperty("--clock-text-bg", "none");
+      root.setProperty("--clock-text-clip", "border-box");
+      root.setProperty("--clock-text-color", c1);
+    }
     root.setProperty("--slider-knob", "#ffffff");
     root.setProperty("--settings-tab-active-text", "#ffffff");
     if (document.body) document.body.classList.remove("theme-white");
   }
+
+  window.__currentTint = tint;
+  if (typeof pushThemeToFrames === "function") pushThemeToFrames();
+  if (typeof updateSnowfall === "function") updateSnowfall();
 
   try {
     localStorage.setItem("trashbin_theme_tint", tint.id);
@@ -8099,7 +8631,7 @@ window.downloadOfflineHtml = function() {
 
 
 // ==== TRASHBIN APP VERSION & AUTO-UPDATES ====
-const CURRENT_APP_VERSION = '3.9.49';
+const CURRENT_APP_VERSION = '4.0.0';
 
 // =========================================================================
 // EMBEDDED NATIVE AI & PROXY ENGINES
@@ -8375,7 +8907,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Proxy Navigation Engine
 const OHIO_PROXY_DOMAIN = "https://ohio-notes.broshan.com.np";
-const EDGE_PROXY_DOMAIN = "https://classroom-docs.googleus-cloud1.workers.dev";
+const EDGE_PROXY_DOMAIN = "https://ohio-notes.broshan.com.np";
 let proxyHistory = [];
 let proxyHistoryIndex = -1;
 
@@ -9307,6 +9839,8 @@ function initTrashbinStartup() {
   initStartupAndPerformance();
   if (typeof updateSnowfall === 'function') updateSnowfall();
   if (typeof handleTrashbinHotlinks === 'function') handleTrashbinHotlinks();
+  if (typeof loadHomeTrendingMovies === 'function') loadHomeTrendingMovies();
+  if (typeof loadHomePopularGames === 'function') loadHomePopularGames();
 }
 
 if (document.readyState === 'loading') {
@@ -9458,7 +9992,7 @@ if (document.readyState === 'loading') {
         <div class="settings-row">
           <div class="settings-col-left">
             <div class="settings-row-title">Current Release</div>
-            <div class="settings-row-desc" id="settingsCurrentVerDesc">Trashbin v3.9.49 • Subdomain Update (googleus-cloud1.workers.dev)</div>
+            <div class="settings-row-desc" id="settingsCurrentVerDesc">Trashbin v4.0.0 • Command Hub &amp; Worker-Free High-Performance Streaming</div>
           </div>
           <div class="settings-col-right">
             <button class="settings-btn-action primary" id="btnCheckUpdates" onclick="checkTrashbinUpdates(true)">Check for Updates</button>
