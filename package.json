@@ -1,6 +1,6 @@
 {
   "name": "pinpoint-mini",
-  "version": "3.9.48",
+  "version": "3.9.49",
   "description": "Trashbin - Fast games, music & study tools disguised in Classroom",
   "scripts": {
     "dev": "vercel dev"
