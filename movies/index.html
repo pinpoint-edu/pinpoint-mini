@@ -2584,6 +2584,15 @@
             const params = new URLSearchParams(combinedQuery);
             const targetId = params.get('id') || (combinedQuery.match(/id=([0-9]+)/) || [])[1];
             const targetType = params.get('type') || (combinedQuery.match(/type=(movie|tv)/) || [])[1] || 'movie';
+            const searchQuery = params.get('search') || params.get('q');
+
+            if (searchQuery) {
+                const sInput = document.getElementById('searchInput');
+                if (sInput) sInput.value = searchQuery;
+                switchTab('search');
+                searchTMDB(searchQuery);
+                return;
+            }
 
             if (targetId) {
                 console.log('[Moss] Executing hotlink for id:', targetId, targetType);
@@ -2617,6 +2626,14 @@
                     const p = new URLSearchParams(q.replace(/^[#?]/, ''));
                     const tid = p.get('id') || e.data.id;
                     const mType = p.get('type') || e.data.mediaType || 'movie';
+                    const sq = p.get('search') || p.get('q');
+                    if (sq) {
+                        const sInput = document.getElementById('searchInput');
+                        if (sInput) sInput.value = sq;
+                        switchTab('search');
+                        searchTMDB(sq);
+                        return;
+                    }
                     if (tid) {
                         fetchTMDB('/' + mType + '/' + tid).then(item => {
                             if (item && !item.status_message) openPreview(item, mType);

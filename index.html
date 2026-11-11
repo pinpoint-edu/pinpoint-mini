@@ -317,56 +317,185 @@
       box-shadow: 0 2px 14px var(--accent-glow) !important;
     }
 
-    .mode-view-prompt {
-      flex: 1;
+    /* Media Cards Grid (Movies & Music in new UI) */
+    .media-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 16px;
+      padding: 10px 4px 30px 4px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .media-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
       display: flex;
       flex-direction: column;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+
+    .media-card:hover {
+      transform: translateY(-4px) scale(1.02);
+      border-color: var(--accent);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6), 0 0 16px var(--accent-glow);
+    }
+
+    .media-poster-wrap {
+      width: 100%;
+      height: 220px;
+      position: relative;
+      background: #121215;
+      overflow: hidden;
+    }
+
+    .media-poster-wrap.square {
+      height: 160px;
+    }
+
+    .media-poster-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .media-card:hover .media-poster-wrap img {
+      transform: scale(1.05);
+    }
+
+    .media-badge {
+      position: absolute;
+      top: 8px;
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .media-badge.rating {
+      right: 8px;
+      background: rgba(0, 0, 0, 0.75);
+      color: #fbbf24;
+      border: 1px solid rgba(251, 191, 36, 0.3);
+    }
+
+    .media-badge.type {
+      left: 8px;
+      background: rgba(0, 0, 0, 0.75);
+      color: var(--accent-light);
+      border: 1px solid var(--border);
+    }
+
+    .media-play-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      display: flex;
       align-items: center;
       justify-content: center;
-      padding: 42px 24px;
-      text-align: center;
-      cursor: pointer;
-      background: var(--bg-surface);
-      border: 1px dashed var(--border);
-      border-radius: 18px;
-      transition: all 0.25s ease;
-      margin: 14px 0 24px;
+      opacity: 0;
+      transition: opacity 0.2s ease;
     }
 
-    .mode-view-prompt:hover {
-      border-color: var(--accent);
-      background: var(--bg-card);
-      transform: translateY(-2px);
-      box-shadow: 0 10px 32px rgba(0,0,0,0.5), 0 0 14px var(--accent-glow);
+    .media-play-overlay .material-symbols-sharp {
+      font-size: 40px;
+      color: var(--accent);
+      filter: drop-shadow(0 0 10px var(--accent-glow));
     }
 
-    .mode-view-prompt h3 {
-      font-size: 18px;
-      margin: 12px 0 6px;
+    .media-card:hover .media-play-overlay {
+      opacity: 1;
+    }
+
+    .media-card-info {
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .media-card-title {
+      font-size: 13px;
+      font-weight: 700;
       color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .mode-view-prompt p {
-      font-size: 13.5px;
+    .media-card-sub {
+      font-size: 11px;
+      color: var(--text-dim);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .media-open-app-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
       color: var(--text-muted);
-      margin: 0;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s ease;
     }
 
-    .mode-view-prompt kbd {
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 4px;
-      padding: 2px 6px;
-      color: var(--accent-light);
-      font-family: inherit;
+    .media-open-app-btn:hover {
+      background: var(--bg-card);
+      border-color: var(--accent);
+      color: #ffffff;
+      transform: translateY(-1px);
     }
 
     body.is-searching #search-block {
-      margin-bottom: 12px;
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 660px;
+      z-index: 100;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    body.is-searching .home-nav-pills {
+      margin-bottom: 8px;
+      background: rgba(18, 18, 22, 0.78);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 4px 10px;
+      border-radius: 9999px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    body.is-searching .search-pill-wrapper {
+      background: rgba(18, 18, 22, 0.9);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.12);
     }
 
     body.is-searching .quick-pills {
-      margin-top: 10px;
+      display: none;
     }
 
     /* Large Logo above Search Bar */
@@ -497,40 +626,32 @@
       transform: scale(1.05);
     }
 
-    .search-hint-pill {
+    .search-submit-btn {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 5px;
-      padding: 4px 9px;
+      padding: 0 16px;
+      height: 34px;
+      background: var(--accent);
+      border: 1px solid var(--accent);
       border-radius: 9999px;
-      font-size: 11px;
+      color: var(--settings-tab-active-text, #000000);
+      font-size: 13px;
       font-weight: 700;
-      cursor: pointer;
-      border: 1px solid var(--border);
-      background: var(--bg-surface);
-      color: var(--text-main);
-      transition: all 0.2s ease;
-      white-space: nowrap;
-      user-select: none;
-    }
-    .search-hint-pill kbd {
-      background: rgba(255, 255, 255, 0.1);
-      padding: 1px 4px;
-      border-radius: 4px;
       font-family: inherit;
-      font-size: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      user-select: none;
+      box-shadow: 0 2px 10px var(--accent-glow);
     }
-    .search-hint-pill.proxy-pill:hover {
-      border-color: #10b981;
-      color: #34d399;
-      background: rgba(16, 185, 129, 0.15);
+    .search-submit-btn:hover {
+      filter: brightness(1.15);
+      transform: scale(1.04);
+      box-shadow: 0 4px 16px var(--accent-glow);
     }
-    .search-hint-pill.ai-pill:hover {
-      border-color: #60a5fa;
-      color: #93c5fd;
-      background: rgba(96, 165, 250, 0.15);
+    .search-submit-btn:active {
+      transform: scale(0.96);
     }
 
     .search-shortcuts-banner {
@@ -722,6 +843,11 @@
       display: flex;
       opacity: 1;
       pointer-events: auto;
+      height: calc(100vh - 36px);
+      padding-bottom: 150px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: thin;
       animation: catalogSlideFadeIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
@@ -2944,6 +3070,50 @@
       color: #e4e4e7;
     }
 
+    .ai-msg-bubble h1, .ai-msg-bubble h2, .ai-msg-bubble h3, .ai-msg-bubble h4 {
+      margin: 12px 0 6px 0;
+      color: #ffffff;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+    .ai-msg-bubble h1 { font-size: 18px; }
+    .ai-msg-bubble h2 { font-size: 16px; }
+    .ai-msg-bubble h3 { font-size: 14.5px; }
+    .ai-msg-bubble h4 { font-size: 13.5px; }
+    .ai-msg-bubble p {
+      margin: 0 0 8px 0;
+      line-height: 1.6;
+    }
+    .ai-msg-bubble p:last-child {
+      margin-bottom: 0;
+    }
+    .ai-msg-bubble ul, .ai-msg-bubble ol {
+      margin: 6px 0 10px 20px;
+      padding: 0;
+    }
+    .ai-msg-bubble li {
+      margin-bottom: 4px;
+      line-height: 1.5;
+    }
+    .ai-msg-bubble blockquote {
+      margin: 8px 0;
+      padding: 6px 12px;
+      border-left: 3px solid var(--accent);
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 0 8px 8px 0;
+      font-style: italic;
+      color: #cbd5e1;
+    }
+    .ai-msg-bubble a.ai-link {
+      color: #60a5fa;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      word-break: break-all;
+    }
+    .ai-msg-bubble a.ai-link:hover {
+      color: #93c5fd;
+    }
+
     .ai-code-block {
       background: #121215;
       border: 1px solid rgba(255, 255, 255, 0.1);
@@ -3231,7 +3401,7 @@
 
     <!-- Search Mode Switcher Pills -->
     <div class="home-nav-pills" id="homeNavPills">
-      <button class="nav-pill active" data-mode="games" onclick="setSearchMode('games')">
+      <button class="nav-pill" data-mode="games" onclick="setSearchMode('games')">
         <span class="material-symbols-sharp" style="font-size: 16px;">sports_esports</span> Games
       </button>
       <button class="nav-pill" data-mode="movies" onclick="setSearchMode('movies')">
@@ -3253,21 +3423,16 @@
       <input 
         type="text" 
         id="searchInput" 
-        placeholder="Search games..." 
+        placeholder="Search games, movies, music, AI..." 
         autocomplete="off" 
         spellcheck="false"
       />
       <div class="search-right-actions">
-        <button id="searchAiHintBtn" class="search-hint-pill ai-pill" onclick="triggerModeAction('ai'); return false;" title="Ask AI (Enter)">
-          <kbd>↵</kbd>
-          <span id="hintAiText">AI</span>
-        </button>
-        <button id="searchProxyHintBtn" class="search-hint-pill proxy-pill" onclick="triggerModeAction('web'); return false;" title="Open in Web Proxy (Shift + Enter)">
-          <kbd>Shift+↵</kbd>
-          <span id="hintProxyText">Proxy</span>
-        </button>
         <button id="clearSearchBtn" class="clear-search-btn" onclick="clearSearch()" style="display: none;" title="Clear search">
           <span class="material-symbols-sharp" style="font-size: 16px;">close</span>
+        </button>
+        <button id="searchSubmitBtn" class="search-submit-btn" onclick="executeSearchAction()" title="Search">
+          <span>Search</span>
         </button>
       </div>
     </div>
@@ -5525,32 +5690,42 @@ function clearSearch() {
 }
 
 function updateResultsPosition() {
-  const sb = document.getElementById('search-block');
   const rc = document.getElementById('results-container');
-  if (sb && rc && document.body.classList.contains('is-searching')) {
-    const bottom = sb.getBoundingClientRect().bottom;
-    rc.style.top = Math.max(134, Math.round(bottom + 12)) + 'px';
+  if (rc) {
+    rc.style.top = '';
   }
 }
 
 function activateSearchState() {
   document.body.classList.add('is-searching');
-  setTimeout(updateResultsPosition, 40);
-  setTimeout(updateResultsPosition, 250);
-  setTimeout(updateResultsPosition, 650);
 }
 
 function resetToCenterHome() {
   if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
   if (typeof multiSearchDebounce !== 'undefined' && multiSearchDebounce) clearTimeout(multiSearchDebounce);
   window.__topSearchResultAction = null;
+
+  // 1. Remove is-searching state completely (return to center home)
+  document.body.classList.remove('is-searching');
+
+  // 2. Clear active mode pills - no genre selected
+  document.querySelectorAll('#homeNavPills .nav-pill').forEach(p => p.classList.remove('active'));
+  currentSearchMode = null;
+
+  // 3. Clear search input
   const input = document.getElementById('searchInput');
-  if (input) input.value = '';
-  document.getElementById('clearSearchBtn').style.display = 'none';
-  if (currentSearchMode === 'games') {
-    renderGames();
-  } else {
-    renderModePrompt(currentSearchMode);
+  if (input) {
+    input.value = '';
+    input.placeholder = 'Search games, movies, music, AI...';
+  }
+  const clearBtn = document.getElementById('clearSearchBtn');
+  if (clearBtn) clearBtn.style.display = 'none';
+
+  // 4. Hide results container
+  const rc = document.getElementById('results-container');
+  if (rc) {
+    rc.style.display = '';
+    rc.style.top = '';
   }
 }
 
@@ -5570,50 +5745,27 @@ searchInput.addEventListener('input', () => {
 
   if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
 
+  // If no genre selected, automatically select Games!
+  if (!currentSearchMode) {
+    setSearchMode('games');
+    return;
+  }
+
   activateSearchState();
+
   if (currentSearchMode === 'games') {
     renderGames();
-  } else {
-    renderModePrompt(currentSearchMode);
+  } else if (currentSearchMode === 'movies') {
+    searchDebounceTimer = setTimeout(() => fetchAndRenderMovies(val.trim()), 300);
+  } else if (currentSearchMode === 'music') {
+    searchDebounceTimer = setTimeout(() => fetchAndRenderMusic(val.trim()), 300);
   }
 });
 
 searchInput.addEventListener('keydown', (e) => {
-  const val = (searchInput.value || '').trim();
-
-  // Shift + Enter or proxy shortcut
-  if ((e.shiftKey || e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-    e.preventDefault();
-    openEmbeddedProxy(val);
-    return;
-  }
-
   if (e.key === 'Enter') {
     e.preventDefault();
-    if (currentSearchMode === 'games') {
-      if (!val) {
-        activateSearchState();
-        renderGames();
-      } else {
-        const qLower = val.toLowerCase();
-        const matched = games.filter(g => g.title && g.title.toLowerCase().includes(qLower));
-        if (matched.length > 0) {
-          playGame(encodeURIComponent(matched[0].file), encodeURIComponent(matched[0].title));
-        } else {
-          openEmbeddedAI(val);
-        }
-      }
-    } else if (currentSearchMode === 'movies') {
-      const target = val ? `movies/index.html#search=${encodeURIComponent(val)}` : 'movies/index.html';
-      playGame(target, 'Moss - Movies & Shows');
-    } else if (currentSearchMode === 'music') {
-      const target = val ? `yolk/index.html#search=${encodeURIComponent(val)}` : 'yolk/index.html';
-      playGame(target, 'Yolk! - Minimalist Music');
-    } else if (currentSearchMode === 'ai') {
-      openEmbeddedAI(val || 'Hello!');
-    } else if (currentSearchMode === 'web') {
-      openEmbeddedProxy(val);
-    }
+    executeSearchAction();
   }
 });
 
@@ -5851,6 +6003,9 @@ function renderGames() {
       </div>
     `;
     listContainer = document.getElementById('gameList');
+  }
+  if (listContainer) {
+    listContainer.className = 'game-grid';
   }
 
   const emptyState = document.getElementById('emptyState');
@@ -7537,33 +7692,23 @@ window.addEventListener('online', updateOnlineStatus);
 window.addEventListener('offline', updateOnlineStatus);
 
 // ==== TRASHBIN v4.0 - SEARCH MODES & CATALOG ENGINE ====
-let currentSearchMode = 'games';
+let currentSearchMode = null;
 
 const SEARCH_MODE_CONFIG = {
   games: {
-    placeholder: "Search games or press Enter to browse...",
-    hintAi: "AI",
-    hintProxy: "Proxy"
+    placeholder: "Search games or press Enter to browse..."
   },
   movies: {
-    placeholder: "Search movies, series, or TV shows... (↵ to open)",
-    hintAi: "AI",
-    hintProxy: "Proxy"
+    placeholder: "Search movies, series, or TV shows..."
   },
   music: {
-    placeholder: "Search songs, artists, or playlists... (↵ to open)",
-    hintAi: "AI",
-    hintProxy: "Proxy"
+    placeholder: "Search songs, artists, or albums..."
   },
   ai: {
-    placeholder: "What would you like to ask? (Trashbin AI)",
-    hintAi: "↵ Ask",
-    hintProxy: "Proxy"
+    placeholder: "What would you like to ask? (Trashbin AI)"
   },
   web: {
-    placeholder: "https://example.com or search the web...",
-    hintAi: "AI",
-    hintProxy: "↵ Browse"
+    placeholder: "https://example.com or search the web..."
   }
 };
 
@@ -7579,97 +7724,226 @@ function setSearchMode(mode) {
   });
 
   const searchInput = document.getElementById('searchInput');
-  const cfg = SEARCH_MODE_CONFIG[mode] || SEARCH_MODE_CONFIG.games;
+  const cfg = SEARCH_MODE_CONFIG[mode] || { placeholder: "Search games, movies, music, AI..." };
   if (searchInput) {
     searchInput.placeholder = cfg.placeholder;
     searchInput.focus();
   }
 
-  const hintAiText = document.getElementById('hintAiText');
-  const hintProxyText = document.getElementById('hintProxyText');
-  if (hintAiText) hintAiText.textContent = cfg.hintAi;
-  if (hintProxyText) hintProxyText.textContent = cfg.hintProxy;
+  const val = (searchInput ? searchInput.value : '').trim();
+
+  if (mode === 'ai') {
+    openEmbeddedAI(val || 'Hello!');
+    return;
+  }
+  if (mode === 'web') {
+    openEmbeddedProxy(val);
+    return;
+  }
 
   activateSearchState();
 
   if (mode === 'games') {
     renderGames();
-  } else {
-    renderModePrompt(mode);
-  }
-}
-
-function triggerModeAction(mode) {
-  const val = (document.getElementById('searchInput').value || '').trim();
-  if (mode === 'ai') {
-    openEmbeddedAI(val || 'Hello!');
-  } else if (mode === 'web') {
-    openEmbeddedProxy(val);
   } else if (mode === 'movies') {
-    const target = val ? `movies/index.html#search=${encodeURIComponent(val)}` : 'movies/index.html';
-    playGame(target, 'Moss - Movies & Shows');
+    fetchAndRenderMovies(val);
   } else if (mode === 'music') {
-    const target = val ? `yolk/index.html#search=${encodeURIComponent(val)}` : 'yolk/index.html';
-    playGame(target, 'Yolk! - Minimalist Music');
-  } else {
-    setSearchMode(mode);
+    fetchAndRenderMusic(val);
   }
 }
 
-function renderModePrompt(mode) {
-  const container = document.getElementById('results-container');
-  if (!container) return;
-  const val = (document.getElementById('searchInput').value || '').trim();
+function executeSearchAction() {
+  const input = document.getElementById('searchInput');
+  const val = (input ? input.value : '').trim();
 
-  if (mode === 'movies') {
-    container.innerHTML = `
-      <div class="mode-view-prompt" onclick="triggerModeAction('movies')">
-        <span class="material-symbols-sharp" style="font-size: 44px; color: #ef4444;">movie</span>
-        <h3>${val ? `Search Moss for "${escapeHtml(val)}"` : 'Explore Movies & TV Shows in Moss'}</h3>
-        <p>Press <kbd>↵ Enter</kbd> or click here to open Moss ${val ? `and stream "${escapeHtml(val)}"` : 'and stream popular titles'}.</p>
-        <button class="btn-sharp btn-primary-sharp" style="margin-top: 14px;">
-          <span class="material-symbols-sharp">open_in_new</span>
-          <span>Open Moss</span>
-        </button>
-      </div>
-    `;
-  } else if (mode === 'music') {
-    container.innerHTML = `
-      <div class="mode-view-prompt" onclick="triggerModeAction('music')">
-        <span class="material-symbols-sharp" style="font-size: 44px; color: var(--accent);">queue_music</span>
-        <h3>${val ? `Search Yolk for "${escapeHtml(val)}"` : 'Listen to Music in Yolk'}</h3>
-        <p>Press <kbd>↵ Enter</kbd> or click here to open Yolk ${val ? `and play "${escapeHtml(val)}"` : 'and listen to your favorites'}.</p>
-        <button class="btn-sharp btn-primary-sharp" style="margin-top: 14px;">
-          <span class="material-symbols-sharp">open_in_new</span>
-          <span>Open Yolk</span>
-        </button>
-      </div>
-    `;
-  } else if (mode === 'ai') {
-    container.innerHTML = `
-      <div class="mode-view-prompt" onclick="triggerModeAction('ai')">
-        <span class="material-symbols-sharp" style="font-size: 44px; color: #60a5fa;">psychology</span>
-        <h3>${val ? `Ask Trashbin AI: "${escapeHtml(val)}"` : 'Ask Trashbin AI Anything'}</h3>
-        <p>Press <kbd>↵ Enter</kbd> or click here to launch the AI assistant.</p>
-        <button class="btn-sharp btn-primary-sharp" style="margin-top: 14px;">
-          <span class="material-symbols-sharp">chat</span>
-          <span>Chat with AI</span>
-        </button>
-      </div>
-    `;
-  } else if (mode === 'web') {
-    container.innerHTML = `
-      <div class="mode-view-prompt" onclick="triggerModeAction('web')">
-        <span class="material-symbols-sharp" style="font-size: 44px; color: #10b981;">language</span>
-        <h3>${val ? `Browse: "${escapeHtml(val)}"` : 'Unblocked Web Proxy'}</h3>
-        <p>Press <kbd>↵ Enter</kbd> or click here to load this page via unblocked web gateway.</p>
-        <button class="btn-sharp btn-primary-sharp" style="margin-top: 14px;">
-          <span class="material-symbols-sharp">travel_explore</span>
-          <span>Open Web Proxy</span>
-        </button>
-      </div>
-    `;
+  if (!currentSearchMode) {
+    setSearchMode('games');
+    return;
   }
+
+  if (currentSearchMode === 'ai') {
+    openEmbeddedAI(val || 'Hello!');
+    return;
+  }
+  if (currentSearchMode === 'web') {
+    openEmbeddedProxy(val);
+    return;
+  }
+
+  activateSearchState();
+
+  if (currentSearchMode === 'games') {
+    if (val) {
+      const qLower = val.toLowerCase();
+      const matched = games.filter(g => g.title && g.title.toLowerCase().includes(qLower));
+      if (matched.length === 1) {
+        playGame(encodeURIComponent(matched[0].file), encodeURIComponent(matched[0].title));
+        return;
+      }
+    }
+    renderGames();
+  } else if (currentSearchMode === 'movies') {
+    fetchAndRenderMovies(val);
+  } else if (currentSearchMode === 'music') {
+    fetchAndRenderMusic(val);
+  }
+}
+
+async function fetchAndRenderMovies(query = '') {
+  const container = document.getElementById('gameList');
+  const categoryLabel = document.getElementById('resultsCategoryLabel');
+  const summaryLabel = document.getElementById('resultsSummaryLabel');
+  const emptyState = document.getElementById('emptyState');
+  if (!container) return;
+
+  if (emptyState) emptyState.style.display = 'none';
+  if (categoryLabel) {
+    categoryLabel.innerHTML = `<span class="material-symbols-sharp" style="font-size: 18px; color: #ef4444;">movie</span> ${query ? `Movies & TV: "${escapeHtml(query)}"` : 'Top Movies & TV Shows'}`;
+  }
+  if (summaryLabel) {
+    const qPart = query ? `#search=${encodeURIComponent(query)}` : '';
+    summaryLabel.innerHTML = `<button class="media-open-app-btn" onclick="playGame('movies/index.html${qPart}', 'Moss - Movies & Shows')"><span class="material-symbols-sharp" style="font-size: 14px;">open_in_new</span> Open Moss</button>`;
+  }
+
+  container.className = 'media-cards-grid';
+  container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-dim);"><span class="material-symbols-sharp spin" style="font-size: 32px; color: var(--accent); display: block; margin: 0 auto 8px auto;">sync</span>Loading top movies & shows...</div>`;
+
+  const TMDB_KEY = "1cf50e6248dc270629e802686245c2c8";
+  const url = query 
+    ? `https://api.themoviedb.org/3/search/multi?api_key=${TMDB_KEY}&query=${encodeURIComponent(query)}`
+    : `https://api.themoviedb.org/3/trending/all/day?api_key=${TMDB_KEY}`;
+
+  let items = [];
+  try {
+    const res = await fetch(url).catch(() => null);
+    if (res && res.ok) {
+      const data = await res.json();
+      if (data && Array.isArray(data.results)) items = data.results;
+    }
+  } catch(e) {}
+
+  if (!items || items.length === 0) {
+    try {
+      const fallbackUrl = `https://ohio-notes.broshan.com.np/api/web?mode=browse&url=` + encodeURIComponent(url);
+      const res = await fetch(fallbackUrl).catch(() => null);
+      if (res && res.ok) {
+        const data = await res.json();
+        if (data && Array.isArray(data.results)) items = data.results;
+      }
+    } catch(e) {}
+  }
+
+  items = (items || []).filter(m => (m.media_type === 'movie' || m.media_type === 'tv' || (!m.media_type && (m.title || m.name))) && (m.poster_path || m.backdrop_path));
+
+  if (!items || items.length === 0) {
+    container.innerHTML = '';
+    if (emptyState) {
+      emptyState.style.display = 'flex';
+      const desc = document.getElementById('emptyStateDesc');
+      if (desc) desc.textContent = query ? `No movies found for "${query}". Try another title.` : 'No trending movies available.';
+    }
+    return;
+  }
+
+  container.innerHTML = items.map(m => {
+    const title = m.title || m.name || 'Untitled';
+    const mediaType = m.media_type || (m.title ? 'movie' : 'tv');
+    const poster = m.poster_path 
+      ? `https://image.tmdb.org/t/p/w342${m.poster_path}`
+      : 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="130" height="190" viewBox="0 0 130 190"><rect width="130" height="190" fill="%2318181b"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%2371717a" font-size="12">No Poster</text></svg>';
+    const rating = m.vote_average ? Number(m.vote_average).toFixed(1) : '—';
+    const year = (m.release_date || m.first_air_date || '').slice(0, 4) || '—';
+    const hotlinkTarget = `movies/index.html#id=${m.id}&type=${mediaType}`;
+    const safeTitle = title.replace(/"/g, '&quot;').replace(/'/g, "\\'");
+    return `
+      <div class="media-card movie-card" onclick="playGame('${hotlinkTarget}', '${safeTitle}')" title="${safeTitle}">
+        <div class="media-poster-wrap">
+          <img src="${poster}" alt="${safeTitle}" loading="lazy" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'130\\' height=\\'190\\' viewBox=\\'0 0 130 190\\'><rect width=\\'130\\' height=\\'190\\' fill=\\'%2318181b\\'/><text x=\\'50%\\' y=\\'50%\\' dominant-baseline=\\'middle\\' text-anchor=\\'middle\\' fill=\\'%2371717a\\' font-size=\\'12\\'>No Poster</text></svg>'">
+          <span class="media-badge rating">★ ${rating}</span>
+          <span class="media-badge type">${mediaType.toUpperCase()}</span>
+          <div class="media-play-overlay"><span class="material-symbols-sharp">play_arrow</span></div>
+        </div>
+        <div class="media-card-info">
+          <div class="media-card-title">${title}</div>
+          <div class="media-card-sub">${year}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function fetchAndRenderMusic(query = '') {
+  const container = document.getElementById('gameList');
+  const categoryLabel = document.getElementById('resultsCategoryLabel');
+  const summaryLabel = document.getElementById('resultsSummaryLabel');
+  const emptyState = document.getElementById('emptyState');
+  if (!container) return;
+
+  if (emptyState) emptyState.style.display = 'none';
+  if (categoryLabel) {
+    categoryLabel.innerHTML = `<span class="material-symbols-sharp" style="font-size: 18px; color: var(--accent);">queue_music</span> ${query ? `Music: "${escapeHtml(query)}"` : 'Top Music Tracks'}`;
+  }
+  if (summaryLabel) {
+    const qPart = query ? `#search=${encodeURIComponent(query)}` : '';
+    summaryLabel.innerHTML = `<button class="media-open-app-btn" onclick="playGame('yolk/index.html${qPart}', 'Yolk! - Minimalist Music')"><span class="material-symbols-sharp" style="font-size: 14px;">open_in_new</span> Open Yolk</button>`;
+  }
+
+  container.className = 'media-cards-grid';
+  container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-dim);"><span class="material-symbols-sharp spin" style="font-size: 32px; color: var(--accent); display: block; margin: 0 auto 8px auto;">sync</span>Searching music tracks...</div>`;
+
+  const searchQuery = query || 'top hits';
+  const url = `https://yolkaudio.broshan.com.np/api/music-api?endpoint=search&q=${encodeURIComponent(searchQuery)}&limit=24`;
+
+  let tracks = [];
+  try {
+    const res = await fetch(url).catch(() => null);
+    if (res && res.ok) {
+      const data = await res.json();
+      if (data && Array.isArray(data.tracks)) tracks = data.tracks;
+    }
+  } catch(e) {}
+
+  if (!tracks || tracks.length === 0) {
+    try {
+      const fallbackUrl = `https://ohio-notes.broshan.com.np/api/web?mode=browse&url=` + encodeURIComponent(url);
+      const res = await fetch(fallbackUrl).catch(() => null);
+      if (res && res.ok) {
+        const data = await res.json();
+        if (data && Array.isArray(data.tracks)) tracks = data.tracks;
+      }
+    } catch(e) {}
+  }
+
+  if (!tracks || tracks.length === 0) {
+    container.innerHTML = '';
+    if (emptyState) {
+      emptyState.style.display = 'flex';
+      const desc = document.getElementById('emptyStateDesc');
+      if (desc) desc.textContent = query ? `No tracks found for "${query}". Try another artist or song.` : 'No music tracks available.';
+    }
+    return;
+  }
+
+  container.innerHTML = tracks.map(t => {
+    const vid = (t.videoId || t.id || (t.youtube_id || '')).replace(/^ytm-/, '');
+    const title = t.title || t.name || 'Song';
+    const artist = t.artist_name || (Array.isArray(t.artists) ? t.artists.map(a => a.name).join(', ') : 'Artist');
+    const cover = t.artwork_url || t.thumbnails?.[0]?.url || (`https://i.ytimg.com/vi/${vid}/hqdefault.jpg`);
+    const hotlinkTarget = `yolk/index.html#song=${encodeURIComponent(vid)}&t=${encodeURIComponent(title)}&a=${encodeURIComponent(artist)}&cover=${encodeURIComponent(cover)}`;
+    const safeTitle = title.replace(/"/g, '&quot;').replace(/'/g, "\\'");
+    return `
+      <div class="media-card music-card" onclick="playGame('${hotlinkTarget}', '${safeTitle}')" title="${safeTitle}">
+        <div class="media-poster-wrap square">
+          <img src="${cover}" alt="${safeTitle}" loading="lazy" onerror="this.src='https://i.ytimg.com/vi/${vid}/hqdefault.jpg'">
+          <div class="media-play-overlay"><span class="material-symbols-sharp">play_arrow</span></div>
+        </div>
+        <div class="media-card-info">
+          <div class="media-card-title">${title}</div>
+          <div class="media-card-sub">${artist}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
 }
 
 async function initGames() {
@@ -7709,8 +7983,22 @@ window.addEventListener('keydown', (e) => {
 });
 
 window.addEventListener('message', (e) => {
-  if (e && e.data && (e.data === 'closePlayer' || e.data.type === 'closePlayer')) {
-    closePlayer();
+  if (e && e.data) {
+    if (e.data === 'closePlayer' || e.data.type === 'closePlayer') {
+      closePlayer();
+    }
+    if (e.data.type === 'TB_CLIENT_NAV' || e.data.type === 'TB_PROXY_NAV' || e.data.type === 'TB_WEB_URL_CHANGE') {
+      const newUrl = e.data.url;
+      if (newUrl) {
+        const input = document.getElementById('embeddedProxyInput');
+        if (input) input.value = newUrl;
+        if (e.data.pushHistory !== false && typeof proxyHistory !== 'undefined') {
+          proxyHistory = proxyHistory.slice(0, proxyHistoryIndex + 1);
+          proxyHistory.push(newUrl);
+          proxyHistoryIndex = proxyHistory.length - 1;
+        }
+      }
+    }
   }
 });
 
@@ -8414,7 +8702,7 @@ window.downloadOfflineHtml = function() {
 
 
 // ==== TRASHBIN APP VERSION & AUTO-UPDATES ====
-const CURRENT_APP_VERSION = '4.0.1';
+const CURRENT_APP_VERSION = '4.0.2';
 
 // =========================================================================
 // EMBEDDED NATIVE AI & PROXY ENGINES
@@ -8428,25 +8716,125 @@ let embeddedAiMessages = [
 
 function formatAiMarkdown(text) {
   if (!text) return '';
-  let h = text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
 
-  // Code blocks
-  h = h.replace(/```([a-zA-Z0-9_-]*)\n([\s\S]*?)```/g, (m, lang, code) => {
-    return `<div class="ai-code-block"><div class="ai-code-header"><span>${lang || 'code'}</span><button class="ai-copy-btn" onclick="navigator.clipboard.writeText(this.parentNode.nextSibling.innerText); this.textContent='Copied!'; setTimeout(()=>this.textContent='Copy', 2000)">Copy</button></div><pre><code>${code.trim()}</code></pre></div>`;
+  // 1. Extract fenced code blocks first to protect formatting and newlines
+  const codeBlocks = [];
+  let s = text.replace(/```([a-zA-Z0-9_-]*)\s*\n([\s\S]*?)```/g, (match, lang, code) => {
+    const idx = codeBlocks.length;
+    const escapedCode = code
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+    const langLabel = lang ? lang.toLowerCase() : 'code';
+    codeBlocks.push(
+      `<div class="ai-code-block">` +
+        `<div class="ai-code-header">` +
+          `<span>${langLabel}</span>` +
+          `<button class="ai-copy-btn" onclick="navigator.clipboard.writeText(this.closest('.ai-code-block').querySelector('code').innerText); this.textContent='Copied!'; setTimeout(()=>this.textContent='Copy', 2000)">Copy</button>` +
+        `</div>` +
+        `<pre><code>${escapedCode}</code></pre>` +
+      `</div>`
+    );
+    return `%%CODEBLOCK_${idx}%%`;
   });
 
-  // Inline code: `code`
-  h = h.replace(/`([^`]+)`/g, '<code class="ai-inline-code">$1</code>');
-  // Bold: **text**
-  h = h.replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>');
-  // Italic: *text*
-  h = h.replace(/\*([^\*]+)\*/g, '<em>$1</em>');
-  // Newlines
-  h = h.replace(/\n/g, '<br/>');
-  return h;
+  // 2. Escape HTML for the rest of the text
+  s = s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  // 3. Inline code: `code`
+  s = s.replace(/`([^`\n]+)`/g, '<code class="ai-inline-code">$1</code>');
+
+  // 4. Line by line processing for markdown blocks
+  const lines = s.split(/\r?\n/);
+  const out = [];
+  let inUl = false;
+  let inOl = false;
+
+  const closeLists = () => {
+    if (inUl) { out.push('</ul>'); inUl = false; }
+    if (inOl) { out.push('</ol>'); inOl = false; }
+  };
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    // Check codeblock token placeholder
+    if (/^%%CODEBLOCK_\d+%%$/.test(line.trim())) {
+      closeLists();
+      out.push(line.trim());
+      continue;
+    }
+
+    // Headers (# to ####)
+    if (/^####\s+(.*)/.test(line)) {
+      closeLists();
+      out.push(`<h4>${line.replace(/^####\s+/, '')}</h4>`);
+      continue;
+    }
+    if (/^###\s+(.*)/.test(line)) {
+      closeLists();
+      out.push(`<h3>${line.replace(/^###\s+/, '')}</h3>`);
+      continue;
+    }
+    if (/^##\s+(.*)/.test(line)) {
+      closeLists();
+      out.push(`<h2>${line.replace(/^##\s+/, '')}</h2>`);
+      continue;
+    }
+    if (/^#\s+(.*)/.test(line)) {
+      closeLists();
+      out.push(`<h1>${line.replace(/^#\s+/, '')}</h1>`);
+      continue;
+    }
+
+    // Blockquote (> text)
+    if (/^&gt;\s*(.*)/.test(line)) {
+      closeLists();
+      out.push(`<blockquote>${line.replace(/^&gt;\s*/, '')}</blockquote>`);
+      continue;
+    }
+
+    // Unordered list (* or -)
+    if (/^\s*[\*\-]\s+(.*)/.test(line)) {
+      if (inOl) { out.push('</ol>'); inOl = false; }
+      if (!inUl) { out.push('<ul>'); inUl = true; }
+      out.push(`<li>${line.replace(/^\s*[\*\-]\s+/, '')}</li>`);
+      continue;
+    }
+
+    // Ordered list (1. 2.)
+    if (/^\s*\d+\.\s+(.*)/.test(line)) {
+      if (inUl) { out.push('</ul>'); inUl = false; }
+      if (!inOl) { out.push('<ol>'); inOl = true; }
+      out.push(`<li>${line.replace(/^\s*\d+\.\s+/, '')}</li>`);
+      continue;
+    }
+
+    // Blank line or regular paragraph text
+    closeLists();
+    if (line.trim() === '') {
+      out.push('');
+    } else {
+      out.push(`<p>${line}</p>`);
+    }
+  }
+  closeLists();
+
+  let rendered = out.join('\n');
+
+  // Inline formatting: Bold, italic, links
+  rendered = rendered.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  rendered = rendered.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+  rendered = rendered.replace(/(^|[^*])\*([^*]+)\*([^*]|$)/g, '$1<em>$2</em>$3');
+  rendered = rendered.replace(/(^|[^_])_([^_]+)_([^_]|$)/g, '$1<em>$2</em>$3');
+  rendered = rendered.replace(/\[([^\]]+)\]\((https?:\/\/[^\s\)]+)\)/g, '<a class="ai-link" href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+
+  // Re-insert codeblocks
+  rendered = rendered.replace(/%%CODEBLOCK_(\d+)%%/g, (match, idx) => {
+    return codeBlocks[Number(idx)] || '';
+  });
+
+  return rendered;
 }
 
 window.openEmbeddedAI = function(initialQuery = '') {
@@ -8766,6 +9154,18 @@ window.navigateEmbeddedProxy = function(rawInput, pushHistory = true) {
         bar.className = 'proxy-progress-bar done';
         setTimeout(() => { bar.className = 'proxy-progress-bar'; }, 500);
       }
+      try {
+        const frameLoc = frame.contentWindow.location.href;
+        if (frameLoc && frameLoc !== 'about:blank') {
+          const match = frameLoc.match(/[?&]url=([^&]+)/);
+          if (match && match[1]) {
+            const resolved = decodeURIComponent(match[1]);
+            if (input && resolved && resolved !== input.value) {
+              input.value = resolved;
+            }
+          }
+        }
+      } catch(e) {}
     };
   }
 };
@@ -9628,8 +10028,10 @@ function initTrashbinStartup() {
   initStartupAndPerformance();
   if (typeof updateSnowfall === 'function') updateSnowfall();
   if (typeof handleTrashbinHotlinks === 'function') handleTrashbinHotlinks();
-  if (typeof setSearchMode === 'function') setSearchMode('games');
-  if (typeof renderGames === 'function') renderGames();
+  currentSearchMode = null;
+  document.querySelectorAll('#homeNavPills .nav-pill').forEach(p => p.classList.remove('active'));
+  const sInput = document.getElementById('searchInput');
+  if (sInput) sInput.placeholder = "Search games, movies, music, AI...";
 }
 
 if (document.readyState === 'loading') {
@@ -9781,7 +10183,7 @@ if (document.readyState === 'loading') {
         <div class="settings-row">
           <div class="settings-col-left">
             <div class="settings-row-title">Current Release</div>
-            <div class="settings-row-desc" id="settingsCurrentVerDesc">Trashbin v4.0.1 • Dynamic Search Modes, Solid Clock &amp; Robust Fallbacks</div>
+            <div class="settings-row-desc" id="settingsCurrentVerDesc">Trashbin v4.0.2 • Bottom Hover Capsule Dock, Direct Media Hotlinks &amp; Markdown AI</div>
           </div>
           <div class="settings-col-right">
             <button class="settings-btn-action primary" id="btnCheckUpdates" onclick="checkTrashbinUpdates(true)">Check for Updates</button>
@@ -10246,7 +10648,7 @@ if (document.readyState === 'loading') {
 
     <!-- Viewport -->
     <div class="proxy-viewport-wrap">
-      <iframe id="embeddedProxyFrame" class="proxy-iframe" allow="autoplay; fullscreen; camera; microphone; clipboard-read; clipboard-write; display-capture; geolocation; encrypted-media; picture-in-picture; web-share"></iframe>
+      <iframe id="embeddedProxyFrame" class="proxy-iframe" sandbox="allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-top-navigation-by-user-activation" allow="autoplay; fullscreen; camera; microphone; clipboard-read; clipboard-write; display-capture; geolocation; encrypted-media; picture-in-picture; web-share"></iframe>
     </div>
   </div>
 

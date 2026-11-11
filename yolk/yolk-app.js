@@ -10456,6 +10456,24 @@ document.addEventListener('DOMContentLoaded', () => {
     window.handleYolkDeepLink = async function (rawHash) {
         if (!rawHash) return;
         const cleanStr = rawHash.replace(/^[#?]/, '');
+        if (cleanStr.startsWith('search=') || cleanStr.startsWith('q=')) {
+            const query = decodeURIComponent(cleanStr.replace(/^(search|q)=/, '').split('&')[0]);
+            if (query) {
+                window.location.hash = '#search';
+                if (typeof window._yolkNavigate === 'function') {
+                    window._yolkNavigate();
+                }
+                const sInput = document.getElementById('searchInput');
+                if (sInput) {
+                    sInput.value = query;
+                    sInput.focus();
+                }
+                if (typeof performSearch === 'function') {
+                    performSearch(query, true);
+                }
+            }
+            return;
+        }
         if (cleanStr.startsWith('artist=')) {
             const artistName = decodeURIComponent(cleanStr.replace('artist=', '').split('&')[0]);
             if (artistName) loadArtistView(artistName);
@@ -10502,17 +10520,26 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('message', (e) => {
         if (e.data && (e.data.type === 'TRASHBIN_HOTLINK' || e.data.type === 'YOLK_HOTLINK')) {
             const q = e.data.query || (e.data.url && (e.data.url.match(/[?#](.*)/) || [])[1]) || '';
-            if (q && q.includes('song=')) {
-                window.handleYolkDeepLink(q.substring(q.indexOf('song=')));
+            if (q) {
+                if (q.includes('song=')) {
+                    window.handleYolkDeepLink(q.substring(q.indexOf('song=')));
+                } else if (q.includes('search=') || q.includes('q=')) {
+                    const sPart = q.slice(q.search(/(search=|q=)/));
+                    window.handleYolkDeepLink(sPart);
+                } else if (q.includes('album=')) {
+                    window.handleYolkDeepLink(q.substring(q.indexOf('album=')));
+                } else if (q.includes('artist=')) {
+                    window.handleYolkDeepLink(q.substring(q.indexOf('artist=')));
+                }
             }
         }
     });
 
-    // Check if opened directly via a shared #song=, #album=, or #artist= deep link
+    // Check if opened directly via a shared #song=, #album=, #artist=, or #search= deep link
     const initialRawHash = (window.location.hash || window.location.search || window.__initialQuery || '').replace(/^[#?]/, '');
-    if (initialRawHash.includes('song=') || initialRawHash.includes('album=') || initialRawHash.includes('artist=')) {
-        const songPart = initialRawHash.slice(initialRawHash.search(/(song=|album=|artist=)/));
-        setTimeout(() => window.handleYolkDeepLink(songPart), 150);
+    if (initialRawHash.includes('song=') || initialRawHash.includes('album=') || initialRawHash.includes('artist=') || initialRawHash.includes('search=') || initialRawHash.includes('q=')) {
+        const deepPart = initialRawHash.slice(initialRawHash.search(/(song=|album=|artist=|search=|q=)/));
+        setTimeout(() => window.handleYolkDeepLink(deepPart), 150);
     }
 
     // Initialize saved theme mode on startup
