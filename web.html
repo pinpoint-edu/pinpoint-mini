@@ -620,7 +620,7 @@
 
     function normalizeTargetUrl(raw) {
       let v = (raw || "").trim();
-      if (!v) return "";
+      if (!v) return "https://www.bing.com";
       if (/^https?:\/\//i.test(v)) return v;
       if (/^[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+(\/.*)?$/.test(v) && !v.includes(" ")) {
         return "https://" + v;
@@ -770,13 +770,7 @@
       const chosenEngine = getAutoEngine();
 
       try {
-        if (chosenEngine === "cf") {
-          viewport.removeAttribute("srcdoc");
-          viewport.src = EDGE_DOMAIN + "/browse?url=" + encodeURIComponent(target);
-          return;
-        }
-
-        if (chosenEngine === "ohio") {
+        if (chosenEngine === "cf" || chosenEngine === "ohio") {
           viewport.removeAttribute("srcdoc");
           viewport.src = OHIO_DOMAIN + "/api/web?mode=browse&url=" + encodeURIComponent(target);
           return;
@@ -837,9 +831,7 @@
       const win = window.open("about:blank", "_blank");
       if (!win) return;
       const chosenEngine = getAutoEngine();
-      const iframeUrl = chosenEngine === "ohio"
-        ? (OHIO_DOMAIN + "/api/web?mode=browse&url=" + encodeURIComponent(target))
-        : (EDGE_DOMAIN + "/browse?url=" + encodeURIComponent(target));
+      const iframeUrl = OHIO_DOMAIN + "/api/web?mode=browse&url=" + encodeURIComponent(target);
       win.document.open();
       win.document.write(
         `<!DOCTYPE html><html><head><title>Home - Classroom</title><link rel="icon" href="https://ssl.gstatic.com/classroom/favicon.png"><style>html,body,iframe{margin:0;padding:0;width:100%;height:100%;border:0;background:#09090b;overflow:hidden;}</style></head><body><iframe src="${iframeUrl}" allow="fullscreen; autoplay; clipboard-read; clipboard-write"></iframe></body></html>`

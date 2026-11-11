@@ -278,14 +278,10 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       flex-wrap: wrap;
-      z-index: 5;
+      z-index: 10;
       transition: opacity 0.3s ease, transform 0.3s ease;
-    }
-
-    body.is-searching .home-nav-pills {
-      display: none !important;
     }
 
     .nav-pill {
@@ -321,260 +317,48 @@
       box-shadow: 0 2px 14px var(--accent-glow) !important;
     }
 
-    .home-featured-deck {
-      width: 100%;
-      max-width: 980px;
-      margin-top: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 22px;
-      z-index: 5;
-      transition: opacity 0.3s ease, transform 0.3s ease;
-    }
-
-    body.is-searching .home-featured-deck {
-      display: none !important;
-    }
-
-    .featured-shelf {
-      background: var(--bg-surface);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 18px 20px;
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-      transition: border-color 0.25s ease;
-    }
-
-    .featured-shelf:hover {
-      border-color: var(--cat-border);
-    }
-
-    .featured-shelf-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
-    }
-
-    .shelf-title-wrap {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .shelf-title {
-      font-size: 15px;
-      font-weight: 700;
-      color: #ffffff;
-      letter-spacing: -0.3px;
-    }
-
-    .shelf-more-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      background: transparent;
-      border: none;
-      color: var(--text-dim);
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
-      transition: color 0.2s ease;
-    }
-
-    .shelf-more-btn:hover {
-      color: var(--accent);
-    }
-
-    /* Horizontal Movies Carousel */
-    .trending-movies-carousel {
-      display: flex;
-      gap: 14px;
-      overflow-x: auto;
-      scrollbar-width: thin;
-      padding-bottom: 6px;
-      scroll-behavior: smooth;
-    }
-
-    .trending-movies-carousel::-webkit-scrollbar {
-      height: 6px;
-    }
-    .trending-movies-carousel::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: 9999px;
-    }
-
-    .home-movie-card {
-      flex: 0 0 138px;
-      width: 138px;
-      border-radius: 14px;
-      background: var(--bg-card);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      overflow: hidden;
-      cursor: pointer;
-      position: relative;
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .home-movie-card:hover {
-      transform: translateY(-4px) scale(1.02);
-      border-color: var(--accent);
-      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.7), 0 0 16px var(--accent-glow);
-    }
-
-    .home-movie-card .poster-wrap {
-      width: 100%;
-      height: 196px;
-      position: relative;
-      overflow: hidden;
-      background: #18181b;
-    }
-
-    .home-movie-card img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.3s ease;
-    }
-
-    .home-movie-card:hover img {
-      transform: scale(1.05);
-    }
-
-    .home-movie-card .rating-tag {
-      position: absolute;
-      top: 6px;
-      right: 6px;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(8px);
-      padding: 2px 6px;
-      border-radius: 6px;
-      font-size: 10.5px;
-      font-weight: 700;
-      color: #fbbf24;
-      display: flex;
-      align-items: center;
-      gap: 2px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-    }
-
-    .home-movie-card .play-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.45);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      transition: opacity 0.2s ease;
-    }
-
-    .home-movie-card:hover .play-overlay {
-      opacity: 1;
-    }
-
-    .home-movie-card .play-btn-circle {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: var(--accent);
-      color: #000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
-      transform: scale(0.85);
-      transition: transform 0.2s ease;
-    }
-
-    .home-movie-card:hover .play-btn-circle {
-      transform: scale(1);
-    }
-
-    .home-movie-card .card-info {
-      padding: 8px 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .home-movie-card .card-title {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-main);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .home-movie-card .card-sub {
-      font-size: 10.5px;
-      color: var(--text-dim);
-    }
-
-    /* Popular Games Bento Grid */
-    .popular-games-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 10px;
-    }
-
-    .home-game-card {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 14px;
-      border-radius: 12px;
-      background: var(--bg-card);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .home-game-card:hover {
-      transform: translateY(-2px);
-      border-color: var(--accent);
-      background: var(--bg-surface);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.5), 0 0 12px var(--accent-glow);
-    }
-
-    .home-game-icon {
-      width: 34px;
-      height: 34px;
-      border-radius: 10px;
-      background: var(--accent-subtle);
-      color: var(--accent);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      flex-shrink: 0;
-    }
-
-    .home-game-info {
+    .mode-view-prompt {
       flex: 1;
-      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 42px 24px;
+      text-align: center;
+      cursor: pointer;
+      background: var(--bg-surface);
+      border: 1px dashed var(--border);
+      border-radius: 18px;
+      transition: all 0.25s ease;
+      margin: 14px 0 24px;
     }
 
-    .home-game-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-main);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    .mode-view-prompt:hover {
+      border-color: var(--accent);
+      background: var(--bg-card);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 32px rgba(0,0,0,0.5), 0 0 14px var(--accent-glow);
     }
 
-    .home-game-badge {
-      font-size: 10px;
-      font-weight: 700;
+    .mode-view-prompt h3 {
+      font-size: 18px;
+      margin: 12px 0 6px;
+      color: #ffffff;
+    }
+
+    .mode-view-prompt p {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    .mode-view-prompt kbd {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+      padding: 2px 6px;
       color: var(--accent-light);
-      letter-spacing: 0.5px;
+      font-family: inherit;
     }
 
     body.is-searching #search-block {
@@ -1402,13 +1186,14 @@
     }
 
     .fullscreen-clock-time {
-      background: var(--clock-text-bg, none);
-      -webkit-background-clip: var(--clock-text-clip, border-box);
-      background-clip: var(--clock-text-clip, border-box);
+      background: none !important;
+      -webkit-background-clip: initial !important;
+      background-clip: initial !important;
+      -webkit-text-fill-color: initial !important;
       font-family: 'Libre Baskerville', serif;
       font-size: clamp(48px, 9vw, 84px);
       font-weight: 700;
-      color: var(--clock-text-color, #ffffff);
+      color: #ffffff !important;
       letter-spacing: -1.5px;
       line-height: 1.1;
       font-variant-numeric: tabular-nums;
@@ -3444,14 +3229,23 @@
       </div>
     </div>
 
-    <!-- Category Pill Switcher -->
+    <!-- Search Mode Switcher Pills -->
     <div class="home-nav-pills" id="homeNavPills">
-      <button class="nav-pill active" data-cat="all" onclick="filterHomeSection('all')"><span class="material-symbols-sharp" style="font-size: 16px;">apps</span> All</button>
-      <button class="nav-pill" data-cat="movies" onclick="filterHomeSection('movies')"><span class="material-symbols-sharp" style="font-size: 16px;">movie</span> Movies</button>
-      <button class="nav-pill" data-cat="games" onclick="filterHomeSection('games')"><span class="material-symbols-sharp" style="font-size: 16px;">sports_esports</span> Games</button>
-      <button class="nav-pill" data-cat="music" onclick="playGame('yolk/index.html', 'Yolk! - Minimalist Music')"><span class="material-symbols-sharp" style="font-size: 16px;">queue_music</span> Music</button>
-      <button class="nav-pill" onclick="openEmbeddedAI()"><span class="material-symbols-sharp" style="font-size: 16px;">psychology</span> AI</button>
-      <button class="nav-pill" onclick="openEmbeddedProxy()"><span class="material-symbols-sharp" style="font-size: 16px;">language</span> Web</button>
+      <button class="nav-pill active" data-mode="games" onclick="setSearchMode('games')">
+        <span class="material-symbols-sharp" style="font-size: 16px;">sports_esports</span> Games
+      </button>
+      <button class="nav-pill" data-mode="movies" onclick="setSearchMode('movies')">
+        <span class="material-symbols-sharp" style="font-size: 16px;">movie</span> Movies
+      </button>
+      <button class="nav-pill" data-mode="music" onclick="setSearchMode('music')">
+        <span class="material-symbols-sharp" style="font-size: 16px;">queue_music</span> Music
+      </button>
+      <button class="nav-pill" data-mode="ai" onclick="setSearchMode('ai')">
+        <span class="material-symbols-sharp" style="font-size: 16px;">psychology</span> AI
+      </button>
+      <button class="nav-pill" data-mode="web" onclick="setSearchMode('web')">
+        <span class="material-symbols-sharp" style="font-size: 16px;">language</span> Web
+      </button>
     </div>
 
     <div class="search-pill-wrapper">
@@ -3459,18 +3253,18 @@
       <input 
         type="text" 
         id="searchInput" 
-        placeholder="Search games, music, movies... (↵ AI • Shift+↵ Proxy)" 
+        placeholder="Search games..." 
         autocomplete="off" 
         spellcheck="false"
       />
       <div class="search-right-actions">
-        <button id="searchAiHintBtn" class="search-hint-pill ai-pill" onclick="openEmbeddedAI(document.getElementById('searchInput').value); return false;" title="Ask AI (Enter)">
+        <button id="searchAiHintBtn" class="search-hint-pill ai-pill" onclick="triggerModeAction('ai'); return false;" title="Ask AI (Enter)">
           <kbd>↵</kbd>
-          <span>AI</span>
+          <span id="hintAiText">AI</span>
         </button>
-        <button id="searchProxyHintBtn" class="search-hint-pill proxy-pill" onclick="openEmbeddedProxy(document.getElementById('searchInput').value); return false;" title="Open in Web Proxy (Shift + Enter)">
+        <button id="searchProxyHintBtn" class="search-hint-pill proxy-pill" onclick="triggerModeAction('web'); return false;" title="Open in Web Proxy (Shift + Enter)">
           <kbd>Shift+↵</kbd>
-          <span>Proxy</span>
+          <span id="hintProxyText">Proxy</span>
         </button>
         <button id="clearSearchBtn" class="clear-search-btn" onclick="clearSearch()" style="display: none;" title="Clear search">
           <span class="material-symbols-sharp" style="font-size: 16px;">close</span>
@@ -3478,43 +3272,6 @@
       </div>
     </div>
 
-    </div>
-
-    <!-- Home Featured Deck (Trending Movies & Popular Games Bento) -->
-    <div id="homeFeaturedDeck" class="home-featured-deck">
-      <!-- 1. POPULAR MOVIES SHELF -->
-      <div class="featured-shelf" id="shelfMovies">
-        <div class="featured-shelf-header">
-          <div class="shelf-title-wrap">
-            <span class="material-symbols-sharp" style="color: #ef4444; font-size: 20px;">local_fire_department</span>
-            <span class="shelf-title">Trending Movies &amp; Shows</span>
-          </div>
-          <button class="shelf-more-btn" onclick="playGame('movies/index.html', 'Moss - Movies &amp; Shows')">
-            <span>Explore Moss</span>
-            <span class="material-symbols-sharp" style="font-size: 14px;">arrow_forward</span>
-          </button>
-        </div>
-        <div class="trending-movies-carousel" id="homeTrendingMovies">
-          <div style="color:var(--text-dim);font-size:12px;padding:12px;">Loading trending releases...</div>
-        </div>
-      </div>
-
-      <!-- 2. POPULAR GAMES BENTO ROW -->
-      <div class="featured-shelf" id="shelfGames">
-        <div class="featured-shelf-header">
-          <div class="shelf-title-wrap">
-            <span class="material-symbols-sharp" style="color: var(--accent); font-size: 20px;">sports_esports</span>
-            <span class="shelf-title">Popular Games</span>
-          </div>
-          <button class="shelf-more-btn" onclick="focusSearch()">
-            <span>Search All</span>
-            <span class="material-symbols-sharp" style="font-size: 14px;">arrow_forward</span>
-          </button>
-        </div>
-        <div class="popular-games-grid" id="homePopularGames">
-          <!-- Populated from catalog -->
-        </div>
-      </div>
     </div>
 
   <!-- Search Results Container -->
@@ -5787,36 +5544,13 @@ function resetToCenterHome() {
   if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
   if (typeof multiSearchDebounce !== 'undefined' && multiSearchDebounce) clearTimeout(multiSearchDebounce);
   window.__topSearchResultAction = null;
-  document.getElementById('searchInput').value = '';
+  const input = document.getElementById('searchInput');
+  if (input) input.value = '';
   document.getElementById('clearSearchBtn').style.display = 'none';
-  document.body.classList.remove('is-searching');
-  const rc = document.getElementById('results-container');
-  if (rc) {
-    rc.style.top = '';
-    rc.innerHTML = `
-      <div class="results-header">
-        <span class="results-title" id="resultsCategoryLabel">All Games</span>
-        <span id="resultsSummaryLabel" style="font-size: 12px; color: var(--text-dim);"></span>
-      </div>
-
-      <div id="gameList" class="game-grid"></div>
-
-      <div id="emptyState" class="empty-state" style="display: none;">
-        <span class="material-symbols-sharp" style="font-size: 40px; color: #52525b;">search_off</span>
-        <h3>No games found</h3>
-        <p id="emptyStateDesc">Try searching for another keyword.</p>
-      </div>
-    `;
-  }
-  currentTab = null;
-  const chipAll = document.getElementById('chipAll');
-  const chipDl = document.getElementById('chipDownloaded');
-  if (chipAll) chipAll.classList.remove('active');
-  if (chipDl) chipDl.classList.remove('active');
-  const catLabel = document.getElementById('resultsCategoryLabel');
-  if (catLabel) catLabel.textContent = 'All Games';
-  if (typeof filterHomeSection === 'function') {
-    filterHomeSection('all');
+  if (currentSearchMode === 'games') {
+    renderGames();
+  } else {
+    renderModePrompt(currentSearchMode);
   }
 }
 
@@ -5825,8 +5559,7 @@ function triggerBrowseAll() {
   const searchInput = document.getElementById('searchInput');
   if (searchInput) searchInput.value = '';
   document.getElementById('clearSearchBtn').style.display = 'none';
-  activateSearchState();
-  renderGames();
+  setSearchMode('games');
 }
 
 // Instant typing handler (0ms delay for seamless instant search)
@@ -5837,40 +5570,50 @@ searchInput.addEventListener('input', () => {
 
   if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
 
-  if (!val.trim()) {
-    resetToCenterHome();
-    return;
-  }
-
   activateSearchState();
-  renderGames();
+  if (currentSearchMode === 'games') {
+    renderGames();
+  } else {
+    renderModePrompt(currentSearchMode);
+  }
 });
 
 searchInput.addEventListener('keydown', (e) => {
   const val = (searchInput.value || '').trim();
-  if (!val) {
-    if (e.key === 'Enter') {
-      activateSearchState();
-      renderGames();
-    }
-    return;
-  }
 
-  const aiKeybind = localStorage.getItem('trashbin_keybind_ai') || 'Enter';
-  const proxyKeybind = localStorage.getItem('trashbin_keybind_proxy') || 'Shift+Enter';
-
-  // Proxy shortcut (Shift + Enter or custom proxy keybind)
-  if (matchesKeybind(e, proxyKeybind) || (e.key === 'Enter' && (e.shiftKey || e.ctrlKey || e.metaKey))) {
+  // Shift + Enter or proxy shortcut
+  if ((e.shiftKey || e.ctrlKey || e.metaKey) && e.key === 'Enter') {
     e.preventDefault();
     openEmbeddedProxy(val);
     return;
   }
 
-  // AI shortcut (Enter or custom AI keybind)
-  if (matchesKeybind(e, aiKeybind) || (e.key === 'Enter' && !e.altKey)) {
+  if (e.key === 'Enter') {
     e.preventDefault();
-    openEmbeddedAI(val);
-    return;
+    if (currentSearchMode === 'games') {
+      if (!val) {
+        activateSearchState();
+        renderGames();
+      } else {
+        const qLower = val.toLowerCase();
+        const matched = games.filter(g => g.title && g.title.toLowerCase().includes(qLower));
+        if (matched.length > 0) {
+          playGame(encodeURIComponent(matched[0].file), encodeURIComponent(matched[0].title));
+        } else {
+          openEmbeddedAI(val);
+        }
+      }
+    } else if (currentSearchMode === 'movies') {
+      const target = val ? `movies/index.html#search=${encodeURIComponent(val)}` : 'movies/index.html';
+      playGame(target, 'Moss - Movies & Shows');
+    } else if (currentSearchMode === 'music') {
+      const target = val ? `yolk/index.html#search=${encodeURIComponent(val)}` : 'yolk/index.html';
+      playGame(target, 'Yolk! - Minimalist Music');
+    } else if (currentSearchMode === 'ai') {
+      openEmbeddedAI(val || 'Hello!');
+    } else if (currentSearchMode === 'web') {
+      openEmbeddedProxy(val);
+    }
   }
 });
 
@@ -6088,9 +5831,28 @@ function renderMultiSearchResults(query) {
 }
 
 function renderGames() {
-  const rawQuery = (document.getElementById("searchInput").value || "").trim();
-  if (rawQuery) { renderMultiSearchResults(rawQuery); return; }
-  const listContainer = document.getElementById('gameList');
+  const container = document.getElementById('results-container');
+  if (!container) return;
+
+  let listContainer = document.getElementById('gameList');
+  if (!listContainer) {
+    container.innerHTML = `
+      <div class="results-header">
+        <span class="results-title" id="resultsCategoryLabel">All Games</span>
+        <span id="resultsSummaryLabel" style="font-size: 12px; color: var(--text-dim);"></span>
+      </div>
+
+      <div id="gameList" class="game-grid"></div>
+
+      <div id="emptyState" class="empty-state" style="display: none;">
+        <span class="material-symbols-sharp" style="font-size: 40px; color: #52525b;">search_off</span>
+        <h3>No games found</h3>
+        <p id="emptyStateDesc">Try searching for another keyword.</p>
+      </div>
+    `;
+    listContainer = document.getElementById('gameList');
+  }
+
   const emptyState = document.getElementById('emptyState');
   const emptyDesc = document.getElementById('emptyStateDesc');
   const summaryLabel = document.getElementById('resultsSummaryLabel');
@@ -6870,6 +6632,27 @@ async function playGame(encodedFile, encodedTitle) {
   updatePlayerDownloadBtn();
 
   const iframe = document.getElementById('gameIframe');
+
+  // Direct local file:// navigation (avoids origin: null CORS fetch block)
+  if (typeof location !== 'undefined' && location.protocol === 'file:') {
+    iframe.removeAttribute('srcdoc');
+    iframe.src = file;
+    try { iframe.contentWindow.focus(); } catch(e) {}
+    const hotlinkQuery = (file.match(/[?#].*$/) || [''])[0];
+    if (hotlinkQuery) {
+      const msgType = file.startsWith('yolk') ? 'YOLK_HOTLINK' : 'MOSS_HOTLINK';
+      const sendMsg = () => {
+        try {
+          iframe.contentWindow.postMessage({ type: msgType, query: hotlinkQuery, url: file }, '*');
+          iframe.contentWindow.postMessage({ type: 'TRASHBIN_HOTLINK', query: hotlinkQuery, url: file }, '*');
+        } catch(e) {}
+      };
+      iframe.addEventListener('load', sendMsg, { once: true });
+      setTimeout(sendMsg, 300);
+      setTimeout(sendMsg, 800);
+    }
+    return;
+  }
 
   // Direct same-origin iframe navigation for yolk/, movies/, and web.html when hosted on custom domain / localhost
   if ((file.startsWith('yolk/') || file.startsWith('movies/') || file === 'web.html') && typeof location !== 'undefined' && (location.protocol === 'https:' || location.protocol === 'http:') && location.origin !== 'null' && !location.hostname.includes('jsdelivr.net') && !location.hostname.includes('googleusercontent.com')) {
@@ -7753,137 +7536,140 @@ function updateOnlineStatus() {
 window.addEventListener('online', updateOnlineStatus);
 window.addEventListener('offline', updateOnlineStatus);
 
-// ==== TRASHBIN v4.0 - COMMAND HUB & BENTO ENTERTAINMENT DECK ====
-function filterHomeSection(cat) {
+// ==== TRASHBIN v4.0 - SEARCH MODES & CATALOG ENGINE ====
+let currentSearchMode = 'games';
+
+const SEARCH_MODE_CONFIG = {
+  games: {
+    placeholder: "Search games or press Enter to browse...",
+    hintAi: "AI",
+    hintProxy: "Proxy"
+  },
+  movies: {
+    placeholder: "Search movies, series, or TV shows... (↵ to open)",
+    hintAi: "AI",
+    hintProxy: "Proxy"
+  },
+  music: {
+    placeholder: "Search songs, artists, or playlists... (↵ to open)",
+    hintAi: "AI",
+    hintProxy: "Proxy"
+  },
+  ai: {
+    placeholder: "What would you like to ask? (Trashbin AI)",
+    hintAi: "↵ Ask",
+    hintProxy: "Proxy"
+  },
+  web: {
+    placeholder: "https://example.com or search the web...",
+    hintAi: "AI",
+    hintProxy: "↵ Browse"
+  }
+};
+
+function setSearchMode(mode) {
+  currentSearchMode = mode;
   const pills = document.querySelectorAll('#homeNavPills .nav-pill');
   pills.forEach(p => {
-    if (p.getAttribute('data-cat') === cat) {
+    if (p.getAttribute('data-mode') === mode) {
       p.classList.add('active');
-    } else if (p.hasAttribute('data-cat')) {
+    } else {
       p.classList.remove('active');
     }
   });
 
-  const shelfMovies = document.getElementById('shelfMovies');
-  const shelfGames = document.getElementById('shelfGames');
+  const searchInput = document.getElementById('searchInput');
+  const cfg = SEARCH_MODE_CONFIG[mode] || SEARCH_MODE_CONFIG.games;
+  if (searchInput) {
+    searchInput.placeholder = cfg.placeholder;
+    searchInput.focus();
+  }
 
-  if (cat === 'all') {
-    if (shelfMovies) shelfMovies.style.display = 'block';
-    if (shelfGames) shelfGames.style.display = 'block';
-  } else if (cat === 'movies') {
-    if (shelfMovies) shelfMovies.style.display = 'block';
-    if (shelfGames) shelfGames.style.display = 'none';
-  } else if (cat === 'games') {
-    if (shelfMovies) shelfMovies.style.display = 'none';
-    if (shelfGames) shelfGames.style.display = 'block';
+  const hintAiText = document.getElementById('hintAiText');
+  const hintProxyText = document.getElementById('hintProxyText');
+  if (hintAiText) hintAiText.textContent = cfg.hintAi;
+  if (hintProxyText) hintProxyText.textContent = cfg.hintProxy;
+
+  activateSearchState();
+
+  if (mode === 'games') {
+    renderGames();
+  } else {
+    renderModePrompt(mode);
   }
 }
 
-async function loadHomeTrendingMovies() {
-  const container = document.getElementById('homeTrendingMovies');
-  if (!container) return;
-  const TMDB_KEY = "1cf50e6248dc270629e802686245c2c8";
-  let items = [];
-  try {
-    const directUrl = `https://api.themoviedb.org/3/trending/all/day?api_key=${TMDB_KEY}`;
-    const res = await fetch(directUrl, { headers: { 'Accept': 'application/json' } }).catch(() => null);
-    if (res && res.ok) {
-      const data = await res.json();
-      if (data && Array.isArray(data.results)) {
-        items = data.results;
-      }
-    }
-  } catch(e) {}
-
-  if (!items || items.length === 0) {
-    try {
-      const fallbackUrl = `https://ohio-notes.broshan.com.np/api/web?mode=browse&url=` + encodeURIComponent(`https://api.themoviedb.org/3/trending/all/day?api_key=${TMDB_KEY}`);
-      const res = await fetch(fallbackUrl);
-      if (res.ok) {
-        const data = await res.json();
-        if (data && Array.isArray(data.results)) {
-          items = data.results;
-        }
-      }
-    } catch(e) {}
+function triggerModeAction(mode) {
+  const val = (document.getElementById('searchInput').value || '').trim();
+  if (mode === 'ai') {
+    openEmbeddedAI(val || 'Hello!');
+  } else if (mode === 'web') {
+    openEmbeddedProxy(val);
+  } else if (mode === 'movies') {
+    const target = val ? `movies/index.html#search=${encodeURIComponent(val)}` : 'movies/index.html';
+    playGame(target, 'Moss - Movies & Shows');
+  } else if (mode === 'music') {
+    const target = val ? `yolk/index.html#search=${encodeURIComponent(val)}` : 'yolk/index.html';
+    playGame(target, 'Yolk! - Minimalist Music');
+  } else {
+    setSearchMode(mode);
   }
-
-  if (!items || items.length === 0) {
-    container.innerHTML = `<div style="color:var(--text-dim);font-size:12px;padding:12px;">Trending media currently offline. Click Explore Moss to browse.</div>`;
-    return;
-  }
-
-  const top15 = items.slice(0, 15);
-  container.innerHTML = top15.map(m => {
-    const title = m.title || m.name || 'Untitled';
-    const mediaType = m.media_type || (m.title ? 'movie' : 'tv');
-    const poster = m.poster_path 
-      ? `https://image.tmdb.org/t/p/w342${m.poster_path}`
-      : 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="130" height="190" viewBox="0 0 130 190"><rect width="130" height="190" fill="%2318181b"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%2371717a" font-size="12">No Poster</text></svg>';
-    const rating = m.vote_average ? Number(m.vote_average).toFixed(1) : '—';
-    const year = (m.release_date || m.first_air_date || '').slice(0, 4);
-    const hotlinkTarget = `movies/index.html#id=${m.id}&type=${mediaType}`;
-    const safeTitle = title.replace(/"/g, '&quot;').replace(/'/g, "\\'");
-    return `
-      <div class="home-movie-card" onclick="playGame('${hotlinkTarget}', '${safeTitle}')" title="${safeTitle}">
-        <img class="home-movie-poster" src="${poster}" alt="${safeTitle}" loading="lazy" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'130\\' height=\\'190\\' viewBox=\\'0 0 130 190\\'><rect width=\\'130\\' height=\\'190\\' fill=\\'%2318181b\\'/><text x=\\'50%\\' y=\\'50%\\' dominant-baseline=\\'middle\\' text-anchor=\\'middle\\' fill=\\'%2371717a\\' font-size=\\'12\\'>No Poster</text></svg>'">
-        <div class="home-movie-meta">
-          <div class="home-movie-title">${title}</div>
-          <div class="home-movie-sub">
-            <span class="home-movie-badge">${mediaType === 'tv' ? 'TV' : 'Film'}</span>
-            <span>★ ${rating}</span>
-            ${year ? `<span>${year}</span>` : ''}
-          </div>
-        </div>
-      </div>
-    `;
-  }).join('');
 }
 
-function loadHomePopularGames() {
-  const container = document.getElementById('homePopularGames');
+function renderModePrompt(mode) {
+  const container = document.getElementById('results-container');
   if (!container) return;
-  const popularKeywords = [
-    'Retro Bowl', 'Slope', '2048', 'Drive Mad', 'Snow Rider 3D',
-    'Basketball Stars', '1v1.LOL', 'Cookie Clicker', 'Subway Surfers', 'Bitlife',
-    'Tunnel Rush', 'Rooftop Snipers'
-  ];
-  let picked = [];
-  if (Array.isArray(games) && games.length > 0) {
-    for (const kw of popularKeywords) {
-      const g = games.find(item => item && item.title && item.title.toLowerCase().includes(kw.toLowerCase()) && !item.isApp);
-      if (g && !picked.some(p => p.file === g.file)) {
-        picked.push(g);
-      }
-    }
-    for (const g of games) {
-      if (picked.length >= 8) break;
-      if (g && !g.isApp && !picked.some(p => p.file === g.file)) {
-        picked.push(g);
-      }
-    }
-  }
+  const val = (document.getElementById('searchInput').value || '').trim();
 
-  if (!picked.length) {
-    container.innerHTML = `<div style="color:var(--text-dim);font-size:12px;padding:12px;">Catalog loading...</div>`;
-    return;
-  }
-
-  container.innerHTML = picked.slice(0, 8).map(g => {
-    const escapedFile = encodeURIComponent(g.file);
-    const safeTitle = (g.title || 'Game').replace(/"/g, '&quot;').replace(/'/g, "\\'");
-    return `
-      <div class="home-game-card" onclick="playGame('${escapedFile}', '${safeTitle}')" title="${safeTitle}">
-        <div class="home-game-icon-box">
-          <span class="material-symbols-sharp" style="font-size: 20px;">sports_esports</span>
-        </div>
-        <div class="home-game-info">
-          <div class="home-game-name">${g.title}</div>
-          <div class="home-game-badge">Instant Play</div>
-        </div>
+  if (mode === 'movies') {
+    container.innerHTML = `
+      <div class="mode-view-prompt" onclick="triggerModeAction('movies')">
+        <span class="material-symbols-sharp" style="font-size: 44px; color: #ef4444;">movie</span>
+        <h3>${val ? `Search Moss for "${escapeHtml(val)}"` : 'Explore Movies & TV Shows in Moss'}</h3>
+        <p>Press <kbd>↵ Enter</kbd> or click here to open Moss ${val ? `and stream "${escapeHtml(val)}"` : 'and stream popular titles'}.</p>
+        <button class="btn-sharp btn-primary-sharp" style="margin-top: 14px;">
+          <span class="material-symbols-sharp">open_in_new</span>
+          <span>Open Moss</span>
+        </button>
       </div>
     `;
-  }).join('');
+  } else if (mode === 'music') {
+    container.innerHTML = `
+      <div class="mode-view-prompt" onclick="triggerModeAction('music')">
+        <span class="material-symbols-sharp" style="font-size: 44px; color: var(--accent);">queue_music</span>
+        <h3>${val ? `Search Yolk for "${escapeHtml(val)}"` : 'Listen to Music in Yolk'}</h3>
+        <p>Press <kbd>↵ Enter</kbd> or click here to open Yolk ${val ? `and play "${escapeHtml(val)}"` : 'and listen to your favorites'}.</p>
+        <button class="btn-sharp btn-primary-sharp" style="margin-top: 14px;">
+          <span class="material-symbols-sharp">open_in_new</span>
+          <span>Open Yolk</span>
+        </button>
+      </div>
+    `;
+  } else if (mode === 'ai') {
+    container.innerHTML = `
+      <div class="mode-view-prompt" onclick="triggerModeAction('ai')">
+        <span class="material-symbols-sharp" style="font-size: 44px; color: #60a5fa;">psychology</span>
+        <h3>${val ? `Ask Trashbin AI: "${escapeHtml(val)}"` : 'Ask Trashbin AI Anything'}</h3>
+        <p>Press <kbd>↵ Enter</kbd> or click here to launch the AI assistant.</p>
+        <button class="btn-sharp btn-primary-sharp" style="margin-top: 14px;">
+          <span class="material-symbols-sharp">chat</span>
+          <span>Chat with AI</span>
+        </button>
+      </div>
+    `;
+  } else if (mode === 'web') {
+    container.innerHTML = `
+      <div class="mode-view-prompt" onclick="triggerModeAction('web')">
+        <span class="material-symbols-sharp" style="font-size: 44px; color: #10b981;">language</span>
+        <h3>${val ? `Browse: "${escapeHtml(val)}"` : 'Unblocked Web Proxy'}</h3>
+        <p>Press <kbd>↵ Enter</kbd> or click here to load this page via unblocked web gateway.</p>
+        <button class="btn-sharp btn-primary-sharp" style="margin-top: 14px;">
+          <span class="material-symbols-sharp">travel_explore</span>
+          <span>Open Web Proxy</span>
+        </button>
+      </div>
+    `;
+  }
 }
 
 async function initGames() {
@@ -7906,7 +7692,7 @@ async function initGames() {
 
   updateOnlineStatus();
   await syncDownloadedStatus();
-  if (typeof loadHomePopularGames === 'function') loadHomePopularGames();
+  if (typeof renderGames === 'function') renderGames();
 }
 
 window.addEventListener('keydown', (e) => {
@@ -8336,15 +8122,12 @@ function applyTint(tintId) {
 
     if (tint.color2) {
       root.setProperty("--clock-bg", `linear-gradient(135deg, color-mix(in srgb, ${c1} 14%, #09090b), color-mix(in srgb, ${c2} 14%, #09090b))`);
-      root.setProperty("--clock-text-bg", `linear-gradient(90deg, ${c1}, ${c2})`);
-      root.setProperty("--clock-text-clip", "text");
-      root.setProperty("--clock-text-color", "transparent");
     } else {
       root.setProperty("--clock-bg", `color-mix(in srgb, ${c1} 14%, #09090b)`);
-      root.setProperty("--clock-text-bg", "none");
-      root.setProperty("--clock-text-clip", "border-box");
-      root.setProperty("--clock-text-color", c1);
     }
+    root.setProperty("--clock-text-bg", "none");
+    root.setProperty("--clock-text-clip", "initial");
+    root.setProperty("--clock-text-color", "#ffffff");
     root.setProperty("--slider-knob", "#ffffff");
     root.setProperty("--settings-tab-active-text", "#ffffff");
     if (document.body) document.body.classList.remove("theme-white");
@@ -8631,7 +8414,7 @@ window.downloadOfflineHtml = function() {
 
 
 // ==== TRASHBIN APP VERSION & AUTO-UPDATES ====
-const CURRENT_APP_VERSION = '4.0.0';
+const CURRENT_APP_VERSION = '4.0.1';
 
 // =========================================================================
 // EMBEDDED NATIVE AI & PROXY ENGINES
@@ -8913,7 +8696,7 @@ let proxyHistoryIndex = -1;
 
 function normalizeProxyUrl(raw) {
   let v = (raw || "").trim();
-  if (!v) return "";
+  if (!v) return "https://www.bing.com";
   if (/^https?:\/\//i.test(v)) return v;
   if (/^[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+(\/.*)?$/.test(v) && !v.includes(" ")) {
     return "https://" + v;
@@ -8934,7 +8717,7 @@ window.openEmbeddedProxy = function(initialTarget = '') {
   if (proxyView) {
     proxyView.style.display = 'flex';
     const input = document.getElementById('embeddedProxyInput');
-    const target = initialTarget || 'https://www.bing.com';
+    const target = normalizeProxyUrl(initialTarget);
     input.value = target;
     navigateEmbeddedProxy(target);
     setTimeout(() => input && input.focus(), 50);
@@ -9075,6 +8858,12 @@ function compareSemVer(v1, v2) {
 }
 
 async function checkTrashbinUpdates(isManual = false) {
+  if (typeof location !== 'undefined' && location.protocol === 'file:') {
+    if (isManual) {
+      showTrashbinToast(`Running locally from file:// (v${CURRENT_APP_VERSION})`, 'success', 3500);
+    }
+    return;
+  }
   const btn = document.getElementById('btnCheckUpdates');
   if (btn && isManual) {
     btn.textContent = 'Checking...';
@@ -9839,8 +9628,8 @@ function initTrashbinStartup() {
   initStartupAndPerformance();
   if (typeof updateSnowfall === 'function') updateSnowfall();
   if (typeof handleTrashbinHotlinks === 'function') handleTrashbinHotlinks();
-  if (typeof loadHomeTrendingMovies === 'function') loadHomeTrendingMovies();
-  if (typeof loadHomePopularGames === 'function') loadHomePopularGames();
+  if (typeof setSearchMode === 'function') setSearchMode('games');
+  if (typeof renderGames === 'function') renderGames();
 }
 
 if (document.readyState === 'loading') {
@@ -9992,7 +9781,7 @@ if (document.readyState === 'loading') {
         <div class="settings-row">
           <div class="settings-col-left">
             <div class="settings-row-title">Current Release</div>
-            <div class="settings-row-desc" id="settingsCurrentVerDesc">Trashbin v4.0.0 • Command Hub &amp; Worker-Free High-Performance Streaming</div>
+            <div class="settings-row-desc" id="settingsCurrentVerDesc">Trashbin v4.0.1 • Dynamic Search Modes, Solid Clock &amp; Robust Fallbacks</div>
           </div>
           <div class="settings-col-right">
             <button class="settings-btn-action primary" id="btnCheckUpdates" onclick="checkTrashbinUpdates(true)">Check for Updates</button>

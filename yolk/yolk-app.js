@@ -3491,6 +3491,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function playYouTube(videoId) {
+        if (!videoId) return;
+        loadYouTubePlayer(videoId);
+    }
+    window.playYouTube = playYouTube;
+
     let crossfadeSeconds = Math.max(0, Math.min(12, parseInt(localStorage.getItem('yolk_crossfade_sec') || '0', 10) || 0));
     let _crossfadeInterval = null;
     let userPausedIntentionally = false;
