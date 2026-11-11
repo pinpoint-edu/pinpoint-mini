@@ -95,19 +95,19 @@
       font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
     }
 
-    /* Top Header Fade behind Title, Category Pills & Top-Right Buttons */
+    /* Top Header Fade behind Title, Category Squircles & Top-Right Buttons */
     .top-header-fade {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 92px;
-      background: linear-gradient(to bottom, 
+      background: var(--top-header-fade-bg, linear-gradient(to bottom, 
         #09090b 25%, 
         rgba(9, 9, 11, 0.95) 55%, 
         rgba(9, 9, 11, 0.6) 80%, 
         transparent 100%
-      );
+      ));
       pointer-events: none;
       z-index: 52;
       opacity: 0;
@@ -294,8 +294,40 @@
     }
 
     /* =========================================================================
-       TRASHBIN v4.0 - MINIMAL COMMAND HUB & BENTO ENTERTAINMENT DECK
+       TRASHBIN v4.0 - MINIMAL COMMAND HUB & SQUIRCLE NAVIGATION
        ========================================================================= */
+    .top-nav-slot {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 60;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .top-nav-slot .home-nav-categories,
+    .top-nav-slot .home-nav-pills {
+      pointer-events: auto;
+      margin-bottom: 0;
+      background: var(--bg-surface);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      padding: 4px 8px;
+      border-radius: 14px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 16px var(--accent-subtle);
+    }
+
+    .search-block-nav-slot {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .home-nav-categories,
     .home-nav-pills {
       display: flex;
       align-items: center;
@@ -304,15 +336,16 @@
       margin-bottom: 16px;
       flex-wrap: wrap;
       z-index: 10;
-      transition: opacity 0.3s ease, transform 0.3s ease;
+      transition: opacity 0.25s ease, transform 0.25s ease;
     }
 
+    .nav-squircle,
     .nav-pill {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 7px 16px;
-      border-radius: 9999px;
+      padding: 7px 14px;
+      border-radius: 12px;
       background: var(--bg-surface);
       border: 1px solid var(--border);
       color: var(--text-muted);
@@ -323,21 +356,49 @@
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       user-select: none;
       backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
     }
 
+    .nav-squircle:hover,
     .nav-pill:hover {
       background: var(--bg-card);
       color: #ffffff;
       border-color: var(--accent);
       transform: translateY(-2px);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), 0 0 12px var(--accent-subtle);
     }
 
+    .nav-squircle.active,
     .nav-pill.active {
       background: var(--accent) !important;
       color: var(--settings-tab-active-text, #000000) !important;
       border-color: var(--accent) !important;
       box-shadow: 0 2px 14px var(--accent-glow) !important;
+    }
+
+    .squircle-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-dim);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      margin-left: 2px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-squircle.active .squircle-badge,
+    .nav-pill.active .squircle-badge {
+      background: rgba(0, 0, 0, 0.25);
+      color: rgba(0, 0, 0, 0.85);
+      border-color: rgba(0, 0, 0, 0.2);
+    }
+
+    .nav-squircle:hover .squircle-badge,
+    .nav-pill:hover .squircle-badge {
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.25);
     }
 
     /* Media Cards Grid (Movies & Music in new UI) */
@@ -499,27 +560,13 @@
       transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    body.is-searching .home-nav-pills {
-      position: fixed;
-      top: 22px;
-      left: 50%;
-      transform: translateX(-50%);
-      margin: 0;
-      z-index: 60;
-      background: rgba(18, 18, 22, 0.85);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 4px 10px;
-      border-radius: 9999px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-    }
-
-    body.is-searching .search-pill-wrapper {
-      background: rgba(18, 18, 22, 0.9);
+    body.is-searching .search-pill-wrapper,
+    body.is-searching .search-squircle-wrapper {
+      background: var(--bg-surface);
+      border-radius: 14px;
       backdrop-filter: blur(24px);
       -webkit-backdrop-filter: blur(24px);
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.12);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.75), 0 0 0 1px var(--border);
     }
 
     body.is-searching .quick-pills {
@@ -579,7 +626,8 @@
       letter-spacing: -0.2px;
     }
 
-    /* Center Pill Search Bar */
+    /* Center Squircle Search Bar */
+    .search-squircle-wrapper,
     .search-pill-wrapper {
       position: relative;
       width: 100%;
@@ -601,7 +649,7 @@
       height: 56px;
       background: var(--bg-surface);
       border: 1px solid var(--border);
-      border-radius: 18px;
+      border-radius: 14px;
       padding: 0 130px 0 54px;
       color: var(--text-main);
       font-size: 16px;
@@ -613,7 +661,7 @@
     }
 
     #searchInput:focus {
-      background: #18181b;
+      background: var(--bg-card);
       border-color: var(--accent);
       box-shadow: 0 0 0 2px var(--accent-glow), 0 8px 32px rgba(0, 0, 0, 0.7);
     }
@@ -637,7 +685,7 @@
     .clear-search-btn {
       width: 28px;
       height: 28px;
-      border-radius: 50%;
+      border-radius: 8px;
       background: #27272a;
       border: none;
       color: #ffffff;
@@ -660,10 +708,10 @@
       justify-content: center;
       gap: 5px;
       padding: 0 16px;
-      height: 34px;
+      height: 36px;
       background: var(--accent);
       border: 1px solid var(--accent);
-      border-radius: 9999px;
+      border-radius: 10px;
       color: var(--settings-tab-active-text, #000000);
       font-size: 13px;
       font-weight: 700;
@@ -1763,7 +1811,7 @@
       padding: 11px 14px;
       border-radius: 12px;
       background: transparent;
-      border: 1px solid transparent;
+      border: 2px solid transparent !important;
       color: var(--text-muted);
       font-size: 14px;
       font-weight: 600;
@@ -1776,14 +1824,18 @@
       transition: all 0.2s var(--parabola-ease);
     }
     .settings-tab-btn:hover {
-      background: var(--bg-card);
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.15) !important;
       color: var(--text-main);
     }
     .settings-tab-btn.active {
-      background: var(--accent);
-      color: #000000;
-      border-color: var(--accent);
-      box-shadow: 0 2px 12px var(--accent-glow);
+      background: #121216 !important;
+      border: 2px solid var(--accent) !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 16px var(--accent-glow) !important;
+    }
+    .settings-tab-btn.active .material-symbols-sharp {
+      color: var(--accent) !important;
     }
 
     @media (max-width: 720px) {
@@ -2293,17 +2345,17 @@
     }
 
     .settings-modal-card {
-      background: rgba(18, 19, 24, 0.85) !important;
+      background: var(--settings-modal-bg, rgba(18, 19, 24, 0.92)) !important;
       backdrop-filter: blur(40px) saturate(200%) !important;
       -webkit-backdrop-filter: blur(40px) saturate(200%) !important;
-      border: 1px solid rgba(255, 255, 255, 0.12) !important;
-      border-radius: 24px !important;
+      border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.12)) !important;
+      border-radius: 20px !important;
       padding: 0;
       width: 100%;
       max-width: 980px !important;
       height: 82vh !important;
       max-height: 740px !important;
-      box-shadow: 0 32px 80px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+      box-shadow: 0 32px 80px rgba(0, 0, 0, 0.85), 0 0 40px var(--accent-subtle), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
       animation: glassModalIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
       display: grid;
       grid-template-columns: 240px 1fr;
@@ -2323,18 +2375,18 @@
       align-items: center;
       justify-content: space-between;
       padding: 20px 28px;
-      background: rgba(255, 255, 255, 0.02);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: var(--settings-header-bg, rgba(255, 255, 255, 0.02)) !important;
+      border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.08)) !important;
     }
 
     .settings-modal-tabs,
     .settings-tabs-bar {
       padding: 16px 12px;
-      background: rgba(0, 0, 0, 0.22);
-      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      background: var(--settings-sidebar-bg, rgba(0, 0, 0, 0.25)) !important;
+      border-right: 1px solid var(--border, rgba(255, 255, 255, 0.08)) !important;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 6px;
     }
 
     .settings-tab-btn {
@@ -2343,7 +2395,7 @@
       gap: 10px;
       padding: 10px 14px;
       border-radius: 12px;
-      border: none;
+      border: 2px solid transparent !important;
       background: transparent;
       color: var(--text-dim);
       font-family: inherit;
@@ -2354,19 +2406,30 @@
     }
 
     .settings-tab-btn:hover {
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.15) !important;
       color: #ffffff;
     }
 
     .settings-tab-btn.active {
-      background: var(--accent) !important;
-      color: var(--settings-tab-active-text, #ffffff) !important;
-      box-shadow: 0 2px 14px var(--accent-glow) !important;
+      background: #121216 !important;
+      border: 2px solid var(--accent) !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 16px var(--accent-glow) !important;
+    }
+
+    .settings-tab-btn.active .material-symbols-sharp {
+      color: var(--accent) !important;
     }
 
     body.theme-white .settings-tab-btn.active {
-      color: #000000 !important;
-      background: #ffffff !important;
+      color: #ffffff !important;
+      background: #121216 !important;
+      border: 2px solid #ffffff !important;
+      box-shadow: 0 0 16px rgba(255, 255, 255, 0.4) !important;
+    }
+    body.theme-white .settings-tab-btn.active .material-symbols-sharp {
+      color: #ffffff !important;
     }
 
     .settings-panel,
@@ -2381,21 +2444,21 @@
       align-items: center;
       justify-content: space-between;
       padding: 14px 16px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
       border-radius: 14px;
       margin-bottom: 10px;
       transition: border-color 0.2s ease, background 0.2s ease;
     }
 
     .settings-row:hover {
-      border-color: rgba(255, 255, 255, 0.14);
-      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--accent-border);
+      background: var(--bg-card);
     }
 
     .settings-input, .settings-select {
-      background: rgba(0, 0, 0, 0.35) !important;
-      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      background: var(--bg-base) !important;
+      border: 1px solid var(--border) !important;
       border-radius: 10px !important;
       color: #ffffff !important;
       padding: 8px 12px !important;
@@ -3455,8 +3518,11 @@
 </head>
 <body>
 
-  <!-- Top Header Fade behind Title, Category Pills & Top-Right Buttons -->
+  <!-- Top Header Fade behind Title, Category Squircles & Top-Right Buttons -->
   <div class="top-header-fade" id="topHeaderFade"></div>
+
+  <!-- Top Center Category Squircles Slot (when searching/active) -->
+  <div id="topCategorySlot" class="top-nav-slot"></div>
 
   <!-- Small Top-Left Logo (reveals during search) -->
   <a href="#" id="smallLogo" onclick="resetToCenterHome(); return false;">
@@ -3500,26 +3566,28 @@
       </div>
     </div>
 
-    <!-- Search Mode Switcher Pills -->
-    <div class="home-nav-pills" id="homeNavPills">
-      <button class="nav-pill" data-mode="games" onclick="setSearchMode('games')">
-        <span class="material-symbols-sharp" style="font-size: 16px;">sports_esports</span> Games
-      </button>
-      <button class="nav-pill" data-mode="movies" onclick="setSearchMode('movies')">
-        <span class="material-symbols-sharp" style="font-size: 16px;">movie</span> Movies
-      </button>
-      <button class="nav-pill" data-mode="music" onclick="setSearchMode('music')">
-        <span class="material-symbols-sharp" style="font-size: 16px;">queue_music</span> Music
-      </button>
-      <button class="nav-pill" data-mode="ai" onclick="setSearchMode('ai')">
-        <span class="material-symbols-sharp" style="font-size: 16px;">psychology</span> AI
-      </button>
-      <button class="nav-pill" data-mode="web" onclick="setSearchMode('web')">
-        <span class="material-symbols-sharp" style="font-size: 16px;">language</span> Web
-      </button>
+    <!-- Search Mode Switcher Squircles Container -->
+    <div id="searchBlockSlot" class="search-block-nav-slot">
+      <div class="home-nav-categories home-nav-pills" id="homeNavPills">
+        <button class="nav-squircle nav-pill" data-mode="games" onclick="setSearchMode('games')" title="Games [1]">
+          <span class="material-symbols-sharp" style="font-size: 16px;">sports_esports</span> Games <span class="squircle-badge">1</span>
+        </button>
+        <button class="nav-squircle nav-pill" data-mode="movies" onclick="setSearchMode('movies')" title="Movies [2]">
+          <span class="material-symbols-sharp" style="font-size: 16px;">movie</span> Movies <span class="squircle-badge">2</span>
+        </button>
+        <button class="nav-squircle nav-pill" data-mode="music" onclick="setSearchMode('music')" title="Music [3]">
+          <span class="material-symbols-sharp" style="font-size: 16px;">queue_music</span> Music <span class="squircle-badge">3</span>
+        </button>
+        <button class="nav-squircle nav-pill" data-mode="ai" onclick="setSearchMode('ai')" title="AI Chat [4]">
+          <span class="material-symbols-sharp" style="font-size: 16px;">psychology</span> AI <span class="squircle-badge">4</span>
+        </button>
+        <button class="nav-squircle nav-pill" data-mode="web" onclick="setSearchMode('web')" title="Web Browser [5]">
+          <span class="material-symbols-sharp" style="font-size: 16px;">language</span> Web <span class="squircle-badge">5</span>
+        </button>
+      </div>
     </div>
 
-    <div class="search-pill-wrapper">
+    <div class="search-squircle-wrapper search-pill-wrapper">
       <span class="material-symbols-sharp search-pill-icon">search</span>
       <input 
         type="text" 
@@ -5797,8 +5865,26 @@ function updateResultsPosition() {
   }
 }
 
+function syncCategoryBarPosition(isSearching) {
+  const bar = document.getElementById('homeNavPills');
+  const topSlot = document.getElementById('topCategorySlot');
+  const homeSlot = document.getElementById('searchBlockSlot');
+  if (!bar || !topSlot || !homeSlot) return;
+
+  if (isSearching) {
+    if (bar.parentElement !== topSlot) {
+      topSlot.appendChild(bar);
+    }
+  } else {
+    if (bar.parentElement !== homeSlot) {
+      homeSlot.appendChild(bar);
+    }
+  }
+}
+
 function activateSearchState() {
   document.body.classList.add('is-searching');
+  syncCategoryBarPosition(true);
 }
 
 function resetToCenterHome() {
@@ -5808,9 +5894,10 @@ function resetToCenterHome() {
 
   // 1. Remove is-searching state completely (return to center home)
   document.body.classList.remove('is-searching');
+  syncCategoryBarPosition(false);
 
-  // 2. Clear active mode pills - no genre selected
-  document.querySelectorAll('#homeNavPills .nav-pill').forEach(p => p.classList.remove('active'));
+  // 2. Clear active mode squircles - no genre selected
+  document.querySelectorAll('#homeNavPills .nav-squircle, #homeNavPills .nav-pill').forEach(p => p.classList.remove('active'));
   currentSearchMode = null;
 
   // 3. Clear search input
@@ -7823,14 +7910,14 @@ const SEARCH_MODE_CONFIG = {
 };
 
 function setSearchMode(mode) {
-  // If clicking an active mode pill while in search state, toggle back to initial center home view!
+  // If clicking an active mode squircle while in search state, toggle back to initial center home view!
   if (currentSearchMode === mode && document.body.classList.contains('is-searching')) {
     resetToCenterHome();
     return;
   }
 
   currentSearchMode = mode;
-  const pills = document.querySelectorAll('#homeNavPills .nav-pill');
+  const pills = document.querySelectorAll('#homeNavPills .nav-squircle, #homeNavPills .nav-pill');
   pills.forEach(p => {
     if (p.getAttribute('data-mode') === mode) {
       p.classList.add('active');
@@ -7988,6 +8075,29 @@ async function fetchAndRenderMovies(query = '') {
   }).join('');
 }
 
+const HARDCODED_TOP_SONGS = [
+  { id: "eVli-tstM5E", title: "Espresso", artist_name: "Sabrina Carpenter", artwork_url: "https://i.ytimg.com/vi/eVli-tstM5E/hqdefault.jpg" },
+  { id: "d5gf9dXHevw", title: "BIRDS OF A FEATHER", artist_name: "Billie Eilish", artwork_url: "https://i.ytimg.com/vi/d5gf9dXHevw/hqdefault.jpg" },
+  { id: "iHh3G8v_aYc", title: "That's So True", artist_name: "Gracie Abrams", artwork_url: "https://i.ytimg.com/vi/iHh3G8v_aYc/hqdefault.jpg" },
+  { id: "4QIZkGgLqMM", title: "I Had Some Help", artist_name: "Post Malone ft. Morgan Wallen", artwork_url: "https://i.ytimg.com/vi/4QIZkGgLqMM/hqdefault.jpg" },
+  { id: "H58vbez_m4E", title: "Not Like Us", artist_name: "Kendrick Lamar", artwork_url: "https://i.ytimg.com/vi/H58vbez_m4E/hqdefault.jpg" },
+  { id: "1RKqOmSkGgM", title: "Good Luck, Babe!", artist_name: "Chappell Roan", artwork_url: "https://i.ytimg.com/vi/1RKqOmSkGgM/hqdefault.jpg" },
+  { id: "t7bQwwqW-Hc", title: "A Bar Song (Tipsy)", artist_name: "Shaboozey", artwork_url: "https://i.ytimg.com/vi/t7bQwwqW-Hc/hqdefault.jpg" },
+  { id: "kPa7bsKwL-8", title: "Die With A Smile", artist_name: "Lady Gaga & Bruno Mars", artwork_url: "https://i.ytimg.com/vi/kPa7bsKwL-8/hqdefault.jpg" },
+  { id: "KH4kC8jG-6U", title: "Taste", artist_name: "Sabrina Carpenter", artwork_url: "https://i.ytimg.com/vi/KH4kC8jG-6U/hqdefault.jpg" },
+  { id: "gMuxgSfZ_c8", title: "MILLION DOLLAR BABY", artist_name: "Tommy Richman", artwork_url: "https://i.ytimg.com/vi/gMuxgSfZ_c8/hqdefault.jpg" },
+  { id: "GZ3zL7kT6_c", title: "Lose Control", artist_name: "Teddy Swims", artwork_url: "https://i.ytimg.com/vi/GZ3zL7kT6_c/hqdefault.jpg" },
+  { id: "Oa_RSwwpPaA", title: "Beautiful Things", artist_name: "Benson Boone", artwork_url: "https://i.ytimg.com/vi/Oa_RSwwpPaA/hqdefault.jpg" },
+  { id: "q3zqJs7J270", title: "Fortnight", artist_name: "Taylor Swift ft. Post Malone", artwork_url: "https://i.ytimg.com/vi/q3zqJs7J270/hqdefault.jpg" },
+  { id: "MLlSSJ0z7xM", title: "Dancing in the Flames", artist_name: "The Weeknd", artwork_url: "https://i.ytimg.com/vi/MLlSSJ0z7xM/hqdefault.jpg" },
+  { id: "aezstcbCd4w", title: "Too Sweet", artist_name: "Hozier", artwork_url: "https://i.ytimg.com/vi/aezstcbCd4w/hqdefault.jpg" },
+  { id: "g3i9k0j7z1c", title: "WILDFLOWER", artist_name: "Billie Eilish", artwork_url: "https://i.ytimg.com/vi/g3i9k0j7z1c/hqdefault.jpg" },
+  { id: "cF1Na4AIecM", title: "Please Please Please", artist_name: "Sabrina Carpenter", artwork_url: "https://i.ytimg.com/vi/cF1Na4AIecM/hqdefault.jpg" },
+  { id: "ZsJ-BHohCRI", title: "vampire", artist_name: "Olivia Rodrigo", artwork_url: "https://i.ytimg.com/vi/ZsJ-BHohCRI/hqdefault.jpg" },
+  { id: "suAR1PYFNYA", title: "Houdini", artist_name: "Dua Lipa", artwork_url: "https://i.ytimg.com/vi/suAR1PYFNYA/hqdefault.jpg" },
+  { id: "LDY_XReUwf8", title: "Snooze", artist_name: "SZA", artwork_url: "https://i.ytimg.com/vi/LDY_XReUwf8/hqdefault.jpg" }
+];
+
 async function fetchAndRenderMusic(query = '') {
   const container = document.getElementById('gameList');
   const categoryLabel = document.getElementById('resultsCategoryLabel');
@@ -8005,14 +8115,62 @@ async function fetchAndRenderMusic(query = '') {
   }
 
   container.className = 'media-cards-grid';
-  container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-dim);"><span class="material-symbols-sharp spin" style="font-size: 32px; color: var(--accent); display: block; margin: 0 auto 8px auto;">sync</span>Loading top 2026 tracks...</div>`;
 
-  const searchQuery = query || 'Billboard Hot 100 2026';
-  const url = `https://yolkaudio.broshan.com.np/api/music-api?endpoint=search&q=${encodeURIComponent(searchQuery)}&limit=35`;
+  const renderTrackList = (trackList) => {
+    if (!trackList || trackList.length === 0) {
+      container.innerHTML = '';
+      if (emptyState) {
+        emptyState.style.display = 'flex';
+        const desc = document.getElementById('emptyStateDesc');
+        if (desc) desc.textContent = query ? `No tracks found for "${query}". Try another artist or song.` : 'No music tracks available.';
+      }
+      return;
+    }
+    container.innerHTML = trackList.map(t => {
+      const vid = (t.videoId || t.id || (t.youtube_id || '')).replace(/^ytm-/, '');
+      const title = t.title || t.name || 'Song';
+      const artist = t.artist_name || (Array.isArray(t.artists) ? t.artists.map(a => a.name).join(', ') : 'Artist');
+      const cover = t.artwork_url || t.thumbnails?.[0]?.url || (`https://i.ytimg.com/vi/${vid}/hqdefault.jpg`);
+      const hotlinkTarget = `yolk/index.html#song=${encodeURIComponent(vid)}&t=${encodeURIComponent(title)}&a=${encodeURIComponent(artist)}&cover=${encodeURIComponent(cover)}`;
+      const safeTitle = title.replace(/"/g, '&quot;').replace(/'/g, "\\'");
+      return `
+        <div class="media-card music-card" onclick="playGame('${hotlinkTarget}', '${safeTitle}')" title="${safeTitle}">
+          <div class="media-poster-wrap square">
+            <img src="${cover}" alt="${safeTitle}" loading="lazy" onerror="this.src='https://i.ytimg.com/vi/${vid}/hqdefault.jpg'">
+            <div class="media-play-overlay"><span class="material-symbols-sharp">play_arrow</span></div>
+          </div>
+          <div class="media-card-info">
+            <div class="media-card-title">${title}</div>
+            <div class="media-card-sub">${artist}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  };
 
+  // Instant zero-latency rendering of hardcoded top songs when no query
+  if (!query) {
+    renderTrackList(HARDCODED_TOP_SONGS);
+    return;
+  }
+
+  // If query provided, check local hardcoded songs first
+  const qLower = query.toLowerCase().trim();
+  const localMatches = HARDCODED_TOP_SONGS.filter(s =>
+    (s.title && s.title.toLowerCase().includes(qLower)) ||
+    (s.artist_name && s.artist_name.toLowerCase().includes(qLower))
+  );
+
+  container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-dim);"><span class="material-symbols-sharp spin" style="font-size: 32px; color: var(--accent); display: block; margin: 0 auto 8px auto;">sync</span>Searching tracks...</div>`;
+
+  const url = `https://yolkaudio.broshan.com.np/api/music-api?endpoint=search&q=${encodeURIComponent(query)}&limit=30`;
   let rawTracks = [];
+
   try {
-    const res = await fetch(url).catch(() => null);
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 4000);
+    const res = await fetch(url, { signal: ctrl.signal }).catch(() => null);
+    clearTimeout(timer);
     if (res && res.ok) {
       const data = await res.json();
       if (data && Array.isArray(data.tracks)) rawTracks = data.tracks;
@@ -8022,7 +8180,10 @@ async function fetchAndRenderMusic(query = '') {
   if (!rawTracks || rawTracks.length === 0) {
     try {
       const fallbackUrl = `https://classroom-docs.googleus-cloud1.workers.dev/browse?url=` + encodeURIComponent(url);
-      const res = await fetch(fallbackUrl).catch(() => null);
+      const ctrl2 = new AbortController();
+      const timer2 = setTimeout(() => ctrl2.abort(), 4000);
+      const res = await fetch(fallbackUrl, { signal: ctrl2.signal }).catch(() => null);
+      clearTimeout(timer2);
       if (res && res.ok) {
         const data = await res.json();
         if (data && Array.isArray(data.tracks)) rawTracks = data.tracks;
@@ -8030,53 +8191,24 @@ async function fetchAndRenderMusic(query = '') {
     } catch(e) {}
   }
 
-  // Filter out long compilation albums and mixes so we show actual top individual songs
   let tracks = rawTracks.filter(t => {
     const dur = t.duration || 0;
     const isNormalDuration = (dur >= 60000 && dur <= 600000) || (dur >= 60 && dur <= 600);
     const title = (t.title || '').toLowerCase();
-    const isCompilation = title.includes('top 100') || title.includes('top hits 2026') || title.includes('playlist') || title.includes('full album') || title.includes('compilation') || title.includes('best english songs') || title.includes('hyperparty');
+    const isCompilation = title.includes('top 100') || title.includes('playlist') || title.includes('full album') || title.includes('compilation');
     return isNormalDuration && !isCompilation;
   });
 
-  // Limit top 2026 tracks to 15-20 individual songs
-  if (!query) {
-    tracks = tracks.slice(0, 20);
-  }
   if (!tracks || tracks.length === 0) {
     tracks = rawTracks.slice(0, 20);
   }
 
+  // If remote fetch failed or returned 502/empty, fall back to matching local tracks
   if (!tracks || tracks.length === 0) {
-    container.innerHTML = '';
-    if (emptyState) {
-      emptyState.style.display = 'flex';
-      const desc = document.getElementById('emptyStateDesc');
-      if (desc) desc.textContent = query ? `No tracks found for "${query}". Try another artist or song.` : 'No music tracks available.';
-    }
-    return;
+    tracks = localMatches;
   }
 
-  container.innerHTML = tracks.map(t => {
-    const vid = (t.videoId || t.id || (t.youtube_id || '')).replace(/^ytm-/, '');
-    const title = t.title || t.name || 'Song';
-    const artist = t.artist_name || (Array.isArray(t.artists) ? t.artists.map(a => a.name).join(', ') : 'Artist');
-    const cover = t.artwork_url || t.thumbnails?.[0]?.url || (`https://i.ytimg.com/vi/${vid}/hqdefault.jpg`);
-    const hotlinkTarget = `yolk/index.html#song=${encodeURIComponent(vid)}&t=${encodeURIComponent(title)}&a=${encodeURIComponent(artist)}&cover=${encodeURIComponent(cover)}`;
-    const safeTitle = title.replace(/"/g, '&quot;').replace(/'/g, "\\'");
-    return `
-      <div class="media-card music-card" onclick="playGame('${hotlinkTarget}', '${safeTitle}')" title="${safeTitle}">
-        <div class="media-poster-wrap square">
-          <img src="${cover}" alt="${safeTitle}" loading="lazy" onerror="this.src='https://i.ytimg.com/vi/${vid}/hqdefault.jpg'">
-          <div class="media-play-overlay"><span class="material-symbols-sharp">play_arrow</span></div>
-        </div>
-        <div class="media-card-info">
-          <div class="media-card-title">${title}</div>
-          <div class="media-card-sub">${artist}</div>
-        </div>
-      </div>
-    `;
-  }).join('');
+  renderTrackList(tracks);
 }
 
 async function initGames() {
@@ -8103,6 +8235,29 @@ async function initGames() {
 }
 
 window.addEventListener('keydown', (e) => {
+  // Category quick-switch keybinds 1-5 (when not in an input, textarea, or contenteditable)
+  const isEditing = e.target && (
+    e.target.tagName === 'INPUT' ||
+    e.target.tagName === 'TEXTAREA' ||
+    e.target.tagName === 'SELECT' ||
+    e.target.isContentEditable ||
+    (typeof e.target.closest === 'function' && e.target.closest('[contenteditable="true"]'))
+  );
+  if (!isEditing && !e.altKey && !e.ctrlKey && !e.metaKey) {
+    const keyCategoryMap = {
+      '1': 'games',
+      '2': 'movies',
+      '3': 'music',
+      '4': 'ai',
+      '5': 'web'
+    };
+    if (keyCategoryMap[e.key]) {
+      e.preventDefault();
+      setSearchMode(keyCategoryMap[e.key]);
+      return;
+    }
+  }
+
   if (e.key === 'Escape') {
     const statusModal = document.getElementById('status-modal-overlay');
     if (statusModal && statusModal.style.display === 'flex') {
@@ -8522,7 +8677,12 @@ function applyTint(tintId) {
     root.setProperty("--bg-surface", "#121215");
     root.setProperty("--bg-card", "#18181b");
     root.setProperty("--border", "rgba(255, 255, 255, 0.16)");
+    root.setProperty("--border-subtle", "rgba(255, 255, 255, 0.25)");
     root.setProperty("--site-ambient-glow", "radial-gradient(ellipse 90% 55% at 50% -10%, rgba(255, 255, 255, 0.1), transparent 70%)");
+    root.setProperty("--settings-modal-bg", "rgba(18, 19, 24, 0.94)");
+    root.setProperty("--settings-header-bg", "rgba(255, 255, 255, 0.04)");
+    root.setProperty("--settings-sidebar-bg", "rgba(10, 10, 14, 0.7)");
+    root.setProperty("--top-header-fade-bg", "linear-gradient(180deg, rgba(8, 8, 10, 0.96) 0%, rgba(8, 8, 10, 0.75) 60%, rgba(8, 8, 10, 0) 100%)");
     root.setProperty("--clock-bg", "rgba(255, 255, 255, 0.1)");
     root.setProperty("--clock-text-bg", "none");
     root.setProperty("--clock-text-clip", "border-box");
@@ -8535,22 +8695,28 @@ function applyTint(tintId) {
     root.setProperty("--cat-border", `color-mix(in srgb, ${c2} 32%, #27272a)`);
     root.setProperty("--menu-bg", `color-mix(in srgb, ${c2} 10%, #121215)`);
     root.setProperty("--menu-border", `color-mix(in srgb, ${c2} 32%, #27272a)`);
-    root.setProperty("--bg-base", `color-mix(in srgb, ${c2} 6%, #09090b)`);
-    root.setProperty("--bg-surface", `color-mix(in srgb, ${c2} 9%, #121215)`);
-    root.setProperty("--bg-card", `color-mix(in srgb, ${c2} 12%, #18181b)`);
-    root.setProperty("--border", `color-mix(in srgb, ${c2} 22%, #27272a)`);
-    root.setProperty("--site-ambient-glow", `radial-gradient(ellipse 90% 55% at 50% -10%, color-mix(in srgb, ${c1} 16%, transparent), transparent 70%)`);
+    root.setProperty("--bg-base", `color-mix(in srgb, ${c2} 7%, #09090b)`);
+    root.setProperty("--bg-surface", `color-mix(in srgb, ${c2} 10%, #121215)`);
+    root.setProperty("--bg-card", `color-mix(in srgb, ${c2} 14%, #18181b)`);
+    root.setProperty("--border", `color-mix(in srgb, ${c2} 24%, #27272a)`);
+    root.setProperty("--border-subtle", `color-mix(in srgb, ${c1} 34%, rgba(255, 255, 255, 0.14))`);
+    root.setProperty("--settings-modal-bg", `color-mix(in srgb, ${c2} 10%, rgba(18, 19, 24, 0.94))`);
+    root.setProperty("--settings-header-bg", `linear-gradient(90deg, color-mix(in srgb, ${c1} 12%, rgba(255, 255, 255, 0.04)), color-mix(in srgb, ${c2} 8%, transparent))`);
+    root.setProperty("--settings-sidebar-bg", `color-mix(in srgb, ${c2} 9%, rgba(10, 10, 14, 0.72))`);
+    root.setProperty("--top-header-fade-bg", `linear-gradient(180deg, color-mix(in srgb, ${c2} 14%, rgba(8, 8, 10, 0.96)) 0%, color-mix(in srgb, ${c2} 8%, rgba(8, 8, 10, 0.75)) 60%, rgba(8, 8, 10, 0) 100%)`);
 
     if (tint.color2) {
-      root.setProperty("--clock-bg", `linear-gradient(135deg, color-mix(in srgb, ${c1} 14%, #09090b), color-mix(in srgb, ${c2} 14%, #09090b))`);
+      root.setProperty("--site-ambient-glow", `radial-gradient(ellipse 95% 60% at 50% -12%, color-mix(in srgb, ${c1} 18%, transparent), color-mix(in srgb, ${c2} 10%, transparent) 60%, transparent 80%)`);
+      root.setProperty("--clock-bg", `linear-gradient(135deg, color-mix(in srgb, ${c1} 16%, #09090b), color-mix(in srgb, ${c2} 16%, #09090b))`);
     } else {
-      root.setProperty("--clock-bg", `color-mix(in srgb, ${c1} 14%, #09090b)`);
+      root.setProperty("--site-ambient-glow", `radial-gradient(ellipse 95% 60% at 50% -12%, color-mix(in srgb, ${c1} 18%, transparent), transparent 75%)`);
+      root.setProperty("--clock-bg", `color-mix(in srgb, ${c1} 16%, #09090b)`);
     }
     root.setProperty("--clock-text-bg", "none");
     root.setProperty("--clock-text-clip", "initial");
     root.setProperty("--clock-text-color", "#ffffff");
     root.setProperty("--slider-knob", "#ffffff");
-    root.setProperty("--settings-tab-active-text", "#ffffff");
+    root.setProperty("--settings-tab-active-text", "#000000");
     if (document.body) document.body.classList.remove("theme-white");
   }
 
@@ -8835,7 +9001,7 @@ window.downloadOfflineHtml = function() {
 
 
 // ==== TRASHBIN APP VERSION & AUTO-UPDATES ====
-const CURRENT_APP_VERSION = '4.0.3';
+const CURRENT_APP_VERSION = '4.0.4';
 
 // =========================================================================
 // EMBEDDED NATIVE AI & PROXY ENGINES
@@ -10306,7 +10472,7 @@ function initTrashbinStartup() {
   if (typeof updateSnowfall === 'function') updateSnowfall();
   if (typeof handleTrashbinHotlinks === 'function') handleTrashbinHotlinks();
   currentSearchMode = null;
-  document.querySelectorAll('#homeNavPills .nav-pill').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('#homeNavPills .nav-squircle, #homeNavPills .nav-pill').forEach(p => p.classList.remove('active'));
   const sInput = document.getElementById('searchInput');
   if (sInput) sInput.placeholder = "Search games, movies, music, AI...";
 }
@@ -10460,7 +10626,7 @@ if (document.readyState === 'loading') {
         <div class="settings-row">
           <div class="settings-col-left">
             <div class="settings-row-title">Current Release</div>
-            <div class="settings-row-desc" id="settingsCurrentVerDesc">Trashbin v4.0.3 • Centered Top Categories, Header Fade, AI Charts &amp; Tables, Proxy Redirects</div>
+            <div class="settings-row-desc" id="settingsCurrentVerDesc">Trashbin v4.0.4 • Top Category Placement, Squircles Everywhere, 1-5 Keybinds, Hardcoded Top Songs &amp; Universal Themes</div>
           </div>
           <div class="settings-col-right">
             <button class="settings-btn-action primary" id="btnCheckUpdates" onclick="checkTrashbinUpdates(true)">Check for Updates</button>
