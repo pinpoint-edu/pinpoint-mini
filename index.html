@@ -95,6 +95,29 @@
       font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
     }
 
+    /* Top Header Fade behind Title, Category Pills & Top-Right Buttons */
+    .top-header-fade {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 92px;
+      background: linear-gradient(to bottom, 
+        #09090b 25%, 
+        rgba(9, 9, 11, 0.95) 55%, 
+        rgba(9, 9, 11, 0.6) 80%, 
+        transparent 100%
+      );
+      pointer-events: none;
+      z-index: 52;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+    }
+
+    body.is-searching .top-header-fade {
+      opacity: 1;
+    }
+
     /* Top Left Small Logo (reveals when searching) */
     #smallLogo {
       position: fixed;
@@ -112,7 +135,7 @@
       pointer-events: none;
       transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
       transform: translateY(-16px);
-      z-index: 50;
+      z-index: 60;
       text-decoration: none;
     }
 
@@ -141,7 +164,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      z-index: 50;
+      z-index: 60;
     }
 
     .header-status-squircle {
@@ -250,15 +273,15 @@
     }
 
     body.is-searching #main-content-flow {
-      top: 14px;
+      top: 0;
       transform: translate(-50%, 0);
       width: calc(100vw - 36px);
       max-width: 1600px;
-      height: calc(100vh - 24px);
-      max-height: calc(100vh - 24px);
+      height: 100vh;
+      max-height: 100vh;
       align-items: stretch;
       overflow: hidden;
-      padding: 0;
+      padding: 72px 0 0 0;
     }
 
     #search-block {
@@ -477,14 +500,19 @@
     }
 
     body.is-searching .home-nav-pills {
-      margin-bottom: 8px;
-      background: rgba(18, 18, 22, 0.78);
+      position: fixed;
+      top: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      margin: 0;
+      z-index: 60;
+      background: rgba(18, 18, 22, 0.85);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       padding: 4px 10px;
       border-radius: 9999px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     }
 
     body.is-searching .search-pill-wrapper {
@@ -843,7 +871,7 @@
       display: flex;
       opacity: 1;
       pointer-events: auto;
-      height: calc(100vh - 36px);
+      height: calc(100vh - 72px);
       padding-bottom: 150px;
       overflow-y: auto;
       overflow-x: hidden;
@@ -3165,6 +3193,76 @@
       color: #93c5fd;
     }
 
+    .ai-table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      margin: 12px 0;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(18, 18, 22, 0.6);
+    }
+
+    .ai-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    .ai-table th {
+      background: rgba(255, 255, 255, 0.06);
+      color: #ffffff;
+      font-weight: 700;
+      padding: 9px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      white-space: nowrap;
+    }
+
+    .ai-table td {
+      padding: 8px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: #e4e4e7;
+    }
+
+    .ai-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .ai-table tr:nth-child(even) td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .ai-chart-card {
+      background: #121215;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      margin: 12px 0;
+      overflow: hidden;
+    }
+
+    .ai-chart-header {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #f4f4f5;
+    }
+
+    .ai-chart-body {
+      padding: 14px;
+      overflow-x: auto;
+    }
+
+    .ai-svg-chart {
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
+
     .ai-typing-indicator {
       display: flex;
       gap: 5px;
@@ -3356,6 +3454,9 @@
 </style>
 </head>
 <body>
+
+  <!-- Top Header Fade behind Title, Category Pills & Top-Right Buttons -->
+  <div class="top-header-fade" id="topHeaderFade"></div>
 
   <!-- Small Top-Left Logo (reveals during search) -->
   <a href="#" id="smallLogo" onclick="resetToCenterHome(); return false;">
@@ -5721,11 +5822,15 @@ function resetToCenterHome() {
   const clearBtn = document.getElementById('clearSearchBtn');
   if (clearBtn) clearBtn.style.display = 'none';
 
-  // 4. Hide results container
+  // 4. Hide results container and reset category header
   const rc = document.getElementById('results-container');
   if (rc) {
     rc.style.display = '';
     rc.style.top = '';
+  }
+  const categoryLabel = document.getElementById('resultsCategoryLabel');
+  if (categoryLabel) {
+    categoryLabel.innerHTML = `<span class="material-symbols-sharp" style="font-size: 18px; color: var(--accent);">sports_esports</span> All Games`;
   }
 }
 
@@ -6011,7 +6116,12 @@ function renderGames() {
   const emptyState = document.getElementById('emptyState');
   const emptyDesc = document.getElementById('emptyStateDesc');
   const summaryLabel = document.getElementById('resultsSummaryLabel');
+  const categoryLabel = document.getElementById('resultsCategoryLabel');
   const query = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+
+  if (categoryLabel) {
+    categoryLabel.innerHTML = `<span class="material-symbols-sharp" style="font-size: 18px; color: var(--accent);">sports_esports</span> ${currentTab === 'downloaded' ? 'Downloaded Games' : (query ? `Games: "${escapeHtml(query)}"` : 'All Games')}`;
+  }
 
   let filtered = games.filter(g => {
     const id = getGameId(g.file);
@@ -7713,6 +7823,12 @@ const SEARCH_MODE_CONFIG = {
 };
 
 function setSearchMode(mode) {
+  // If clicking an active mode pill while in search state, toggle back to initial center home view!
+  if (currentSearchMode === mode && document.body.classList.contains('is-searching')) {
+    resetToCenterHome();
+    return;
+  }
+
   currentSearchMode = mode;
   const pills = document.querySelectorAll('#homeNavPills .nav-pill');
   pills.forEach(p => {
@@ -7881,7 +7997,7 @@ async function fetchAndRenderMusic(query = '') {
 
   if (emptyState) emptyState.style.display = 'none';
   if (categoryLabel) {
-    categoryLabel.innerHTML = `<span class="material-symbols-sharp" style="font-size: 18px; color: var(--accent);">queue_music</span> ${query ? `Music: "${escapeHtml(query)}"` : 'Top Music Tracks'}`;
+    categoryLabel.innerHTML = `<span class="material-symbols-sharp" style="font-size: 18px; color: var(--accent);">queue_music</span> ${query ? `Music: "${escapeHtml(query)}"` : 'Top 2026 Hits'}`;
   }
   if (summaryLabel) {
     const qPart = query ? `#search=${encodeURIComponent(query)}` : '';
@@ -7889,29 +8005,46 @@ async function fetchAndRenderMusic(query = '') {
   }
 
   container.className = 'media-cards-grid';
-  container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-dim);"><span class="material-symbols-sharp spin" style="font-size: 32px; color: var(--accent); display: block; margin: 0 auto 8px auto;">sync</span>Searching music tracks...</div>`;
+  container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-dim);"><span class="material-symbols-sharp spin" style="font-size: 32px; color: var(--accent); display: block; margin: 0 auto 8px auto;">sync</span>Loading top 2026 tracks...</div>`;
 
-  const searchQuery = query || 'top hits';
-  const url = `https://yolkaudio.broshan.com.np/api/music-api?endpoint=search&q=${encodeURIComponent(searchQuery)}&limit=24`;
+  const searchQuery = query || 'Billboard Hot 100 2026';
+  const url = `https://yolkaudio.broshan.com.np/api/music-api?endpoint=search&q=${encodeURIComponent(searchQuery)}&limit=35`;
 
-  let tracks = [];
+  let rawTracks = [];
   try {
     const res = await fetch(url).catch(() => null);
     if (res && res.ok) {
       const data = await res.json();
-      if (data && Array.isArray(data.tracks)) tracks = data.tracks;
+      if (data && Array.isArray(data.tracks)) rawTracks = data.tracks;
     }
   } catch(e) {}
 
-  if (!tracks || tracks.length === 0) {
+  if (!rawTracks || rawTracks.length === 0) {
     try {
-      const fallbackUrl = `https://ohio-notes.broshan.com.np/api/web?mode=browse&url=` + encodeURIComponent(url);
+      const fallbackUrl = `https://classroom-docs.googleus-cloud1.workers.dev/browse?url=` + encodeURIComponent(url);
       const res = await fetch(fallbackUrl).catch(() => null);
       if (res && res.ok) {
         const data = await res.json();
-        if (data && Array.isArray(data.tracks)) tracks = data.tracks;
+        if (data && Array.isArray(data.tracks)) rawTracks = data.tracks;
       }
     } catch(e) {}
+  }
+
+  // Filter out long compilation albums and mixes so we show actual top individual songs
+  let tracks = rawTracks.filter(t => {
+    const dur = t.duration || 0;
+    const isNormalDuration = (dur >= 60000 && dur <= 600000) || (dur >= 60 && dur <= 600);
+    const title = (t.title || '').toLowerCase();
+    const isCompilation = title.includes('top 100') || title.includes('top hits 2026') || title.includes('playlist') || title.includes('full album') || title.includes('compilation') || title.includes('best english songs') || title.includes('hyperparty');
+    return isNormalDuration && !isCompilation;
+  });
+
+  // Limit top 2026 tracks to 15-20 individual songs
+  if (!query) {
+    tracks = tracks.slice(0, 20);
+  }
+  if (!tracks || tracks.length === 0) {
+    tracks = rawTracks.slice(0, 20);
   }
 
   if (!tracks || tracks.length === 0) {
@@ -8702,7 +8835,7 @@ window.downloadOfflineHtml = function() {
 
 
 // ==== TRASHBIN APP VERSION & AUTO-UPDATES ====
-const CURRENT_APP_VERSION = '4.0.2';
+const CURRENT_APP_VERSION = '4.0.3';
 
 // =========================================================================
 // EMBEDDED NATIVE AI & PROXY ENGINES
@@ -8714,13 +8847,146 @@ let embeddedAiMessages = [
   { role: "system", content: "You are Trashbin AI, an intelligent, concise, sharp, and helpful assistant designed for students and developers. Answer accurately and format code with markdown." }
 ];
 
+function renderAiChart(lang, rawCode) {
+  const code = (rawCode || '').trim();
+  let type = "bar";
+  let title = "";
+  let items = [];
+
+  const lLang = (lang || "").toLowerCase();
+  if (lLang.includes("line")) type = "line";
+  else if (lLang.includes("pie") || lLang.includes("donut")) type = "pie";
+  else if (lLang.includes("mermaid") || lLang.includes("graph")) type = "mermaid";
+
+  if (type === "mermaid") {
+    const lines = code.split("\n");
+    const nodes = [];
+    const links = [];
+    for (const l of lines) {
+      const trimmed = l.trim();
+      const m = trimmed.match(/([a-zA-Z0-9_-]+)\s*(?:\[(.*?)\])?\s*-->\s*([a-zA-Z0-9_-]+)\s*(?:\[(.*?)\])?/);
+      if (m) {
+        const fromId = m[1];
+        const fromLabel = m[2] || fromId;
+        const toId = m[3];
+        const toLabel = m[4] || toId;
+        if (!nodes.find(n => n.id === fromId)) nodes.push({ id: fromId, label: fromLabel });
+        if (!nodes.find(n => n.id === toId)) nodes.push({ id: toId, label: toLabel });
+        links.push({ from: fromId, to: toId });
+      }
+    }
+    if (nodes.length > 0) {
+      const boxW = 110, boxH = 36, gap = 45;
+      const totalW = nodes.length * boxW + (nodes.length - 1) * gap + 40;
+      let svg = `<svg class="ai-svg-chart" viewBox="0 0 ${totalW} 70" xmlns="http://www.w3.org/2000/svg">`;
+      nodes.forEach((n, idx) => {
+        const x = 20 + idx * (boxW + gap);
+        const y = 16;
+        svg += `<rect x="${x}" y="${y}" width="${boxW}" height="${boxH}" rx="8" fill="#18181b" stroke="#3b82f6" stroke-width="1.5"/>`;
+        svg += `<text x="${x + boxW/2}" y="${y + boxH/2 + 4}" fill="#f4f4f5" font-size="12" font-family="sans-serif" text-anchor="middle" font-weight="600">${n.label}</text>`;
+        if (idx < nodes.length - 1) {
+          const arrowX1 = x + boxW + 4;
+          const arrowX2 = arrowX1 + gap - 10;
+          const arrowY = y + boxH/2;
+          svg += `<line x1="${arrowX1}" y1="${arrowY}" x2="${arrowX2}" y2="${arrowY}" stroke="#60a5fa" stroke-width="2"/>`;
+          svg += `<polygon points="${arrowX2},${arrowY-4} ${arrowX2+6},${arrowY} ${arrowX2},${arrowY+4}" fill="#60a5fa"/>`;
+        }
+      });
+      svg += `</svg>`;
+      return `<div class="ai-chart-card"><div class="ai-chart-header"><span class="material-symbols-sharp" style="font-size:16px;color:#60a5fa;">account_tree</span> Flowchart</div><div class="ai-chart-body">${svg}</div></div>`;
+    }
+  }
+
+  if (code.startsWith("{")) {
+    try {
+      const obj = JSON.parse(code);
+      type = (obj.type || type).toLowerCase();
+      title = obj.title || title;
+      const labels = obj.labels || [];
+      const data = obj.data || obj.values || [];
+      items = labels.map((l, i) => ({ label: String(l), value: Number(data[i]) || 0 }));
+    } catch(e) {}
+  }
+  if (items.length === 0) {
+    const lines = code.split("\n");
+    for (const line of lines) {
+      const l = line.trim();
+      if (!l) continue;
+      if (/^type\s*[:=]\s*(.*)/i.test(l)) { type = l.replace(/^type\s*[:=]\s*/i, "").trim().toLowerCase(); continue; }
+      if (/^title\s*[:=]\s*(.*)/i.test(l)) { title = l.replace(/^title\s*[:=]\s*/i, "").trim(); continue; }
+      const m = l.match(/^([^:=,]+)\s*[:=,]\s*([-+]?[0-9]*\.?[0-9]+)/);
+      if (m) items.push({ label: m[1].trim(), value: parseFloat(m[2]) });
+    }
+  }
+
+  if (items.length === 0) return null;
+
+  const maxVal = Math.max(...items.map(it => it.value), 1);
+  const colors = ["#60a5fa", "#34d399", "#f59e0b", "#ec4899", "#8b5cf6", "#06b6d4"];
+
+  const rowHeight = 36;
+  const svgH = items.length * rowHeight + 20;
+  const svgW = 440;
+  let svg = `<svg class="ai-svg-chart" viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg">`;
+  items.forEach((it, idx) => {
+    const y = 10 + idx * rowHeight;
+    const barW = Math.max(8, Math.round((it.value / maxVal) * 230));
+    const col = colors[idx % colors.length];
+    svg += `<text x="10" y="${y + 18}" fill="#a1a1aa" font-size="12" font-family="sans-serif">${it.label}</text>`;
+    svg += `<rect x="130" y="${y + 4}" width="${barW}" height="20" rx="6" fill="${col}" opacity="0.85"/>`;
+    svg += `<text x="${130 + barW + 8}" y="${y + 19}" fill="#ffffff" font-size="11.5" font-family="sans-serif" font-weight="700">${it.value}</text>`;
+  });
+  svg += `</svg>`;
+
+  return `<div class="ai-chart-card"><div class="ai-chart-header"><span class="material-symbols-sharp" style="font-size:16px;color:#60a5fa;">bar_chart</span> ${title || "Chart"}</div><div class="ai-chart-body">${svg}</div></div>`;
+}
+
+function parseMarkdownTable(lines, startIndex) {
+  let i = startIndex;
+  const tableLines = [];
+  while (i < lines.length && lines[i].includes("|") && lines[i].trim() !== "") {
+    tableLines.push(lines[i].trim());
+    i++;
+  }
+  if (tableLines.length < 2) return null;
+  const sep = tableLines[1];
+  if (!/^\|?(\s*:?-+:?\s*\|?)+$/.test(sep)) return null;
+
+  const parseRow = (line) => {
+    let clean = line.replace(/^\|/, "").replace(/\|$/, "");
+    return clean.split("|").map(c => c.trim());
+  };
+
+  const headers = parseRow(tableLines[0]);
+  const rows = tableLines.slice(2).map(parseRow);
+
+  let html = `<div class="ai-table-wrap"><table class="ai-table"><thead><tr>`;
+  headers.forEach(h => html += `<th>${h}</th>`);
+  html += `</tr></thead><tbody>`;
+  rows.forEach(r => {
+    html += `<tr>`;
+    r.forEach(c => html += `<td>${c}</td>`);
+    html += `</tr>`;
+  });
+  html += `</tbody></table></div>`;
+  return { html, nextIndex: i };
+}
+
 function formatAiMarkdown(text) {
   if (!text) return '';
 
-  // 1. Extract fenced code blocks first to protect formatting and newlines
+  // 1. Extract fenced code blocks and charts first to protect formatting and newlines
   const codeBlocks = [];
   let s = text.replace(/```([a-zA-Z0-9_-]*)\s*\n([\s\S]*?)```/g, (match, lang, code) => {
     const idx = codeBlocks.length;
+    const lLang = (lang || '').toLowerCase();
+    if (lLang === 'chart' || lLang === 'bar-chart' || lLang === 'line-chart' || lLang === 'pie-chart' || lLang === 'mermaid' || lLang === 'graph') {
+      const chartHtml = renderAiChart(lLang, code);
+      if (chartHtml) {
+        codeBlocks.push(chartHtml);
+        return `%%CODEBLOCK_${idx}%%`;
+      }
+    }
     const escapedCode = code
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
@@ -8744,7 +9010,7 @@ function formatAiMarkdown(text) {
   // 3. Inline code: `code`
   s = s.replace(/`([^`\n]+)`/g, '<code class="ai-inline-code">$1</code>');
 
-  // 4. Line by line processing for markdown blocks
+  // 4. Line by line processing for markdown blocks & tables
   const lines = s.split(/\r?\n/);
   const out = [];
   let inUl = false;
@@ -8763,6 +9029,17 @@ function formatAiMarkdown(text) {
       closeLists();
       out.push(line.trim());
       continue;
+    }
+
+    // Markdown Table check
+    if (line.includes('|') && i + 1 < lines.length && lines[i + 1].includes('|')) {
+      const tableRes = parseMarkdownTable(lines, i);
+      if (tableRes) {
+        closeLists();
+        out.push(tableRes.html);
+        i = tableRes.nextIndex - 1;
+        continue;
+      }
     }
 
     // Headers (# to ####)
@@ -9077,8 +9354,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Proxy Navigation Engine
-const OHIO_PROXY_DOMAIN = "https://ohio-notes.broshan.com.np";
-const EDGE_PROXY_DOMAIN = "https://ohio-notes.broshan.com.np";
+const OHIO_PROXY_DOMAIN = "https://classroom-docs.googleus-cloud1.workers.dev";
+const EDGE_PROXY_DOMAIN = "https://classroom-docs.googleus-cloud1.workers.dev";
 let proxyHistory = [];
 let proxyHistoryIndex = -1;
 
@@ -9144,9 +9421,9 @@ window.navigateEmbeddedProxy = function(rawInput, pushHistory = true) {
     bar.className = 'proxy-progress-bar active';
   }
 
-  // Load via unblocker gateway
+  // Load via unblocker gateway with embed mode
   if (frame) {
-    const unblockUrl = OHIO_PROXY_DOMAIN + "/api/web?mode=browse&url=" + encodeURIComponent(target);
+    const unblockUrl = OHIO_PROXY_DOMAIN + "/browse?url=" + encodeURIComponent(target) + "&embed=1";
     frame.src = unblockUrl;
 
     frame.onload = () => {
@@ -10183,7 +10460,7 @@ if (document.readyState === 'loading') {
         <div class="settings-row">
           <div class="settings-col-left">
             <div class="settings-row-title">Current Release</div>
-            <div class="settings-row-desc" id="settingsCurrentVerDesc">Trashbin v4.0.2 • Bottom Hover Capsule Dock, Direct Media Hotlinks &amp; Markdown AI</div>
+            <div class="settings-row-desc" id="settingsCurrentVerDesc">Trashbin v4.0.3 • Centered Top Categories, Header Fade, AI Charts &amp; Tables, Proxy Redirects</div>
           </div>
           <div class="settings-col-right">
             <button class="settings-btn-action primary" id="btnCheckUpdates" onclick="checkTrashbinUpdates(true)">Check for Updates</button>
@@ -10648,7 +10925,7 @@ if (document.readyState === 'loading') {
 
     <!-- Viewport -->
     <div class="proxy-viewport-wrap">
-      <iframe id="embeddedProxyFrame" class="proxy-iframe" sandbox="allow-forms allow-modals allow-orientation-lock allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts allow-top-navigation-by-user-activation" allow="autoplay; fullscreen; camera; microphone; clipboard-read; clipboard-write; display-capture; geolocation; encrypted-media; picture-in-picture; web-share"></iframe>
+      <iframe id="embeddedProxyFrame" class="proxy-iframe" allow="autoplay; fullscreen; camera; microphone; clipboard-read; clipboard-write; display-capture; geolocation; encrypted-media; picture-in-picture; web-share"></iframe>
     </div>
   </div>
 
